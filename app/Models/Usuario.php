@@ -4,7 +4,7 @@ namespace App\Models;
 
 class Usuario
 {
-    public $id, $usuario, $tipo, $password;
+    public $id, $usuario, $tipo, $password, $ultimo_login;
     
     private const TIPOS_USUARIOS = [
         "ADMIN" => 0,
@@ -29,6 +29,7 @@ class Usuario
         $usuario->usuario = $reg->usuario ?? null;
         $usuario->tipo = $reg->tipo ?? null;
         $usuario->password = $reg->password ?? null;
+        $usuario->ultimo_login = $reg->ultimo_login ?? null;
 
         return $usuario;
     }
@@ -40,6 +41,7 @@ class Usuario
         $usuario->usuario = $reg["usuario"] ?? null;
         $usuario->tipo = $reg["tipo"] ?? null;
         $usuario->password = $reg["password"] ?? null;
+        $usuario->ultimo_login = $reg["ultimo_login"] ?? null;
 
         return $usuario;
     }
@@ -47,7 +49,7 @@ class Usuario
     public static function getUsuario($id){
         $db = Database::getInstance();
 
-        $resultado = $db->leeUnRegistro("usuarios", "id = ".Database::limpiarCampo($id), "id, usuario, tipo, token");
+        $resultado = $db->leeUnRegistro("usuarios", "id = ".Database::limpiarCampo($id), "id, usuario, tipo, token, ultimo_login");
 
         if($resultado){
             return Usuario::registroToUsuario($resultado);
@@ -133,7 +135,7 @@ class Usuario
 
         $db = Database::getInstance();
 
-        $sql = "UPDATE usuarios SET token = ? WHERE id = ?";
+        $sql = "UPDATE usuarios SET token = ?, ultimo_login = CURRENT_TIMESTAMP WHERE id = ?";
 
         $stmt = $db->crearSentenciaPreparada($sql);
 

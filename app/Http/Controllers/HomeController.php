@@ -13,6 +13,7 @@ class HomeController extends Controller
             return redirect()->route('login.index');
         }
 
-        return view('home');
+        $usuario = Usuario::getUsuario($_COOKIE["id_usuario"]);
+        return view('home', compact('usuario'));
     }
 }

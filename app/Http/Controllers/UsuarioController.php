@@ -45,8 +45,8 @@ class UsuarioController extends Controller
         $tokenGenerado = Usuario::updateToken($id);
 
         // Crear las cookies para guardar el usuario que se ha logueado
-        setcookie('id_usuario', $id, time() + 60 * 60 * 24 * 10);
-        setcookie('token_usuario', $tokenGenerado, time() + 60 * 60 * 24 * 10);
+        setcookie('id_usuario', $id, time() + 60 * 60 * 24 * 3); // El tiempo de expiración es de 3 días
+        setcookie('token_usuario', $tokenGenerado, time() + 60 * 60 * 24 * 3);
 
         // Redirige al usuario a la página de inicio
         return redirect()->route('home');
@@ -55,7 +55,7 @@ class UsuarioController extends Controller
 
     public function logout(){
         // Sobreescribe las cookies anteriores con unas nuevas cookies con la fecha ya expirada
-        setcookie('id_usuario', 0, time() + - 60);
+        setcookie('id_usuario', 0, time() - 60);
         setcookie('token_usuario', 0, time() - 60);
 
         // Redirige al usuario a la página de inicio
