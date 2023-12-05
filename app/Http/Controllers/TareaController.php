@@ -185,7 +185,7 @@ class TareaController extends Controller
     public function completarUpdate(Request $request, $idTarea){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
-        
+
         $validador_err = new ValidarErrores();
         $gestor_err = $validador_err->validarCampos($request, []);
         
@@ -201,9 +201,19 @@ class TareaController extends Controller
                 "optionsEstado"=>Tarea::OPTIONS_ESTADOS
             ]);
         }
+
+        // Si no hay errores modifica la tarea.
         $tarea->estado = $request->estado;
         $tarea->fecha_realizacion = $request->fecha_realizacion;
         $tarea->anotaciones_p = $request->anotaciones_posteriores;
+
+        // Guarda el archivo en storage
+        if($request->hasFile('fichero')){
+            $fichero = $request->file('fichero');
+            $nombreFichero = $fichero->getClientOriginalName();
+            $fichero->storeAs("tareas/$tarea->id/ficheros_tarea", $nombreFichero, "public");
+            $tarea->fichero = "tareas/$tarea->id/ficheros_tarea/$nombreFichero";
+        }
         
         $tarea->completar();
         

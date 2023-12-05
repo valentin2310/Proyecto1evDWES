@@ -103,7 +103,11 @@
 
     <section>
         <h1>Fichero resumen</h1>
-        El fichero resumen..
+        @if ($tarea->fichero)
+            <a href="{{ asset('storage/' . $tarea->fichero) }}" target="_blank">Ver archivo</a>
+        @else
+            No hay ningun archivo..
+        @endif
     </section>
 
     <section>

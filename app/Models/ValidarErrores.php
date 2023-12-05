@@ -59,7 +59,6 @@ class ValidarErrores
             $fechaCreacion = empty($request->input('fecha_creacion')) ? date('d/m/Y') : $request->input('fecha_creacion');
             $this->validarFechaRealizacion($fechaCreacion, $request->input('fecha_realizacion'));
         }
-        $this->validarCampoTexto('descripcion', $request->descripcion);
         $this->validarCampoTexto('contacto', $request->contacto);
 
         return $this->gestor;

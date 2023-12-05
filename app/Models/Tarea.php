@@ -11,6 +11,7 @@ class Tarea
     public $nif, $contacto, $telefono, $descripcion, $correo, $direccion, $estado, $anotaciones_a, $anotaciones_p;
     public $fecha_creacion;
     public $fecha_realizacion;
+    public $fichero;
 
     const OPTIONS_ESTADOS = [
         "B"=> "Esperando a ser aprobada",
@@ -91,6 +92,7 @@ class Tarea
         $tarea->fecha_realizacion = $reg->fecha_realizacion ?? null;
         $tarea->anotaciones_a = $reg->anotaciones_anteriores ?? null;
         $tarea->anotaciones_p = $reg->anotaciones_posteriores ?? null;
+        $tarea->fichero = $reg->fichero ?? null;
 
         return $tarea;
     }
@@ -114,6 +116,7 @@ class Tarea
         $tarea->fecha_realizacion = $reg["fecha_realizacion"] ?? null;
         $tarea->anotaciones_a = $reg["anotaciones_anteriores"] ?? null;
         $tarea->anotaciones_p = $reg["anotaciones_posteriores"] ?? null;
+        $tarea->fichero = $reg["fichero"] ?? null;
 
         return $tarea;
     }
@@ -249,17 +252,18 @@ class Tarea
         $db = Database::getInstance();
 
         $sql = "UPDATE tarea 
-        SET estado = ?, fecha_realizacion = ?, anotaciones_posteriores = ? 
+        SET estado = ?, fecha_realizacion = ?, anotaciones_posteriores = ?, fichero = ? 
         WHERE id = ?";
         
         $stmt = $db->crearSentenciaPreparada($sql);
 
         $fecha_realizacion_f = self::formatearFechaBD($this->fecha_realizacion);
 
-        $stmt->bind_param('sssi',
+        $stmt->bind_param('ssssi',
             $this->estado,
             $fecha_realizacion_f,
             $this->anotaciones_p,
+            $this->fichero,
             $this->id
         );
 

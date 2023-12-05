@@ -30,7 +30,7 @@
         </div>
     </section>
 
-    <form action="{{ route('tareas.completarUpdate', $tarea->id) }}" method="POST">
+    <form action="{{ route('tareas.completarUpdate', $tarea->id) }}" method="POST" enctype="multipart/form-data">
 
         @method("put")
 
@@ -66,13 +66,13 @@
             <fieldset>
                 <legend>Fichero resumen</legend>
                 <label class="form-label">Fichero:</label>
-                <input type="file" name="fichero" class="form-control">
+                <input type="file" accept=".pdf, .doc, .docx, .txt" name="fichero" class="form-control">
             </fieldset>
         
             <fieldset>
                 <legend>Fotos del trabajo realizado</legend>
                 <label class="form-label">Subir foto:</label>
-                <input type="file" name="foto" class="form-control">
+                <input type="file" accept="image/*" name="foto" class="form-control">
             </fieldset>
             <!-- Campos ocultos -->
             <input type="text" value="{{ $tarea->fecha_creacion }}" hidden>
