@@ -154,4 +154,13 @@ class Usuario
     public function esAdmin(){
         return $this->tipo == self::TIPOS_USUARIOS["ADMIN"];
     }
+
+    public static function getUltimoLogin(){
+        $db = Database::getInstance();
+        
+        $db->consulta("SELECT id, usuario FROM usuarios ORDER BY ultimo_login DESC LIMIT 1");
+
+        $reg = $db->leeRegistro();
+        return Usuario::registroToUsuario($reg);
+    }
 }

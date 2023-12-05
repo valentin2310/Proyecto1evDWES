@@ -17,9 +17,11 @@
                         <small class='text-danger float-end'><i class='fa-solid fa-circle-exclamation'></i> {{ $gestor_err->getMensajeError('usuario') }}</small>
                     @endif
                     <input type="text" name="usuario" class="form-control"
-                        @isset ($request)
-                            value="{{ $request['usuario'] }}"usuario
-                        @endisset
+                        @if (isset($request))
+                            value="{{ $request['usuario'] }}"
+                        @elseif(isset($ultimo_login))
+                            value="{{ $ultimo_login }}"
+                        @endif
                     >
                 </div>
                 <div class="mb-3">
@@ -29,9 +31,16 @@
                     @endif
                     <input type="password" name="password" class="form-control"
                         @isset ($request)
-                            value="{{ $request['password'] }}"usuario
+                            value="{{ $request['password'] }}"
                         @endisset
                     >
+                </div>
+                <div class="form-check mb-3">
+                    <input type="checkbox" name="recordar" class="form-check-input">
+                    <label class="form-check-label">Recordar credenciales de inicio de sesión
+                        <i class="fa-solid fa-circle-question ms-2" 
+                        title="Tus credenciales se guardarán para evitar tener que iniciar sesión siempre, después de 3 días tendrás que volver a introducir tus credenciales"></i>
+                    </label>
                 </div>
                 <div class="text-center pt-3">
                     <button type="submit" class="btn btn-primary fw-bold">Iniciar Sesión</button>

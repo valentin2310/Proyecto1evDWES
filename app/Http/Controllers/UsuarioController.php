@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SeguridadUsuario;
 use App\Models\Usuario;
 use App\Models\ValidarErrores;
 use Illuminate\Http\Request;
@@ -9,11 +10,17 @@ use Illuminate\Http\Request;
 class UsuarioController extends Controller
 {
     public function index(){
-        return view('login');
+        // Si tiene iniciada la sesión redirige al usuario al inicio.
+        if(SeguridadUsuario::validarUsuario()) return redirect()->route('home');
+
+        $ultimo_login = Usuario::getUltimoLogin() ?? '';
+
+        return view('login', [
+            'ultimo_login'=>$ultimo_login->usuario
+        ]);
     }
 
     public function login(Request $request){
-
         // Comprueba los campos del login
         $validador_err = new ValidarErrores();
         $gestor_err = $validador_err->validarLogin($request);
@@ -44,9 +51,19 @@ class UsuarioController extends Controller
         // Actualizar el token de acceso en la bd
         $tokenGenerado = Usuario::updateToken($id);
 
-        // Crear las cookies para guardar el usuario que se ha logueado
-        setcookie('id_usuario', $id, time() + 60 * 60 * 24 * 3); // El tiempo de expiración es de 3 días
-        setcookie('token_usuario', $tokenGenerado, time() + 60 * 60 * 24 * 3);
+        // Si el usuario ha seleccionado el checkbox
+        if($request->recuerdame){
+            // Crear las cookies para guardar el usuario que se ha logueado
+            setcookie('id_usuario', $id, time() + 60 * 60 * 24 * 3); // El tiempo de expiración es de 3 días
+            setcookie('token_usuario', $tokenGenerado, time() + 60 * 60 * 24 * 3);
+        }
+        else{
+            // Crear las variables de sesión con el usuario que ha iniciado sesión
+            session_start();
+            $_SESSION["id_usuario"] = $id;
+            $_SESSION["token_usuario"] = $tokenGenerado;
+        }
+
 
         // Redirige al usuario a la página de inicio
         return redirect()->route('home');
@@ -57,6 +74,10 @@ class UsuarioController extends Controller
         // Sobreescribe las cookies anteriores con unas nuevas cookies con la fecha ya expirada
         setcookie('id_usuario', 0, time() - 60);
         setcookie('token_usuario', 0, time() - 60);
+        
+        // Elimina las variables de sesión
+        session_start();
+        session_destroy();
 
         // Redirige al usuario a la página de inicio
         return redirect()->route('home');
