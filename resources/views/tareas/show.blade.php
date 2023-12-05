@@ -17,7 +17,7 @@
                 <p><span class="fw-bold">NIF facturador: </span>{{ $tarea->nif }}</p>
             </div>
             <div class="col-md-12">
-                <p><span class="fw-bold">Operario: </span>{{ $tarea->operario ?? 'Ninguno' }}</p>
+                <p><span class="fw-bold">Operario: </span>{{ $tarea->getOperario() ?? 'Ninguno' }}</p>
             </div>
             <div class="col-md-12">
                 <p><span class="fw-bold">Descripción: </span>{{ $tarea->descripcion }}</p>
@@ -33,38 +33,37 @@
 
     <section>
         <h1>Acciones</h1>
-        <button class="btn btn-dark fw-bold">
-            <a href="{{ route('tareas.completar', $tarea->id) }}" class="text-decoration-none text-success">
-                <i class="fa-solid fa-circle-check"></i>
-                Completar tarea
-            </a>
-        </button>
-        <button class="btn btn-dark fw-bold text-white">
-            <i class="fa-solid fa-pen-to-square"></i>
-            Cambiar estado
-        </button>
-        <button class="btn btn-dark fw-bold">
-            <a href="{{ route('tareas.edit', $tarea->id) }}" class="text-decoration-none text-warning">
-                <i class="fa-solid fa-pen"></i>
-                Modificar
-            </a>
-        </button>
-        <button class="btn btn-danger fw-bold">
-            <a href="{{ route('tareas.confirmacion', $tarea->id) }}" class="text-decoration-none text-white">
-                <i class="fa-solid fa-trash-can"></i>
-                Eliminar
-            </a>
-        </button>
+        @if ($usuario->esAdmin())    
+            <button class="btn btn-dark fw-bold">
+                <a href="{{ route('tareas.edit', $tarea->id) }}" class="text-decoration-none text-warning">
+                    <i class="fa-solid fa-pen me-2"></i>
+                    Modificar
+                </a>
+            </button>
+            <button class="btn btn-danger fw-bold">
+                <a href="{{ route('tareas.confirmacion', $tarea->id) }}" class="text-decoration-none text-white">
+                    <i class="fa-solid fa-trash-can me-2"></i>
+                    Eliminar
+                </a>
+            </button>
+        @else
+            <button class="btn btn-dark fw-bold" @disabled($tarea->operario != $usuario->id) >
+                <a href="{{ route('tareas.completar', $tarea->id) }}" class="text-decoration-none text-success">
+                    <i class="fa-solid fa-circle-check me-2"></i>
+                    Completar tarea
+                </a>
+            </button>
+        @endif
     </section>
 
     <section>
         <h1>Datos contacto</h1>
         <div class="row">
             <div class="col-md-6">
-                <p><span class="fw-bold">Persona de contacto: </span>{{ $tarea->contacto }}</p>
+                <p><span class="fw-bold">Persona de contacto: </span>{{ $tarea->contacto ?? 'Ninguno' }}</p>
             </div>
             <div class="col-md-6">
-                <p><span class="fw-bold">Teléfono de contacto: </span>{{ $tarea->telefono }}</p>
+                <p><span class="fw-bold">Teléfono de contacto: </span>{{ $tarea->telefono ?? 'Ninguno' }}</p>
             </div>
             <div class="col-md-12">
                 <p><span class="fw-bold">Correo de contacto: </span>{{ $tarea->correo }}</p>
@@ -76,16 +75,16 @@
         <h1>Datos de ubicación</h1>
         <div class="row">
             <div class="col-md-12">
-                <p><span class="fw-bold">Dirección: </span>{{ $tarea->direccion }}</p>
+                <p><span class="fw-bold">Dirección: </span>{{ $tarea->direccion ?? 'Sin dirección' }}</p>
             </div>
             <div class="col-md-6">
-                <p><span class="fw-bold">Provincia: </span>{{ $tarea->provincia }}</p>
+                <p><span class="fw-bold">Provincia: </span>{{ $tarea->provincia ?? 'Ninguna' }}</p>
             </div>
             <div class="col-md-6">
-                <p><span class="fw-bold">Población: </span>{{ $tarea->poblacion }}</p>
+                <p><span class="fw-bold">Población: </span>{{ $tarea->poblacion ?? 'Ninguna' }}</p>
             </div>
             <div class="col-md-12">
-                <p><span class="fw-bold">Código postal: </span>{{ $tarea->cod_postal }}</p>
+                <p><span class="fw-bold">Código postal: </span>{{ $tarea->cod_postal ?? 'Ninguno' }}</p>
             </div>
         </div>
     </section>
@@ -94,10 +93,10 @@
         <h1>Anotaciones</h1>
         <div class="row">
             <div class="col-md-12">
-                <p><span class="fw-bold">Anotaciones anteriores: </span>{{ $tarea->anotaciones_a }}</p>
+                <p><span class="fw-bold">Anotaciones anteriores: </span>{{ $tarea->anotaciones_a ?? 'Ninguna' }}</p>
             </div>
             <div class="col-md-12">
-                <p><span class="fw-bold">Anotaciones posteriores: </span>{{ $tarea->anotaciones_p }}</p>
+                <p><span class="fw-bold">Anotaciones posteriores: </span>{{ $tarea->anotaciones_p ?? 'Ninguna' }}</p>
             </div>
         </div>
     </section>

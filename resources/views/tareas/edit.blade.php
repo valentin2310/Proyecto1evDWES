@@ -12,7 +12,7 @@
         <div class="row m-0">
             <div class="col-md-5 mb-3">
                 <label class="form-label">Estado:</label>
-                <select name="estado" class="form-select">
+                <select name="estado" class="form-select" disabled>
                     @foreach ($optionsEstado as $key => $value)
                     <option value="{{ $key }}"
                         @if ($key == $tarea->estado)
@@ -36,8 +36,9 @@
             <div class="col-md-5 mb-3">
                 <label class="form-label">Operario:</label>
                 <select class="form-select" name="operario">
-                    <option value="0">Administrador</option>
-                    <option value="1">Operario</option>
+                    @foreach ($listaOperarios as $item)
+                        <option value="{{ $item->id }}">{{ $item->usuario }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="col-md-7 mb-3">

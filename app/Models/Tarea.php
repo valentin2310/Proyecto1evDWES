@@ -300,4 +300,9 @@ class Tarea
         if($fechaObjeto == null) return $fecha;
         return $fechaObjeto->format('d/m/Y');
     }
+    public function getOperario(){
+        if($this->operario == null) return null;
+        $usuario = Usuario::getUsuario($this->operario);
+        return $usuario->usuario ?? null;
+    }
 }

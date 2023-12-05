@@ -127,12 +127,14 @@ class TareaController extends Controller
 
         $usuario = Usuario::getUsuario($_COOKIE["id_usuario"]);
         $tarea = Tarea::getTarea($idTarea);
+        $operarios = Usuario::getOperarios();
         $provincias = Provincia::getProvincias();
         return view('tareas/edit', [
             'usuario'=>$usuario,
             "tarea"=>$tarea, 
             "optionsEstado"=>Tarea::OPTIONS_ESTADOS,
-            "listaProvincias"=>$provincias
+            "listaProvincias"=>$provincias,
+            "listaOperarios"=>$operarios
         ]);
     }
 
@@ -148,12 +150,14 @@ class TareaController extends Controller
         $tarea = Tarea::getTarea($idTarea);
         
         if($gestor_err->hayErrores()){
+            $operarios = Usuario::getOperarios();
             $provincias = Provincia::getProvincias();
             return view('tareas/edit', [
                 "tarea"=>$tarea,
                 "gestor_err"=>$gestor_err,
                 "request"=>$request,
                 "listaProvincias"=>$provincias,
+                "listaOperarios"=>$operarios,
                 "optionsEstado"=>Tarea::OPTIONS_ESTADOS
             ]);
         }
@@ -161,7 +165,8 @@ class TareaController extends Controller
         $tarea->nif = $request->input('nif', $tarea->nif);
         $tarea->contacto = $request->input('contacto', $tarea->contacto);
         $tarea->telefono = $request->input('telefono', $tarea->telefono);
-        $tarea->descripcion = $request->input('descripcion', $tarea->descripcion);
+        $tarea->telefono = $request->input('telefono', $tarea->telefono);
+        $tarea->operario = $request->input('operario', $tarea->operario);
         $tarea->correo = $request->input('correo', $tarea->correo);
         $tarea->direccion = $request->input('direccion', $tarea->direccion);
         $tarea->poblacion = $request->input('poblacion', $tarea->poblacion);

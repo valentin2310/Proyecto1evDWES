@@ -6,6 +6,30 @@
 
     <h1>Completar la tarea {{ $tarea->id }}</h1>
 
+    <section>
+        <h2>Datos de la tarea</h2>
+        <div class="row m-0">
+            <div class="col-md-6">
+                <p><span class="fw-bold">Id factura: </span>{{ $tarea->id }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><span class="fw-bold">Estado: </span>{{ $tarea->estado }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><span class="fw-bold">NIF facturador: </span>{{ $tarea->nif }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><span class="fw-bold">Operario: </span>{{ $tarea->getOperario() }}</p>
+            </div>
+            <div class="col-md-12">
+                <p><span class="fw-bold">Descripción: </span>{{ $tarea->descripcion }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><span class="fw-bold">Fecha creación: </span>{{ $tarea->fecha_creacion }}</p>
+            </div>
+        </div>
+    </section>
+
     <form action="{{ route('tareas.completarUpdate', $tarea->id) }}" method="POST">
 
         @method("put")

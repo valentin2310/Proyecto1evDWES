@@ -13,7 +13,7 @@
         <div class="row m-0">
             <div class="col-md-5 mb-3">
                 <label class="form-label">Estado:</label>
-                <select name="estado" class="form-select">
+                <select name="estado" class="form-select" disabled>
                     @foreach ($optionsEstado as $key => $value)
                     <option value="{{ $key }}">{{ $value }}</option>
                     @endforeach
