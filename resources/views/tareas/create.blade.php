@@ -54,7 +54,7 @@
                 @if (isset($gestor_err) && $gestor_err->hayError('descripcion'))
                     <small class='text-danger float-end'><i class='fa-solid fa-circle-exclamation'></i> {{ $gestor_err->getMensajeError('descripcion') }}</small>
                 @endif
-                <textarea class="form-control" name="descripcion" cols="30" rows="10" placeholder="Una descripcion sobre la tarea...">@if (isset($request)){{ $request['descripcion'] }}@endif</textarea>
+                <textarea class="form-control" name="descripcion" cols="30" rows="5" placeholder="Una descripcion sobre la tarea...">@if (isset($request)){{ $request['descripcion'] }}@endif</textarea>
             </div>
         </div>
     </fieldset>
@@ -150,16 +150,16 @@
         <div class="row m-0">
             <div class="col-md-12 mb-3">
                 <label class="form-label">Anotaciones anteriores:</label>
-                <textarea name="anotaciones_anteriores" cols="30" rows="10" class="form-control"></textarea>
+                <textarea name="anotaciones_anteriores" cols="30" rows="5" class="form-control"></textarea>
             </div>
-            <div class="col-md-12 mb-3">
+            {{-- <div class="col-md-12 mb-3">
                 <label class="form-label">Anotaciones posteriores:</label>
                 <textarea name="anotaciones_posteriores" cols="30" rows="10" class="form-control"></textarea>
-            </div>
+            </div> --}}
         </div>
     </fieldset>
 
-    <fieldset>
+    {{-- <fieldset>
         <legend>Fichero resumen</legend>
         <label class="form-label">Fichero:</label>
         <input type="file" name="fichero" class="form-control">
@@ -169,7 +169,7 @@
         <legend>Fotos del trabajo realizado</legend>
         <label class="form-label">Subir foto:</label>
         <input type="file" name="foto" class="form-control">
-    </fieldset>
+    </fieldset> --}}
     
     <button type="submit" class="btn btn-primary my-3">Añadir tarea</button>
 </form>

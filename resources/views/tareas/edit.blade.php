@@ -55,7 +55,7 @@
                 @if (isset($gestor_err) && $gestor_err->hayError('descripcion'))
                     <small class='text-danger float-end'><i class='fa-solid fa-circle-exclamation'></i> {{ $gestor_err->getMensajeError('descripcion') }}</small>
                 @endif
-                <textarea class="form-control" name="descripcion" cols="30" rows="10" placeholder="Una descripcion sobre la tarea...">{{ isset($request) ? $request['descripcion'] : $tarea->descripcion }}</textarea>
+                <textarea class="form-control" name="descripcion" cols="30" rows="5" placeholder="Una descripcion sobre la tarea...">{{ isset($request) ? $request['descripcion'] : $tarea->descripcion }}</textarea>
             </div>
         </div>
     </fieldset>
@@ -145,26 +145,26 @@
         <div class="row m-0">
             <div class="col-md-12 mb-3">
                 <label class="form-label">Anotaciones anteriores:</label>
-                <textarea name="anotaciones_anteriores" cols="30" rows="10" class="form-control">{{ isset($request) ? $request['anotaciones_anteriores'] : $tarea->anotaciones_a }}</textarea>
+                <textarea name="anotaciones_anteriores" cols="30" rows="5" class="form-control">{{ isset($request) ? $request['anotaciones_anteriores'] : $tarea->anotaciones_a }}</textarea>
             </div>
             <div class="col-md-12 mb-3">
                 <label class="form-label">Anotaciones posteriores:</label>
-                <textarea name="anotaciones_posteriores" cols="30" rows="10" class="form-control">{{ isset($request) ? $request['anotaciones_posteriores'] : $tarea->anotaciones_p }}</textarea>
+                <textarea name="anotaciones_posteriores" cols="30" disabled rows="5" class="form-control">{{ isset($request) ? $request['anotaciones_posteriores'] : $tarea->anotaciones_p }}</textarea>
             </div>
         </div>
     </fieldset>
 
-    <fieldset>
+    {{-- <fieldset>
         <legend>Fichero resumen</legend>
         <label class="form-label">Fichero:</label>
-        <input type="file" name="fichero" class="form-control">
+        <input type="file" name="fichero" disabled class="form-control">
     </fieldset>
 
     <fieldset>
         <legend>Fotos del trabajo realizado</legend>
         <label class="form-label">Subir foto:</label>
-        <input type="file" name="foto" class="form-control">
-    </fieldset>
+        <input type="file" name="foto" disabled class="form-control">
+    </fieldset> --}}
     
     <button type="submit" class="btn btn-primary my-3">Actualizar tarea</button>
 </form>
