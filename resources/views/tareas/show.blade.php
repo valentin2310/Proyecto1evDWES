@@ -112,17 +112,15 @@
 
     <section>
         <h1>Fotos del trabajo realizado</h1>
-        <div class="fotos d-flex flex-wrap gap-3">
-            <img src="https://picsum.photos/id/{{$tarea->id}}/200" alt="img random">
-            <img src="https://picsum.photos/id/{{$tarea->id + 1}}/200" alt="img random">
-            <img src="https://picsum.photos/id/{{$tarea->id + 2}}/200" alt="img random">
-            <img src="https://picsum.photos/id/{{$tarea->id + 3}}/200" alt="img random">
-            <img src="https://picsum.photos/id/{{$tarea->id + 4}}/200" alt="img random">
-            <img src="https://picsum.photos/id/{{$tarea->id + 5}}/200" alt="img random">
-            <img src="https://picsum.photos/id/{{$tarea->id + 6}}/200" alt="img random">
-            <img src="https://picsum.photos/id/{{$tarea->id + 7}}/200" alt="img random">
-            <img src="https://picsum.photos/id/{{$tarea->id + 8}}/200" alt="img random">
-        </div>
+        @if (count($tarea->getImagenes()) > 0)
+            <div class="fotos d-flex flex-wrap gap-3">
+                @foreach ($tarea->getImagenes() as $img)
+                    <img src="{{ asset('storage/' . $img['path']) }}" width="200" alt="Imagen de la tarea">
+                @endforeach
+            </div>
+        @else
+            <p>No hay ninguna foto</p>
+        @endif
     </section>
     
 @endsection

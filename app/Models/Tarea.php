@@ -12,6 +12,7 @@ class Tarea
     public $fecha_creacion;
     public $fecha_realizacion;
     public $fichero;
+    public $imagenes;
 
     const OPTIONS_ESTADOS = [
         "B"=> "Esperando a ser aprobada",
@@ -308,5 +309,33 @@ class Tarea
         if($this->operario == null) return null;
         $usuario = Usuario::getUsuario($this->operario);
         return $usuario->usuario ?? null;
+    }
+
+    public function guardarImagenes(){
+        $db = Database::getInstance();
+
+        $sql = "INSERT INTO img(path, tarea) VALUES(?, ?)";
+        $stmt = $db->crearSentenciaPreparada($sql);
+
+        foreach($this->imagenes as $img){
+            $stmt->bind_param('si', $img, $this->id);
+            $stmt->execute();
+        }
+
+        $stmt->close();
+    }
+
+    public function getImagenes(){
+        $db = Database::getInstance();
+        
+        $db->consulta("SELECT path FROM img WHERE tarea = $this->id");
+
+        $lista = [];
+
+        while($reg = $db->leeRegistro()){
+            $lista[] = $reg;
+        }
+
+        return $lista;
     }
 }

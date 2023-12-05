@@ -34,7 +34,9 @@
                 <label class="form-label">Operario:</label>
                 <select class="form-select" name="operario">
                     @foreach ($listaOperarios as $item)
-                        <option value="{{ $item->id }}">{{ $item->usuario }}</option>
+                    <option value="{{ $item->id }}" @selected(isset($request) && $item->id == $request['operario'])>
+                        {{ $item->usuario }}
+                    </option>
                     @endforeach
                 </select>
             </div>

@@ -214,6 +214,20 @@ class TareaController extends Controller
             $fichero->storeAs("tareas/$tarea->id/ficheros_tarea", $nombreFichero, "public");
             $tarea->fichero = "tareas/$tarea->id/ficheros_tarea/$nombreFichero";
         }
+
+        // Guarda las imagenes en storage
+        if($request->hasFile('fotos')){
+            $fotos_arr = [];
+            foreach($request->file('fotos') as $foto){
+                $nombreFoto = $foto->getClientOriginalName();
+                $foto->storeAs("tareas/$tarea->id/fotos_tarea", $nombreFoto, "public");
+                $rutaFoto = "tareas/$tarea->id/fotos_tarea/$nombreFoto";
+
+                $fotos_arr[] = $rutaFoto;
+            }
+            $tarea->imagenes = $fotos_arr;
+            $tarea->guardarImagenes();
+        }
         
         $tarea->completar();
         
