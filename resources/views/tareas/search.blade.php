@@ -129,6 +129,7 @@
                     <th>ID</th>
                     <th>NIF facturador</th>
                     <th>Estado</th>
+                    <th>Operario</th>
                     <th>Descripcion</th>
                     <th>Persona contacto</th>
                     <th>Fecha creación</th>
@@ -141,6 +142,7 @@
                             <td>#{{ $item->id }}</td>
                             <td>{{ $item->nif }}</td>
                             <td>{{ $item->estado }}</td>
+                            <td>{{ $item->getOperario() ?? 'Sin operario' }}</td>
                             <td>{{ $item->descripcion }}</td>
                             <td>{{ $item->contacto }}</td>
                             <td>{{ $item->fecha_creacion }}</td>

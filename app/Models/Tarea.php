@@ -129,13 +129,13 @@ class Tarea
         $arr_filtros = [];
 
         if(!empty($filtros["valor1"])){
-            $arr_filtros[] = Database::limpiarCampo($filtros["campo1"])." ".Database::limpiarCampo($filtros["criterio1"])." '".Database::limpiarCampo($filtros["valor1"])."'";
+            $arr_filtros[] = Database::limpiarCampo($filtros["campo1"])." ".$filtros["criterio1"]." '".Database::limpiarCampo($filtros["valor1"])."'";
         }
         if(!empty($filtros["valor2"])){
-            $arr_filtros[] = Database::limpiarCampo($filtros["campo2"])." ".Database::limpiarCampo($filtros["criterio2"])." '".Database::limpiarCampo($filtros["valor2"])."'";
+            $arr_filtros[] = Database::limpiarCampo($filtros["campo2"])." ".$filtros["criterio2"]." '".Database::limpiarCampo($filtros["valor2"])."'";
         }
         if(!empty($filtros["valor3"])){
-            $arr_filtros[] = Database::limpiarCampo($filtros["campo3"])." ".Database::limpiarCampo($filtros["criterio3"])." '".Database::limpiarCampo($filtros["valor3"])."' ";
+            $arr_filtros[] = Database::limpiarCampo($filtros["campo3"])." ".$filtros["criterio3"]." '".Database::limpiarCampo($filtros["valor3"])."' ";
         }
         if(count($arr_filtros) > 0){
             $sql_filtro = implode(' and ', $arr_filtros);
@@ -146,7 +146,8 @@ class Tarea
         $db = Database::getInstance();
 
         // Obtener las tareas
-        $db->consulta("SELECT * FROM tarea WHERE $sql_filtro ORDER BY fecha_realizacion DESC LIMIT $inicio, $offset");
+        $sql = "SELECT * FROM tarea WHERE $sql_filtro ORDER BY fecha_realizacion DESC LIMIT $inicio, $offset";
+        $db->consulta($sql);
 
         $lista = [];
 

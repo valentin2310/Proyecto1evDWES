@@ -13,11 +13,13 @@
         <div class="row m-0">
             <div class="col-md-5 mb-3">
                 <label class="form-label">Estado:</label>
-                <select name="estado" class="form-select" disabled>
+                <select class="form-select" disabled>
                     @foreach ($optionsEstado as $key => $value)
-                    <option value="{{ $key }}">{{ $value }}</option>
+                    <option value="{{ $key }}" @selected($key == 'B')>{{ $value }}</option>
                     @endforeach
                 </select>
+                <!-- Campo oculto con el valor del estado -->
+                <input type="hidden" name="estado" value="B">
             </div>
             <div class="col-md-7 mb-3">
                 <label class="form-label">Fecha realización:</label>

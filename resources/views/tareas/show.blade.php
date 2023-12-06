@@ -113,9 +113,12 @@
     <section>
         <h1>Fotos del trabajo realizado</h1>
         @if (count($tarea->getImagenes()) > 0)
-            <div class="fotos d-flex flex-wrap gap-3">
+            <p>Hay {{ count($tarea->getImagenes()) }} fotos: </p>
+            <div class="fotos my-3 d-flex flex-wrap justify-content-center align-items-center gap-1">
                 @foreach ($tarea->getImagenes() as $img)
-                    <img src="{{ asset('storage/' . $img['path']) }}" width="200" alt="Imagen de la tarea">
+                    <div class="foto-card">
+                        <img src="{{ asset('storage/' . $img['path']) }}" width="200" alt="Imagen de la tarea">
+                    </div>
                 @endforeach
             </div>
         @else
