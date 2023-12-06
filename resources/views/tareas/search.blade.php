@@ -114,6 +114,48 @@
                 <input type="text" name="valor3" id="valor3" class="form-control" value="{{ $filtros["valor3"] ?? '' }}">
             </div>
         </div>
+        <div class="row mx-0 my-3 mb-1">
+            <div class="col-12">Ordenar por:</div>
+            <div class="col-9">
+                <select name="order" class="form-select">
+                    @foreach ($OPTIONS_CAMPOS as $key => $value)
+                        <option value="{{ $key }}" 
+                            @if (!empty($filtros["order"]))
+                                {{ ($filtros["order"] == $key ? "selected":"") }}
+                            @endif
+                        >
+                            {{ $value }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-3">
+                <select name="order-mode" class="form-select">
+                    <option value="ASC"
+                        @if (!empty($filtros['order-mode']))
+                            {{ ($filtros["order-mode"] == 'ASC' ? "selected":"") }}
+                        @endif
+                    >
+                        Ascendente
+                    </option>
+                    <option value="DESC"
+                        @if (!empty($filtros['order-mode']))
+                            {{ ($filtros["order-mode"] == 'DESC' ? "selected":"") }}
+                        @endif
+                    >
+                        Descendente
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="row mx-0 my-3 mb-1">
+            <div class="col-12">
+                <div class="form-check">
+                    <input type="checkbox" name="pendientes" class="form-check-input" @checked(!empty($filtros['pendientes']))>
+                    <label class="form-check-label">Mostrar solo las tareas pendientes</label>
+                </div>
+            </div>
+        </div>
     </form>
 
     <div class="info-busqueda pt-3">
@@ -187,6 +229,8 @@
                     'valor1'=>$filtros['valor1']??'',
                     'valor2'=>$filtros['valor2']??'',
                     'valor3'=>$filtros['valor3']??'',
+                    'order'=>$filtros['order']??'',
+                    'order-mode'=>$filtros['order-mode']??'',
                     ]) }}" 
                     class="text-decoration-none text-white">Anterior</a>
                 </button>
@@ -209,6 +253,8 @@
                     'valor1'=>$filtros['valor1']??'',
                     'valor2'=>$filtros['valor2']??'',
                     'valor3'=>$filtros['valor3']??'',
+                    'order'=>$filtros['order']??'',
+                    'order-mode'=>$filtros['order-mode']??'',
                     ]) }}" 
                     class="text-decoration-none text-white">Siguiente</a>
             </button>

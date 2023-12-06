@@ -128,7 +128,9 @@ class Tarea
         $inicio = ($page -1) * $offset;
         $sql_filtro = '';
         $arr_filtros = [];
+        $sql_order_by = 'fecha_realizacion DESC';
 
+        // Generar el sql para filtrar los datos según los campos y criterios seleccionados
         if(!empty($filtros["valor1"])){
             $arr_filtros[] = Database::limpiarCampo($filtros["campo1"])." ".$filtros["criterio1"]." '".Database::limpiarCampo($filtros["valor1"])."'";
         }
@@ -138,16 +140,24 @@ class Tarea
         if(!empty($filtros["valor3"])){
             $arr_filtros[] = Database::limpiarCampo($filtros["campo3"])." ".$filtros["criterio3"]." '".Database::limpiarCampo($filtros["valor3"])."' ";
         }
+        if(!empty($filtros["pendientes"])){
+            $arr_filtros[] = "estado like 'B'";
+        }
         if(count($arr_filtros) > 0){
             $sql_filtro = implode(' and ', $arr_filtros);
         }else{
             $sql_filtro = '1';
         }
 
+        // Generar order by
+        if(!empty($filtros["order"])){
+            $sql_order_by = Database::limpiarCampo($filtros["order"])." ".Database::limpiarCampo($filtros["order-mode"] ?? 'desc');
+        }
+
         $db = Database::getInstance();
 
         // Obtener las tareas
-        $sql = "SELECT * FROM tarea WHERE $sql_filtro ORDER BY fecha_realizacion DESC LIMIT $inicio, $offset";
+        $sql = "SELECT * FROM tarea WHERE $sql_filtro ORDER BY $sql_order_by LIMIT $inicio, $offset";
         $db->consulta($sql);
 
         $lista = [];

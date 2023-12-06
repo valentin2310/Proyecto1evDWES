@@ -188,7 +188,7 @@ class TareaController extends Controller
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
 
         $validador_err = new ValidarErrores();
-        $gestor_err = $validador_err->validarCampos($request, []);
+        $gestor_err = $validador_err->validarCampos($request, ['fecha_realizacion']);
         
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
         $tarea = Tarea::getTarea($idTarea);
