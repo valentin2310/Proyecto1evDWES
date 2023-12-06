@@ -8,6 +8,7 @@ use App\Models\Tarea;
 use App\Models\Usuario;
 use App\Models\ValidarErrores;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TareaController extends Controller
 {
@@ -246,13 +247,20 @@ class TareaController extends Controller
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
 
+        // Elimina la tarea de la bd
         $tarea = new Tarea();
         $tarea->id = $idTarea;
         $resultado = $tarea->eliminar();
 
+        // Elimina la carpeta de la tarea en storage
+        $rutaDirectorio = "public/tareas/$tarea->id";
+        if(Storage::directoryExists($rutaDirectorio)){
+            Storage::deleteDirectory($rutaDirectorio);
+        }
+
         return view('tareas.resultado', [
             'tarea'=>$tarea,
             'resultado'=>$resultado
-        ]);
+        ]); 
     }
 }

@@ -19,7 +19,7 @@
         <h1 class="m-0 p-0">Bunglebuild S.L.</h1>
         <div class="text-end">
             @if (isset($usuario))
-                <p class="m-0 fs-5">Has iniciado sesión con <span class="fw-bold">{{ $usuario->usuario }}</span></p>
+                <p class="m-0 fs-5">Has iniciado sesión con <span class="fw-bold">{{ $usuario->usuario }}</span><span class="fw-bold fst-italic text-secondary">#{{ $usuario->id }}</span></p>
                 <p class="m-0">
                     Estás en modo: <span class="fw-bold">{{ $usuario->tipo == 0 ? 'ADMINISTRADOR' : 'OPERADOR' }}</span>
                     <span class="px-3">|</span>

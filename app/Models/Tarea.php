@@ -25,6 +25,7 @@ class Tarea
         'id' => 'ID',
         'nif' => 'NIF',
         'contacto' => 'Contacto',
+        'operario' => 'Operario',
         'telefono' => 'Teléfono',
         'descripcion' => 'Descripción',
         'correo' => 'Correo',

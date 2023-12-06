@@ -66,13 +66,17 @@
             <fieldset>
                 <legend>Fichero resumen</legend>
                 <label class="form-label">Fichero:</label>
-                <input type="file" name="fichero" accept=".pdf, .doc, .docx, .txt" class="form-control">
+                <input type="file" name="fichero" accept=".pdf, .doc, .docx, .txt" class="form-control"
+                    value="{{ isset($request) ? $request["fichero"] : $tarea->fichero }}"
+                >
             </fieldset>
         
             <fieldset>
                 <legend>Fotos del trabajo realizado</legend>
                 <label class="form-label">Subir foto:</label>
-                <input type="file" name="fotos[]" accept="image/*" multiple class="form-control">
+                <input type="file" name="fotos[]" accept="image/*" multiple class="form-control"
+                    value="{{ isset($request) ? $request["fotos"] : null }}"
+                >
             </fieldset>
             <!-- Campos ocultos -->
             <input type="text" value="{{ $tarea->fecha_creacion }}" hidden>
