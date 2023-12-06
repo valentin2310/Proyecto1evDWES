@@ -35,6 +35,9 @@ class TareaController extends Controller
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
+        // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
+
         $operarios = Usuario::getOperarios();
         $provincias = Provincia::getProvincias();
         return view('tareas/create', [
@@ -48,12 +51,15 @@ class TareaController extends Controller
     public function store(Request $request){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+
+        // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
 
         $validador_err = new ValidarErrores();
         $gestor_err = $validador_err->validarCampos($request);
 
         if($gestor_err->hayErrores()){
-            $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
             $operarios = Usuario::getOperarios();
             $provincias = Provincia::getProvincias();
             return view('tareas.create', [
@@ -110,9 +116,12 @@ class TareaController extends Controller
     }
 
     public function edit($idTarea){
-         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
-         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
-         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+        // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
+        if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+
+         // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
 
         $tarea = Tarea::getTarea($idTarea);
         $operarios = Usuario::getOperarios();
@@ -129,6 +138,10 @@ class TareaController extends Controller
     public function update(Request $request, $idTarea){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+
+        // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
 
         $validador_err = new ValidarErrores();
         $gestor_err = $validador_err->validarCampos($request);
@@ -136,7 +149,6 @@ class TareaController extends Controller
         $tarea = Tarea::getTarea($idTarea);
         
         if($gestor_err->hayErrores()){
-            $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
             $operarios = Usuario::getOperarios();
             $provincias = Provincia::getProvincias();
             return view('tareas/edit', [
@@ -171,9 +183,12 @@ class TareaController extends Controller
     }
 
     public function completar($id){
-         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
-         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
-         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+        // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
+        if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+
+        // Si el usuario es admin redirigir al inicio
+        if($usuario->esAdmin()) return redirect()->route('home');
 
         $tarea = Tarea::getTarea($id);
         return view('tareas/completar', [
@@ -186,11 +201,14 @@ class TareaController extends Controller
     public function completarUpdate(Request $request, $idTarea){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+
+        // Si el usuario es admin redirigir al inicio
+        if($usuario->esAdmin()) return redirect()->route('home');
 
         $validador_err = new ValidarErrores();
         $gestor_err = $validador_err->validarCampos($request, ['fecha_realizacion']);
         
-        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
         $tarea = Tarea::getTarea($idTarea);
         
         if($gestor_err->hayErrores()){
@@ -235,9 +253,12 @@ class TareaController extends Controller
         return redirect()->route('tareas.show', $idTarea);
     }
     public function confirmacion($idTarea){
-         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
-         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
-         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+        // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
+        if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+
+        // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
 
         $tarea = Tarea::getTarea($idTarea);
         return view('tareas.confirmacion', compact(['tarea', 'usuario']));
@@ -246,6 +267,10 @@ class TareaController extends Controller
     public function delete($idTarea){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+        
+        // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
 
         // Elimina la tarea de la bd
         $tarea = new Tarea();
