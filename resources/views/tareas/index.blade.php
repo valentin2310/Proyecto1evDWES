@@ -70,7 +70,7 @@
         @if ($page < $paginas)
             <button class="btn btn-dark"><a href="{{ route('tareas.index', ['page'=>$page+1]) }}" class="text-decoration-none text-white">Siguiente</a></button>
         @else
-            <button class="btn btn-dark" disabled>Anterior</button>
+            <button class="btn btn-dark" disabled>Siguiente</button>
         @endif
     </div>
 

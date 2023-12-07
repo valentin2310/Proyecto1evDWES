@@ -91,14 +91,15 @@ class UsuarioController extends Controller
         // Si el usuario no es admin redirigir al inicio
         if(!$usuario->esAdmin()) return redirect()->route('home');
 
-        $operarios = Usuario::getOperarios();
+        $page = request()->query('page') ?? 1;
+        $resultado = Usuario::getUsuarios($page);
 
         return view('usuarios/show', [
             'usuario' => $usuario,
-            'listaUsuarios'=>$operarios,
-            'resultados'=>count($operarios),
-            'page'=>1,
-            'paginas'=>1
+            'listaUsuarios'=>$resultado["usuarios"],
+            'resultados'=>$resultado["registros"],
+            'page'=>$page,
+            'paginas'=>$resultado["paginas"]
         ]);
     }
 

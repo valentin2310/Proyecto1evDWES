@@ -3,7 +3,7 @@
 @section('titulo', 'Lista de usuarios')
 
 @section('contenido')
-    <h1>Aquí se muestran todas las tareas</h1>
+    <h1>Aquí se muestran todas los usuarios operadores</h1>
 
     <div class="info-busqueda pt-3">
         <p class="fw-bold">Hay {{ $resultados }} resultados:</p>

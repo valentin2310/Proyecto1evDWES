@@ -73,6 +73,35 @@ class Usuario
         return $lista;
     }
 
+    public static function getUsuarios($page = 1){
+        $offset = 10;
+        $inicio = ($page - 1) * $offset;
+        $tipo = self::TIPOS_USUARIOS["OPERARIO"];
+        $sql_filtro = "tipo = $tipo";
+
+        $db = Database::getInstance();
+    
+        $db->consulta("SELECT id, usuario, ultimo_login FROM usuarios WHERE $sql_filtro LIMIT $inicio, $offset");
+
+        $lista = [];
+
+        while($reg = $db->leeRegistro()){
+            $operario = Usuario::registroToUsuario($reg);
+            $lista[] = $operario;
+        }
+
+        // Obtener el total de resultados sin paginar
+        $rs = $db->leeUnRegistro("usuarios", $sql_filtro, "COUNT(*) as count");
+        $totalRegistros = $rs["count"];
+        $totalPaginas = ceil($totalRegistros/$offset);
+
+        return [
+            "usuarios"=>$lista,
+            "registros"=>$totalRegistros,
+            "paginas"=>$totalPaginas
+        ];
+    }
+
     public function validarLogin(){
         $db = Database::getInstance();
 
