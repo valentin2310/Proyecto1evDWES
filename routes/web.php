@@ -18,9 +18,22 @@ use App\Http\Controllers\UsuarioController;
 
 Route::get('/', HomeController::class)->name('home');
 
-Route::get('login', [UsuarioController::class, 'index'])->name('login.index');
-Route::post('login', [UsuarioController::class, 'login'])->name('login.login');
-Route::post('logout', [UsuarioController::class, 'logout'])->name('login.logout');
+Route::controller(UsuarioController::class)->group(function(){
+    Route::get('login', 'index')->name('login.index');
+    Route::post('login', 'login')->name('login.login');
+    Route::post('logout', 'logout')->name('login.logout');
+
+    Route::get('usuarios', 'show')->name('usuarios.show');
+
+    Route::get('usuarios/create', 'create')->name('usuarios.create');
+    Route::post('usuarios/create', 'store')->name('usuarios.store');
+
+    Route::get('usuarios/{usuario}/edit', 'edit')->name('usuarios.edit');
+    Route::put('usuarios/{usuario}/edit', 'update')->name('usuarios.update');
+
+    Route::get('usuarios/{usuario}/delete', 'confirmacion')->name('usuarios.confirmacion');
+    Route::get('usuarios/{usuario}/resultado', 'delete')->name('usuarios.delete');
+});
 
 Route::controller(TareaController::class)->group(function () {
     Route::get('tareas', 'index')->name('tareas.index');

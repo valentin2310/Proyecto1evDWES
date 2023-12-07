@@ -23,7 +23,7 @@ class UsuarioController extends Controller
     public function login(Request $request){
         // Comprueba los campos del login
         $validador_err = new ValidarErrores();
-        $gestor_err = $validador_err->validarLogin($request);
+        $gestor_err = $validador_err->validarCamposUsuario($request);
 
         // Si hay errores devuelve los valores del formulario y el gestor de errores
         if($gestor_err->hayErrores()){
@@ -82,4 +82,139 @@ class UsuarioController extends Controller
         // Redirige al usuario a la página de inicio
         return redirect()->route('home');
     }
+
+    public function show(){
+        // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
+        if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+
+        // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
+
+        $operarios = Usuario::getOperarios();
+
+        return view('usuarios/show', [
+            'usuario' => $usuario,
+            'listaUsuarios'=>$operarios,
+            'resultados'=>count($operarios),
+            'page'=>1,
+            'paginas'=>1
+        ]);
+    }
+
+    public function create(){
+        // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
+        if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+
+        // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
+
+        return view('usuarios/create', compact('usuario'));
+    }
+    
+    public function store(Request $request){
+        // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
+        if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+
+        // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
+
+        // Comprueba los datos enviados
+        $validador_err = new ValidarErrores();
+        $gestor_err = $validador_err->validarCamposUsuario($request);
+
+        if($gestor_err->hayErrores()){
+            return view('usuarios/create', [
+                'usuario' => $usuario,
+                'request' => $request,
+                'gestor_err' => $gestor_err
+            ]);
+        }
+
+        // Guarda el usuario en al bd
+        $newUsuario = Usuario::registroToUsuario($request->all());
+        $newUsuario->guardar();
+        
+        // Redirige a la lista de usuarios
+        return redirect()->route('usuarios.show');
+    }
+
+    public function edit($idUsuario){
+        // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
+        if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+
+        // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
+
+        $editUsuario = Usuario::getUsuario($idUsuario);
+        return view('usuarios/edit', compact(['usuario', 'editUsuario']));
+    }
+
+    public function update(Request $request, $idUsuario){
+        // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
+        if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+
+        // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
+
+        $validador_err = new ValidarErrores();
+        $gestor_err = $validador_err->validarCamposUsuario($request);
+
+        $editUsuario = Usuario::getUsuario($idUsuario);
+
+        if($gestor_err->hayErrores()){
+            return view('usuarios/edit', [
+                'usuario' => $usuario,
+                'editUsuario' => $editUsuario,
+                'request' => $request,
+                'gestor_err' => $gestor_err
+            ]);
+        }
+
+        // Modifica los atributos del usuario
+        $editUsuario->usuario = $request->input('usuario', $editUsuario->usuario);
+        $editUsuario->password = $request->input('password', $editUsuario->password);
+
+        // Modifica el usuario en la bd
+        $editUsuario->update();
+
+        return redirect()->route('usuarios.show');
+    }
+
+    public function confirmacion($idUsuario){
+        // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
+        if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+
+        // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
+
+        $delUsuario = Usuario::getUsuario($idUsuario);
+        return view('usuarios/confirmacion', compact(['usuario', 'delUsuario']));
+    }
+
+    public function delete($idUsuario){
+        // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
+        if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+        
+        // Si el usuario no es admin redirigir al inicio
+        if(!$usuario->esAdmin()) return redirect()->route('home');
+
+        // Elimina la tarea de la bd
+        $delUsuario = new Usuario();
+        $delUsuario->id = $idUsuario;
+        $resultado = $delUsuario->eliminar();
+
+        return view('usuarios/resultado', [
+            'usuario'=>$usuario,
+            'delUsuario'=>$delUsuario,
+            'resultado'=>$resultado
+        ]); 
+    }
+
 }

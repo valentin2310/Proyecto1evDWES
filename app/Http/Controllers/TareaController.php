@@ -261,7 +261,7 @@ class TareaController extends Controller
         if(!$usuario->esAdmin()) return redirect()->route('home');
 
         $tarea = Tarea::getTarea($idTarea);
-        return view('tareas.confirmacion', compact(['tarea', 'usuario']));
+        return view('tareas/confirmacion', compact(['tarea', 'usuario']));
     }
 
     public function delete($idTarea){
@@ -283,7 +283,8 @@ class TareaController extends Controller
             Storage::deleteDirectory($rutaDirectorio);
         }
 
-        return view('tareas.resultado', [
+        return view('tareas/resultado', [
+            'usuario'=>$usuario,
             'tarea'=>$tarea,
             'resultado'=>$resultado
         ]); 

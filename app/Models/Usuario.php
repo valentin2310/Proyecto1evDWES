@@ -61,7 +61,7 @@ class Usuario
     public static function getOperarios(){
         $db = Database::getInstance();
         
-        $db->consulta("SELECT id, usuario FROM usuarios WHERE tipo = " . self::TIPOS_USUARIOS["OPERARIO"]);
+        $db->consulta("SELECT id, usuario, ultimo_login FROM usuarios WHERE tipo = " . self::TIPOS_USUARIOS["OPERARIO"]);
 
         $lista = [];
 
@@ -162,5 +162,50 @@ class Usuario
 
         $reg = $db->leeRegistro();
         return Usuario::registroToUsuario($reg);
+    }
+
+    public function guardar(){
+        $db = Database::getInstance();
+
+        $sql = "INSERT INTO usuarios(usuario, tipo, password) VALUES(?, ?, ?)";
+        $stmt = $db->crearSentenciaPreparada($sql);
+        
+        $tipo = self::TIPOS_USUARIOS["OPERARIO"];
+
+        $stmt->bind_param('sis',
+            $this->usuario,
+            $tipo,
+            $this->password
+        );
+
+        return $stmt->execute();
+    }
+
+    public function update(){
+        $db = Database::getInstance();
+
+        $sql = "UPDATE usuarios SET usuario = ?, password = ? WHERE id = ?";
+        $stmt = $db->crearSentenciaPreparada($sql);
+
+        $stmt->bind_param('ssi',
+            $this->usuario,
+            $this->password,
+            $this->id
+        );
+
+        return $stmt->execute();
+    }
+
+    public function eliminar(){
+        $db = Database::getInstance();
+
+        $sql = "DELETE FROM usuarios WHERE id = ?";
+        $stmt = $db->crearSentenciaPreparada($sql);
+
+        $stmt->bind_param('i',
+            $this->id
+        );
+
+        return $stmt->execute();
     }
 }

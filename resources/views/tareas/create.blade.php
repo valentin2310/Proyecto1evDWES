@@ -175,7 +175,7 @@
         <input type="file" name="foto" class="form-control">
     </fieldset> --}}
     
-    <button type="submit" class="btn btn-primary my-3">Añadir tarea</button>
+    <button type="submit" class="btn btn-primary my-3">Guardar tarea</button>
 </form>
     
 @endsection

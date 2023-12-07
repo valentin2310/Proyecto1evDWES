@@ -20,7 +20,7 @@ class ValidarErrores
         return $data;
     }
 
-    public function validarLogin(Request $request){
+    public function validarCamposUsuario(Request $request){
         if(empty($request->input('usuario'))){
             $this->gestor->addError('usuario', 'El campo usuario no puede estar vacío');
         }else{
@@ -30,6 +30,15 @@ class ValidarErrores
             $this->gestor->addError('password', 'El campo contraseña no puede estar vacío');
         }else{
             $this->validarPassword($request->password);
+        }
+
+        // Comprobar contraseña
+        if($request->input('password_2')){
+            if(empty($request->input('password_2'))){
+                $this->gestor->addError('password_2', 'El campo contraseña no puede estar vacío');
+            }else if($request->input('password') != $request->input('password_2')){
+                $this->gestor->addError('password_2', 'Las contraseñas no coinciden');
+            }
         }
 
         return $this->gestor;

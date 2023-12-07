@@ -36,6 +36,10 @@
         <nav>
             <ul>
                 <li><a href="/">Inicio</a></li>
+                @if (isset($usuario) && $usuario->esAdmin())
+                    <li><a href="{{route('usuarios.show')}}">Ver lista usuarios</a></li>
+                    <li><a href="{{route('usuarios.create')}}">Añadir usuario</a></li>
+                @endif
                 <li><a href="{{route('tareas.index')}}">Ver lista tareas</a></li>
                 @if (isset($usuario) && $usuario->esAdmin())
                     <li><a href="{{route('tareas.create')}}">Añadir tarea</a></li>

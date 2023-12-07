@@ -129,15 +129,18 @@ class Tarea
         $sql_filtro = '';
         $arr_filtros = [];
         $sql_order_by = 'fecha_realizacion DESC';
+        $criterios_tarea = Tarea::OPTIONS_CRITERIOS;
 
-        // Generar el sql para filtrar los datos según los campos y criterios seleccionados
-        if(!empty($filtros["valor1"])){
+        // Genera el sql para filtrar los datos según los campos y criterios seleccionados
+        // Comprueba si el valor no está vacío y si el criterio es válido.
+        // En caso que el criterio no sea válido omitirá ese filtro de búsqueda
+        if(!empty($filtros["valor1"]) && isset($criterios_tarea[$filtros["criterio1"]])){
             $arr_filtros[] = Database::limpiarCampo($filtros["campo1"])." ".$filtros["criterio1"]." '".Database::limpiarCampo($filtros["valor1"])."'";
         }
-        if(!empty($filtros["valor2"])){
+        if(!empty($filtros["valor2"]) && isset($criterios_tarea[$filtros["criterio2"]])){
             $arr_filtros[] = Database::limpiarCampo($filtros["campo2"])." ".$filtros["criterio2"]." '".Database::limpiarCampo($filtros["valor2"])."'";
         }
-        if(!empty($filtros["valor3"])){
+        if(!empty($filtros["valor3"]) && isset($criterios_tarea[$filtros["criterio3"]])){
             $arr_filtros[] = Database::limpiarCampo($filtros["campo3"])." ".$filtros["criterio3"]." '".Database::limpiarCampo($filtros["valor3"])."' ";
         }
         if(!empty($filtros["pendientes"])){
