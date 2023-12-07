@@ -1,4 +1,9 @@
 <?php
+/**
+ * Autor: Valentin Andrei Culea
+ * Fecha: 07/12/2023
+ * Versión 1
+ */
 
 namespace App\Models;
 
@@ -30,23 +35,4 @@ class Provincia
         return $lista;
     }
 
-    public static function getLocalidades($provincia){
-        $db = Database::getInstance();
-
-        $db->consulta("SELECT * FROM localidades where provincia = $provincia");
-
-        $lista = [];
-
-        while($reg = $db->leeRegistro()){
-            $localidad = new Localidad();
-
-            $localidad->id = $reg["id"];
-            $localidad->provincia = $reg["provincia"];
-            $localidad->localidad = $reg["localidad"];
-
-            $lista[] = $localidad;
-        }
-
-        return $lista;
-    }
 }

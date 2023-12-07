@@ -1,3 +1,10 @@
+<?php
+/**
+ * Autor: Valentin Andrei Culea
+ * Fecha: 07/12/2023
+ * Versión 1
+ */
+?>
 @extends('layouts.simple')
 
 @section('titulo', 'Login')

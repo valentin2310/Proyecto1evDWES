@@ -1,4 +1,9 @@
 <?php
+/**
+ * Autor: Valentin Andrei Culea
+ * Fecha: 07/12/2023
+ * Versión 1
+ */
 
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
@@ -16,8 +21,18 @@ use App\Http\Controllers\UsuarioController;
 |
 */
 
+/**
+ * Crea las rutas de la aplicación asignando un controlador y una función de dicho controlador
+ * El controlador se encargará de gestionar los datos haciendo uso de los modelos creados y devolver las vistas necesarias.
+ */
+
+ // Crea una ruta con el método get, asignando el valor de la ruta y el nombre del controlador y una función de dicho controlador, 
+ // en caso de no indicar la función se usará por defecto la función invoke.
+ // Posteriormente se le asigna un nombre a dicha ruta para mejorar la accesibilidad y hacer que cambiar la ruta no suponga ningún inconveniente.
 Route::get('/', HomeController::class)->name('home');
 
+// Con el método controller y haciendo uso de la función group, crea un grupo de rutas gestionadas por el mismo controlador, 
+// esto para mejorar la logibilidad del código.
 Route::controller(UsuarioController::class)->group(function(){
     Route::get('login', 'index')->name('login.index');
     Route::post('login', 'login')->name('login.login');
