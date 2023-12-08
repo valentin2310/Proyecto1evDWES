@@ -5,6 +5,9 @@
  * Versión 1
  */
 
+ /**
+  * Array con los datos de configuración de la bd
+  */
 return array(
     'servidor' => 'localhost',
     'usuario'=> 'root',

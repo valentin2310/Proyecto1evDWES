@@ -17,15 +17,21 @@ use Illuminate\Support\Facades\Storage;
 
 class TareaController extends Controller
 {
-
+    /**
+     * Devuelve la página con la lista de usuarios operarios en formato tabla
+     * @return mixed
+     */
     public function index(){
         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
+        // Obtiene la página actual
         $page = request()->query('page') ?? 1;
         $resultado = Tarea::getTareas($page);
 
+        // Devuelve la vista con los resultados de la bd
         return view('tareas/index', [
             'usuario'=>$usuario,
             'tareas'=> $resultado["tareas"],
@@ -34,17 +40,24 @@ class TareaController extends Controller
             'page'=> $page
         ]);
     }
-
+    /**
+     * Devuelve la página para crear un usuario
+     * Solo para administradores
+     * @return mixed
+     */
     public function create(){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
         // Si el usuario no es admin redirigir al inicio
         if(!$usuario->esAdmin()) return redirect()->route('home');
 
+        // Obtiene las variables necesarias para mostrar en la vista
         $operarios = Usuario::getOperarios();
         $provincias = Provincia::getProvincias();
+        // Devuelve la vista
         return view('tareas/create', [
             'usuario'=>$usuario,
             "optionsEstado"=>Tarea::OPTIONS_ESTADOS,
@@ -52,18 +65,29 @@ class TareaController extends Controller
             "listaOperarios"=>$operarios
         ]);
     }
-
+    /**
+     * Inserta una tarea en la bd con los datos del formulario
+     * Primero válida que los datos no tengas errores con el validador de errores
+     * Luego devuelve la página con la tarea recién creada
+     * Solo para administradores
+     * @param Request
+     * @return mixed
+     */
     public function store(Request $request){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
         // Si el usuario no es admin redirigir al inicio
         if(!$usuario->esAdmin()) return redirect()->route('home');
 
+        // Crea un validador de errores
         $validador_err = new ValidarErrores();
+        // Comprueba los errores
         $gestor_err = $validador_err->validarCampos($request);
 
+        // Si hay errores devuelve la vista create con los datos necesarios, los que recibimos y los errores
         if($gestor_err->hayErrores()){
             $operarios = Usuario::getOperarios();
             $provincias = Provincia::getProvincias();
@@ -76,24 +100,36 @@ class TareaController extends Controller
                 "listaOperarios"=>$operarios
             ]);
         }
-
+        // Crea una tarea con los datos del formulario
         $tarea = Tarea::registroToTarea($request->all());
+        // Guarda la tarea en la bd
         $tarea->guardar();
 
-        // TODO: Obtener el id del registro insertado
+        // Obtiene el id del registro insertado
         $id = Tarea::getUltimoId();
+        // Devuelve la vista con el registro recién insertado
         return redirect()->route('tareas.show', $id);
     }
-
+    /**
+     * Muestra la página con la lista de tareas en formato tabla
+     * @param int $idTarea
+     * @return mixed
+     */
     public function show($idTarea){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
+        // Obtiene la tarea usando el id
         $tarea = Tarea::getTarea($idTarea);
+        // Devuelve la vista con la tarea
         return view('tareas/show', compact(['tarea', 'usuario']));
     }
-
+    /**
+     * Devuelve la página con la lista de tareas y un buscador para poder filtrar las tareas por diferentes campos y criterios
+     * @return mixed
+     */
     public function search(){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
@@ -104,10 +140,14 @@ class TareaController extends Controller
             $filtros = request()->all();
         }
         
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
+        // Obtiene la pagina actual através de los query params
         $page = request()->query('page') ?? 1;
+        // Obtiene el resultado de la búsqueda en la bd
         $resultado = Tarea::getTareas($page, $filtros??null);
 
+        // Devuelve la vista con los datos necesarios y los resultados de la búsqueda.
         return view('tareas/search', [
             'usuario'=>$usuario,
             "tareas"=>$resultado["tareas"],
@@ -119,10 +159,16 @@ class TareaController extends Controller
             "OPTIONS_CRITERIOS"=>Tarea::OPTIONS_CRITERIOS,
         ]);
     }
-
+    /**
+     * Devuelve la página para poder modificar los datos de una tarea
+     * Solo para administradores
+     * @param int $idTarea
+     * @return mixed
+     */
     public function edit($idTarea){
         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
          // Si el usuario no es admin redirigir al inicio
@@ -139,20 +185,31 @@ class TareaController extends Controller
             "listaOperarios"=>$operarios
         ]);
     }
-
+    /**
+     * Recibe y comprueba los datos enviados por el formulario, en caso que todo esté correcto actualiza los datos de la tarea
+     * Solo para administradores
+     * @param Request $request
+     * @param int $idTarea
+     * @return mixed
+     */
     public function update(Request $request, $idTarea){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
         // Si el usuario no es admin redirigir al inicio
         if(!$usuario->esAdmin()) return redirect()->route('home');
 
+        // Crea un validador de errores
         $validador_err = new ValidarErrores();
+        // Comprueba los errores
         $gestor_err = $validador_err->validarCampos($request);
 
+        // Obtiene la tarea usando el id
         $tarea = Tarea::getTarea($idTarea);
         
+        // En caso de haber errores devuelve la vista edit con los datos necesarios, los que recibimos y los errores
         if($gestor_err->hayErrores()){
             $operarios = Usuario::getOperarios();
             $provincias = Provincia::getProvincias();
@@ -167,6 +224,7 @@ class TareaController extends Controller
             ]);
         }
         
+        // Modifica los atributos de la tarea
         $tarea->nif = $request->input('nif', $tarea->nif);
         $tarea->contacto = $request->input('contacto', $tarea->contacto);
         $tarea->telefono = $request->input('telefono', $tarea->telefono);
@@ -182,40 +240,62 @@ class TareaController extends Controller
         $tarea->anotaciones_p = $request->input('anotaciones_posteriores', $tarea->anotaciones_p);
         $tarea->anotaciones_a = $request->input('anotaciones_anteriores', $tarea->anotaciones_a);
         
+        // Actualiza la tarea en la bd
         $tarea->actualizar();
         
+        // Devuelve la vista
         return redirect()->route('tareas.show', $idTarea);
     }
-
-    public function completar($id){
+    /**
+     * Devuelve la página para actualizar el estado de una tarea.
+     * Solo para operarios
+     * @param int $idTarea
+     * @return mixed
+     */
+    public function completar($idTarea){
         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
         // Si el usuario es admin redirigir al inicio
         if($usuario->esAdmin()) return redirect()->route('home');
 
-        $tarea = Tarea::getTarea($id);
+        // Obtiene la tarea usando el id
+        $tarea = Tarea::getTarea($idTarea);
+
+        // Devuelve la vista con la tarea
         return view('tareas/completar', [
             'usuario'=>$usuario,
             "tarea"=>$tarea,
             "optionsEstado"=>Tarea::OPTIONS_ESTADOS
         ]);
     }
-
+    /**
+     * Comprueba los datos enviados por el formulario y actualiza la tarea.
+     * Solo para operarios
+     * @param Request $request
+     * @param int $idTarea
+     * @return mixed
+     */
     public function completarUpdate(Request $request, $idTarea){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
         // Si el usuario es admin redirigir al inicio
         if($usuario->esAdmin()) return redirect()->route('home');
 
+        // Crea un validador de errores
         $validador_err = new ValidarErrores();
+        // Comprueba los errores
         $gestor_err = $validador_err->validarCampos($request, ['fecha_realizacion']);
         
+        // Obtiene la tarea usando el id
         $tarea = Tarea::getTarea($idTarea);
         
+        // Si hay errores devuelve la vista completar con los datos necesarios, los que recibimos y los errores
         if($gestor_err->hayErrores()){
             return view('tareas/completar', [
                 'usuario'=>$usuario,
@@ -249,17 +329,27 @@ class TareaController extends Controller
 
                 $fotos_arr[] = $rutaFoto;
             }
+            // Guarda las imagenes en la bd
             $tarea->imagenes = $fotos_arr;
             $tarea->guardarImagenes();
         }
         
+        // Actualiza la tarea en la bd
         $tarea->completar();
         
+        // Redirecciona a la vista de la tarea que se ha modificado
         return redirect()->route('tareas.show', $idTarea);
     }
+    /**
+     * Devuelve la página de confirmación para la eliminación de una tarea.
+     * Solo para administradores
+     * @param int $idTarea
+     * @return mixed
+     */
     public function confirmacion($idTarea){
         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
         // Si el usuario no es admin redirigir al inicio
@@ -268,10 +358,16 @@ class TareaController extends Controller
         $tarea = Tarea::getTarea($idTarea);
         return view('tareas/confirmacion', compact(['tarea', 'usuario']));
     }
-
+    /**
+     * Elimina la tarea de la bd
+     * Solo para administradores
+     * @param int $idTarea
+     * @return mixed
+     */
     public function delete($idTarea){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
         
         // Si el usuario no es admin redirigir al inicio
@@ -288,6 +384,7 @@ class TareaController extends Controller
             Storage::deleteDirectory($rutaDirectorio);
         }
 
+        // Devuelve la vista con el resultado
         return view('tareas/resultado', [
             'usuario'=>$usuario,
             'tarea'=>$tarea,

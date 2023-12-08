@@ -14,17 +14,27 @@ use Illuminate\Http\Request;
 
 class UsuarioController extends Controller
 {
+    /**
+     * Devuelve la página de login
+     * @return mixed
+     */
     public function index(){
         // Si tiene iniciada la sesión redirige al usuario al inicio.
         if(SeguridadUsuario::validarUsuario()) return redirect()->route('home');
 
+        // Obtiene el último usuario que ha iniciado sesión
         $ultimo_login = Usuario::getUltimoLogin() ?? '';
 
+        // Devuelve la vista con le último usuario que ha iniciado sesión
         return view('login', [
             'ultimo_login'=>$ultimo_login->usuario
         ]);
     }
-
+    /**
+     * Comprueba los datos del login y la sesión del usuario
+     * @param Request $request
+     * @return mixed
+     */
     public function login(Request $request){
         // Comprueba los campos del login
         $validador_err = new ValidarErrores();
@@ -74,7 +84,10 @@ class UsuarioController extends Controller
         return redirect()->route('home');
         
     }
-
+    /**
+     * Cierra la sesión del usuario y lo redirige al inicio
+     * @return mixed
+     */
     public function logout(){
         // Sobreescribe las cookies anteriores con unas nuevas cookies con la fecha ya expirada
         setcookie('id_usuario', 0, time() - 60);
@@ -87,18 +100,26 @@ class UsuarioController extends Controller
         // Redirige al usuario a la página de inicio
         return redirect()->route('home');
     }
-
+    /**
+     * Muesta la página con la lista de usuarios en formato tabla
+     * Solo para administradores
+     * @return mixed
+     */
     public function show(){
         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
         // Si el usuario no es admin redirigir al inicio
         if(!$usuario->esAdmin()) return redirect()->route('home');
 
+        // Obtiene la página actual usando los query params
         $page = request()->query('page') ?? 1;
+        // Obtiene el resultado de los usuarios de la bd
         $resultado = Usuario::getUsuarios($page);
 
+        // Devuelve la vista con los resultados de la bd
         return view('usuarios/show', [
             'usuario' => $usuario,
             'listaUsuarios'=>$resultado["usuarios"],
@@ -107,21 +128,33 @@ class UsuarioController extends Controller
             'paginas'=>$resultado["paginas"]
         ]);
     }
-
+    /**
+     * Devuelve la página para crear un usuario. 
+     * Solo para administradores
+     * @return mixed
+     */
     public function create(){
         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
         // Si el usuario no es admin redirigir al inicio
         if(!$usuario->esAdmin()) return redirect()->route('home');
 
+        // Devuelve la vista
         return view('usuarios/create', compact('usuario'));
     }
-    
+    /**
+     * Comprueba los datos del formulario y crea un nuevo usuario en la bd.
+     * Solo para administradores
+     * @param Request $request
+     * @return mixed
+     */
     public function store(Request $request){
         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
+        // Obtiene el usuario que está logueado
         $usuario = Usuario::getUsuario(SeguridadUsuario::getIdUsuario());
 
         // Si el usuario no es admin redirigir al inicio
@@ -131,6 +164,7 @@ class UsuarioController extends Controller
         $validador_err = new ValidarErrores();
         $gestor_err = $validador_err->validarCamposUsuario($request);
 
+        // Si hay errores devolver la vista create con los datos recibidos y los errores
         if($gestor_err->hayErrores()){
             return view('usuarios/create', [
                 'usuario' => $usuario,
@@ -146,7 +180,12 @@ class UsuarioController extends Controller
         // Redirige a la lista de usuarios
         return redirect()->route('usuarios.show');
     }
-
+    /**
+     * Devuelve la página para editar un usuario.
+     * Solo para administradores
+     * @param int $idUsuairo
+     * @return mixed
+     */
     public function edit($idUsuario){
         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
@@ -155,10 +194,18 @@ class UsuarioController extends Controller
         // Si el usuario no es admin redirigir al inicio
         if(!$usuario->esAdmin()) return redirect()->route('home');
 
+        // Obtiene el usuario que queremos modificar
         $editUsuario = Usuario::getUsuario($idUsuario);
+        // Devuelve la vista con lso datos del usuario a modificar
         return view('usuarios/edit', compact(['usuario', 'editUsuario']));
     }
-
+    /**
+     * Comprueba los datos del formulario y actualiza el usuario en la bd
+     * Solo para administradores
+     * @param Request $request
+     * @param int $idUsuario
+     * @return mixed
+     */
     public function update(Request $request, $idUsuario){
         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
@@ -167,11 +214,14 @@ class UsuarioController extends Controller
         // Si el usuario no es admin redirigir al inicio
         if(!$usuario->esAdmin()) return redirect()->route('home');
 
+        // Comprueba los errores
         $validador_err = new ValidarErrores();
         $gestor_err = $validador_err->validarCamposUsuario($request);
 
+        // Obtiene el usuario a modificar
         $editUsuario = Usuario::getUsuario($idUsuario);
 
+        // Si hay errores devuelve la vista edit con lso datos recibidos y los errores
         if($gestor_err->hayErrores()){
             return view('usuarios/edit', [
                 'usuario' => $usuario,
@@ -188,9 +238,15 @@ class UsuarioController extends Controller
         // Modifica el usuario en la bd
         $editUsuario->update();
 
+        // Redirige al usuario a la página con todos los usuarios
         return redirect()->route('usuarios.show');
     }
-
+    /**
+     * Devuelve la página de confimación para eliminar un usuario
+     * Solo para administradores
+     * @param int $idUsuario
+     * @return mixed
+     */
     public function confirmacion($idUsuario){
         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
@@ -199,10 +255,17 @@ class UsuarioController extends Controller
         // Si el usuario no es admin redirigir al inicio
         if(!$usuario->esAdmin()) return redirect()->route('home');
 
+        // Obtiene el usuario que queremos eliminar
         $delUsuario = Usuario::getUsuario($idUsuario);
+        // Devuelve la vista con el usuario a eliminar
         return view('usuarios/confirmacion', compact(['usuario', 'delUsuario']));
     }
-
+    /**
+     * Elimina el usuario y devuelve la página con el resultado de la bd al eliminarlo
+     * Solo para administradores
+     * @param int $idUsuario
+     * @return mixed
+     */
     public function delete($idUsuario){
         // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
         if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
@@ -216,6 +279,7 @@ class UsuarioController extends Controller
         $delUsuario->id = $idUsuario;
         $resultado = $delUsuario->eliminar();
 
+        // Devuelve la vista con el resultado
         return view('usuarios/resultado', [
             'usuario'=>$usuario,
             'delUsuario'=>$delUsuario,

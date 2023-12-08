@@ -15,7 +15,10 @@ class Provincia
     public function __construct(){
 
     }
-
+    /**
+     * Obtiene una lista con todas las provincias de la bd
+     * @return array
+     */
     public static function getProvincias(){
         $db = Database::getInstance();
 

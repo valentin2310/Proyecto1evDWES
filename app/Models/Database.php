@@ -11,26 +11,45 @@ use mysqli;
 
 class Database
 {
-
+	// Instancia del objeto Database
     static $_instance = null;
-
+	// Variable de la conexion con la bd mysqli
     private $link;
+	// Resultado actual de la consulta en la bd
     private $result; 
+	// Registro actual del resultado en la bd
     private $regActual;
      
+
+	/**
+	 * Contructor del objeto.
+	 * Conecta automáticamente a la bd usando los datos de configuración de la bd
+	 */
     private function __construct() {
 		$db_conf = include(app_path('Config\dbconfig.php'));
         $this->conectar($db_conf);
     }
+	/**
+	 * Sobreescribe el metodo para clonar para aplicar el patrón Singleton
+	 */
     private function __clone() {}
-     
+    
+	/**
+	 * Devuelva la instancia actual del objeto en caso de que exista, por el contrario crea una nueva.
+	 * Aplica el patrón singleton
+	 * @return Database
+	 */
     public static function getInstance() {
         if (!(self::$_instance instanceof self)){
 			self::$_instance=new self();
 		}
 		return self::$_instance;
     }
-     
+    
+	/**
+	 * Crea la conexion con al bd usando los datos pasados por parámetro.
+	 * @param array
+	 */
     public function conectar($conf) {
         if(! is_array($conf)) {
             exit();
@@ -117,10 +136,17 @@ class Database
 		}
 	}
 
+	/**
+	 * Crea una sentencia preparada y la devuelve para manipular los datos de la bd de forma más segura
+	 * @param string $sql
+	 */
 	public function crearSentenciaPreparada($sql){
 		return $this->link->prepare($sql);
 	}
-
+	/**
+	 * Limpia los datos eliminando los espacios por delante y detrás, los slashes y los carácteres especiales
+	 * @param mixed $data
+	 */
 	public static function limpiarCampo($data) {
         $data = trim($data);
         $data = stripslashes($data);

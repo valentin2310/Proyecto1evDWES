@@ -13,6 +13,10 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
+    /**
+     * Devuelve la página de inicio
+     * @return mixed
+     */
     public function __invoke(){
          // Obtiene las cookies del usuario y token, comprueba que son validas y en caso de que no lo sean devulve la vista login
          if(!SeguridadUsuario::validarUsuario()) return redirect()->route('login.index');
