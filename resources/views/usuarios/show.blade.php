@@ -17,8 +17,8 @@
     </div>
 
     <div class="table-responsive">
-        <table class="tabla-tareas table table-striped table-hover table-bordered">
-            <thead class="table-dark">
+        <table class="tabla-tareas table table-striped table-hover table-bordered text-center">
+            <thead class="table-dark text-azul">
                 <th>ID</th>
                 <th>Usuario</th>
                 <th>Ultimo inicio de sesión</th>
@@ -66,7 +66,7 @@
             <button class="btn btn-dark" disabled>Anterior</button>
         @endif
 
-        <p class="m-0">Página actual: <span class="fw-bold">{{ $page }}</span></p>
+        <p class="m-0">Página actual: <span class="fw-bold text-azul">{{ $page }}</span></p>
 
         @if ($page < $paginas)
             <button class="btn btn-dark"><a href="{{ route('usuarios.show', ['page'=>$page+1]) }}" class="text-decoration-none text-white">Siguiente</a></button>

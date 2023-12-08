@@ -12,20 +12,20 @@
 @section('contenido')
     <h1>Busca y filtra las tareas</h1>
 
-    <form action="{{ route('tareas.search') }}" method="GET" class="busqueda">
+    <form action="{{ route('tareas.search') }}" method="GET" class="busqueda my-4">
         
-        <div class="row m-0 mb-1">
+        <div class="row m-0 mb-1 align-items-center fw-bold">
             <div class="col-2">
-                Campo
+                <i class="fa-solid fa-filter me-2"></i>Campo
             </div>
             <div class="col-2">
                 Criterio
             </div>
             <div class="col-6">
-                Valor
+                <i class="fa-solid fa-keyboard me-2"></i>Valor
             </div>
             <div class="col-2">
-                <button type="submit" class="btn btn-success w-100">Buscar</button>
+                <button type="submit" class="btn btn-dark text-azul fw-bold w-100 text-start"><i class="fa-solid fa-magnifying-glass me-4"></i>Buscar</button>
             </div>
         </div>
         <div class="row m-0 mb-1">
@@ -122,7 +122,7 @@
             </div>
         </div>
         <div class="row mx-0 my-3 mb-1">
-            <div class="col-12">Ordenar por:</div>
+            <div class="col-12 fw-bold"><i class="fa-solid fa-arrow-up-wide-short me-2"></i>Ordenar por:</div>
             <div class="col-9">
                 <select name="order" class="form-select">
                     @foreach ($OPTIONS_CAMPOS as $key => $value)
@@ -173,8 +173,8 @@
         <p>No hay ningún resultado en su búsqueda, prueba a hacer otra búsqueda con otros filtros.</p>
     @else
         <div class="table-responsive">
-            <table class="tabla-tareas table table-striped table-hover table-bordered">
-                <thead class="table-dark">
+            <table class="tabla-tareas table table-striped table-hover table-bordered text-center">
+                <thead class="table-dark text-azul">
                     <th>ID</th>
                     <th>NIF facturador</th>
                     <th>Estado</th>
@@ -245,7 +245,7 @@
             <button class="btn btn-dark" disabled>Anterior</button>
         @endif
 
-        <p class="m-0">Página actual: <span class="fw-bold">{{ $page }}</span></p>
+        <p class="m-0">Página actual: <span class="fw-bold text-azul">{{ $page }}</span></p>
 
         @if ($page < $paginas)
             <button class="btn btn-dark">

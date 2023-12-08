@@ -23,15 +23,21 @@
 </head>
 <body>
     <header>
-        <h1>Bunglebuild S.L.</h1>
+        <div class="container">
+            <h1><i class="fa-solid fa-building me-2"></i>Bunglebuild S.L.</h1>
+        </div>
     </header>
 
-    @yield('contenido')
+    <div class="pagina">
+        @yield('contenido')
+    </div>
 
     <footer>
-        Creado por Valentin AC 
-        <br>
-        &copy; - 2023
+        <div class="container">
+            Creado por Valentin AC 
+            <br>
+            &copy; - 2023
+        </div>
     </footer>
 </body>
 </html>
