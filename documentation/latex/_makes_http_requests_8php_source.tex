@@ -1,0 +1,399 @@
+\doxysection{Makes\+Http\+Requests.\+php}
+\hypertarget{_makes_http_requests_8php_source}{}\label{_makes_http_requests_8php_source}\index{vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php@{vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php}}
+\mbox{\hyperlink{_makes_http_requests_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns}{Illuminate\(\backslash\)Foundation\(\backslash\)Testing\(\backslash\)Concerns}};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00005}00005\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_http_1_1_kernel}{Illuminate\(\backslash\)Contracts\(\backslash\)Http\(\backslash\)Kernel}}\ as\ HttpKernel;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00006}00006\ use\ \mbox{\hyperlink{class_illuminate_1_1_cookie_1_1_cookie_value_prefix}{Illuminate\(\backslash\)Cookie\(\backslash\)CookieValuePrefix}};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_request}{Illuminate\(\backslash\)Http\(\backslash\)Request}};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_testing_1_1_logged_exception_collection}{Illuminate\(\backslash\)Testing\(\backslash\)LoggedExceptionCollection}};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_testing_1_1_test_response}{Illuminate\(\backslash\)Testing\(\backslash\)TestResponse}};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_file_1_1_uploaded_file}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)File\(\backslash\)UploadedFile}}\ as\ SymfonyUploadedFile;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)Request}}\ as\ SymfonyRequest;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00013}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a60d761e7df6ca94164620a1fade4ab80}{00013}}\ trait\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a60d761e7df6ca94164620a1fade4ab80}{MakesHttpRequests}}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00014}00014\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{protected}\ \$defaultHeaders\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00027}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ac0e66d21a156eb43d63947b73cc57e90}{00027}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ac0e66d21a156eb43d63947b73cc57e90}{\$defaultCookies}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00034}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a70adb479c050e21598ebe1e97cf7575b}{00034}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a70adb479c050e21598ebe1e97cf7575b}{\$unencryptedCookies}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00041}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a83a77e04657ff01936f01ee141973577}{00041}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a83a77e04657ff01936f01ee141973577}{\$serverVariables}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00048}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ac95cb4e0debb182bc3e79022c98b08da}{00048}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ac95cb4e0debb182bc3e79022c98b08da}{\$followRedirects}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00055}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a44936e995e588dbad4f63abfe697b7d5}{00055}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a44936e995e588dbad4f63abfe697b7d5}{\$encryptCookies}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00064}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a0fede39d7e45ac94ebd22d1cb548ce58}{00064}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a0fede39d7e45ac94ebd22d1cb548ce58}{\$withCredentials}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \$latestResponse;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00079}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a4180a84d424c470be7b2710fb5005bee}{00079}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a4180a84d424c470be7b2710fb5005bee}{withHeaders}}(array\ \$headers)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00080}00080\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \$this-\/>defaultHeaders\ =\ array\_merge(\$this-\/>defaultHeaders,\ \$headers);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00084}00084\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00093}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aa915ca97ba5e73dae619c57e3d39508e}{00093}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aa915ca97ba5e73dae619c57e3d39508e}{withHeader}}(\textcolor{keywordtype}{string}\ \$name,\ \textcolor{keywordtype}{string}\ \$value)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00094}00094\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \$this-\/>defaultHeaders[\$name]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00098}00098\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00107}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a7fe029a1a2531b96901387f1e276a347}{00107}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a7fe029a1a2531b96901387f1e276a347}{withToken}}(\textcolor{keywordtype}{string}\ \$token,\ \textcolor{keywordtype}{string}\ \$type\ =\ \textcolor{stringliteral}{'Bearer'})}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00108}00108\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aa915ca97ba5e73dae619c57e3d39508e}{withHeader}}(\textcolor{stringliteral}{'Authorization'},\ \$type.\textcolor{charliteral}{'\ '}.\$token);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00110}00110\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00119}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ae316adb7b9d7f79037793c12cf04a5bb}{00119}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ae316adb7b9d7f79037793c12cf04a5bb}{withBasicAuth}}(\textcolor{keywordtype}{string}\ \$username,\ \textcolor{keywordtype}{string}\ \$password)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00120}00120\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a7fe029a1a2531b96901387f1e276a347}{withToken}}(base64\_encode(\textcolor{stringliteral}{"{}\$username:\$password"{}}),\ \textcolor{stringliteral}{'Basic'});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00122}00122\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00129}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a3d257445fbc575691ebbf90a5c572f06}{00129}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a3d257445fbc575691ebbf90a5c572f06}{withoutToken}}()}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00130}00130\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ unset(\$this-\/>defaultHeaders[\textcolor{stringliteral}{'Authorization'}]);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00134}00134\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00141}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a754b2413f43936b7a8b3fabf99b0ddb0}{00141}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a754b2413f43936b7a8b3fabf99b0ddb0}{flushHeaders}}()}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00142}00142\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \$this-\/>defaultHeaders\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00146}00146\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00154}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a46fb902113a5cc303b30d34acda41bf7}{00154}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a46fb902113a5cc303b30d34acda41bf7}{withServerVariables}}(array\ \$server)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00155}00155\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \$this-\/>serverVariables\ =\ \$server;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00159}00159\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00167}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_af353f4ee99555e2bbb181837b222658c}{00167}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_af353f4ee99555e2bbb181837b222658c}{withoutMiddleware}}(\$middleware\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00168}00168\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$middleware))\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>app-\/>instance(\textcolor{stringliteral}{'middleware.disable'},\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ ((array)\ \$middleware\ as\ \$abstract)\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>app-\/>instance(\$abstract,\ \textcolor{keyword}{new}\ \textcolor{keyword}{class}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ handle(\$request,\ \$next)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$next(\$request);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00186}00186\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00194}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ab35f013ff6ed55b8c0c7eb1bf3a626d4}{00194}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ab35f013ff6ed55b8c0c7eb1bf3a626d4}{withMiddleware}}(\$middleware\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00195}00195\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$middleware))\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$this-\/>app[\textcolor{stringliteral}{'middleware.disable'}]);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ ((array)\ \$middleware\ as\ \$abstract)\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$this-\/>app[\$abstract]);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00207}00207\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00215}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a37b5d2795b9b267cec358741fb847b4b}{00215}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a37b5d2795b9b267cec358741fb847b4b}{withCookies}}(array\ \$cookies)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00216}00216\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \$this-\/>defaultCookies\ =\ array\_merge(\$this-\/>defaultCookies,\ \$cookies);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00220}00220\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00229}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aecd57d65a0c2b0aadc71cf9ddebb40e0}{00229}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aecd57d65a0c2b0aadc71cf9ddebb40e0}{withCookie}}(\textcolor{keywordtype}{string}\ \$name,\ \textcolor{keywordtype}{string}\ \$value)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00230}00230\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \$this-\/>defaultCookies[\$name]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00234}00234\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00242}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ab0ac40b8ec768c8b5963a9d8eaffe92b}{00242}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ab0ac40b8ec768c8b5963a9d8eaffe92b}{withUnencryptedCookies}}(array\ \$cookies)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00243}00243\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \$this-\/>unencryptedCookies\ =\ array\_merge(\$this-\/>unencryptedCookies,\ \$cookies);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00247}00247\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00256}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a97c78a2e557066668cb5a79b8dd1bacf}{00256}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a97c78a2e557066668cb5a79b8dd1bacf}{withUnencryptedCookie}}(\textcolor{keywordtype}{string}\ \$name,\ \textcolor{keywordtype}{string}\ \$value)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00257}00257\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \$this-\/>unencryptedCookies[\$name]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00261}00261\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00268}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a4f4966ed79d7b0ec257cbc72796c01dc}{00268}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a4f4966ed79d7b0ec257cbc72796c01dc}{followingRedirects}}()}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00269}00269\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aef6ea063e7ab0fbadb9d2fa01613930d}{followRedirects}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00273}00273\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00280}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a4c10fd14a954309b39f4dc955e033580}{00280}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a4c10fd14a954309b39f4dc955e033580}{withCredentials}}()}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00281}00281\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a4c10fd14a954309b39f4dc955e033580}{withCredentials}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00284}00284\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00285}00285\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00292}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a5cb075c0074cc9a6da34aa3da7e02f77}{00292}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a5cb075c0074cc9a6da34aa3da7e02f77}{disableCookieEncryption}}()}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00293}00293\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \$this-\/>encryptCookies\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00297}00297\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00298}00298\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00305}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a4e3d0d4b626e0ee57b533d53e6025d11}{00305}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a4e3d0d4b626e0ee57b533d53e6025d11}{from}}(\textcolor{keywordtype}{string}\ \$url)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00306}00306\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \$this-\/>app[\textcolor{stringliteral}{'session'}]-\/>setPreviousUrl(\$url);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00308}00308\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aa915ca97ba5e73dae619c57e3d39508e}{withHeader}}(\textcolor{stringliteral}{'referer'},\ \$url);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00310}00310\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00311}00311\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00317}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aff41a9e26f941f74dea5ef436d2e593a}{00317}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aff41a9e26f941f74dea5ef436d2e593a}{withPrecognition}}()}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00318}00318\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aa915ca97ba5e73dae619c57e3d39508e}{withHeader}}(\textcolor{stringliteral}{'Precognition'},\ \textcolor{stringliteral}{'true'});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00320}00320\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00321}00321\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00329}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_abc05549565290099a36492966c50470b}{00329}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{get}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \$headers\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00330}00330\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \$server\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ae58ed895f3bc21b1a946c0069c0371d8}{transformHeadersToServerVars}}(\$headers);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \$cookies\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_afe015b49e5bae616f4c0ee56bcfe4e5a}{prepareCookiesForRequest}}();}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00333}00333\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a058cf4dff47203ce65b0f26e83c07dea}{call}}(\textcolor{stringliteral}{'GET'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ [],\ \$cookies,\ [],\ \$server);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00335}00335\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00336}00336\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00345}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ac8708ac505b21b152652adc6c5d3063e}{00345}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ac8708ac505b21b152652adc6c5d3063e}{getJson}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \$headers\ =\ [],\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00346}00346\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1babe7ebf2c1d921e79f681e013da272}{json}}(\textcolor{stringliteral}{'GET'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ [],\ \$headers,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00348}00348\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00358}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_afb30a94e401aae7d30306f49624bb5be}{00358}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_afb30a94e401aae7d30306f49624bb5be}{post}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [],\ array\ \$headers\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00359}00359\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \$server\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ae58ed895f3bc21b1a946c0069c0371d8}{transformHeadersToServerVars}}(\$headers);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \$cookies\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_afe015b49e5bae616f4c0ee56bcfe4e5a}{prepareCookiesForRequest}}();}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00362}00362\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a058cf4dff47203ce65b0f26e83c07dea}{call}}(\textcolor{stringliteral}{'POST'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$cookies,\ [],\ \$server);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00364}00364\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00375}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1e225007d09a8a27ee0c137fc1fb5c42}{00375}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1e225007d09a8a27ee0c137fc1fb5c42}{postJson}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [],\ array\ \$headers\ =\ [],\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00376}00376\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00377}00377\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1babe7ebf2c1d921e79f681e013da272}{json}}(\textcolor{stringliteral}{'POST'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$headers,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00378}00378\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00379}00379\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00388}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ac6914f9a5d0eb9d61f0748cfbbe946fe}{00388}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ac6914f9a5d0eb9d61f0748cfbbe946fe}{put}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [],\ array\ \$headers\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00389}00389\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \$server\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ae58ed895f3bc21b1a946c0069c0371d8}{transformHeadersToServerVars}}(\$headers);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \$cookies\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_afe015b49e5bae616f4c0ee56bcfe4e5a}{prepareCookiesForRequest}}();}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a058cf4dff47203ce65b0f26e83c07dea}{call}}(\textcolor{stringliteral}{'PUT'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$cookies,\ [],\ \$server);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00394}00394\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00395}00395\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00405}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a55ef19d5ab495a3112837fafdbb4a563}{00405}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a55ef19d5ab495a3112837fafdbb4a563}{putJson}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [],\ array\ \$headers\ =\ [],\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00406}00406\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00407}00407\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1babe7ebf2c1d921e79f681e013da272}{json}}(\textcolor{stringliteral}{'PUT'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$headers,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00408}00408\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00409}00409\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00418}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a5064066fa707c7d7b11ff4ef164984b2}{00418}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a5064066fa707c7d7b11ff4ef164984b2}{patch}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [],\ array\ \$headers\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00419}00419\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00420}00420\ \ \ \ \ \ \ \ \ \$server\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ae58ed895f3bc21b1a946c0069c0371d8}{transformHeadersToServerVars}}(\$headers);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00421}00421\ \ \ \ \ \ \ \ \ \$cookies\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_afe015b49e5bae616f4c0ee56bcfe4e5a}{prepareCookiesForRequest}}();}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00422}00422\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00423}00423\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a058cf4dff47203ce65b0f26e83c07dea}{call}}(\textcolor{stringliteral}{'PATCH'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$cookies,\ [],\ \$server);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00424}00424\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00425}00425\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00435}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ad52f4a439e95137efc83acaa50ff2dd7}{00435}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ad52f4a439e95137efc83acaa50ff2dd7}{patchJson}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [],\ array\ \$headers\ =\ [],\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00436}00436\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1babe7ebf2c1d921e79f681e013da272}{json}}(\textcolor{stringliteral}{'PATCH'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$headers,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00438}00438\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00439}00439\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00448}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a340c744bbcaf56ff0585001692ebc83f}{00448}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{delete}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [],\ array\ \$headers\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00449}00449\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \$server\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ae58ed895f3bc21b1a946c0069c0371d8}{transformHeadersToServerVars}}(\$headers);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \$cookies\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_afe015b49e5bae616f4c0ee56bcfe4e5a}{prepareCookiesForRequest}}();}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a058cf4dff47203ce65b0f26e83c07dea}{call}}(\textcolor{stringliteral}{'DELETE'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \$data,\ \$cookies,\ [],\ \$server);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00454}00454\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00455}00455\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00465}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a042a6d66161d1dd5ad5396cd64740f2f}{00465}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a042a6d66161d1dd5ad5396cd64740f2f}{deleteJson}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [],\ array\ \$headers\ =\ [],\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00466}00466\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00467}00467\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1babe7ebf2c1d921e79f681e013da272}{json}}(\textcolor{stringliteral}{'DELETE'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \$data,\ \$headers,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00468}00468\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00469}00469\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00478}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_af8c23af245f2b4a79e361446ff07142a}{00478}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_af8c23af245f2b4a79e361446ff07142a}{options}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [],\ array\ \$headers\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00479}00479\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \$server\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ae58ed895f3bc21b1a946c0069c0371d8}{transformHeadersToServerVars}}(\$headers);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00481}00481\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00482}00482\ \ \ \ \ \ \ \ \ \$cookies\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_afe015b49e5bae616f4c0ee56bcfe4e5a}{prepareCookiesForRequest}}();}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00483}00483\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00484}00484\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a058cf4dff47203ce65b0f26e83c07dea}{call}}(\textcolor{stringliteral}{'OPTIONS'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \$data,\ \$cookies,\ [],\ \$server);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00485}00485\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00486}00486\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00496}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_abf9d59ed6583dcc7f3696a4181865c40}{00496}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_abf9d59ed6583dcc7f3696a4181865c40}{optionsJson}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [],\ array\ \$headers\ =\ [],\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00497}00497\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00498}00498\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1babe7ebf2c1d921e79f681e013da272}{json}}(\textcolor{stringliteral}{'OPTIONS'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \$data,\ \$headers,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00499}00499\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00500}00500\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00508}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a6f9767f51203e22c430f04c7feb0e29f}{00508}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a6f9767f51203e22c430f04c7feb0e29f}{head}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \$headers\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00509}00509\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \$server\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ae58ed895f3bc21b1a946c0069c0371d8}{transformHeadersToServerVars}}(\$headers);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00511}00511\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \$cookies\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_afe015b49e5bae616f4c0ee56bcfe4e5a}{prepareCookiesForRequest}}();}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00513}00513\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a058cf4dff47203ce65b0f26e83c07dea}{call}}(\textcolor{stringliteral}{'HEAD'},\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ [],\ \$cookies,\ [],\ \$server);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00515}00515\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00516}00516\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00527}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1babe7ebf2c1d921e79f681e013da272}{00527}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1babe7ebf2c1d921e79f681e013da272}{json}}(\$method,\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [],\ array\ \$headers\ =\ [],\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00528}00528\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \$files\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a34b21db69ac51a83d346386ce07d99be}{extractFilesFromDataArray}}(\$data);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00530}00530\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \$content\ =\ json\_encode(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00532}00532\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00533}00533\ \ \ \ \ \ \ \ \ \$headers\ =\ array\_merge([}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'CONTENT\_LENGTH'}\ =>\ mb\_strlen(\$content,\ \textcolor{stringliteral}{'8bit'}),}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00535}00535\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'CONTENT\_TYPE'}\ =>\ \textcolor{stringliteral}{'application/json'},}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Accept'}\ =>\ \textcolor{stringliteral}{'application/json'},}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00537}00537\ \ \ \ \ \ \ \ \ ],\ \$headers);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00538}00538\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00539}00539\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a058cf4dff47203ce65b0f26e83c07dea}{call}}(}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \ \ \ \ \$method,}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ [],}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00543}00543\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a215c7978f3cf66e9df4fae67d7223a2f}{prepareCookiesForJsonRequest}}(),}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \ \ \ \$files,}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ae58ed895f3bc21b1a946c0069c0371d8}{transformHeadersToServerVars}}(\$headers),}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \$content}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00547}00547\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00548}00548\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00549}00549\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00562}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a058cf4dff47203ce65b0f26e83c07dea}{00562}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a058cf4dff47203ce65b0f26e83c07dea}{call}}(\$method,\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \$parameters\ =\ [],\ \$cookies\ =\ [],\ \$files\ =\ [],\ \$server\ =\ [],\ \$content\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00563}00563\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_abf40ed7ce84347395deb8abf12cdd9da}{\$kernel}}\ =\ \$this-\/>app-\/>make(HttpKernel::class);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00565}00565\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00566}00566\ \ \ \ \ \ \ \ \ \$files\ =\ array\_merge(\$files,\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a34b21db69ac51a83d346386ce07d99be}{extractFilesFromDataArray}}(\$parameters));}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00567}00567\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00568}00568\ \ \ \ \ \ \ \ \ \$symfonyRequest\ =\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request_a4804147e5a7727778a600b79ba52c01d}{SymfonyRequest::create}}(}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ad0dfc04d26c647988276043040071d65}{prepareUrlForRequest}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}}),\ \$method,\ \$parameters,}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00570}00570\ \ \ \ \ \ \ \ \ \ \ \ \ \$cookies,\ \$files,\ array\_replace(\$this-\/>serverVariables,\ \$server),\ \$content}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00571}00571\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00572}00572\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00573}00573\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \mbox{\hyperlink{index_8php_abf40ed7ce84347395deb8abf12cdd9da}{\$kernel}}-\/>handle(}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00574}00574\ \ \ \ \ \ \ \ \ \ \ \ \ \$request\ =\ Request::createFromBase(\$symfonyRequest)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00575}00575\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00576}00576\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_abf40ed7ce84347395deb8abf12cdd9da}{\$kernel}}-\/>terminate(\$request,\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00578}00578\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00579}00579\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aef6ea063e7ab0fbadb9d2fa01613930d}{followRedirects}})\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00580}00580\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aef6ea063e7ab0fbadb9d2fa01613930d}{followRedirects}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00582}00582\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00583}00583\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ static::\$latestResponse\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1dc8cfa9b6da49ed04e8ede27c787629}{createTestResponse}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00584}00584\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00585}00585\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00592}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ad0dfc04d26c647988276043040071d65}{00592}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ad0dfc04d26c647988276043040071d65}{prepareUrlForRequest}}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}})}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00593}00593\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00594}00594\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \textcolor{charliteral}{'/'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00595}00595\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}}\ =\ substr(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ 1);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00597}00597\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00598}00598\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ trim(url(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}}),\ \textcolor{charliteral}{'/'});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00599}00599\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00600}00600\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00607}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ae58ed895f3bc21b1a946c0069c0371d8}{00607}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_ae58ed895f3bc21b1a946c0069c0371d8}{transformHeadersToServerVars}}(array\ \$headers)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00608}00608\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00609}00609\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(array\_merge(\$this-\/>defaultHeaders,\ \$headers))-\/>mapWithKeys(\textcolor{keyword}{function}\ (\$value,\ \$name)\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \ \ \ \ \$name\ =\ strtr(strtoupper(\$name),\ \textcolor{charliteral}{'-\/'},\ \textcolor{charliteral}{'\_'});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00611}00611\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00612}00612\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a7588e99793a32720f5e87a1ccf0636dc}{formatServerHeaderKey}}(\$name)\ =>\ \$value];}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00613}00613\ \ \ \ \ \ \ \ \ \})-\/>all();}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00614}00614\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00615}00615\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00622}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a7588e99793a32720f5e87a1ccf0636dc}{00622}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a7588e99793a32720f5e87a1ccf0636dc}{formatServerHeaderKey}}(\$name)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00623}00623\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00624}00624\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ str\_starts\_with(\$name,\ \textcolor{stringliteral}{'HTTP\_'})\ \&\&\ \$name\ !==\ \textcolor{stringliteral}{'CONTENT\_TYPE'}\ \&\&\ \$name\ !==\ \textcolor{stringliteral}{'REMOTE\_ADDR'})\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00625}00625\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'HTTP\_'}.\$name;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00626}00626\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00627}00627\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00628}00628\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$name;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00629}00629\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00630}00630\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00637}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a34b21db69ac51a83d346386ce07d99be}{00637}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a34b21db69ac51a83d346386ce07d99be}{extractFilesFromDataArray}}(\&\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00638}00638\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00639}00639\ \ \ \ \ \ \ \ \ \$files\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00640}00640\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00641}00641\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00642}00642\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ instanceof\ SymfonyUploadedFile)\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00643}00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$files[\$key]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00644}00644\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00645}00645\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\$key]);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00646}00646\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00647}00647\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00648}00648\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00649}00649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$files[\$key]\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a34b21db69ac51a83d346386ce07d99be}{extractFilesFromDataArray}}(\$value);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00650}00650\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00651}00651\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\$key]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00652}00652\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00653}00653\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00654}00654\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00655}00655\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$files;}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00656}00656\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00657}00657\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00663}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_afe015b49e5bae616f4c0ee56bcfe4e5a}{00663}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_afe015b49e5bae616f4c0ee56bcfe4e5a}{prepareCookiesForRequest}}()}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00664}00664\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00665}00665\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>encryptCookies)\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00666}00666\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_merge(\$this-\/>defaultCookies,\ \$this-\/>unencryptedCookies);}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00667}00667\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00668}00668\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00669}00669\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$this-\/>defaultCookies)-\/>map(\textcolor{keyword}{function}\ (\$value,\ \$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00670}00670\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ encrypt(CookieValuePrefix::create(\$key,\ app(\textcolor{stringliteral}{'encrypter'})-\/>getKey()).\$value,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00671}00671\ \ \ \ \ \ \ \ \ \})-\/>merge(\$this-\/>unencryptedCookies)-\/>all();}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00672}00672\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00673}00673\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00679}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a215c7978f3cf66e9df4fae67d7223a2f}{00679}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a215c7978f3cf66e9df4fae67d7223a2f}{prepareCookiesForJsonRequest}}()}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00680}00680\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00681}00681\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a4c10fd14a954309b39f4dc955e033580}{withCredentials}}\ ?\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_afe015b49e5bae616f4c0ee56bcfe4e5a}{prepareCookiesForRequest}}()\ :\ [];}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00682}00682\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00683}00683\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00690}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aef6ea063e7ab0fbadb9d2fa01613930d}{00690}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aef6ea063e7ab0fbadb9d2fa01613930d}{followRedirects}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00691}00691\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00692}00692\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_aef6ea063e7ab0fbadb9d2fa01613930d}{followRedirects}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00693}00693\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00694}00694\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>isRedirect())\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00695}00695\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \$this-\/>\textcolor{keyword}{get}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>get(\textcolor{stringliteral}{'Location'}));}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00696}00696\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00697}00697\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00698}00698\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}};}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00699}00699\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00700}00700\ }
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00707}\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1dc8cfa9b6da49ed04e8ede27c787629}{00707}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a1dc8cfa9b6da49ed04e8ede27c787629}{createTestResponse}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00708}00708\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00709}00709\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\mbox{\hyperlink{class_illuminate_1_1_testing_1_1_test_response_a9192e1066a9c248bfbb9aba62c6c82ca}{TestResponse::fromBaseResponse}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}),\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})\ \{}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00710}00710\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>withExceptions(}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00711}00711\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>app-\/>bound(LoggedExceptionCollection::class)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00712}00712\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$this-\/>app-\/>make(LoggedExceptionCollection::class)}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00713}00713\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_testing_1_1_logged_exception_collection}{LoggedExceptionCollection}}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00714}00714\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00715}00715\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00716}00716\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_makes_http_requests_8php_source_l00717}00717\ \}}
+
+\end{DoxyCode}

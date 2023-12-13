@@ -1,0 +1,1136 @@
+\doxysection{Shell.\+php}
+\hypertarget{_shell_8php_source}{}\label{_shell_8php_source}\index{vendor/psy/psysh/src/Shell.php@{vendor/psy/psysh/src/Shell.php}}
+\mbox{\hyperlink{_shell_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ Psy\ Shell.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ 2012-\/2023\ Justin\ Hileman}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_psy}{Psy}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_no_return_value}{Psy\(\backslash\)CodeCleaner\(\backslash\)NoReturnValue}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_break_exception}{Psy\(\backslash\)Exception\(\backslash\)BreakException}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_error_exception}{Psy\(\backslash\)Exception\(\backslash\)ErrorException}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00017}00017\ use\ \mbox{\hyperlink{interface_psy_1_1_exception_1_1_exception}{Psy\(\backslash\)Exception\(\backslash\)Exception}}\ as\ PsyException;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_runtime_exception}{Psy\(\backslash\)Exception\(\backslash\)RuntimeException}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_throw_up_exception}{Psy\(\backslash\)Exception\(\backslash\)ThrowUpException}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_psy_1_1_execution_loop_1_1_process_forker}{Psy\(\backslash\)ExecutionLoop\(\backslash\)ProcessForker}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_psy_1_1_execution_loop_1_1_runkit_reloader}{Psy\(\backslash\)ExecutionLoop\(\backslash\)RunkitReloader}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_psy_1_1_formatter_1_1_trace_formatter}{Psy\(\backslash\)Formatter\(\backslash\)TraceFormatter}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_psy_1_1_input_1_1_shell_input}{Psy\(\backslash\)Input\(\backslash\)ShellInput}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00024}00024\ use\ \mbox{\hyperlink{class_psy_1_1_input_1_1_silent_input}{Psy\(\backslash\)Input\(\backslash\)SilentInput}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00025}00025\ use\ \mbox{\hyperlink{class_psy_1_1_output_1_1_shell_output}{Psy\(\backslash\)Output\(\backslash\)ShellOutput}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00026}00026\ use\ \mbox{\hyperlink{namespace_psy_1_1_tab_completion_1_1_matcher}{Psy\(\backslash\)TabCompletion\(\backslash\)Matcher}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00027}00027\ use\ \mbox{\hyperlink{interface_psy_1_1_var_dumper_1_1_presenter_aware}{Psy\(\backslash\)VarDumper\(\backslash\)PresenterAware}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00028}00028\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_application}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Application}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00029}00029\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_command_1_1_command}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Command\(\backslash\)Command}}\ as\ BaseCommand;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00030}00030\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_exception_1_1_exception_interface}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Exception\(\backslash\)ExceptionInterface}}\ as\ SymfonyConsoleException;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00031}00031\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_formatter_1_1_output_formatter}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Formatter\(\backslash\)OutputFormatter}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00032}00032\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_input_1_1_array_input}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Input\(\backslash\)ArrayInput}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00033}00033\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_input_1_1_input_argument}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Input\(\backslash\)InputArgument}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00034}00034\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_input_1_1_input_definition}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Input\(\backslash\)InputDefinition}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00035}00035\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_input_1_1_input_interface}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Input\(\backslash\)InputInterface}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00036}00036\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_input_1_1_input_option}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Input\(\backslash\)InputOption}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00037}00037\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_input_1_1_string_input}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Input\(\backslash\)StringInput}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00038}00038\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_output_1_1_console_output}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Output\(\backslash\)ConsoleOutput}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00039}00039\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_output_1_1_output_interface}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Output\(\backslash\)OutputInterface}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00051}\mbox{\hyperlink{class_psy_1_1_shell}{00051}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_psy_1_1_shell}{Shell}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_application}{Application}}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00052}00052\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00053}\mbox{\hyperlink{class_psy_1_1_shell_af71005841ce53adac00581ab0ba24c1f}{00053}}\ \ \ \ \ \textcolor{keyword}{const}\ VERSION\ =\ \textcolor{stringliteral}{'v0.11.22'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00056}\mbox{\hyperlink{class_psy_1_1_shell_a8f2854b444e7d583ffc719e66246da21}{00056}}\ \ \ \ \ \textcolor{keyword}{const}\ PROMPT\ =\ \textcolor{stringliteral}{'>>>\ '};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00058}\mbox{\hyperlink{class_psy_1_1_shell_ab794b4e9887440a42582ad476aae55d8}{00058}}\ \ \ \ \ \textcolor{keyword}{const}\ BUFF\_PROMPT\ =\ \textcolor{stringliteral}{'...\ '};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00060}\mbox{\hyperlink{class_psy_1_1_shell_a524e0d66fbc136d0b7ad1304c2ca97dc}{00060}}\ \ \ \ \ \textcolor{keyword}{const}\ REPLAY\ =\ \textcolor{stringliteral}{'-\/-\/>\ '};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00062}\mbox{\hyperlink{class_psy_1_1_shell_acd0cfef9fd7aca29e086a62bd373f899}{00062}}\ \ \ \ \ \textcolor{keyword}{const}\ RETVAL\ =\ \textcolor{stringliteral}{'=>\ '};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00064}00064\ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00065}00065\ \ \ \ \ \textcolor{keyword}{private}\ \$cleaner;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00066}00066\ \ \ \ \ \textcolor{keyword}{private}\ \$output;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00067}00067\ \ \ \ \ \textcolor{keyword}{private}\ \$originalVerbosity;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00068}00068\ \ \ \ \ \textcolor{keyword}{private}\ \$readline;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00069}00069\ \ \ \ \ \textcolor{keyword}{private}\ \$inputBuffer;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00070}00070\ \ \ \ \ \textcolor{keyword}{private}\ \$code;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{private}\ \$codeBuffer;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00072}00072\ \ \ \ \ \textcolor{keyword}{private}\ \$codeBufferOpen;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00073}00073\ \ \ \ \ \textcolor{keyword}{private}\ \$codeStack;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00074}00074\ \ \ \ \ \textcolor{keyword}{private}\ \$stdoutBuffer;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00075}00075\ \ \ \ \ \textcolor{keyword}{private}\ \$context;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00076}00076\ \ \ \ \ \textcolor{keyword}{private}\ \$includes;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00077}00077\ \ \ \ \ \textcolor{keyword}{private}\ \$outputWantsNewline\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00078}00078\ \ \ \ \ \textcolor{keyword}{private}\ \$loopListeners;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00079}00079\ \ \ \ \ \textcolor{keyword}{private}\ \$autoCompleter;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00080}00080\ \ \ \ \ \textcolor{keyword}{private}\ \$matchers\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00081}00081\ \ \ \ \ \textcolor{keyword}{private}\ \$commandsMatcher;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00082}00082\ \ \ \ \ \textcolor{keyword}{private}\ \$lastExecSuccess\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00083}00083\ \ \ \ \ \textcolor{keyword}{private}\ \$nonInteractive\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00084}00084\ \ \ \ \ \textcolor{keyword}{private}\ \$errorReporting;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00091}\mbox{\hyperlink{class_psy_1_1_shell_ad52e2172a739ff3d6b44cea3ceb55198}{00091}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ad52e2172a739ff3d6b44cea3ceb55198}{\_\_construct}}(\mbox{\hyperlink{class_psy_1_1_configuration}{Configuration}}\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00092}00092\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \$this-\/>config\ =\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}\ ?:\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_configuration}{Configuration}}();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \$this-\/>cleaner\ =\ \$this-\/>config-\/>getCodeCleaner();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \$this-\/>context\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_context}{Context}}();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \$this-\/>includes\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \$this-\/>readline\ =\ \$this-\/>config-\/>getReadline();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \$this-\/>inputBuffer\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \$this-\/>codeStack\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \$this-\/>stdoutBuffer\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \$this-\/>loopListeners\ =\ \$this-\/>getDefaultLoopListeners();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ parent::\_\_construct(\textcolor{stringliteral}{'Psy\ Shell'},\ self::VERSION);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \$this-\/>config-\/>setShell(\$this);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Register\ the\ current\ shell\ session's\ config\ with\ \(\backslash\)Psy\(\backslash\)info}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \(\backslash\)Psy\(\backslash\)info(\$this-\/>config);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00109}00109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00117}\mbox{\hyperlink{class_psy_1_1_shell_aabddb69d9728e999cb50efe35088fad4}{00117}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_aabddb69d9728e999cb50efe35088fad4}{isIncluded}}(array\ \$trace):\ bool}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00118}00118\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \$isIncluded\ =\ isset(\$trace[0][\textcolor{stringliteral}{'function'}])\ \&\&}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)in\_array(\$trace[0][\textcolor{stringliteral}{'function'}],\ [\textcolor{stringliteral}{'require'},\ \textcolor{stringliteral}{'include'},\ \textcolor{stringliteral}{'require\_once'},\ \textcolor{stringliteral}{'include\_once'}]);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Detect\ Composer\ PHP\ bin\ proxies.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$isIncluded\ \&\&\ \(\backslash\)array\_key\_exists(\textcolor{stringliteral}{'\_composer\_autoload\_path'},\ \$GLOBALS)\ \&\&\ \(\backslash\)preg\_match(\textcolor{stringliteral}{'\{[\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)/]psysh\$\}'},\ \$trace[0][\textcolor{stringliteral}{'file'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we're\ in\ a\ bin\ proxy,\ we'll\ *always*\ see\ one\ include,\ but\ we}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ care\ if\ we\ see\ a\ second\ immediately\ after\ that.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ isset(\$trace[1][\textcolor{stringliteral}{'function'}])\ \&\&}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)in\_array(\$trace[1][\textcolor{stringliteral}{'function'}],\ [\textcolor{stringliteral}{'require'},\ \textcolor{stringliteral}{'include'},\ \textcolor{stringliteral}{'require\_once'},\ \textcolor{stringliteral}{'include\_once'}]);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$isIncluded;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00131}00131\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00136}\mbox{\hyperlink{class_psy_1_1_shell_ae12084c8cad6eeca69f471b57a825cf1}{00136}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ae12084c8cad6eeca69f471b57a825cf1}{isPhar}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00137}00137\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ return\ \(\backslash\)class\_exists(\textcolor{stringliteral}{"{}\(\backslash\)Phar"{}})\ \&\&\ \(\backslash\)Phar::running()\ !==\ \textcolor{stringliteral}{''}\ \&\&\ \(\backslash\)strpos(\_\_FILE\_\_,\ \(\backslash\)Phar::running(\textcolor{keyword}{true}))\ ===\ 0;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00139}00139\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00152}\mbox{\hyperlink{class_psy_1_1_shell_ac14d00702aab6724290d35c9afd0f022}{00152}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ac14d00702aab6724290d35c9afd0f022}{debug}}(array\ \$vars\ =\ [],\ \$bindTo\ =\ \textcolor{keyword}{null}):\ array}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00153}00153\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ return\ \(\backslash\)Psy\(\backslash\)debug(\$vars,\ \$bindTo);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00155}00155\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00166}\mbox{\hyperlink{class_psy_1_1_shell_a6f0e1d6f4117e444f8cd5a426c0aeb00}{00166}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a6f0e1d6f4117e444f8cd5a426c0aeb00}{add}}(BaseCommand\ \$command):\ BaseCommand}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00167}00167\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$ret\ =\ parent::add(\$command))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$ret\ instanceof\ \mbox{\hyperlink{interface_psy_1_1_context_aware}{ContextAware}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$ret-\/>setContext(\$this-\/>context);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$ret\ instanceof\ \mbox{\hyperlink{interface_psy_1_1_var_dumper_1_1_presenter_aware}{PresenterAware}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$ret-\/>setPresenter(\$this-\/>config-\/>getPresenter());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>commandsMatcher))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>commandsMatcher-\/>setCommands(\$this-\/>all());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$ret;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00183}00183\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00190}\mbox{\hyperlink{class_psy_1_1_shell_ad134976d6a592eb596114fd87959aa2c}{00190}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ad134976d6a592eb596114fd87959aa2c}{getDefaultInputDefinition}}():\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_input_1_1_input_definition}{InputDefinition}}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00191}00191\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_input_1_1_input_definition}{InputDefinition}}([}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_input_1_1_input_argument}{InputArgument}}(\textcolor{stringliteral}{'command'},\ InputArgument::REQUIRED,\ \textcolor{stringliteral}{'The\ command\ to\ execute'}),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_input_1_1_input_option}{InputOption}}(\textcolor{stringliteral}{'-\/-\/help'},\ \textcolor{stringliteral}{'-\/h'},\ InputOption::VALUE\_NONE,\ \textcolor{stringliteral}{'Display\ this\ help\ message.'}),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00196}00196\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00203}\mbox{\hyperlink{class_psy_1_1_shell_ad81f2593505f08a7f041b9f8f1e22326}{00203}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ad81f2593505f08a7f041b9f8f1e22326}{getDefaultCommands}}():\ array}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00204}00204\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \$sudo\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_sudo_command}{Command\(\backslash\)SudoCommand}}();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \$sudo-\/>setReadline(\$this-\/>readline);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \$hist\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_history_command}{Command\(\backslash\)HistoryCommand}}();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \$hist-\/>setReadline(\$this-\/>readline);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_help_command}{Command\(\backslash\)HelpCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_list_command}{Command\(\backslash\)ListCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_dump_command}{Command\(\backslash\)DumpCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_doc_command}{Command\(\backslash\)DocCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_show_command}{Command\(\backslash\)ShowCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_wtf_command}{Command\(\backslash\)WtfCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_whereami_command}{Command\(\backslash\)WhereamiCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_throw_up_command}{Command\(\backslash\)ThrowUpCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_timeit_command}{Command\(\backslash\)TimeitCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_trace_command}{Command\(\backslash\)TraceCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_buffer_command}{Command\(\backslash\)BufferCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_clear_command}{Command\(\backslash\)ClearCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_edit_command}{Command\(\backslash\)EditCommand}}(\$this-\/>config-\/>getRuntimeDir()),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ new\ Command\(\backslash\)PsyVersionCommand(),}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \$sudo,}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \$hist,}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_command_1_1_exit_command}{Command\(\backslash\)ExitCommand}}(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00230}00230\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00235}\mbox{\hyperlink{class_psy_1_1_shell_a854126db54def8d067295b9757bcec04}{00235}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a854126db54def8d067295b9757bcec04}{getDefaultMatchers}}():\ array}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00236}00236\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Store\ the\ Commands\ Matcher\ for\ later.\ If\ more\ commands\ are\ added,}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we'll\ update\ the\ Commands\ Matcher\ too.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \$this-\/>commandsMatcher\ =\ \textcolor{keyword}{new}\ Matcher\(\backslash\)CommandsMatcher(\$this-\/>all());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>commandsMatcher,}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Matcher\(\backslash\)KeywordsMatcher(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Matcher\(\backslash\)VariablesMatcher(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Matcher\(\backslash\)ConstantsMatcher(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Matcher\(\backslash\)FunctionsMatcher(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Matcher\(\backslash\)ClassNamesMatcher(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Matcher\(\backslash\)ClassMethodsMatcher(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Matcher\(\backslash\)ClassAttributesMatcher(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Matcher\(\backslash\)ObjectMethodsMatcher(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Matcher\(\backslash\)ObjectAttributesMatcher(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Matcher\(\backslash\)ClassMethodDefaultParametersMatcher(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Matcher\(\backslash\)ObjectMethodDefaultParametersMatcher(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Matcher\(\backslash\)FunctionDefaultParametersMatcher(),}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00256}00256\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00261}\mbox{\hyperlink{class_psy_1_1_shell_a33f421ac164a48e166a356f5501ae372}{00261}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a33f421ac164a48e166a356f5501ae372}{getTabCompletionMatchers}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00262}00262\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ @\(\backslash\)trigger\_error(\textcolor{stringliteral}{'getTabCompletionMatchers\ is\ no\ longer\ used'},\ \(\backslash\)E\_USER\_DEPRECATED);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00264}00264\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00271}\mbox{\hyperlink{class_psy_1_1_shell_a3b5d704d83b69e8c75e1f99e5e1a7ca8}{00271}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a3b5d704d83b69e8c75e1f99e5e1a7ca8}{getDefaultLoopListeners}}():\ array}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00272}00272\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \$listeners\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ProcessForker::isSupported()\ \&\&\ \$this-\/>config-\/>usePcntl())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \$listeners[]\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_execution_loop_1_1_process_forker}{ProcessForker}}();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00278}00278\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (RunkitReloader::isSupported())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \$listeners[]\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_execution_loop_1_1_runkit_reloader}{RunkitReloader}}();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$listeners;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00284}00284\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00291}\mbox{\hyperlink{class_psy_1_1_shell_a0cdf133547734a1d239bcb848a8af622}{00291}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a0cdf133547734a1d239bcb848a8af622}{addMatchers}}(array\ \$matchers)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00292}00292\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \$this-\/>matchers\ =\ \(\backslash\)array\_merge(\$this-\/>matchers,\ \$matchers);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00294}00294\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>autoCompleter))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>addMatchersToAutoCompleter(\$matchers);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00298}00298\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00305}\mbox{\hyperlink{class_psy_1_1_shell_ac3ea07db68f7969d52cd9d07cfc6270d}{00305}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ac3ea07db68f7969d52cd9d07cfc6270d}{addTabCompletionMatchers}}(array\ \$matchers)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00306}00306\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \$this-\/>addMatchers(\$matchers);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00308}00308\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00315}\mbox{\hyperlink{class_psy_1_1_shell_a25085bce936586f89866bde2d1baa4bb}{00315}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a25085bce936586f89866bde2d1baa4bb}{setOutput}}(\mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_output_1_1_output_interface}{OutputInterface}}\ \$output)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00316}00316\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \$this-\/>output\ =\ \$output;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \$this-\/>originalVerbosity\ =\ \$output-\/>getVerbosity();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00319}00319\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00320}00320\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00329}\mbox{\hyperlink{class_psy_1_1_shell_a05dd9c0ddaec72a715c26082770151e1}{00329}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a05dd9c0ddaec72a715c26082770151e1}{run}}(\mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_input_1_1_input_interface}{InputInterface}}\ \$input\ =\ \textcolor{keyword}{null},\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_output_1_1_output_interface}{OutputInterface}}\ \$output\ =\ \textcolor{keyword}{null}):\ int}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00330}00330\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We'll\ just\ ignore\ the\ input\ passed\ in,\ and\ set\ up\ our\ own!}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \$input\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_input_1_1_array_input}{ArrayInput}}([]);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00333}00333\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$output\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \$output\ =\ \$this-\/>config-\/>getOutput();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ \$this-\/>setAutoExit(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00339}00339\ \ \ \ \ \ \ \ \ \$this-\/>setCatchExceptions(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00341}00341\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parent::run(\$input,\ \$output);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Throwable\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>writeException(\$e);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00348}00348\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00360}\mbox{\hyperlink{class_psy_1_1_shell_a6474e644924bebff81f50225990f6079}{00360}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a6474e644924bebff81f50225990f6079}{doRun}}(\mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_input_1_1_input_interface}{InputInterface}}\ \$input,\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_output_1_1_output_interface}{OutputInterface}}\ \$output):\ int}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00361}00361\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \$this-\/>setOutput(\$output);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \$this-\/>resetCodeBuffer();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00365}00365\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$input-\/>isInteractive())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @todo\ should\ it\ be\ possible\ to\ have\ raw\ output\ in\ an\ interactive\ run?}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>doInteractiveRun();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00368}00368\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>doNonInteractiveRun(\$this-\/>config-\/>rawOutput());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00370}00370\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00371}00371\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00372}00372\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00383}00383\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ doInteractiveRun():\ int}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00384}00384\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00385}00385\ \ \ \ \ \ \ \ \ \$this-\/>initializeTabCompletion();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \$this-\/>readline-\/>readHistory();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(\$this-\/>getHeader());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \$this-\/>writeVersionInfo();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \$this-\/>writeStartupMessage();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00391}00391\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>beforeRun();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>loadIncludes();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{1a557177cfd75ac38db8e3e496f560d8_8php_ae7d53f6b57a5cd2cec9cadec7e80910a}{\$loop}}\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_execution_loop_closure}{ExecutionLoopClosure}}(\$this);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00396}00396\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{1a557177cfd75ac38db8e3e496f560d8_8php_ae7d53f6b57a5cd2cec9cadec7e80910a}{\$loop}}-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>afterRun();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00398}00398\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (ThrowUpException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e-\/>getPrevious();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00400}00400\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (BreakException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ ProcessForker\ throws\ a\ BreakException\ to\ finish\ the\ main\ thread.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00403}00403\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00405}00405\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00406}00406\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00417}00417\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ doNonInteractiveRun(\textcolor{keywordtype}{bool}\ \$rawOutput):\ int}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00418}00418\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00419}00419\ \ \ \ \ \ \ \ \ \$this-\/>nonInteractive\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00420}00420\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00421}00421\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ raw\ output\ is\ enabled\ (or\ output\ is\ piped)\ we\ don't\ want\ startup\ messages.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00422}00422\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$rawOutput\ \&\&\ !\$this-\/>config-\/>outputIsPiped())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(\$this-\/>\mbox{\hyperlink{namespace_guzzle_http_1_1_psr7_aab81e43916cdc2d7c29fd4beb9f52519}{getHeader}}());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>writeVersionInfo();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>writeStartupMessage();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00426}00426\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00428}00428\ \ \ \ \ \ \ \ \ \$this-\/>beforeRun();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00429}00429\ \ \ \ \ \ \ \ \ \$this-\/>loadIncludes();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00430}00430\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ For\ non-\/interactive\ execution,\ read\ only\ from\ the\ input\ buffer\ or\ from\ piped\ input.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Otherwise\ it'll\ try\ to\ readline\ and\ hang,\ waiting\ for\ user\ input\ with\ no\ indication\ of}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ what's\ holding\ things\ up.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!empty(\$this-\/>inputBuffer)\ ||\ \$this-\/>config-\/>inputIsPiped())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_console_1_1_tester_a4380f30ae9202fa49ebd2439572f9cdb}{getInput}}(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00437}00437\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>hasCode())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \$ret\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_testing_1_1_concerns_a1909f4b7f8129c7790cb75de2ffbe1e4}{execute}}(\$this-\/>flushCode());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>writeReturnValue(\$ret,\ \$rawOutput);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00441}00441\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00442}00442\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00443}00443\ \ \ \ \ \ \ \ \ \$this-\/>afterRun();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00444}00444\ \ \ \ \ \ \ \ \ \$this-\/>nonInteractive\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00445}00445\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00446}00446\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00447}00447\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00448}00448\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00452}\mbox{\hyperlink{class_psy_1_1_shell_a624edb7ee96baea6adbddbeb6123fe04}{00452}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a624edb7ee96baea6adbddbeb6123fe04}{configureIO}}(\mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_input_1_1_input_interface}{InputInterface}}\ \$input,\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_output_1_1_output_interface}{OutputInterface}}\ \$output)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00453}00453\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @todo\ overrides\ via\ environment\ variables\ (or\ should\ these\ happen\ in\ config?\ ...\ probably\ config)}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \$input-\/>setInteractive(\$this-\/>config-\/>getInputInteractive());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00456}00456\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>config-\/>getOutputDecorated()\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \ \ \$output-\/>setDecorated(\$this-\/>config-\/>getOutputDecorated());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00459}00459\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00460}00460\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00461}00461\ \ \ \ \ \ \ \ \ \$output-\/>setVerbosity(\$this-\/>config-\/>getOutputVerbosity());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00462}00462\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00463}00463\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00467}00467\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ loadIncludes()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00468}00468\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Load\ user-\/defined\ includes}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00470}00470\ \ \ \ \ \ \ \ \ \$load\ =\ \textcolor{keyword}{function}\ (\textcolor{keyword}{self}\ \$\_\_psysh\_\_)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)set\_error\_handler([\$\_\_psysh\_\_,\ \textcolor{stringliteral}{'handleError'}]);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$\_\_psysh\_\_-\/>getIncludes()\ as\ \$\_\_psysh\_include\_\_)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00474}00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ include\_once\ \$\_\_psysh\_include\_\_;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Exception\ \$\_e)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$\_\_psysh\_\_-\/>writeException(\$\_e);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)restore\_error\_handler();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$\_\_psysh\_include\_\_);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00481}00481\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00482}00482\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Override\ any\ new\ local\ variables\ with\ pre-\/defined\ scope\ variables}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00483}00483\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)extract(\$\_\_psysh\_\_-\/>getScopeVariables(\textcolor{keyword}{false}));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00484}00484\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ...\ then\ add\ the\ whole\ mess\ of\ variables\ back.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00486}00486\ \ \ \ \ \ \ \ \ \ \ \ \ \$\_\_psysh\_\_-\/>setScopeVariables(\(\backslash\)get\_defined\_vars());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00487}00487\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00488}00488\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \$load(\$this);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00490}00490\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00491}00491\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00502}\mbox{\hyperlink{class_psy_1_1_shell_abe9d768495196264ffbdfb63c99fd732}{00502}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_abe9d768495196264ffbdfb63c99fd732}{getInput}}(\textcolor{keywordtype}{bool}\ \$interactive\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00503}00503\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \$this-\/>codeBufferOpen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00505}00505\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00506}00506\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{do}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00507}00507\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ reset\ output\ verbosity\ (in\ case\ it\ was\ altered\ by\ a\ subcommand)}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00508}00508\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>setVerbosity(\$this-\/>originalVerbosity);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \$input\ =\ \$this-\/>readline();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00511}00511\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00513}00513\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *\ Handle\ Ctrl+D.\ It\ behaves\ differently\ in\ different\ cases:}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00514}00514\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00515}00515\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *\ \ \ 1)\ In\ an\ expression,\ like\ a\ function\ or\ "{}if"{}\ block,\ clear\ the\ input\ buffer}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00516}00516\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *\ \ \ 2)\ At\ top-\/level\ session,\ behave\ like\ the\ exit\ command}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00517}00517\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ *\ \ \ 3)\ When\ non-\/interactive,\ return,\ because\ that's\ the\ end\ of\ stdin}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00518}00518\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$input\ ===\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$interactive)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00523}00523\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00524}00524\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(\textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00525}00525\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>hasCode())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00527}00527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>resetCodeBuffer();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00528}00528\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_break_exception}{BreakException}}(\textcolor{stringliteral}{'Ctrl+D'});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00530}00530\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00532}00532\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00533}00533\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ handle\ empty\ input}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)trim(\$input)\ ===\ \textcolor{stringliteral}{''}\ \&\&\ !\$this-\/>codeBufferOpen)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00535}00535\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00537}00537\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00538}00538\ \ \ \ \ \ \ \ \ \ \ \ \ \$input\ =\ \$this-\/>onInput(\$input);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00539}00539\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ input\ isn't\ in\ an\ open\ string\ or\ comment,\ check\ for\ commands\ to\ run.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>hasCommand(\$input)\ \&\&\ !\$this-\/>inputInOpenStringOrComment(\$input))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>addHistory(\$input);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00543}00543\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>runCommand(\$input);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00544}00544\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00547}00547\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00548}00548\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>addCode(\$input);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{while}\ (!\$interactive\ ||\ !\$this-\/>hasValidCode());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00550}00550\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00551}00551\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00559}00559\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ inputInOpenStringOrComment(\textcolor{keywordtype}{string}\ \$input):\ bool}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00560}00560\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>hasCode())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00562}00562\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00563}00563\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00564}00564\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00565}00565\ \ \ \ \ \ \ \ \ \$code\ =\ \$this-\/>codeBuffer;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00566}00566\ \ \ \ \ \ \ \ \ \$code[]\ =\ \$input;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00567}00567\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}\ =\ @\(\backslash\)token\_get\_all(\textcolor{stringliteral}{'<?php\ '}.\(\backslash\)implode(\textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ \$code));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00568}00568\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8html_8php_acf48db609a946d13953d8060363fd1d3}{\$last}}\ =\ \(\backslash\)array\_pop(\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00569}00569\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00570}00570\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{exception_8html_8php_acf48db609a946d13953d8060363fd1d3}{\$last}}\ ===\ \textcolor{charliteral}{'"{}'}\ ||\ \mbox{\hyperlink{exception_8html_8php_acf48db609a946d13953d8060363fd1d3}{\$last}}\ ===\ \textcolor{charliteral}{'`'}\ ||}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00571}00571\ \ \ \ \ \ \ \ \ \ \ \ \ (\(\backslash\)is\_array(\mbox{\hyperlink{exception_8html_8php_acf48db609a946d13953d8060363fd1d3}{\$last}})\ \&\&\ \(\backslash\)in\_array(\mbox{\hyperlink{exception_8html_8php_acf48db609a946d13953d8060363fd1d3}{\$last}}[0],\ [\(\backslash\)T\_ENCAPSED\_AND\_WHITESPACE,\ \(\backslash\)T\_START\_HEREDOC,\ \(\backslash\)T\_COMMENT]));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00572}00572\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00573}00573\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00577}\mbox{\hyperlink{class_psy_1_1_shell_aaeb3b98fe947372c1f44c5496beb12c5}{00577}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_aaeb3b98fe947372c1f44c5496beb12c5}{beforeRun}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00578}00578\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00579}00579\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>loopListeners\ as\ \$listener)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00580}00580\ \ \ \ \ \ \ \ \ \ \ \ \ \$listener-\/>beforeRun(\$this);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00582}00582\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00583}00583\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00587}\mbox{\hyperlink{class_psy_1_1_shell_af7fb6cb4a2d8183eee8bc2e828adb992}{00587}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_af7fb6cb4a2d8183eee8bc2e828adb992}{beforeLoop}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00588}00588\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00589}00589\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>loopListeners\ as\ \$listener)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00590}00590\ \ \ \ \ \ \ \ \ \ \ \ \ \$listener-\/>beforeLoop(\$this);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00591}00591\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00592}00592\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00593}00593\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00599}\mbox{\hyperlink{class_psy_1_1_shell_a241682ddab3904c89d26aa092d0eaade}{00599}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a241682ddab3904c89d26aa092d0eaade}{onInput}}(\textcolor{keywordtype}{string}\ \$input):\ string}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00600}00600\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00601}00601\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>loopListeners\ as\ \$listeners)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\$return\ =\ \$listeners-\/>onInput(\$this,\ \$input))\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00603}00603\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$input\ =\ \$return;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00604}00604\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00605}00605\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00606}00606\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00607}00607\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$input;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00608}00608\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00609}00609\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00615}\mbox{\hyperlink{class_psy_1_1_shell_a0d97ff59a50367497f31b679b64f6bc6}{00615}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a0d97ff59a50367497f31b679b64f6bc6}{onExecute}}(\textcolor{keywordtype}{string}\ \$code):\ string}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00616}00616\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00617}00617\ \ \ \ \ \ \ \ \ \$this-\/>errorReporting\ =\ \(\backslash\)error\_reporting();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00618}00618\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00619}00619\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>loopListeners\ as\ \$listener)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00620}00620\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\$return\ =\ \$listener-\/>onExecute(\$this,\ \$code))\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$code\ =\ \$return;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00623}00623\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00624}00624\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00625}00625\ \ \ \ \ \ \ \ \ \$output\ =\ \$this-\/>output;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00626}00626\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$output\ instanceof\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_output_1_1_console_output}{ConsoleOutput}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00627}00627\ \ \ \ \ \ \ \ \ \ \ \ \ \$output\ =\ \$output-\/>getErrorOutput();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00628}00628\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00629}00629\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00630}00630\ \ \ \ \ \ \ \ \ \$output-\/>writeln(\(\backslash\)sprintf(\textcolor{stringliteral}{'<whisper>\%s</whisper>'},\ OutputFormatter::escape(\$code)),\ ConsoleOutput::VERBOSITY\_DEBUG);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00631}00631\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00632}00632\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$code;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00633}00633\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00634}00634\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00638}\mbox{\hyperlink{class_psy_1_1_shell_ac1da2831d5b05438b481d742c32906c6}{00638}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ac1da2831d5b05438b481d742c32906c6}{afterLoop}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00639}00639\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00640}00640\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>loopListeners\ as\ \$listener)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00641}00641\ \ \ \ \ \ \ \ \ \ \ \ \ \$listener-\/>afterLoop(\$this);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00642}00642\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00643}00643\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00644}00644\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00648}\mbox{\hyperlink{class_psy_1_1_shell_ac325e1a207cc3d682bb8078ef7d98835}{00648}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ac325e1a207cc3d682bb8078ef7d98835}{afterRun}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00649}00649\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00650}00650\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>loopListeners\ as\ \$listener)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00651}00651\ \ \ \ \ \ \ \ \ \ \ \ \ \$listener-\/>afterRun(\$this);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00652}00652\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00653}00653\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00654}00654\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00660}\mbox{\hyperlink{class_psy_1_1_shell_a3bf8681e0da41a742ffdd99d0308368d}{00660}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a3bf8681e0da41a742ffdd99d0308368d}{setScopeVariables}}(array\ \$vars)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00661}00661\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00662}00662\ \ \ \ \ \ \ \ \ \$this-\/>context-\/>setAll(\$vars);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00663}00663\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00664}00664\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00674}\mbox{\hyperlink{class_psy_1_1_shell_ab3d7429a9d32071d5657c87f68f42701}{00674}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ab3d7429a9d32071d5657c87f68f42701}{getScopeVariables}}(\textcolor{keywordtype}{bool}\ \$includeBoundObject\ =\ \textcolor{keyword}{true}):\ array}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00675}00675\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00676}00676\ \ \ \ \ \ \ \ \ \$vars\ =\ \$this-\/>context-\/>getAll();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00677}00677\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00678}00678\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$includeBoundObject)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00679}00679\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$vars[\textcolor{stringliteral}{'this'}]);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00680}00680\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00681}00681\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00682}00682\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$vars;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00683}00683\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00684}00684\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00694}\mbox{\hyperlink{class_psy_1_1_shell_ac95dc6cc306b46fcb99142262cbe0fb3}{00694}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ac95dc6cc306b46fcb99142262cbe0fb3}{getSpecialScopeVariables}}(\textcolor{keywordtype}{bool}\ \$includeBoundObject\ =\ \textcolor{keyword}{true}):\ array}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00695}00695\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00696}00696\ \ \ \ \ \ \ \ \ \$vars\ =\ \$this-\/>context-\/>getSpecialVariables();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00697}00697\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00698}00698\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$includeBoundObject)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00699}00699\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$vars[\textcolor{stringliteral}{'this'}]);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00700}00700\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00701}00701\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00702}00702\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$vars;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00703}00703\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00704}00704\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00716}\mbox{\hyperlink{class_psy_1_1_shell_a283c22bbd21b27e1d68a21fc14e9cd20}{00716}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a283c22bbd21b27e1d68a21fc14e9cd20}{getScopeVariablesDiff}}(array\ \$currentVars):\ array}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00717}00717\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00718}00718\ \ \ \ \ \ \ \ \ \$newVars\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00719}00719\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00720}00720\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>getScopeVariables(\textcolor{keyword}{false})\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00721}00721\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)array\_key\_exists(\$key,\ \$currentVars)\ ||\ \$currentVars[\$key]\ !==\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00722}00722\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$newVars[\$key]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00723}00723\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00724}00724\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00725}00725\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00726}00726\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$newVars;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00727}00727\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00728}00728\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00734}\mbox{\hyperlink{class_psy_1_1_shell_ad09e77aad4dd62531b3a1962bc0d6c35}{00734}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ad09e77aad4dd62531b3a1962bc0d6c35}{getUnusedCommandScopeVariableNames}}():\ array}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00735}00735\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00736}00736\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>context-\/>getUnusedCommandScopeVariableNames();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00737}00737\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00738}00738\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00744}\mbox{\hyperlink{class_psy_1_1_shell_a1aefa5d2ab6dd3e636563dcaa35bee11}{00744}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a1aefa5d2ab6dd3e636563dcaa35bee11}{getScopeVariableNames}}():\ array}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00745}00745\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00746}00746\ \ \ \ \ \ \ \ \ return\ \(\backslash\)array\_keys(\$this-\/>context-\/>getAll());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00747}00747\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00748}00748\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00756}\mbox{\hyperlink{class_psy_1_1_shell_a1c5f974fdd680af8a4ecabb6d47d0216}{00756}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a1c5f974fdd680af8a4ecabb6d47d0216}{getScopeVariable}}(\textcolor{keywordtype}{string}\ \$name)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00757}00757\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00758}00758\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>context-\/>get(\$name);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00759}00759\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00760}00760\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00766}\mbox{\hyperlink{class_psy_1_1_shell_ac916dd1c43fde545236707464147439f}{00766}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ac916dd1c43fde545236707464147439f}{setBoundObject}}(\$boundObject)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00767}00767\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00768}00768\ \ \ \ \ \ \ \ \ \$this-\/>context-\/>setBoundObject(\$boundObject);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00769}00769\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00770}00770\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00776}\mbox{\hyperlink{class_psy_1_1_shell_a6aa8747b5e0f5fdbcf765a3f03e8b34e}{00776}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a6aa8747b5e0f5fdbcf765a3f03e8b34e}{getBoundObject}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00777}00777\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00778}00778\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>context-\/>getBoundObject();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00779}00779\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00780}00780\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00786}\mbox{\hyperlink{class_psy_1_1_shell_ac9c06ce74537bd2c8d8b77bcc6f24ef0}{00786}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ac9c06ce74537bd2c8d8b77bcc6f24ef0}{setBoundClass}}(\$boundClass)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00787}00787\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00788}00788\ \ \ \ \ \ \ \ \ \$this-\/>context-\/>setBoundClass(\$boundClass);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00789}00789\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00790}00790\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00796}\mbox{\hyperlink{class_psy_1_1_shell_a46349ee7ddb3d42c8500f881f875772a}{00796}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a46349ee7ddb3d42c8500f881f875772a}{getBoundClass}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00797}00797\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00798}00798\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>context-\/>getBoundClass();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00799}00799\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00800}00800\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00806}\mbox{\hyperlink{class_psy_1_1_shell_a9525b80c19c52a0432452c5cdd6a6476}{00806}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a9525b80c19c52a0432452c5cdd6a6476}{setIncludes}}(array\ \$includes\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00807}00807\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00808}00808\ \ \ \ \ \ \ \ \ \$this-\/>includes\ =\ \$includes;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00809}00809\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00810}00810\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00816}\mbox{\hyperlink{class_psy_1_1_shell_abb68f9a8654344b16ad437501f70352e}{00816}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_abb68f9a8654344b16ad437501f70352e}{getIncludes}}():\ array}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00817}00817\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00818}00818\ \ \ \ \ \ \ \ \ return\ \(\backslash\)array\_merge(\$this-\/>config-\/>getDefaultIncludes(),\ \$this-\/>includes);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00819}00819\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00820}00820\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00826}\mbox{\hyperlink{class_psy_1_1_shell_a2bd4e0d93bc783f058a8b1af222c3bd0}{00826}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a2bd4e0d93bc783f058a8b1af222c3bd0}{hasCode}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00827}00827\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00828}00828\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !empty(\$this-\/>codeBuffer);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00829}00829\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00830}00830\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00838}\mbox{\hyperlink{class_psy_1_1_shell_a23fe86f9c285191152c0ae207fce9a6e}{00838}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a23fe86f9c285191152c0ae207fce9a6e}{hasValidCode}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00839}00839\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00840}00840\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\$this-\/>codeBufferOpen\ \&\&\ \$this-\/>code\ !==\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00841}00841\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00842}00842\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00849}\mbox{\hyperlink{class_psy_1_1_shell_ad9bcad34927b6b728b48a9a32a8bd717}{00849}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ad9bcad34927b6b728b48a9a32a8bd717}{addCode}}(\textcolor{keywordtype}{string}\ \$code,\ \textcolor{keywordtype}{bool}\ \$silent\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00850}00850\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00851}00851\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00852}00852\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Code\ lines\ ending\ in\ \(\backslash\)\ keep\ the\ buffer\ open}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00853}00853\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)substr(\(\backslash\)rtrim(\$code),\ -\/1)\ ===\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00854}00854\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>codeBufferOpen\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00855}00855\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$code\ =\ \(\backslash\)substr(\(\backslash\)rtrim(\$code),\ 0,\ -\/1);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00856}00856\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00857}00857\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>codeBufferOpen\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00858}00858\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00859}00859\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00860}00860\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>codeBuffer[]\ =\ \$silent\ ?\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_input_1_1_silent_input}{SilentInput}}(\$code)\ :\ \$code;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00861}00861\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>code\ =\ \$this-\/>cleaner-\/>clean(\$this-\/>codeBuffer,\ \$this-\/>config-\/>requireSemicolons());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00862}00862\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Throwable\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00863}00863\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ failed\ code\ blocks\ to\ the\ readline\ history.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00864}00864\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>addCodeBufferToHistory();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00865}00865\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00866}00866\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00867}00867\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00868}00868\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00869}00869\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00882}00882\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ setCode(\textcolor{keywordtype}{string}\ \$code,\ \textcolor{keywordtype}{bool}\ \$silent\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00883}00883\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00884}00884\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>hasCode())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00885}00885\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>codeStack[]\ =\ [\$this-\/>codeBuffer,\ \$this-\/>codeBufferOpen,\ \$this-\/>code];}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00886}00886\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00887}00887\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00888}00888\ \ \ \ \ \ \ \ \ \$this-\/>resetCodeBuffer();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00889}00889\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00890}00890\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>addCode(\$code,\ \$silent);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00891}00891\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Throwable\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00892}00892\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>popCodeStack();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00893}00893\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00894}00894\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00895}00895\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00896}00896\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00897}00897\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>hasValidCode())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00898}00898\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>popCodeStack();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00899}00899\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00900}00900\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'Unexpected\ end\ of\ input'});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00901}00901\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00902}00902\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00903}00903\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00911}\mbox{\hyperlink{class_psy_1_1_shell_a5406fba0c93346c1af2a3c6454e6f865}{00911}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a5406fba0c93346c1af2a3c6454e6f865}{getCodeBuffer}}():\ array}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00912}00912\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00913}00913\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>codeBuffer;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00914}00914\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00915}00915\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00925}\mbox{\hyperlink{class_psy_1_1_shell_ad5975ecb96664e1cd29e5cc0e0962dfe}{00925}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ad5975ecb96664e1cd29e5cc0e0962dfe}{runCommand}}(\textcolor{keywordtype}{string}\ \$input)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00926}00926\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00927}00927\ \ \ \ \ \ \ \ \ \$command\ =\ \$this-\/>getCommand(\$input);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00928}00928\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00929}00929\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$command))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00930}00930\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'Command\ not\ found:\ '}.\$input);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00931}00931\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00932}00932\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00933}00933\ \ \ \ \ \ \ \ \ \$input\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_input_1_1_shell_input}{ShellInput}}(\(\backslash\)str\_replace(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)'},\ \(\backslash\)rtrim(\$input,\ \textcolor{stringliteral}{"{}\ \(\backslash\)t\(\backslash\)n\(\backslash\)r\(\backslash\)0\(\backslash\)x0B;"{}})));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00934}00934\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00935}00935\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$input-\/>hasParameterOption([\textcolor{stringliteral}{'-\/-\/help'},\ \textcolor{stringliteral}{'-\/h'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00936}00936\ \ \ \ \ \ \ \ \ \ \ \ \ \$helpCommand\ =\ \$this-\/>\textcolor{keyword}{get}(\textcolor{stringliteral}{'help'});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00937}00937\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$helpCommand\ instanceof\ \mbox{\hyperlink{class_psy_1_1_command_1_1_command}{Command}}\(\backslash\)HelpCommand)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00938}00938\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_runtime_exception}{RuntimeException}}(\textcolor{stringliteral}{'Invalid\ help\ command\ instance'});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00939}00939\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00940}00940\ \ \ \ \ \ \ \ \ \ \ \ \ \$helpCommand-\/>setCommand(\$command);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00941}00941\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00942}00942\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$helpCommand-\/>run(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_input_1_1_string_input}{StringInput}}(\textcolor{stringliteral}{''}),\ \$this-\/>output);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00943}00943\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00944}00944\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00945}00945\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$command-\/>run(\$input,\ \$this-\/>output);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00946}00946\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00947}00947\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00954}\mbox{\hyperlink{class_psy_1_1_shell_a74edee9a389c4e6335d356e68d493dbf}{00954}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a74edee9a389c4e6335d356e68d493dbf}{resetCodeBuffer}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00955}00955\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00956}00956\ \ \ \ \ \ \ \ \ \$this-\/>codeBuffer\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00957}00957\ \ \ \ \ \ \ \ \ \$this-\/>code\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00958}00958\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00959}00959\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00968}\mbox{\hyperlink{class_psy_1_1_shell_a09f0ac4e34d9805507872b7d66d03923}{00968}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a09f0ac4e34d9805507872b7d66d03923}{addInput}}(\$input,\ \textcolor{keywordtype}{bool}\ \$silent\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00969}00969\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00970}00970\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ ((array)\ \$input\ as\ \$line)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00971}00971\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>inputBuffer[]\ =\ \$silent\ ?\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_input_1_1_silent_input}{SilentInput}}(\$line)\ :\ \$line;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00972}00972\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00973}00973\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00974}00974\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00983}\mbox{\hyperlink{class_psy_1_1_shell_a44c2fcec9e91e839a8a8339c47902518}{00983}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a44c2fcec9e91e839a8a8339c47902518}{flushCode}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00984}00984\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00985}00985\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>hasValidCode())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00986}00986\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>addCodeBufferToHistory();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00987}00987\ \ \ \ \ \ \ \ \ \ \ \ \ \$code\ =\ \$this-\/>code;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00988}00988\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>popCodeStack();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00989}00989\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00990}00990\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$code;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00991}00991\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00992}00992\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00993}00993\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00997}00997\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ popCodeStack()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00998}00998\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l00999}00999\ \ \ \ \ \ \ \ \ \$this-\/>resetCodeBuffer();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01000}01000\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01001}01001\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$this-\/>codeStack))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01002}01002\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01003}01003\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01004}01004\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01005}01005\ \ \ \ \ \ \ \ \ list(\$codeBuffer,\ \$codeBufferOpen,\ \$code)\ =\ \(\backslash\)array\_pop(\$this-\/>codeStack);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01006}01006\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01007}01007\ \ \ \ \ \ \ \ \ \$this-\/>codeBuffer\ =\ \$codeBuffer;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01008}01008\ \ \ \ \ \ \ \ \ \$this-\/>codeBufferOpen\ =\ \$codeBufferOpen;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01009}01009\ \ \ \ \ \ \ \ \ \$this-\/>code\ =\ \$code;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01010}01010\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01011}01011\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01024}01024\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ addHistory(\$line)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01025}01025\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01026}01026\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$line\ instanceof\ SilentInput)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01027}01027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01028}01028\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01029}01029\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01030}01030\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Skip\ empty\ lines\ and\ lines\ starting\ with\ a\ space}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01031}01031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)trim(\$line)\ !==\ \textcolor{stringliteral}{''}\ \&\&\ \(\backslash\)substr(\$line,\ 0,\ 1)\ !==\ \textcolor{charliteral}{'\ '})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01032}01032\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>readline-\/>addHistory(\$line);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01033}01033\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01034}01034\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01035}01035\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01039}01039\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ addCodeBufferToHistory()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01040}01040\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01041}01041\ \ \ \ \ \ \ \ \ \$codeBuffer\ =\ \(\backslash\)array\_filter(\$this-\/>codeBuffer,\ \textcolor{keyword}{function}\ (\$line)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01042}01042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\$line\ instanceof\ SilentInput;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01043}01043\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01044}01044\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01045}01045\ \ \ \ \ \ \ \ \ \$this-\/>addHistory(\(\backslash\)implode(\textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ \$codeBuffer));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01046}01046\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01047}01047\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01055}\mbox{\hyperlink{class_psy_1_1_shell_a2614df64646ac71b70b1e1074258052b}{01055}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a2614df64646ac71b70b1e1074258052b}{getNamespace}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01056}01056\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01057}01057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{traces_8html_8php_a3825c9b9060c2d6ef594385997cd60aa}{\$namespace}}\ =\ \$this-\/>cleaner-\/>getNamespace())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01058}01058\ \ \ \ \ \ \ \ \ \ \ \ \ return\ \(\backslash\)implode(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ \mbox{\hyperlink{traces_8html_8php_a3825c9b9060c2d6ef594385997cd60aa}{\$namespace}});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01059}01059\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01060}01060\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01061}01061\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01070}\mbox{\hyperlink{class_psy_1_1_shell_a700a16cb69e7f8db688eb82508abccee}{01070}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a700a16cb69e7f8db688eb82508abccee}{writeStdout}}(\textcolor{keywordtype}{string}\ \$out,\ \textcolor{keywordtype}{int}\ \$phase\ =\ \(\backslash\)PHP\_OUTPUT\_HANDLER\_END)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01071}01071\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01072}01072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$phase\ \&\ \(\backslash\)PHP\_OUTPUT\_HANDLER\_START)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01073}01073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>output\ instanceof\ \mbox{\hyperlink{class_psy_1_1_output_1_1_shell_output}{ShellOutput}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01074}01074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>startPaging();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01075}01075\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01076}01076\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01077}01077\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01078}01078\ \ \ \ \ \ \ \ \ \$isCleaning\ =\ \$phase\ \&\ \(\backslash\)PHP\_OUTPUT\_HANDLER\_CLEAN;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01079}01079\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01080}01080\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Incremental\ flush}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01081}01081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$out\ !==\ \textcolor{stringliteral}{''}\ \&\&\ !\$isCleaning)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01082}01082\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>write(\$out,\ \textcolor{keyword}{false},\ OutputInterface::OUTPUT\_RAW);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01083}01083\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>outputWantsNewline\ =\ (\(\backslash\)substr(\$out,\ -\/1)\ !==\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01084}01084\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>stdoutBuffer\ .=\ \$out;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01085}01085\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01086}01086\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01087}01087\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Output\ buffering\ is\ done!}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01088}01088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$phase\ \&\ \(\backslash\)PHP\_OUTPUT\_HANDLER\_END)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01089}01089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Write\ an\ extra\ newline\ if\ stdout\ didn't\ end\ with\ one}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01090}01090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>outputWantsNewline)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01091}01091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>config-\/>rawOutput()\ \&\&\ !\$this-\/>config-\/>outputIsPiped())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01092}01092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(\(\backslash\)sprintf(\textcolor{stringliteral}{'<whisper>\%s</whisper>'},\ \$this-\/>config-\/>useUnicode()\ ?\ \textcolor{stringliteral}{'⏎'}\ :\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)n'}));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01093}01093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01094}01094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(\textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01095}01095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01096}01096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>outputWantsNewline\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01097}01097\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01098}01098\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01099}01099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Save\ the\ stdout\ buffer\ as\ \$\_\_out}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01100}01100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>stdoutBuffer\ !==\ \textcolor{stringliteral}{''})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01101}01101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>context-\/>setLastStdout(\$this-\/>stdoutBuffer);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01102}01102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>stdoutBuffer\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01103}01103\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01104}01104\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01105}01105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>output\ instanceof\ \mbox{\hyperlink{class_psy_1_1_output_1_1_shell_output}{ShellOutput}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01106}01106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>stopPaging();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01107}01107\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01108}01108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01109}01109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01110}01110\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01122}\mbox{\hyperlink{class_psy_1_1_shell_a57fb6579983432a668d7c7cecbef160e}{01122}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a57fb6579983432a668d7c7cecbef160e}{writeReturnValue}}(\$ret,\ \textcolor{keywordtype}{bool}\ \$rawOutput\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01123}01123\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01124}01124\ \ \ \ \ \ \ \ \ \$this-\/>lastExecSuccess\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01125}01125\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01126}01126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$ret\ instanceof\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_no_return_value}{NoReturnValue}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01127}01127\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01128}01128\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01129}01129\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01130}01130\ \ \ \ \ \ \ \ \ \$this-\/>context-\/>setReturnValue(\$ret);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01131}01131\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01132}01132\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$rawOutput)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01133}01133\ \ \ \ \ \ \ \ \ \ \ \ \ \$formatted\ =\ \(\backslash\)var\_export(\$ret,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01134}01134\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01135}01135\ \ \ \ \ \ \ \ \ \ \ \ \ \$prompt\ =\ \$this-\/>config-\/>theme()-\/>returnValue();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01136}01136\ \ \ \ \ \ \ \ \ \ \ \ \ \$indent\ =\ \(\backslash\)str\_repeat(\textcolor{charliteral}{'\ '},\ \(\backslash\)strlen(\$prompt));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01137}01137\ \ \ \ \ \ \ \ \ \ \ \ \ \$formatted\ =\ \$this-\/>presentValue(\$ret);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01138}01138\ \ \ \ \ \ \ \ \ \ \ \ \ \$formattedRetValue\ =\ \(\backslash\)sprintf(\textcolor{stringliteral}{'<whisper>\%s</whisper>'},\ \$prompt);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01139}01139\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01140}01140\ \ \ \ \ \ \ \ \ \ \ \ \ \$formatted\ =\ \$formattedRetValue.\(\backslash\)str\_replace(\(\backslash\)PHP\_EOL,\ \(\backslash\)PHP\_EOL.\$indent,\ \$formatted);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01141}01141\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01142}01142\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01143}01143\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>output\ instanceof\ \mbox{\hyperlink{class_psy_1_1_output_1_1_shell_output}{ShellOutput}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01144}01144\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>page(\$formatted.\(\backslash\)PHP\_EOL);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01145}01145\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01146}01146\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(\$formatted);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01147}01147\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01148}01148\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01149}01149\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01160}\mbox{\hyperlink{class_psy_1_1_shell_a0ec91e3250d02faf6f29a001fbec6275}{01160}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a0ec91e3250d02faf6f29a001fbec6275}{writeException}}(\(\backslash\)Throwable\ \$e)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01161}01161\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01162}01162\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ No\ need\ to\ write\ the\ break\ exception\ during\ a\ non-\/interactive\ run.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01163}01163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$e\ instanceof\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_break_exception}{BreakException}}\ \&\&\ \$this-\/>nonInteractive)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01164}01164\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>resetCodeBuffer();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01165}01165\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01166}01166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01167}01167\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01168}01168\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01169}01169\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Break\ exceptions\ don't\ count\ :)}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01170}01170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$e\ instanceof\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_break_exception}{BreakException}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01171}01171\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>lastExecSuccess\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01172}01172\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>context-\/>setLastException(\$e);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01173}01173\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01174}01174\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01175}01175\ \ \ \ \ \ \ \ \ \$output\ =\ \$this-\/>output;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01176}01176\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$output\ instanceof\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_output_1_1_console_output}{ConsoleOutput}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01177}01177\ \ \ \ \ \ \ \ \ \ \ \ \ \$output\ =\ \$output-\/>getErrorOutput();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01178}01178\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01179}01179\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01180}01180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>config-\/>theme()-\/>compact())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01181}01181\ \ \ \ \ \ \ \ \ \ \ \ \ \$output-\/>writeln(\textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01182}01182\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01183}01183\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01184}01184\ \ \ \ \ \ \ \ \ \$output-\/>writeln(\$this-\/>formatException(\$e));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01185}01185\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01186}01186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>config-\/>theme()-\/>compact())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01187}01187\ \ \ \ \ \ \ \ \ \ \ \ \ \$output-\/>writeln(\textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01188}01188\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01189}01189\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01190}01190\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Include\ an\ exception\ trace\ (as\ long\ as\ this\ isn't\ a\ BreakException).}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01191}01191\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$e\ instanceof\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_break_exception}{BreakException}}\ \&\&\ \$output-\/>getVerbosity()\ >=\ OutputInterface::VERBOSITY\_VERBOSE)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01192}01192\ \ \ \ \ \ \ \ \ \ \ \ \ \$trace\ =\ TraceFormatter::formatTrace(\$e);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01193}01193\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)count(\$trace)\ !==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01194}01194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$output-\/>writeln(\textcolor{stringliteral}{'-\/-\/'});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01195}01195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$output-\/>write(\$trace,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01196}01196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$output-\/>writeln(\textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01197}01197\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01198}01198\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01199}01199\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01200}01200\ \ \ \ \ \ \ \ \ \$this-\/>resetCodeBuffer();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01201}01201\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01202}01202\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01208}\mbox{\hyperlink{class_psy_1_1_shell_ad24058425f6b8a31ee335d1b8e028cf1}{01208}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_ad24058425f6b8a31ee335d1b8e028cf1}{getLastExecSuccess}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01209}01209\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01210}01210\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>lastExecSuccess;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01211}01211\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01212}01212\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01220}\mbox{\hyperlink{class_psy_1_1_shell_a25da25227ebf0a908cf1682c6df4ec1c}{01220}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a25da25227ebf0a908cf1682c6df4ec1c}{formatException}}(\(\backslash\)Throwable\ \$e):\ string}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01221}01221\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01222}01222\ \ \ \ \ \ \ \ \ \$indent\ =\ \$this-\/>config-\/>theme()-\/>compact()\ ?\ \textcolor{stringliteral}{''}\ :\ \textcolor{stringliteral}{'\ \ '};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01223}01223\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01224}01224\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$e\ instanceof\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_break_exception}{BreakException}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01225}01225\ \ \ \ \ \ \ \ \ \ \ \ \ return\ \(\backslash\)sprintf(\textcolor{stringliteral}{'\%s<info>\ INFO\ </info>\ \%s.'},\ \$indent,\ \(\backslash\)rtrim(\$e-\/>getRawMessage(),\ \textcolor{charliteral}{'.'}));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01226}01226\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$e\ instanceof\ PsyException)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01227}01227\ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \$e-\/>getLine()\ >\ 1}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01228}01228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \(\backslash\)sprintf(\textcolor{stringliteral}{'\%s\ in\ \%s\ on\ line\ \%d'},\ \$e-\/>getRawMessage(),\ \$e-\/>getFile(),\ \$e-\/>getLine())}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01229}01229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \(\backslash\)sprintf(\textcolor{stringliteral}{'\%s\ in\ \%s'},\ \$e-\/>getRawMessage(),\ \$e-\/>getFile());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01230}01230\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01231}01231\ \ \ \ \ \ \ \ \ \ \ \ \ \$messageLabel\ =\ \(\backslash\)strtoupper(\$this-\/>getMessageLabel(\$e));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01232}01232\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01233}01233\ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \$e-\/>getMessage();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01234}01234\ \ \ \ \ \ \ \ \ \ \ \ \ \$messageLabel\ =\ \$this-\/>getMessageLabel(\$e);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01235}01235\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01236}01236\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01237}01237\ \ \ \ \ \ \ \ \ \$message\ =\ \(\backslash\)preg\_replace(}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01238}01238\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\#(\(\backslash\)\(\backslash\)w:)?([\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)/]\(\backslash\)\(\backslash\)w+)*[\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)/]src[\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)/]Execution(?:Loop)?Closure.php\(\backslash\)(\(\backslash\)d+\(\backslash\))\ :\ eval\(\backslash\)(\(\backslash\))'d\ code\#"{}},}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01239}01239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}eval()'d\ code"{}},}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01240}01240\ \ \ \ \ \ \ \ \ \ \ \ \ \$message}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01241}01241\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01242}01242\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01243}01243\ \ \ \ \ \ \ \ \ \$message\ =\ \(\backslash\)str\_replace(\textcolor{stringliteral}{"{}\ in\ eval()'d\ code"{}},\ \textcolor{stringliteral}{''},\ \$message);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01244}01244\ \ \ \ \ \ \ \ \ \$message\ =\ \(\backslash\)trim(\$message);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01245}01245\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01246}01246\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Ensures\ the\ given\ string\ ends\ with\ punctuation...}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01247}01247\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!empty(\$message)\ \&\&\ !\(\backslash\)in\_array(\(\backslash\)substr(\$message,\ -\/1),\ [\textcolor{charliteral}{'.'},\ \textcolor{charliteral}{'?'},\ \textcolor{charliteral}{'!'},\ \textcolor{charliteral}{':'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01248}01248\ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \textcolor{stringliteral}{"{}\$message."{}};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01249}01249\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01250}01250\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01251}01251\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Ensures\ the\ given\ message\ only\ contains\ relative\ paths...}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01252}01252\ \ \ \ \ \ \ \ \ \$message\ =\ \(\backslash\)str\_replace(\(\backslash\)getcwd().\(\backslash\)DIRECTORY\_SEPARATOR,\ \textcolor{stringliteral}{''},\ \$message);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01253}01253\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01254}01254\ \ \ \ \ \ \ \ \ \$severity\ =\ (\$e\ instanceof\ \(\backslash\)ErrorException)\ ?\ \$this-\/>getSeverity(\$e)\ :\ \textcolor{stringliteral}{'error'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01255}01255\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01256}01256\ \ \ \ \ \ \ \ \ return\ \(\backslash\)sprintf(\textcolor{stringliteral}{'\%s<\%s>\ \%s\ </\%s>\ \%s'},\ \$indent,\ \$severity,\ \$messageLabel,\ \$severity,\ OutputFormatter::escape(\$message));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01257}01257\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01258}01258\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01264}\mbox{\hyperlink{class_psy_1_1_shell_a515f874dc00640bf3fcf73b4fde81a0e}{01264}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a515f874dc00640bf3fcf73b4fde81a0e}{getSeverity}}(\(\backslash\)\mbox{\hyperlink{class_psy_1_1_exception_1_1_error_exception}{ErrorException}}\ \$e):\ string}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01265}01265\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01266}01266\ \ \ \ \ \ \ \ \ \$severity\ =\ \$e-\/>getSeverity();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01267}01267\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$severity\ \&\ \(\backslash\)error\_reporting())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01268}01268\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$severity)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01269}01269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_WARNING:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01270}01270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_NOTICE:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01271}01271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_CORE\_WARNING:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01272}01272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_COMPILE\_WARNING:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01273}01273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_USER\_WARNING:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01274}01274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_USER\_NOTICE:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01275}01275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_USER\_DEPRECATED:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01276}01276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_DEPRECATED:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01277}01277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_STRICT:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01278}01278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'warning'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01279}01279\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01280}01280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01281}01281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'error'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01282}01282\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01283}01283\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01284}01284\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Since\ this\ is\ below\ the\ user's\ reporting\ threshold,\ it's\ always\ going\ to\ be\ a\ warning.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01285}01285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'warning'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01286}01286\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01287}01287\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01288}01288\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01294}\mbox{\hyperlink{class_psy_1_1_shell_aa57bde794f73548a47bfeed33290aed8}{01294}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_aa57bde794f73548a47bfeed33290aed8}{getMessageLabel}}(\(\backslash\)Throwable\ \$e):\ string}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01295}01295\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01296}01296\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$e\ instanceof\ \(\backslash\)\mbox{\hyperlink{class_psy_1_1_exception_1_1_error_exception}{ErrorException}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01297}01297\ \ \ \ \ \ \ \ \ \ \ \ \ \$severity\ =\ \$e-\/>getSeverity();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01298}01298\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01299}01299\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$severity\ \&\ \(\backslash\)error\_reporting())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01300}01300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$severity)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01301}01301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_WARNING:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01302}01302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'Warning'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01303}01303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_NOTICE:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01304}01304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'Notice'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01305}01305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_CORE\_WARNING:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01306}01306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'Core\ Warning'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01307}01307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_COMPILE\_WARNING:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01308}01308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'Compile\ Warning'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01309}01309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_USER\_WARNING:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01310}01310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'User\ Warning'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01311}01311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_USER\_NOTICE:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01312}01312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'User\ Notice'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01313}01313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_USER\_DEPRECATED:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01314}01314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'User\ Deprecated'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01315}01315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_DEPRECATED:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01316}01316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'Deprecated'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01317}01317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ case\ \(\backslash\)E\_STRICT:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01318}01318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'Strict'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01319}01319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01320}01320\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01321}01321\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01322}01322\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01323}01323\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$e\ instanceof\ PsyException\ ||\ \$e\ instanceof\ SymfonyConsoleException)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01324}01324\ \ \ \ \ \ \ \ \ \ \ \ \ \$exceptionShortName\ =\ (new\ \(\backslash\)ReflectionClass(\$e))-\/>getShortName();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01325}01325\ \ \ \ \ \ \ \ \ \ \ \ \ \$typeParts\ =\ \(\backslash\)preg\_split(\textcolor{stringliteral}{'/(?=[A-\/Z])/'},\ \$exceptionShortName);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01326}01326\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01327}01327\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$exceptionShortName)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01328}01328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'RuntimeException'}:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01329}01329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'LogicException'}:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01330}01330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ These\ ones\ look\ weird\ without\ 'Exception'}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01331}01331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01332}01332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01333}01333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)end(\$typeParts)\ ===\ \textcolor{stringliteral}{'Exception'})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01334}01334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)array\_pop(\$typeParts);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01335}01335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01336}01336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01337}01337\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01338}01338\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01339}01339\ \ \ \ \ \ \ \ \ \ \ \ \ return\ \(\backslash\)trim(\(\backslash\)strtoupper(\(\backslash\)implode(\textcolor{charliteral}{'\ '},\ \$typeParts)));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01340}01340\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01341}01341\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01342}01342\ \ \ \ \ \ \ \ \ return\ \(\backslash\)get\_class(\$e);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01343}01343\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01344}01344\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01353}\mbox{\hyperlink{class_psy_1_1_shell_abb1d5e1b7698d8f0c86285edc487f7dd}{01353}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_abb1d5e1b7698d8f0c86285edc487f7dd}{execute}}(\textcolor{keywordtype}{string}\ \$code,\ \textcolor{keywordtype}{bool}\ \$throwExceptions\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01354}01354\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01355}01355\ \ \ \ \ \ \ \ \ \$this-\/>setCode(\$code,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01356}01356\ \ \ \ \ \ \ \ \ \$closure\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_execution_closure}{ExecutionClosure}}(\$this);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01357}01357\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01358}01358\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$throwExceptions)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01359}01359\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$closure-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01360}01360\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01361}01361\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01362}01362\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01363}01363\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$closure-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01364}01364\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Throwable\ \$\_e)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01365}01365\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>writeException(\$\_e);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01366}01366\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01367}01367\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01368}01368\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01394}\mbox{\hyperlink{class_psy_1_1_shell_a34a7b5c54d405faaeadd1ce6231fca0d}{01394}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a34a7b5c54d405faaeadd1ce6231fca0d}{handleError}}(\$errno,\ \$errstr,\ \$errfile,\ \$errline)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01395}01395\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01396}01396\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ is\ an\ error\ worth\ throwing.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01397}01397\ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01398}01398\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ n.b.\ Technically\ we\ can't\ handle\ all\ of\ these\ in\ userland\ code,\ but}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01399}01399\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we'll\ list\ 'em\ all\ for\ good\ measure}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01400}01400\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$errno\ \&\ (\(\backslash\)E\_ERROR\ |\ \(\backslash\)E\_PARSE\ |\ \(\backslash\)E\_CORE\_ERROR\ |\ \(\backslash\)E\_COMPILE\_ERROR\ |\ \(\backslash\)E\_USER\_ERROR\ |\ \(\backslash\)E\_RECOVERABLE\_ERROR))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01401}01401\ \ \ \ \ \ \ \ \ \ \ \ \ ErrorException::throwException(\$errno,\ \$errstr,\ \$errfile,\ \$errline);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01402}01402\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01403}01403\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01404}01404\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ errors\ are\ suppressed,\ the\ error\_reporting\ value\ will\ differ}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01405}01405\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ from\ when\ we\ started\ executing.\ In\ that\ case,\ we\ won't\ log\ errors.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01406}01406\ \ \ \ \ \ \ \ \ \$errorsSuppressed\ =\ \$this-\/>errorReporting\ !==\ \textcolor{keyword}{null}\ \&\&\ \$this-\/>errorReporting\ !==\ \(\backslash\)error\_reporting();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01407}01407\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01408}01408\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Otherwise\ log\ it\ and\ continue.}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01409}01409\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$errno\ \&\ \(\backslash\)error\_reporting()\ ||\ (!\$errorsSuppressed\ \&\&\ (\$errno\ \&\ \$this-\/>config-\/>errorLoggingLevel())))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01410}01410\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>writeException(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_error_exception}{ErrorException}}(\$errstr,\ 0,\ \$errno,\ \$errfile,\ \$errline));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01411}01411\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01412}01412\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01413}01413\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01423}\mbox{\hyperlink{class_psy_1_1_shell_a471a27539d027da31d8f6bfe25a40dd3}{01423}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a471a27539d027da31d8f6bfe25a40dd3}{presentValue}}(\$val):\ string}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01424}01424\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01425}01425\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>config-\/>getPresenter()-\/>present(\$val);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01426}01426\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01427}01427\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01435}\mbox{\hyperlink{class_psy_1_1_shell_a2ec451382381917aaae709afb966dc32}{01435}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a2ec451382381917aaae709afb966dc32}{getCommand}}(\textcolor{keywordtype}{string}\ \$input)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01436}01436\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01437}01437\ \ \ \ \ \ \ \ \ \$input\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_input_1_1_string_input}{StringInput}}(\$input);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01438}01438\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$name\ =\ \$input-\/>getFirstArgument())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01439}01439\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\textcolor{keyword}{get}(\$name);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01440}01440\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01441}01441\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01442}01442\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01450}\mbox{\hyperlink{class_psy_1_1_shell_a267585a3dbe3a7b8016c895a60a3c56a}{01450}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a267585a3dbe3a7b8016c895a60a3c56a}{hasCommand}}(\textcolor{keywordtype}{string}\ \$input):\ bool}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01451}01451\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01452}01452\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)preg\_match(\textcolor{stringliteral}{'/([\string^\(\backslash\)s]+?)(?:\(\backslash\)s|\$)/A'},\ \(\backslash\)ltrim(\$input),\ \$match))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01453}01453\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>has(\$match[1]);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01454}01454\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01455}01455\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01456}01456\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01457}01457\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01458}01458\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01464}\mbox{\hyperlink{class_psy_1_1_shell_a05669b4cff44cead1d4229eb1b900320}{01464}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a05669b4cff44cead1d4229eb1b900320}{getPrompt}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01465}01465\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01466}01466\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>output-\/>isQuiet())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01467}01467\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01468}01468\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01469}01469\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01470}01470\ \ \ \ \ \ \ \ \ \$theme\ =\ \$this-\/>config-\/>theme();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01471}01471\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01472}01472\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>hasCode())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01473}01473\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$theme-\/>bufferPrompt();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01474}01474\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01475}01475\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01476}01476\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$theme-\/>prompt();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01477}01477\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01478}01478\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01492}\mbox{\hyperlink{class_psy_1_1_shell_a0ca0241db2d4514a57b20090fe1882b6}{01492}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a0ca0241db2d4514a57b20090fe1882b6}{readline}}(\textcolor{keywordtype}{bool}\ \$interactive\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01493}01493\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01494}01494\ \ \ \ \ \ \ \ \ \$prompt\ =\ \$this-\/>config-\/>theme()-\/>replayPrompt();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01495}01495\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01496}01496\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!empty(\$this-\/>inputBuffer))\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01497}01497\ \ \ \ \ \ \ \ \ \ \ \ \ \$line\ =\ \(\backslash\)array\_shift(\$this-\/>inputBuffer);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01498}01498\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$line\ instanceof\ \mbox{\hyperlink{class_psy_1_1_input_1_1_silent_input}{SilentInput}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01499}01499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(\(\backslash\)sprintf(\textcolor{stringliteral}{'<whisper>\%s</whisper><aside>\%s</aside>'},\ \$prompt,\ OutputFormatter::escape(\$line)));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01500}01500\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01501}01501\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01502}01502\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$line;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01503}01503\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01504}01504\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01505}01505\ \ \ \ \ \ \ \ \ \$bracketedPaste\ =\ \$interactive\ \&\&\ \$this-\/>config-\/>useBracketedPaste();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01506}01506\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01507}01507\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$bracketedPaste)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01508}01508\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)printf(\textcolor{stringliteral}{"{}\(\backslash\)e[?2004h"{}});\ \textcolor{comment}{//\ Enable\ bracketed\ paste}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01509}01509\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01510}01510\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01511}01511\ \ \ \ \ \ \ \ \ \$line\ =\ \$this-\/>readline-\/>readline(\$this-\/>getPrompt());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01512}01512\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01513}01513\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$bracketedPaste)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01514}01514\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)printf(\textcolor{stringliteral}{"{}\(\backslash\)e[?2004l"{}});\ \textcolor{comment}{//\ ...\ and\ disable\ it\ again}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01515}01515\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01516}01516\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01517}01517\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$line;}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01518}01518\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01519}01519\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01523}\mbox{\hyperlink{class_psy_1_1_shell_a614834f1605e407376028e8c82298c82}{01523}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a614834f1605e407376028e8c82298c82}{getHeader}}():\ string}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01524}01524\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01525}01525\ \ \ \ \ \ \ \ \ return\ \(\backslash\)sprintf(\textcolor{stringliteral}{'<whisper>\%s\ by\ Justin\ Hileman</whisper>'},\ \$this-\/>getVersion());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01526}01526\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01527}01527\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01533}\mbox{\hyperlink{class_psy_1_1_shell_afa8e7a3a646144eab50188b7a805a389}{01533}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_afa8e7a3a646144eab50188b7a805a389}{getVersion}}():\ string}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01534}01534\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01535}01535\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::getVersionHeader(\$this-\/>config-\/>useUnicode());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01536}01536\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01537}01537\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01543}\mbox{\hyperlink{class_psy_1_1_shell_a28608fbc1bf0f353a496b251dcc56888}{01543}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a28608fbc1bf0f353a496b251dcc56888}{getVersionHeader}}(\textcolor{keywordtype}{bool}\ \$useUnicode\ =\ \textcolor{keyword}{false}):\ string}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01544}01544\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01545}01545\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{traces_8html_8php_acb4e8e50eaf0132d1e70b8776b4ad5cc}{\$separator}}\ =\ \$useUnicode\ ?\ \textcolor{stringliteral}{'—'}\ :\ \textcolor{charliteral}{'-\/'};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01546}01546\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01547}01547\ \ \ \ \ \ \ \ \ return\ \(\backslash\)sprintf(\textcolor{stringliteral}{'Psy\ Shell\ \%s\ (PHP\ \%s\ \%s\ \%s)'},\ self::VERSION,\ \(\backslash\)PHP\_VERSION,\ \mbox{\hyperlink{traces_8html_8php_acb4e8e50eaf0132d1e70b8776b4ad5cc}{\$separator}},\ \(\backslash\)PHP\_SAPI);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01548}01548\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01549}01549\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01555}\mbox{\hyperlink{class_psy_1_1_shell_a2492cbb0e3ae6e1c40d67fb549a2dd86}{01555}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a2492cbb0e3ae6e1c40d67fb549a2dd86}{getManualDb}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01556}01556\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01557}01557\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>config-\/>getManualDb();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01558}01558\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01559}01559\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01563}\mbox{\hyperlink{class_psy_1_1_shell_abdd4a28eb068489f2d4f19730229c4a7}{01563}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_abdd4a28eb068489f2d4f19730229c4a7}{autocomplete}}(\$text)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01564}01564\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01565}01565\ \ \ \ \ \ \ \ \ @\(\backslash\)trigger\_error(\textcolor{stringliteral}{'Tab\ completion\ is\ provided\ by\ the\ AutoCompleter\ service'},\ \(\backslash\)E\_USER\_DEPRECATED);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01566}01566\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01567}01567\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01574}\mbox{\hyperlink{class_psy_1_1_shell_afc0ae806b4cd8331628fd299f89cc3a0}{01574}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_afc0ae806b4cd8331628fd299f89cc3a0}{initializeTabCompletion}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01575}01575\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01576}01576\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>config-\/>useTabCompletion())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01577}01577\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01578}01578\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01579}01579\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01580}01580\ \ \ \ \ \ \ \ \ \$this-\/>autoCompleter\ =\ \$this-\/>config-\/>getAutoCompleter();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01581}01581\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01582}01582\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ auto\ completer\ needs\ shell\ to\ be\ linked\ to\ configuration\ because\ of}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01583}01583\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ context\ aware\ matchers}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01584}01584\ \ \ \ \ \ \ \ \ \$this-\/>addMatchersToAutoCompleter(\$this-\/>getDefaultMatchers());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01585}01585\ \ \ \ \ \ \ \ \ \$this-\/>addMatchersToAutoCompleter(\$this-\/>matchers);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01586}01586\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01587}01587\ \ \ \ \ \ \ \ \ \$this-\/>autoCompleter-\/>activate();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01588}01588\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01589}01589\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01595}01595\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ addMatchersToAutoCompleter(array\ \$matchers)}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01596}01596\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01597}01597\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$matchers\ as\ \$matcher)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01598}01598\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$matcher\ instanceof\ \mbox{\hyperlink{interface_psy_1_1_context_aware}{ContextAware}})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01599}01599\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$matcher-\/>setContext(\$this-\/>context);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01600}01600\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01601}01601\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>autoCompleter-\/>addMatcher(\$matcher);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01602}01602\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01603}01603\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01604}01604\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01610}\mbox{\hyperlink{class_psy_1_1_shell_acf4d88742cef734b9a59b048e6e3d215}{01610}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_acf4d88742cef734b9a59b048e6e3d215}{writeVersionInfo}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01611}01611\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01612}01612\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)PHP\_SAPI\ !==\ \textcolor{stringliteral}{'cli'})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01613}01613\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01614}01614\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01615}01615\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01616}01616\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01617}01617\ \ \ \ \ \ \ \ \ \ \ \ \ \$client\ =\ \$this-\/>config-\/>getChecker();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01618}01618\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$client-\/>isLatest())\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01619}01619\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(\(\backslash\)sprintf(\textcolor{stringliteral}{'<whisper>New\ version\ is\ available\ at\ psysh.org/psysh\ (current:\ \%s,\ latest:\ \%s)</whisper>'},\ self::VERSION,\ \$client-\/>getLatest()));}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01620}01620\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01621}01621\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)InvalidArgumentException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01622}01622\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(\$e-\/>getMessage());}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01623}01623\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01624}01624\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01625}01625\ }
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01629}\mbox{\hyperlink{class_psy_1_1_shell_a627e7717405b5f22391e433367a6fbaa}{01629}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_shell_a627e7717405b5f22391e433367a6fbaa}{writeStartupMessage}}()}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01630}01630\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01631}01631\ \ \ \ \ \ \ \ \ \$message\ =\ \$this-\/>config-\/>getStartupMessage();}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01632}01632\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$message\ !==\ \textcolor{keyword}{null}\ \&\&\ \$message\ !==\ \textcolor{stringliteral}{''})\ \{}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01633}01633\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(\$message);}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01634}01634\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01635}01635\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_shell_8php_source_l01636}01636\ \}}
+
+\end{DoxyCode}

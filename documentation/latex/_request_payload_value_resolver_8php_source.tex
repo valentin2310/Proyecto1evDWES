@@ -1,0 +1,191 @@
+\doxysection{Request\+Payload\+Value\+Resolver.\+php}
+\hypertarget{_request_payload_value_resolver_8php_source}{}\label{_request_payload_value_resolver_8php_source}\index{vendor/symfony/http-\/kernel/Controller/ArgumentResolver/RequestPayloadValueResolver.php@{vendor/symfony/http-\/kernel/Controller/ArgumentResolver/RequestPayloadValueResolver.php}}
+\mbox{\hyperlink{_request_payload_value_resolver_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_argument_resolver}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)Controller\(\backslash\)ArgumentResolver}};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00014}00014\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_event_dispatcher_1_1_event_subscriber_interface}{Symfony\(\backslash\)Component\(\backslash\)EventDispatcher\(\backslash\)EventSubscriberInterface}};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)Request}};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_response}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)Response}};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_attribute_1_1_map_query_string}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)Attribute\(\backslash\)MapQueryString}};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_attribute_1_1_map_request_payload}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)Attribute\(\backslash\)MapRequestPayload}};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00019}00019\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_value_resolver_interface}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)Controller\(\backslash\)ValueResolverInterface}};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_metadata_1_1_argument_metadata}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)ControllerMetadata\(\backslash\)ArgumentMetadata}};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_event_1_1_controller_arguments_event}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)Event\(\backslash\)ControllerArgumentsEvent}};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_exception_1_1_http_exception}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)Exception\(\backslash\)HttpException}};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_kernel_events}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)KernelEvents}};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00024}00024\ use\ Symfony\(\backslash\)Component\(\backslash\)Serializer\(\backslash\)Exception\(\backslash\)NotEncodableValueException;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00025}00025\ use\ Symfony\(\backslash\)Component\(\backslash\)Serializer\(\backslash\)Exception\(\backslash\)PartialDenormalizationException;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00026}00026\ use\ Symfony\(\backslash\)Component\(\backslash\)Serializer\(\backslash\)Exception\(\backslash\)UnsupportedFormatException;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00027}00027\ use\ Symfony\(\backslash\)Component\(\backslash\)Serializer\(\backslash\)Normalizer\(\backslash\)DenormalizerInterface;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00028}00028\ use\ Symfony\(\backslash\)Component\(\backslash\)Serializer\(\backslash\)SerializerInterface;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00029}00029\ use\ Symfony\(\backslash\)Component\(\backslash\)Validator\(\backslash\)ConstraintViolation;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00030}00030\ use\ Symfony\(\backslash\)Component\(\backslash\)Validator\(\backslash\)ConstraintViolationList;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00031}00031\ use\ Symfony\(\backslash\)Component\(\backslash\)Validator\(\backslash\)Exception\(\backslash\)ValidationFailedException;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00032}00032\ use\ Symfony\(\backslash\)Component\(\backslash\)Validator\(\backslash\)Validator\(\backslash\)ValidatorInterface;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00033}00033\ use\ \mbox{\hyperlink{interface_symfony_1_1_contracts_1_1_translation_1_1_translator_interface}{Symfony\(\backslash\)Contracts\(\backslash\)Translation\(\backslash\)TranslatorInterface}};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00040}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_argument_resolver_1_1_request_payload_value_resolver}{00040}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_argument_resolver_1_1_request_payload_value_resolver}{RequestPayloadValueResolver}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_value_resolver_interface}{ValueResolverInterface}},\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_event_dispatcher_1_1_event_subscriber_interface}{EventSubscriberInterface}}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00041}00041\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ CONTEXT\_DENORMALIZE\ =\ [}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'disable\_type\_enforcement'}\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'collect\_denormalization\_errors'}\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00049}00049\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00054}00054\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ CONTEXT\_DESERIALIZE\ =\ [}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'collect\_denormalization\_errors'}\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00056}00056\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00058}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_argument_resolver_1_1_request_payload_value_resolver_a188a7c1de00feddd219fbe61d96747a5}{00058}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_argument_resolver_1_1_request_payload_value_resolver_a188a7c1de00feddd219fbe61d96747a5}{\_\_construct}}(}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ readonly\ SerializerInterface\&DenormalizerInterface\ \$serializer,}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ readonly\ ?ValidatorInterface\ \$validator\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ readonly\ ?\mbox{\hyperlink{interface_symfony_1_1_contracts_1_1_translation_1_1_translator_interface}{TranslatorInterface}}\ \$translator\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00062}00062\ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00063}00063\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00065}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_argument_resolver_1_1_request_payload_value_resolver_aa7efc3a2bdabd20a0f25f54a947f09d1}{00065}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_argument_resolver_1_1_request_payload_value_resolver_aa7efc3a2bdabd20a0f25f54a947f09d1}{resolve}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request,\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_metadata_1_1_argument_metadata}{ArgumentMetadata}}\ \$argument):\ iterable}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00066}00066\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \$attribute\ =\ \$argument-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_metadata_1_1_argument_metadata_a27f78d0b2daf7e8f9981c33ac90b41ce}{getAttributesOfType}}(MapQueryString::class,\ ArgumentMetadata::IS\_INSTANCEOF)[0]}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ ??\ \$argument-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_metadata_1_1_argument_metadata_a27f78d0b2daf7e8f9981c33ac90b41ce}{getAttributesOfType}}(MapRequestPayload::class,\ ArgumentMetadata::IS\_INSTANCEOF)[0]}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ ??\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$attribute)\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$argument-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_metadata_1_1_argument_metadata_ab2aa651fb210b4868f4c2a846ab40ebb}{isVariadic}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)LogicException(sprintf(\textcolor{stringliteral}{'Mapping\ variadic\ argument\ "{}\$\%s"{}\ is\ not\ supported.'},\ \$argument-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_metadata_1_1_argument_metadata_a3d0963e68bb313b163a73f2803c64600}{getName}}()));}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \$attribute-\/>metadata\ =\ \$argument;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\$attribute];}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00082}00082\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00084}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_argument_resolver_1_1_request_payload_value_resolver_af546914b288dfe8a99d9444534a88a9f}{00084}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_argument_resolver_1_1_request_payload_value_resolver_af546914b288dfe8a99d9444534a88a9f}{onKernelControllerArguments}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_event_1_1_controller_arguments_event}{ControllerArgumentsEvent}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00085}00085\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \$arguments\ =\ \$event-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_event_1_1_controller_arguments_event_a1d4c324c5a088be98d99d3efbf3502e1}{getArguments}}();}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$arguments\ as\ \$i\ =>\ \$argument)\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$argument\ instanceof\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_attribute_1_1_map_query_string}{MapQueryString}})\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$payloadMapper\ =\ \textcolor{stringliteral}{'mapQueryString'};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$validationFailedCode\ =\ Response::HTTP\_NOT\_FOUND;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$argument\ instanceof\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_attribute_1_1_map_request_payload}{MapRequestPayload}})\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$payloadMapper\ =\ \textcolor{stringliteral}{'mapRequestPayload'};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$validationFailedCode\ =\ Response::HTTP\_UNPROCESSABLE\_ENTITY;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \$request\ =\ \$event-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_event_1_1_kernel_event_adf1a35ad20e475c59cc0967d5764aa22}{getRequest}}();}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$type\ =\ \$argument-\/>metadata-\/>getType())\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)LogicException(sprintf(\textcolor{stringliteral}{'Could\ not\ resolve\ the\ "{}\$\%s"{}\ controller\ argument:\ argument\ should\ be\ typed.'},\ \$argument-\/>metadata-\/>getName()));}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>validator)\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$violations\ =\ \textcolor{keyword}{new}\ ConstraintViolationList();}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$payload\ =\ \$this-\/>\$payloadMapper(\$request,\ \$type,\ \$argument);}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (PartialDenormalizationException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$trans\ =\ \$this-\/>translator\ ?\ \$this-\/>translator-\/>trans(...)\ :\ fn\ (\$m,\ \$p)\ =>\ strtr(\$m,\ \$p);}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$e-\/>getErrors()\ as\ \$error)\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$parameters\ =\ [\textcolor{stringliteral}{'\{\{\ type\ \}\}'}\ =>\ implode(\textcolor{charliteral}{'|'},\ \$error-\/>getExpectedTypes())];}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$error-\/>canUseMessageForUser())\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$parameters[\textcolor{stringliteral}{'hint'}]\ =\ \$error-\/>getMessage();}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$template\ =\ \textcolor{stringliteral}{'This\ value\ should\ be\ of\ type\ \{\{\ type\ \}\}.'};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \$trans(\$template,\ \$parameters,\ \textcolor{stringliteral}{'validators'});}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$violations-\/>add(\textcolor{keyword}{new}\ ConstraintViolation(\$message,\ \$template,\ \$parameters,\ \textcolor{keyword}{null},\ \$error-\/>getPath(),\ \textcolor{keyword}{null}));}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$payload\ =\ \$e-\/>getData();}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$payload)\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$violations-\/>addAll(\$this-\/>validator-\/>validate(\$payload,\ \textcolor{keyword}{null},\ \$argument-\/>validationGroups\ ??\ \textcolor{keyword}{null}));}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)count(\$violations))\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_exception_1_1_http_exception}{HttpException}}(\$validationFailedCode,\ implode(\textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ array\_map(\textcolor{keyword}{static}\ fn\ (\$e)\ =>\ \$e-\/>getMessage(),\ iterator\_to\_array(\$violations))),\ \textcolor{keyword}{new}\ ValidationFailedException(\$payload,\ \$violations));}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$payload\ =\ \$this-\/>\$payloadMapper(\$request,\ \$type,\ \$argument);}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (PartialDenormalizationException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_exception_1_1_http_exception}{HttpException}}(\$validationFailedCode,\ implode(\textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ array\_map(\textcolor{keyword}{static}\ fn\ (\$e)\ =>\ \$e-\/>getMessage(),\ \$e-\/>getErrors())),\ \$e);}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$payload)\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$payload\ =\ match\ (\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$argument-\/>metadata-\/>hasDefaultValue()\ =>\ \$argument-\/>metadata-\/>getDefaultValue(),}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$argument-\/>metadata-\/>isNullable()\ =>\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}\ =>\ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_exception_1_1_http_exception}{HttpException}}(\$validationFailedCode)}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \$arguments[\$i]\ =\ \$payload;}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_event_1_1_controller_arguments_event_a54df7b21fe0700333277b9404774f333}{setArguments}}(\$arguments);}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00149}00149\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00151}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_argument_resolver_1_1_request_payload_value_resolver_af1f63475927bbcb3bd21b58712076104}{00151}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_controller_1_1_argument_resolver_1_1_request_payload_value_resolver_af1f63475927bbcb3bd21b58712076104}{getSubscribedEvents}}():\ array}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00152}00152\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_kernel_events_a6f76409576f6077d57916f239bcba461}{KernelEvents::CONTROLLER\_ARGUMENTS}}\ =>\ \textcolor{stringliteral}{'onKernelControllerArguments'},}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00156}00156\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00158}00158\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ mapQueryString(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request,\ \textcolor{keywordtype}{string}\ \$type,\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_attribute_1_1_map_query_string}{MapQueryString}}\ \$attribute):\ ?object}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00159}00159\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \$request-\/>query-\/>all())\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>serializer-\/>denormalize(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$type,\ \textcolor{keyword}{null},\ \$attribute-\/>serializationContext\ +\ self::CONTEXT\_DENORMALIZE);}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00165}00165\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00167}00167\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ mapRequestPayload(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request,\ \textcolor{keywordtype}{string}\ \$type,\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_attribute_1_1_map_request_payload}{MapRequestPayload}}\ \$attribute):\ ?object}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00168}00168\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$format\ =\ \$request-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request_a446b1069dbe534a4808e057a8fea0195}{getContentTypeFormat}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_exception_1_1_http_exception}{HttpException}}(Response::HTTP\_UNSUPPORTED\_MEDIA\_TYPE,\ \textcolor{stringliteral}{'Unsupported\ format.'});}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$attribute-\/>acceptFormat\ \&\&\ !\(\backslash\)in\_array(\$format,\ (array)\ \$attribute-\/>acceptFormat,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ HttpException(Response::HTTP\_UNSUPPORTED\_MEDIA\_TYPE,\ sprintf(\textcolor{stringliteral}{'Unsupported\ format,\ expects\ "{}\%s"{},\ but\ "{}\%s"{}\ given.'},\ implode(\textcolor{stringliteral}{'"{},\ "{}'},\ (array)\ \$attribute-\/>acceptFormat),\ \$format));}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \$request-\/>request-\/>all())\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>serializer-\/>denormalize(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$type,\ \textcolor{keyword}{null},\ \$attribute-\/>serializationContext\ +\ self::CONTEXT\_DENORMALIZE);}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{''}\ ===\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \$request-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request_a41725cc047f6a92c46bbb5d8aff51e30}{getContent}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'form'}\ ===\ \$format)\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ HttpException(Response::HTTP\_BAD\_REQUEST,\ \textcolor{stringliteral}{'Request\ payload\ contains\ invalid\ "{}form"{}\ data.'});}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>serializer-\/>deserialize(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$type,\ \$format,\ self::CONTEXT\_DESERIALIZE\ +\ \$attribute-\/>serializationContext);}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (UnsupportedFormatException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ HttpException(Response::HTTP\_UNSUPPORTED\_MEDIA\_TYPE,\ sprintf(\textcolor{stringliteral}{'Unsupported\ format:\ "{}\%s"{}.'},\ \$format),\ \$e);}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (NotEncodableValueException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ HttpException(Response::HTTP\_BAD\_REQUEST,\ sprintf(\textcolor{stringliteral}{'Request\ payload\ contains\ invalid\ "{}\%s"{}\ data.'},\ \$format),\ \$e);}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00196}00196\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_request_payload_value_resolver_8php_source_l00197}00197\ \}}
+
+\end{DoxyCode}

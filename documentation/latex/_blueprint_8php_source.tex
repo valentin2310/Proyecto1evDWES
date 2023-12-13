@@ -1,0 +1,933 @@
+\doxysection{Blueprint.\+php}
+\hypertarget{_blueprint_8php_source}{}\label{_blueprint_8php_source}\index{vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php@{vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php}}
+\mbox{\hyperlink{_blueprint_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00003}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_schema}{00003}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_schema}{Illuminate\(\backslash\)Database\(\backslash\)Schema}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00005}00005\ use\ BadMethodCallException;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00006}00006\ use\ Closure;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection}{Illuminate\(\backslash\)Database\(\backslash\)Connection}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00008}00008\ use\ Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Concerns\(\backslash\)HasUlids;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_query_1_1_expression}{Illuminate\(\backslash\)Database\(\backslash\)Query\(\backslash\)Expression}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_grammars_1_1_grammar}{Illuminate\(\backslash\)Database\(\backslash\)Schema\(\backslash\)Grammars\(\backslash\)Grammar}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_s_q_lite_connection}{Illuminate\(\backslash\)Database\(\backslash\)SQLiteConnection}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00012}00012\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_fluent}{Illuminate\(\backslash\)Support\(\backslash\)Fluent}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00013}00013\ use\ Illuminate\(\backslash\)Support\(\backslash\)Traits\(\backslash\)Macroable;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00015}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint}{00015}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint}{Blueprint}}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00016}00016\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00017}00017\ \ \ \ \ use\ Macroable;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00024}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae8876a14058f368335baccf35af4a22b}{00024}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae8876a14058f368335baccf35af4a22b}{\$table}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00031}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a09e8cf95b9d29955a0bfabca9b420edc}{00031}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a09e8cf95b9d29955a0bfabca9b420edc}{\$prefix}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00038}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a19d2a3d21fe02053311fde465e6ae2e9}{00038}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a19d2a3d21fe02053311fde465e6ae2e9}{\$columns}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00045}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ab63cd62b3b65fd223b6f3d57b6ca754d}{00045}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ab63cd62b3b65fd223b6f3d57b6ca754d}{\$commands}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00052}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8a3b012ad4844366d9207d8f0e174a00}{00052}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8a3b012ad4844366d9207d8f0e174a00}{\$engine}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00059}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af10158dd74b75f1d337e83102d6b82ce}{00059}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af10158dd74b75f1d337e83102d6b82ce}{\$charset}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00066}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a39e21e0bc9fbd03bb429e6a040a361aa}{00066}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a39e21e0bc9fbd03bb429e6a040a361aa}{\$collation}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00073}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a1cb81bd683eb55bd7e42129cd73310f6}{00073}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a1cb81bd683eb55bd7e42129cd73310f6}{\$temporary}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00080}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a335c90aa9e7c7ecca4cac38fc37d2d23}{00080}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a335c90aa9e7c7ecca4cac38fc37d2d23}{\$after}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00090}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a5f5dcfaa0dc8c00dabcb0ce877287187}{00090}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a5f5dcfaa0dc8c00dabcb0ce877287187}{\_\_construct}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae8876a14058f368335baccf35af4a22b}{\$table}},\ Closure\ \$callback\ =\ \textcolor{keyword}{null},\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a09e8cf95b9d29955a0bfabca9b420edc}{\$prefix}}\ =\ \textcolor{stringliteral}{''})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00091}00091\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \$this-\/>table\ =\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae8876a14058f368335baccf35af4a22b}{\$table}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \$this-\/>prefix\ =\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a09e8cf95b9d29955a0bfabca9b420edc}{\$prefix}};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$callback))\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \$callback(\$this);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00098}00098\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00107}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a348f1e472883c1fe3aaf60b7179442a1}{00107}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a348f1e472883c1fe3aaf60b7179442a1}{build}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection}{Connection}}\ \$connection,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_grammars_1_1_grammar}{Grammar}}\ \$grammar)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00108}00108\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af6550c3b508be59bd047bbf501a3e8e1}{toSql}}(\$connection,\ \$grammar)\ as\ \$statement)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \$connection-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection_a7b0320ea1e8a2d079586166539d399f9}{statement}}(\$statement);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00112}00112\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00121}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af6550c3b508be59bd047bbf501a3e8e1}{00121}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af6550c3b508be59bd047bbf501a3e8e1}{toSql}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection}{Connection}}\ \$connection,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_grammars_1_1_grammar}{Grammar}}\ \$grammar)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00122}00122\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aeb4ed937c00aac86ca674bbf8051fbb7}{addImpliedCommands}}(\$connection,\ \$grammar);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \$statements\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Each\ type\ of\ command\ has\ a\ corresponding\ compiler\ function\ on\ the\ schema}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ grammar\ which\ is\ used\ to\ build\ the\ necessary\ SQL\ statements\ to\ build}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ blueprint\ element,\ so\ we'll\ just\ call\ that\ compilers\ function.}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8286f03eb02c7c5ff27ce311955d4122}{ensureCommandsAreValid}}(\$connection);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>commands\ as\ \$command)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \$method\ =\ \textcolor{stringliteral}{'compile'}.ucfirst(\$command-\/>name);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (method\_exists(\$grammar,\ \$method)\ ||\ \$grammar::hasMacro(\$method))\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$sql\ =\ \$grammar-\/>\$method(\$this,\ \$command,\ \$connection)))\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$statements\ =\ array\_merge(\$statements,\ (array)\ \$sql);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$statements;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00143}00143\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00153}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8286f03eb02c7c5ff27ce311955d4122}{00153}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8286f03eb02c7c5ff27ce311955d4122}{ensureCommandsAreValid}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection}{Connection}}\ \$connection)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00154}00154\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$connection\ instanceof\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_s_q_lite_connection}{SQLiteConnection}})\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af93d02de3cd6685dfb494c4fc4e10aa5}{commandsNamed}}([\textcolor{stringliteral}{'dropColumn'},\ \textcolor{stringliteral}{'renameColumn'}])-\/>count()\ >\ 1}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ !\ \$connection-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection_a17625e2b07d6b4d46d4d0ec84c4a9819}{usingNativeSchemaOperations}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ BadMethodCallException(}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}SQLite\ doesn't\ support\ multiple\ calls\ to\ dropColumn\ /\ renameColumn\ in\ a\ single\ modification."{}}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af93d02de3cd6685dfb494c4fc4e10aa5}{commandsNamed}}([\textcolor{stringliteral}{'dropForeign'}])-\/>count()\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ BadMethodCallException(}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}SQLite\ doesn't\ support\ dropping\ foreign\ keys\ (you\ would\ need\ to\ re-\/create\ the\ table)."{}}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00169}00169\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00177}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af93d02de3cd6685dfb494c4fc4e10aa5}{00177}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af93d02de3cd6685dfb494c4fc4e10aa5}{commandsNamed}}(array\ \$names)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00178}00178\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$this-\/>commands)-\/>filter(\textcolor{keyword}{function}\ (\$command)\ use\ (\$names)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ in\_array(\$command-\/>name,\ \$names);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00182}00182\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00191}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aeb4ed937c00aac86ca674bbf8051fbb7}{00191}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aeb4ed937c00aac86ca674bbf8051fbb7}{addImpliedCommands}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection}{Connection}}\ \$connection,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_grammars_1_1_grammar}{Grammar}}\ \$grammar)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00192}00192\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a551ed38a46419762059f01956684fd2d}{getAddedColumns}}())\ >\ 0\ \&\&\ !\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a3b07466072e9149acf76859fed2dc0fb}{creating}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ array\_unshift(\$this-\/>commands,\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af9ba17945bfd8f0b0e70d4701c6ed7f1}{createCommand}}(\textcolor{stringliteral}{'add'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a2a1816b423720a0937cdf39f4c831675}{getChangedColumns}}())\ >\ 0\ \&\&\ !\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a3b07466072e9149acf76859fed2dc0fb}{creating}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ array\_unshift(\$this-\/>commands,\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af9ba17945bfd8f0b0e70d4701c6ed7f1}{createCommand}}(\textcolor{stringliteral}{'change'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a85f1675e26f11d970b8bbbe7239fcd17}{addFluentIndexes}}();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a49fda9b8a25c67fc386d1e20622be14a}{addFluentCommands}}(\$connection,\ \$grammar);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00204}00204\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00211}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a85f1675e26f11d970b8bbbe7239fcd17}{00211}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a85f1675e26f11d970b8bbbe7239fcd17}{addFluentIndexes}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00212}00212\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>columns\ as\ \$column)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ ([\textcolor{stringliteral}{'primary'},\ \textcolor{stringliteral}{'unique'},\ \textcolor{stringliteral}{'index'},\ \textcolor{stringliteral}{'fulltext'},\ \textcolor{stringliteral}{'fullText'},\ \textcolor{stringliteral}{'spatialIndex'}]\ as\ \$index)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ index\ has\ been\ specified\ on\ the\ given\ column,\ but\ is\ simply\ equal}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ "{}true"{}\ (boolean),\ no\ name\ has\ been\ specified\ for\ this\ index\ so\ the}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ index\ method\ can\ be\ called\ without\ a\ name\ and\ it\ will\ generate\ one.}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$column-\/>\{\$index\}\ ===\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\{\$index\}(\$column-\/>name);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$column-\/>\{\$index\}\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}\ 2;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ index\ has\ been\ specified\ on\ the\ given\ column,\ but\ it\ equals\ false}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ the\ column\ is\ supposed\ to\ be\ changed,\ we\ will\ call\ the\ drop\ index}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ method\ with\ an\ array\ of\ column\ to\ drop\ it\ by\ its\ conventional\ name.}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ elseif\ (\$column-\/>\{\$index\}\ ===\ \textcolor{keyword}{false}\ \&\&\ \$column-\/>change)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\{\textcolor{stringliteral}{'drop'}.ucfirst(\$index)\}([\$column-\/>name]);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$column-\/>\{\$index\}\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}\ 2;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ index\ has\ been\ specified\ on\ the\ given\ column,\ and\ it\ has\ a\ string}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ value,\ we'll\ go\ ahead\ and\ call\ the\ index\ method\ and\ pass\ the\ name\ for}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ index\ since\ the\ developer\ specified\ the\ explicit\ name\ for\ this.}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ elseif\ (isset(\$column-\/>\{\$index\}))\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\{\$index\}(\mbox{\hyperlink{namespace_illuminate_1_1_validation_1_1_rules_a60e9ae05178c483ab3d9ff5c2399a463}{\$column}}-\/>name,\ \mbox{\hyperlink{namespace_illuminate_1_1_validation_1_1_rules_a60e9ae05178c483ab3d9ff5c2399a463}{\$column}}-\/>\{\$index\});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_validation_1_1_rules_a60e9ae05178c483ab3d9ff5c2399a463}{\$column}}-\/>\{\$index\}\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}\ 2;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00246}00246\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00255}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a49fda9b8a25c67fc386d1e20622be14a}{00255}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a49fda9b8a25c67fc386d1e20622be14a}{addFluentCommands}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection}{Connection}}\ \$connection,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_grammars_1_1_grammar}{Grammar}}\ \$grammar)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00256}00256\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>columns\ as\ \$column)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$column-\/>change\ \&\&\ !\ \$connection-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection_a17625e2b07d6b4d46d4d0ec84c4a9819}{usingNativeSchemaOperations}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$grammar-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_grammars_1_1_grammar_a1ab14fc2762aade38def29785315043f}{getFluentCommands}}()\ as\ \$commandName)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>addCommand(\$commandName,\ compact(\textcolor{stringliteral}{'column'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00266}00266\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00273}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a3b07466072e9149acf76859fed2dc0fb}{00273}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a3b07466072e9149acf76859fed2dc0fb}{creating}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00274}00274\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$this-\/>commands)-\/>contains(\textcolor{keyword}{function}\ (\$command)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$command-\/>name\ ===\ \textcolor{stringliteral}{'create'};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00278}00278\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00285}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a435e7d7525d4bcd0ed5e34a469f3adf6}{00285}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a435e7d7525d4bcd0ed5e34a469f3adf6}{create}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00286}00286\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addCommand(\textcolor{stringliteral}{'create'});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00288}00288\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00295}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9dc556227b438deeb7c3ca459930d9cb}{00295}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9dc556227b438deeb7c3ca459930d9cb}{temporary}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00296}00296\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \$this-\/>temporary\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00298}00298\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00305}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aeb639e5b2b713ed87ab8f2033af98ae8}{00305}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aeb639e5b2b713ed87ab8f2033af98ae8}{drop}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00306}00306\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addCommand(\textcolor{stringliteral}{'drop'});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00308}00308\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00315}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a69c4145b0e184ce708a8d1c15fa13775}{00315}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a69c4145b0e184ce708a8d1c15fa13775}{dropIfExists}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00316}00316\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addCommand(\textcolor{stringliteral}{'dropIfExists'});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00318}00318\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00326}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae34216318f8a10a242290e57fc29816a}{00326}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae34216318f8a10a242290e57fc29816a}{dropColumn}}(\$columns)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00327}00327\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \$columns\ =\ is\_array(\$columns)\ ?\ \$columns\ :\ func\_get\_args();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00329}00329\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addCommand(\textcolor{stringliteral}{'dropColumn'},\ compact(\textcolor{stringliteral}{'columns'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00331}00331\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00340}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a340335a9235fe901c748730b204a6b59}{00340}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a340335a9235fe901c748730b204a6b59}{renameColumn}}(\$from,\ \$to)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00341}00341\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00342}00342\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addCommand(\textcolor{stringliteral}{'renameColumn'},\ compact(\textcolor{stringliteral}{'from'},\ \textcolor{stringliteral}{'to'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00343}00343\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00344}00344\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00351}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a6e6dc94e2e93d12f2dde5ccda485a884}{00351}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a6e6dc94e2e93d12f2dde5ccda485a884}{dropPrimary}}(\$index\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00352}00352\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00353}00353\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>dropIndexCommand(\textcolor{stringliteral}{'dropPrimary'},\ \textcolor{stringliteral}{'primary'},\ \$index);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00354}00354\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00355}00355\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00362}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9d80f77aabb3f53bd01f08862d406b90}{00362}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9d80f77aabb3f53bd01f08862d406b90}{dropUnique}}(\$index)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00363}00363\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>dropIndexCommand(\textcolor{stringliteral}{'dropUnique'},\ \textcolor{stringliteral}{'unique'},\ \$index);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00365}00365\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00373}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aa6814906c90faade909731c5e451fdd9}{00373}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aa6814906c90faade909731c5e451fdd9}{dropIndex}}(\$index)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00374}00374\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00375}00375\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>dropIndexCommand(\textcolor{stringliteral}{'dropIndex'},\ \textcolor{stringliteral}{'index'},\ \$index);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00376}00376\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00377}00377\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00384}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ad4d3cf9421e538e545b47c31af469257}{00384}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ad4d3cf9421e538e545b47c31af469257}{dropFullText}}(\$index)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00385}00385\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>dropIndexCommand(\textcolor{stringliteral}{'dropFullText'},\ \textcolor{stringliteral}{'fulltext'},\ \$index);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00387}00387\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00388}00388\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00395}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8771167d5eb0ea606c4ef3f4e60d607b}{00395}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8771167d5eb0ea606c4ef3f4e60d607b}{dropSpatialIndex}}(\$index)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00396}00396\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>dropIndexCommand(\textcolor{stringliteral}{'dropSpatialIndex'},\ \textcolor{stringliteral}{'spatialIndex'},\ \$index);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00398}00398\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00399}00399\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00406}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a1cfc0b66d0c499052b913ee474941189}{00406}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a1cfc0b66d0c499052b913ee474941189}{dropForeign}}(\$index)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00407}00407\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>dropIndexCommand(\textcolor{stringliteral}{'dropForeign'},\ \textcolor{stringliteral}{'foreign'},\ \$index);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00409}00409\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00410}00410\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00417}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_abc9d4118ffca509920c8d8821ff4fd28}{00417}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_abc9d4118ffca509920c8d8821ff4fd28}{dropConstrainedForeignId}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00418}00418\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00419}00419\ \ \ \ \ \ \ \ \ \$this-\/>dropForeign([\$column]);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00420}00420\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00421}00421\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>dropColumn(\$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00422}00422\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00423}00423\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00431}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a77cfb78f6bec4c027aca6b0e64b58100}{00431}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a77cfb78f6bec4c027aca6b0e64b58100}{dropForeignIdFor}}(\$model,\ \$column\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00432}00432\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$model))\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \$model\ =\ \textcolor{keyword}{new}\ \$model;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>dropForeign([\$column\ ?:\ \$model-\/>getForeignKey()]);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00438}00438\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00439}00439\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00447}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae927bc031562b346e5d21a7584675c60}{00447}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae927bc031562b346e5d21a7584675c60}{dropConstrainedForeignIdFor}}(\$model,\ \$column\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00448}00448\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$model))\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ \ \ \$model\ =\ \textcolor{keyword}{new}\ \$model;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>dropConstrainedForeignId(\$column\ ?:\ \$model-\/>getForeignKey());}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00454}00454\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00455}00455\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00463}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a4f7e13ee9868cf635ce9d97a820eac0b}{00463}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a4f7e13ee9868cf635ce9d97a820eac0b}{renameIndex}}(\$from,\ \$to)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00464}00464\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addCommand(\textcolor{stringliteral}{'renameIndex'},\ compact(\textcolor{stringliteral}{'from'},\ \textcolor{stringliteral}{'to'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00466}00466\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00473}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_adbcc971adbdc128bdcc218ef40fdaa6d}{00473}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_adbcc971adbdc128bdcc218ef40fdaa6d}{dropTimestamps}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00474}00474\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \$this-\/>dropColumn(\textcolor{stringliteral}{'created\_at'},\ \textcolor{stringliteral}{'updated\_at'});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00476}00476\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00477}00477\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00483}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9af6f3034f508c1f7d1be9e74f002692}{00483}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9af6f3034f508c1f7d1be9e74f002692}{dropTimestampsTz}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00484}00484\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00485}00485\ \ \ \ \ \ \ \ \ \$this-\/>dropTimestamps();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00486}00486\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00494}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af0f6441fa48bd8b80faa4887fc295351}{00494}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af0f6441fa48bd8b80faa4887fc295351}{dropSoftDeletes}}(\$column\ =\ \textcolor{stringliteral}{'deleted\_at'})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00495}00495\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \$this-\/>dropColumn(\$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00497}00497\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00498}00498\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00505}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a496f8b928082f4b88db6ea784674d6b0}{00505}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a496f8b928082f4b88db6ea784674d6b0}{dropSoftDeletesTz}}(\$column\ =\ \textcolor{stringliteral}{'deleted\_at'})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00506}00506\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00507}00507\ \ \ \ \ \ \ \ \ \$this-\/>dropSoftDeletes(\$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00508}00508\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00515}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9db3b6dce3636ba40c6a6d90dd1f849f}{00515}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9db3b6dce3636ba40c6a6d90dd1f849f}{dropRememberToken}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00516}00516\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \$this-\/>dropColumn(\textcolor{stringliteral}{'remember\_token'});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00518}00518\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00519}00519\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00527}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ada6a26ead1cd9bf12a58771994539e0a}{00527}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ada6a26ead1cd9bf12a58771994539e0a}{dropMorphs}}(\$name,\ \$indexName\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00528}00528\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \$this-\/>dropIndex(\$indexName\ ?:\ \$this-\/>createIndexName(\textcolor{stringliteral}{'index'},\ [\textcolor{stringliteral}{"{}\{\$name\}\_type"{}},\ \textcolor{stringliteral}{"{}\{\$name\}\_id"{}}]));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00530}00530\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \$this-\/>dropColumn(\textcolor{stringliteral}{"{}\{\$name\}\_type"{}},\ \textcolor{stringliteral}{"{}\{\$name\}\_id"{}});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00532}00532\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00533}00533\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00540}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9a18595b014544f70343c99a63ff8520}{00540}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9a18595b014544f70343c99a63ff8520}{rename}}(\$to)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00541}00541\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addCommand(\textcolor{stringliteral}{'rename'},\ compact(\textcolor{stringliteral}{'to'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00543}00543\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00544}00544\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00553}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a11a08b2853323426ca9414f7304c4193}{00553}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a11a08b2853323426ca9414f7304c4193}{primary}}(\$columns,\ \$name\ =\ \textcolor{keyword}{null},\ \$algorithm\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00554}00554\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00555}00555\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>indexCommand(\textcolor{stringliteral}{'primary'},\ \$columns,\ \$name,\ \$algorithm);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00556}00556\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00557}00557\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00566}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ad3d15fdf4bff861e1a0bd267738e42e8}{00566}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ad3d15fdf4bff861e1a0bd267738e42e8}{unique}}(\$columns,\ \$name\ =\ \textcolor{keyword}{null},\ \$algorithm\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00567}00567\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00568}00568\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>indexCommand(\textcolor{stringliteral}{'unique'},\ \$columns,\ \$name,\ \$algorithm);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00569}00569\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00570}00570\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00579}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a1ca953bf89d58013c3d14eef7d62061c}{00579}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a1ca953bf89d58013c3d14eef7d62061c}{index}}(\$columns,\ \$name\ =\ \textcolor{keyword}{null},\ \$algorithm\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00580}00580\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>indexCommand(\textcolor{stringliteral}{'index'},\ \$columns,\ \$name,\ \$algorithm);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00582}00582\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00583}00583\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00592}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a273247020aac8764bf7863bdb3590c8d}{00592}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a273247020aac8764bf7863bdb3590c8d}{fullText}}(\$columns,\ \$name\ =\ \textcolor{keyword}{null},\ \$algorithm\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00593}00593\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00594}00594\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>indexCommand(\textcolor{stringliteral}{'fulltext'},\ \$columns,\ \$name,\ \$algorithm);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00595}00595\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00596}00596\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00604}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a55a685a65deb19067eeaf086c7acff45}{00604}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a55a685a65deb19067eeaf086c7acff45}{spatialIndex}}(\$columns,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00605}00605\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00606}00606\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>indexCommand(\textcolor{stringliteral}{'spatialIndex'},\ \$columns,\ \$name);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00607}00607\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00608}00608\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00616}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8c5d1653ac633232a34a418db11efb4b}{00616}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8c5d1653ac633232a34a418db11efb4b}{rawIndex}}(\$expression,\ \$name)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00617}00617\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00618}00618\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>index([\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_query_1_1_expression}{Expression}}(\$expression)],\ \$name);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00619}00619\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00620}00620\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00628}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a0ab388ee1039e7569dccfeb15680e61a}{00628}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a0ab388ee1039e7569dccfeb15680e61a}{foreign}}(\$columns,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00629}00629\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00630}00630\ \ \ \ \ \ \ \ \ \$command\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_foreign_key_definition}{ForeignKeyDefinition}}(}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00631}00631\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>indexCommand(\textcolor{stringliteral}{'foreign'},\ \$columns,\ \$name)-\/>getAttributes()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00632}00632\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00633}00633\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00634}00634\ \ \ \ \ \ \ \ \ \$this-\/>commands[count(\$this-\/>commands)\ -\/\ 1]\ =\ \$command;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00635}00635\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00636}00636\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$command;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00637}00637\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00638}00638\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00645}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a08f9e3e6a7fcf32664e0e5d4ea2e56ac}{00645}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a08f9e3e6a7fcf32664e0e5d4ea2e56ac}{id}}(\$column\ =\ \textcolor{stringliteral}{'id'})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00646}00646\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00647}00647\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>bigIncrements(\$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00648}00648\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00649}00649\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00656}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a14c11ea781af98b900cf98f189931861}{00656}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a14c11ea781af98b900cf98f189931861}{increments}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00657}00657\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00658}00658\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>unsignedInteger(\$column,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00659}00659\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00660}00660\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00667}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ad3e82c7fe7998732dfb2e12ce7eca3dc}{00667}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ad3e82c7fe7998732dfb2e12ce7eca3dc}{integerIncrements}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00668}00668\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00669}00669\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>unsignedInteger(\$column,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00670}00670\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00671}00671\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00678}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8af5da3a5c295fcc65c1f8f0249d2c00}{00678}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8af5da3a5c295fcc65c1f8f0249d2c00}{tinyIncrements}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00679}00679\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00680}00680\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>unsignedTinyInteger(\$column,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00681}00681\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00682}00682\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00689}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aaba66f7ea20ea8986f8ddef1ed7d5acd}{00689}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aaba66f7ea20ea8986f8ddef1ed7d5acd}{smallIncrements}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00690}00690\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00691}00691\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>unsignedSmallInteger(\$column,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00692}00692\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00693}00693\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00700}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a0025e8801c8b0d997a90dd1e3e7d1176}{00700}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a0025e8801c8b0d997a90dd1e3e7d1176}{mediumIncrements}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00701}00701\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00702}00702\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>unsignedMediumInteger(\$column,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00703}00703\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00704}00704\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00711}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a37e5c6eebd9f12ea3acb832f499b2d59}{00711}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a37e5c6eebd9f12ea3acb832f499b2d59}{bigIncrements}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00712}00712\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00713}00713\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>unsignedBigInteger(\$column,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00714}00714\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00715}00715\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00723}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a71a0250916acf2df47d2a1aaaee36f7e}{00723}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a71a0250916acf2df47d2a1aaaee36f7e}{char}}(\$column,\ \$length\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00724}00724\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00725}00725\ \ \ \ \ \ \ \ \ \$length\ =\ !\ is\_null(\$length)\ ?\ \$length\ :\ Builder::\$defaultStringLength;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00726}00726\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00727}00727\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'char'},\ \$column,\ compact(\textcolor{stringliteral}{'length'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00728}00728\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00729}00729\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00737}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9de057d97e45c618a53c5c8191f0daa0}{00737}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9de057d97e45c618a53c5c8191f0daa0}{string}}(\$column,\ \$length\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00738}00738\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00739}00739\ \ \ \ \ \ \ \ \ \$length\ =\ \$length\ ?:\ Builder::\$defaultStringLength;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00740}00740\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00741}00741\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'string'},\ \$column,\ compact(\textcolor{stringliteral}{'length'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00742}00742\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00743}00743\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00750}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a5d883d5cf4ebbd8ecaa89bd774d48685}{00750}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a5d883d5cf4ebbd8ecaa89bd774d48685}{tinyText}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00751}00751\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00752}00752\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'tinyText'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00753}00753\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00754}00754\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00761}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aeaf5d09eb992d006f7d9c43e04dc421f}{00761}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aeaf5d09eb992d006f7d9c43e04dc421f}{text}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00762}00762\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00763}00763\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'text'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00764}00764\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00765}00765\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00772}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af6335024efde5713aa402579376b6890}{00772}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af6335024efde5713aa402579376b6890}{mediumText}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00773}00773\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00774}00774\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'mediumText'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00775}00775\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00776}00776\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00783}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a0c68a370343ee15ac43a336e5d98f997}{00783}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a0c68a370343ee15ac43a336e5d98f997}{longText}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00784}00784\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00785}00785\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'longText'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00786}00786\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00787}00787\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00796}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a1c6488c9dff3d2b82c449670b688aaaf}{00796}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a1c6488c9dff3d2b82c449670b688aaaf}{integer}}(\$column,\ \$autoIncrement\ =\ \textcolor{keyword}{false},\ \$unsigned\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00797}00797\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00798}00798\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'integer'},\ \$column,\ compact(\textcolor{stringliteral}{'autoIncrement'},\ \textcolor{stringliteral}{'unsigned'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00799}00799\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00800}00800\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00809}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9dd0bd48dfe8e82d17591272a0e90e26}{00809}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9dd0bd48dfe8e82d17591272a0e90e26}{tinyInteger}}(\$column,\ \$autoIncrement\ =\ \textcolor{keyword}{false},\ \$unsigned\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00810}00810\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00811}00811\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'tinyInteger'},\ \$column,\ compact(\textcolor{stringliteral}{'autoIncrement'},\ \textcolor{stringliteral}{'unsigned'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00812}00812\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00813}00813\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00822}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a1540efa10489e2c06050305acfcedef8}{00822}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a1540efa10489e2c06050305acfcedef8}{smallInteger}}(\$column,\ \$autoIncrement\ =\ \textcolor{keyword}{false},\ \$unsigned\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00823}00823\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00824}00824\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'smallInteger'},\ \$column,\ compact(\textcolor{stringliteral}{'autoIncrement'},\ \textcolor{stringliteral}{'unsigned'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00825}00825\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00826}00826\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00835}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae5d7a85a306aeef1057803c29fcf93d8}{00835}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae5d7a85a306aeef1057803c29fcf93d8}{mediumInteger}}(\$column,\ \$autoIncrement\ =\ \textcolor{keyword}{false},\ \$unsigned\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00836}00836\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00837}00837\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'mediumInteger'},\ \$column,\ compact(\textcolor{stringliteral}{'autoIncrement'},\ \textcolor{stringliteral}{'unsigned'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00838}00838\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00839}00839\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00848}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ab29e0dc4a93d71d647b830cab588a709}{00848}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ab29e0dc4a93d71d647b830cab588a709}{bigInteger}}(\$column,\ \$autoIncrement\ =\ \textcolor{keyword}{false},\ \$unsigned\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00849}00849\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00850}00850\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'bigInteger'},\ \$column,\ compact(\textcolor{stringliteral}{'autoIncrement'},\ \textcolor{stringliteral}{'unsigned'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00851}00851\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00852}00852\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00860}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a17becb2b1f59d6aa87017cb84d4392aa}{00860}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a17becb2b1f59d6aa87017cb84d4392aa}{unsignedInteger}}(\$column,\ \$autoIncrement\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00861}00861\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00862}00862\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>integer(\$column,\ \$autoIncrement,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00863}00863\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00864}00864\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00872}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aab2921da0afe5e781d8e6b16a12da478}{00872}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aab2921da0afe5e781d8e6b16a12da478}{unsignedTinyInteger}}(\$column,\ \$autoIncrement\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00873}00873\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00874}00874\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>tinyInteger(\$column,\ \$autoIncrement,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00875}00875\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00876}00876\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00884}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae0c12fb38ba5c5781dd40eafd58ae27c}{00884}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae0c12fb38ba5c5781dd40eafd58ae27c}{unsignedSmallInteger}}(\$column,\ \$autoIncrement\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00885}00885\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00886}00886\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>smallInteger(\$column,\ \$autoIncrement,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00887}00887\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00888}00888\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00896}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a31087cff0d135b6f59de4d401414e15a}{00896}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a31087cff0d135b6f59de4d401414e15a}{unsignedMediumInteger}}(\$column,\ \$autoIncrement\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00897}00897\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00898}00898\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>mediumInteger(\$column,\ \$autoIncrement,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00899}00899\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00900}00900\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00908}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a5b500a4690a7fd6634925f6b6d0d7f33}{00908}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a5b500a4690a7fd6634925f6b6d0d7f33}{unsignedBigInteger}}(\$column,\ \$autoIncrement\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00909}00909\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00910}00910\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>bigInteger(\$column,\ \$autoIncrement,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00911}00911\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00912}00912\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00919}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a0a65428af6f5e7bf8175dfc09da7fe8f}{00919}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a0a65428af6f5e7bf8175dfc09da7fe8f}{foreignId}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00920}00920\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00921}00921\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumnDefinition(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_foreign_id_column_definition}{ForeignIdColumnDefinition}}(\$this,\ [}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00922}00922\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'type'}\ =>\ \textcolor{stringliteral}{'bigInteger'},}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00923}00923\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ \$column,}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00924}00924\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'autoIncrement'}\ =>\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00925}00925\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'unsigned'}\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00926}00926\ \ \ \ \ \ \ \ \ ]));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00927}00927\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00928}00928\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00936}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9390978a25b99837ff0492fbe83336dd}{00936}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9390978a25b99837ff0492fbe83336dd}{foreignIdFor}}(\$model,\ \$column\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00937}00937\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00938}00938\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$model))\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00939}00939\ \ \ \ \ \ \ \ \ \ \ \ \ \$model\ =\ \textcolor{keyword}{new}\ \$model;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00940}00940\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00941}00941\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00942}00942\ \ \ \ \ \ \ \ \ \$column\ =\ \$column\ ?:\ \$model-\/>getForeignKey();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00943}00943\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00944}00944\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$model-\/>getKeyType()\ ===\ \textcolor{stringliteral}{'int'}\ \&\&\ \$model-\/>getIncrementing())\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00945}00945\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>foreignId(\$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00946}00946\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00947}00947\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00948}00948\ \ \ \ \ \ \ \ \ \$modelTraits\ =\ class\_uses\_recursive(\$model);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00949}00949\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00950}00950\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(HasUlids::class,\ \$modelTraits,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00951}00951\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>foreignUlid(\$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00952}00952\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00953}00953\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00954}00954\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>foreignUuid(\$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00955}00955\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00956}00956\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00966}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae47d80e68bd061f859f7479dcd0609b0}{00966}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae47d80e68bd061f859f7479dcd0609b0}{float}}(\$column,\ \$total\ =\ 8,\ \$places\ =\ 2,\ \$unsigned\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00967}00967\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00968}00968\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'float'},\ \$column,\ compact(\textcolor{stringliteral}{'total'},\ \textcolor{stringliteral}{'places'},\ \textcolor{stringliteral}{'unsigned'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00969}00969\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00970}00970\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00980}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a940ee00367f0004194b3ff79e38724c9}{00980}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a940ee00367f0004194b3ff79e38724c9}{double}}(\$column,\ \$total\ =\ \textcolor{keyword}{null},\ \$places\ =\ \textcolor{keyword}{null},\ \$unsigned\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00981}00981\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00982}00982\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'double'},\ \$column,\ compact(\textcolor{stringliteral}{'total'},\ \textcolor{stringliteral}{'places'},\ \textcolor{stringliteral}{'unsigned'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00983}00983\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00984}00984\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00994}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_acef3e7d4b3c77dd33ec59368edae2f32}{00994}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_acef3e7d4b3c77dd33ec59368edae2f32}{decimal}}(\$column,\ \$total\ =\ 8,\ \$places\ =\ 2,\ \$unsigned\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00995}00995\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00996}00996\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'decimal'},\ \$column,\ compact(\textcolor{stringliteral}{'total'},\ \textcolor{stringliteral}{'places'},\ \textcolor{stringliteral}{'unsigned'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00997}00997\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l00998}00998\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01007}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8605638f5649945d754255c4acbea234}{01007}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8605638f5649945d754255c4acbea234}{unsignedFloat}}(\$column,\ \$total\ =\ 8,\ \$places\ =\ 2)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01008}01008\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01009}01009\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>float(\$column,\ \$total,\ \$places,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01010}01010\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01011}01011\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01020}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a5af287442032281b369a66a88c03fc2d}{01020}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a5af287442032281b369a66a88c03fc2d}{unsignedDouble}}(\$column,\ \$total\ =\ \textcolor{keyword}{null},\ \$places\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01021}01021\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01022}01022\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>double(\$column,\ \$total,\ \$places,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01023}01023\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01024}01024\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01033}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a542699284c8f4d068c8014989c73ca3a}{01033}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a542699284c8f4d068c8014989c73ca3a}{unsignedDecimal}}(\$column,\ \$total\ =\ 8,\ \$places\ =\ 2)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01034}01034\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01035}01035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>decimal(\$column,\ \$total,\ \$places,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01036}01036\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01037}01037\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01044}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ac53942b70c415d075fbd404c3171ae02}{01044}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ac53942b70c415d075fbd404c3171ae02}{boolean}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01045}01045\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01046}01046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'boolean'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01047}01047\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01048}01048\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01056}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a6d464a3820cd6708aaef691966ea44c0}{01056}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{enum}(\$column,\ array\ \$allowed)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01057}01057\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01058}01058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'enum'},\ \$column,\ compact(\textcolor{stringliteral}{'allowed'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01059}01059\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01060}01060\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01068}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a6c33d83fe10788578ae8f986629f5364}{01068}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{set}(\$column,\ array\ \$allowed)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01069}01069\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01070}01070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'set'},\ \$column,\ compact(\textcolor{stringliteral}{'allowed'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01071}01071\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01072}01072\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01079}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a83c154a24e5c367e41eb90117263b36e}{01079}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a83c154a24e5c367e41eb90117263b36e}{json}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01080}01080\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01081}01081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'json'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01082}01082\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01083}01083\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01090}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a38f659ae9fa2b3d7cf98381f724e90a6}{01090}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a38f659ae9fa2b3d7cf98381f724e90a6}{jsonb}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01091}01091\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01092}01092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'jsonb'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01093}01093\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01094}01094\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01101}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a6456b057aa56d0c0f3d698c9c54fe853}{01101}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a6456b057aa56d0c0f3d698c9c54fe853}{date}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01102}01102\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01103}01103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'date'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01104}01104\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01105}01105\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01113}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_afeff1dfb43761ac7915f7d72b8818de2}{01113}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_afeff1dfb43761ac7915f7d72b8818de2}{dateTime}}(\$column,\ \$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01114}01114\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01115}01115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'dateTime'},\ \$column,\ compact(\textcolor{stringliteral}{'precision'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01116}01116\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01117}01117\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01125}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9c4b465136bb95b7c36b7a3ce2a8c69d}{01125}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9c4b465136bb95b7c36b7a3ce2a8c69d}{dateTimeTz}}(\$column,\ \$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01126}01126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01127}01127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'dateTimeTz'},\ \$column,\ compact(\textcolor{stringliteral}{'precision'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01128}01128\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01129}01129\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01137}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ab192fb010c4ebe4803d0c625d78ecb20}{01137}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ab192fb010c4ebe4803d0c625d78ecb20}{time}}(\$column,\ \$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01138}01138\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01139}01139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'time'},\ \$column,\ compact(\textcolor{stringliteral}{'precision'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01140}01140\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01141}01141\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01149}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a44110553f884cc5376c1d6b702102f98}{01149}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a44110553f884cc5376c1d6b702102f98}{timeTz}}(\$column,\ \$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01150}01150\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01151}01151\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'timeTz'},\ \$column,\ compact(\textcolor{stringliteral}{'precision'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01152}01152\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01153}01153\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01161}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ac250022e356c3cc2671769117440c264}{01161}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ac250022e356c3cc2671769117440c264}{timestamp}}(\$column,\ \$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01162}01162\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01163}01163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'timestamp'},\ \$column,\ compact(\textcolor{stringliteral}{'precision'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01164}01164\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01165}01165\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01173}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a84ded617d38413e338b71d7cc90a92d5}{01173}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a84ded617d38413e338b71d7cc90a92d5}{timestampTz}}(\$column,\ \$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01174}01174\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01175}01175\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'timestampTz'},\ \$column,\ compact(\textcolor{stringliteral}{'precision'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01176}01176\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01177}01177\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01184}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae6732abb589ef112305a8b7d24ef1c61}{01184}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae6732abb589ef112305a8b7d24ef1c61}{timestamps}}(\$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01185}01185\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01186}01186\ \ \ \ \ \ \ \ \ \$this-\/>timestamp(\textcolor{stringliteral}{'created\_at'},\ \$precision)-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01187}01187\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01188}01188\ \ \ \ \ \ \ \ \ \$this-\/>timestamp(\textcolor{stringliteral}{'updated\_at'},\ \$precision)-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01189}01189\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01190}01190\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01199}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a428f706db72d17ef1771e95dcd74da78}{01199}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a428f706db72d17ef1771e95dcd74da78}{nullableTimestamps}}(\$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01200}01200\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01201}01201\ \ \ \ \ \ \ \ \ \$this-\/>timestamps(\$precision);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01202}01202\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01203}01203\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01210}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a222dcfcd8f820175727822fb3ad1f508}{01210}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a222dcfcd8f820175727822fb3ad1f508}{timestampsTz}}(\$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01211}01211\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01212}01212\ \ \ \ \ \ \ \ \ \$this-\/>timestampTz(\textcolor{stringliteral}{'created\_at'},\ \$precision)-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01213}01213\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01214}01214\ \ \ \ \ \ \ \ \ \$this-\/>timestampTz(\textcolor{stringliteral}{'updated\_at'},\ \$precision)-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01215}01215\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01216}01216\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01223}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a10688f8c386c209c7dec3544c5b954af}{01223}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a10688f8c386c209c7dec3544c5b954af}{datetimes}}(\$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01224}01224\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01225}01225\ \ \ \ \ \ \ \ \ \$this-\/>datetime(\textcolor{stringliteral}{'created\_at'},\ \$precision)-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01226}01226\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01227}01227\ \ \ \ \ \ \ \ \ \$this-\/>datetime(\textcolor{stringliteral}{'updated\_at'},\ \$precision)-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01228}01228\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01229}01229\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01237}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a0468ef2b99960d676e5ea855e5cce387}{01237}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a0468ef2b99960d676e5ea855e5cce387}{softDeletes}}(\$column\ =\ \textcolor{stringliteral}{'deleted\_at'},\ \$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01238}01238\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01239}01239\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>timestamp(\$column,\ \$precision)-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01240}01240\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01241}01241\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01249}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af86c2dc0900d3338781b11583d826bc7}{01249}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af86c2dc0900d3338781b11583d826bc7}{softDeletesTz}}(\$column\ =\ \textcolor{stringliteral}{'deleted\_at'},\ \$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01250}01250\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01251}01251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>timestampTz(\$column,\ \$precision)-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01252}01252\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01253}01253\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01261}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a05b74646485ec5f4b2d134e4e9ae212e}{01261}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a05b74646485ec5f4b2d134e4e9ae212e}{softDeletesDatetime}}(\$column\ =\ \textcolor{stringliteral}{'deleted\_at'},\ \$precision\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01262}01262\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01263}01263\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>datetime(\$column,\ \$precision)-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01264}01264\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01265}01265\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01272}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a46b08fd5a224c8c4784364e1a2c62a55}{01272}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a46b08fd5a224c8c4784364e1a2c62a55}{year}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01273}01273\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01274}01274\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'year'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01275}01275\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01276}01276\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01283}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a891661bce39e47cd170541bf9d8713ee}{01283}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a891661bce39e47cd170541bf9d8713ee}{binary}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01284}01284\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01285}01285\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'binary'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01286}01286\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01287}01287\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01294}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_abfb81d928f887745c7e32e3d572775cc}{01294}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_abfb81d928f887745c7e32e3d572775cc}{uuid}}(\$column\ =\ \textcolor{stringliteral}{'uuid'})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01295}01295\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01296}01296\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'uuid'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01297}01297\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01298}01298\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01305}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a2dc9e37452902b9263120bf835b9457d}{01305}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a2dc9e37452902b9263120bf835b9457d}{foreignUuid}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01306}01306\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01307}01307\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumnDefinition(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_foreign_id_column_definition}{ForeignIdColumnDefinition}}(\$this,\ [}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01308}01308\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'type'}\ =>\ \textcolor{stringliteral}{'uuid'},}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01309}01309\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ \$column,}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01310}01310\ \ \ \ \ \ \ \ \ ]));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01311}01311\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01312}01312\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01320}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ab8f02dc1706b68ea4ca55c5082e1ca79}{01320}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ab8f02dc1706b68ea4ca55c5082e1ca79}{ulid}}(\$column\ =\ \textcolor{stringliteral}{'ulid'},\ \$length\ =\ 26)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01321}01321\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01322}01322\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>char(\$column,\ \$length);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01323}01323\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01324}01324\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01332}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af1e61a961616b1a3757d153352c1949e}{01332}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af1e61a961616b1a3757d153352c1949e}{foreignUlid}}(\$column,\ \$length\ =\ 26)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01333}01333\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01334}01334\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumnDefinition(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_foreign_id_column_definition}{ForeignIdColumnDefinition}}(\$this,\ [}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01335}01335\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'type'}\ =>\ \textcolor{stringliteral}{'char'},}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01336}01336\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ \$column,}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01337}01337\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'length'}\ =>\ \$length,}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01338}01338\ \ \ \ \ \ \ \ \ ]));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01339}01339\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01340}01340\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01347}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a2f41ec7c0bb3f144c53d536033fb8b94}{01347}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a2f41ec7c0bb3f144c53d536033fb8b94}{ipAddress}}(\$column\ =\ \textcolor{stringliteral}{'ip\_address'})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01348}01348\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01349}01349\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'ipAddress'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01350}01350\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01351}01351\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01358}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a2125e967c06a3ea09647b31672ad7e12}{01358}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a2125e967c06a3ea09647b31672ad7e12}{macAddress}}(\$column\ =\ \textcolor{stringliteral}{'mac\_address'})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01359}01359\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01360}01360\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'macAddress'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01361}01361\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01362}01362\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01369}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ab8a2581735db073187b599ce84c79ea8}{01369}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ab8a2581735db073187b599ce84c79ea8}{geometry}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01370}01370\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01371}01371\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'geometry'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01372}01372\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01373}01373\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01381}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a12985d8464402c147757afea04f3faaf}{01381}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a12985d8464402c147757afea04f3faaf}{point}}(\$column,\ \$srid\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01382}01382\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01383}01383\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'point'},\ \$column,\ compact(\textcolor{stringliteral}{'srid'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01384}01384\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01385}01385\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01392}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9660ff9fe8e575c5d7056034a14e4a07}{01392}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9660ff9fe8e575c5d7056034a14e4a07}{lineString}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01393}01393\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01394}01394\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'linestring'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01395}01395\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01396}01396\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01403}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8fbf2594ffe0615ab8299f74a26ebc02}{01403}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a8fbf2594ffe0615ab8299f74a26ebc02}{polygon}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01404}01404\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01405}01405\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'polygon'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01406}01406\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01407}01407\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01414}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a3f80c5997fa883c46dc29faab820efd7}{01414}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a3f80c5997fa883c46dc29faab820efd7}{geometryCollection}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01415}01415\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01416}01416\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'geometrycollection'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01417}01417\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01418}01418\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01425}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a2633e812c9197426379af75118a5522b}{01425}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a2633e812c9197426379af75118a5522b}{multiPoint}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01426}01426\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01427}01427\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'multipoint'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01428}01428\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01429}01429\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01436}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a12a09ce390811b9aa98d0b8ce340b246}{01436}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a12a09ce390811b9aa98d0b8ce340b246}{multiLineString}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01437}01437\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01438}01438\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'multilinestring'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01439}01439\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01440}01440\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01447}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a7a3e9215e0865833d64c53a9e5679ef2}{01447}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a7a3e9215e0865833d64c53a9e5679ef2}{multiPolygon}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01448}01448\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01449}01449\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'multipolygon'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01450}01450\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01451}01451\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01458}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ad1dfd23640aa965e5074add48a27b13e}{01458}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ad1dfd23640aa965e5074add48a27b13e}{multiPolygonZ}}(\$column)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01459}01459\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01460}01460\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'multipolygonz'},\ \$column);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01461}01461\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01462}01462\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01470}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a7c179dc17167fcf87d0a875815e05005}{01470}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a7c179dc17167fcf87d0a875815e05005}{computed}}(\$column,\ \$expression)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01471}01471\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01472}01472\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumn(\textcolor{stringliteral}{'computed'},\ \$column,\ compact(\textcolor{stringliteral}{'expression'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01473}01473\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01474}01474\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01482}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ab445588975c91ea900e7fd50b5614b27}{01482}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ab445588975c91ea900e7fd50b5614b27}{morphs}}(\$name,\ \$indexName\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01483}01483\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01484}01484\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Builder::\$defaultMorphKeyType\ ===\ \textcolor{stringliteral}{'uuid'})\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01485}01485\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>uuidMorphs(\$name,\ \$indexName);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01486}01486\ \ \ \ \ \ \ \ \ \}\ elseif\ (Builder::\$defaultMorphKeyType\ ===\ \textcolor{stringliteral}{'ulid'})\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01487}01487\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>ulidMorphs(\$name,\ \$indexName);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01488}01488\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01489}01489\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numericMorphs(\$name,\ \$indexName);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01490}01490\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01491}01491\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01492}01492\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01500}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a72253064aa132f25e77eb74316f9dc97}{01500}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a72253064aa132f25e77eb74316f9dc97}{nullableMorphs}}(\$name,\ \$indexName\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01501}01501\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01502}01502\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Builder::\$defaultMorphKeyType\ ===\ \textcolor{stringliteral}{'uuid'})\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01503}01503\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>nullableUuidMorphs(\$name,\ \$indexName);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01504}01504\ \ \ \ \ \ \ \ \ \}\ elseif\ (Builder::\$defaultMorphKeyType\ ===\ \textcolor{stringliteral}{'ulid'})\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01505}01505\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>nullableUlidMorphs(\$name,\ \$indexName);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01506}01506\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01507}01507\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>nullableNumericMorphs(\$name,\ \$indexName);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01508}01508\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01509}01509\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01510}01510\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01518}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a398197a2e387f4a68cb0e841372a34a1}{01518}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a398197a2e387f4a68cb0e841372a34a1}{numericMorphs}}(\$name,\ \$indexName\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01519}01519\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01520}01520\ \ \ \ \ \ \ \ \ \$this-\/>string(\textcolor{stringliteral}{"{}\{\$name\}\_type"{}});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01521}01521\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01522}01522\ \ \ \ \ \ \ \ \ \$this-\/>unsignedBigInteger(\textcolor{stringliteral}{"{}\{\$name\}\_id"{}});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01523}01523\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01524}01524\ \ \ \ \ \ \ \ \ \$this-\/>index([\textcolor{stringliteral}{"{}\{\$name\}\_type"{}},\ \textcolor{stringliteral}{"{}\{\$name\}\_id"{}}],\ \$indexName);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01525}01525\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01526}01526\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01534}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9766563eaed42a76ce1353fc4098ad2a}{01534}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9766563eaed42a76ce1353fc4098ad2a}{nullableNumericMorphs}}(\$name,\ \$indexName\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01535}01535\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01536}01536\ \ \ \ \ \ \ \ \ \$this-\/>string(\textcolor{stringliteral}{"{}\{\$name\}\_type"{}})-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01537}01537\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01538}01538\ \ \ \ \ \ \ \ \ \$this-\/>unsignedBigInteger(\textcolor{stringliteral}{"{}\{\$name\}\_id"{}})-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01539}01539\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01540}01540\ \ \ \ \ \ \ \ \ \$this-\/>index([\textcolor{stringliteral}{"{}\{\$name\}\_type"{}},\ \textcolor{stringliteral}{"{}\{\$name\}\_id"{}}],\ \$indexName);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01541}01541\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01542}01542\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01550}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a0197dbea036bd98737883e78e162d6ee}{01550}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a0197dbea036bd98737883e78e162d6ee}{uuidMorphs}}(\$name,\ \$indexName\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01551}01551\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01552}01552\ \ \ \ \ \ \ \ \ \$this-\/>string(\textcolor{stringliteral}{"{}\{\$name\}\_type"{}});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01553}01553\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01554}01554\ \ \ \ \ \ \ \ \ \$this-\/>uuid(\textcolor{stringliteral}{"{}\{\$name\}\_id"{}});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01555}01555\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01556}01556\ \ \ \ \ \ \ \ \ \$this-\/>index([\textcolor{stringliteral}{"{}\{\$name\}\_type"{}},\ \textcolor{stringliteral}{"{}\{\$name\}\_id"{}}],\ \$indexName);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01557}01557\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01558}01558\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01566}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a6f3ce8ea7162b358abf75e3d619adac9}{01566}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a6f3ce8ea7162b358abf75e3d619adac9}{nullableUuidMorphs}}(\$name,\ \$indexName\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01567}01567\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01568}01568\ \ \ \ \ \ \ \ \ \$this-\/>string(\textcolor{stringliteral}{"{}\{\$name\}\_type"{}})-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01569}01569\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01570}01570\ \ \ \ \ \ \ \ \ \$this-\/>uuid(\textcolor{stringliteral}{"{}\{\$name\}\_id"{}})-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01571}01571\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01572}01572\ \ \ \ \ \ \ \ \ \$this-\/>index([\textcolor{stringliteral}{"{}\{\$name\}\_type"{}},\ \textcolor{stringliteral}{"{}\{\$name\}\_id"{}}],\ \$indexName);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01573}01573\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01574}01574\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01582}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_abbb75dece4075a05e5534ab1c4fbcbcc}{01582}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_abbb75dece4075a05e5534ab1c4fbcbcc}{ulidMorphs}}(\$name,\ \$indexName\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01583}01583\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01584}01584\ \ \ \ \ \ \ \ \ \$this-\/>string(\textcolor{stringliteral}{"{}\{\$name\}\_type"{}});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01585}01585\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01586}01586\ \ \ \ \ \ \ \ \ \$this-\/>ulid(\textcolor{stringliteral}{"{}\{\$name\}\_id"{}});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01587}01587\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01588}01588\ \ \ \ \ \ \ \ \ \$this-\/>index([\textcolor{stringliteral}{"{}\{\$name\}\_type"{}},\ \textcolor{stringliteral}{"{}\{\$name\}\_id"{}}],\ \$indexName);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01589}01589\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01590}01590\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01598}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a85babf5d657e7133cbf04d32fee94e81}{01598}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a85babf5d657e7133cbf04d32fee94e81}{nullableUlidMorphs}}(\$name,\ \$indexName\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01599}01599\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01600}01600\ \ \ \ \ \ \ \ \ \$this-\/>string(\textcolor{stringliteral}{"{}\{\$name\}\_type"{}})-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01601}01601\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01602}01602\ \ \ \ \ \ \ \ \ \$this-\/>ulid(\textcolor{stringliteral}{"{}\{\$name\}\_id"{}})-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01603}01603\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01604}01604\ \ \ \ \ \ \ \ \ \$this-\/>index([\textcolor{stringliteral}{"{}\{\$name\}\_type"{}},\ \textcolor{stringliteral}{"{}\{\$name\}\_id"{}}],\ \$indexName);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01605}01605\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01606}01606\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01612}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_acfffc323738b5cd25c43efa0c4c923e0}{01612}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_acfffc323738b5cd25c43efa0c4c923e0}{rememberToken}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01613}01613\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01614}01614\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>string(\textcolor{stringliteral}{'remember\_token'},\ 100)-\/>nullable();}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01615}01615\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01616}01616\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01623}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_acbfa9874100f9bc0b8f698120156e2b7}{01623}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_acbfa9874100f9bc0b8f698120156e2b7}{comment}}(\$comment)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01624}01624\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01625}01625\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addCommand(\textcolor{stringliteral}{'tableComment'},\ compact(\textcolor{stringliteral}{'comment'}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01626}01626\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01627}01627\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01637}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a11870ed7b53eb4c45cd44e5281c8399f}{01637}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a11870ed7b53eb4c45cd44e5281c8399f}{indexCommand}}(\$type,\ \$columns,\ \$index,\ \$algorithm\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01638}01638\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01639}01639\ \ \ \ \ \ \ \ \ \$columns\ =\ (array)\ \$columns;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01640}01640\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01641}01641\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ no\ name\ was\ specified\ for\ this\ index,\ we\ will\ create\ one\ using\ a\ basic}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01642}01642\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ convention\ of\ the\ table\ name,\ followed\ by\ the\ columns,\ followed\ by\ an}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01643}01643\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ index\ type,\ such\ as\ primary\ or\ index,\ which\ makes\ the\ index\ unique.}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01644}01644\ \ \ \ \ \ \ \ \ \$index\ =\ \$index\ ?:\ \$this-\/>createIndexName(\$type,\ \$columns);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01645}01645\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01646}01646\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addCommand(}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01647}01647\ \ \ \ \ \ \ \ \ \ \ \ \ \$type,\ compact(\textcolor{stringliteral}{'index'},\ \textcolor{stringliteral}{'columns'},\ \textcolor{stringliteral}{'algorithm'})}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01648}01648\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01649}01649\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01650}01650\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01659}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a17ee340b644e9d64e047734b20949e66}{01659}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a17ee340b644e9d64e047734b20949e66}{dropIndexCommand}}(\$command,\ \$type,\ \$index)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01660}01660\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01661}01661\ \ \ \ \ \ \ \ \ \$columns\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01662}01662\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01663}01663\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ given\ "{}index"{}\ is\ actually\ an\ array\ of\ columns,\ the\ developer\ means}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01664}01664\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ drop\ an\ index\ merely\ by\ specifying\ the\ columns\ involved\ without\ the}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01665}01665\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ conventional\ name,\ so\ we\ will\ build\ the\ index\ name\ from\ the\ columns.}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01666}01666\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$index))\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01667}01667\ \ \ \ \ \ \ \ \ \ \ \ \ \$index\ =\ \$this-\/>createIndexName(\$type,\ \$columns\ =\ \$index);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01668}01668\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01669}01669\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01670}01670\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>indexCommand(\$command,\ \$columns,\ \$index);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01671}01671\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01672}01672\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01680}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a7493bf6f2fb9a00347d264e00d9894a1}{01680}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a7493bf6f2fb9a00347d264e00d9894a1}{createIndexName}}(\$type,\ array\ \$columns)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01681}01681\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01682}01682\ \ \ \ \ \ \ \ \ \$index\ =\ strtolower(\$this-\/>prefix.\$this-\/>table.\textcolor{charliteral}{'\_'}.implode(\textcolor{charliteral}{'\_'},\ \$columns).\textcolor{charliteral}{'\_'}.\$type);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01683}01683\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01684}01684\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str\_replace([\textcolor{charliteral}{'-\/'},\ \textcolor{charliteral}{'.'}],\ \textcolor{charliteral}{'\_'},\ \$index);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01685}01685\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01686}01686\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01695}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a738bbe519e10ee72585a66e2fff78692}{01695}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a738bbe519e10ee72585a66e2fff78692}{addColumn}}(\$type,\ \$name,\ array\ \$parameters\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01696}01696\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01697}01697\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addColumnDefinition(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_column_definition}{ColumnDefinition}}(}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01698}01698\ \ \ \ \ \ \ \ \ \ \ \ \ array\_merge(compact(\textcolor{stringliteral}{'type'},\ \textcolor{stringliteral}{'name'}),\ \$parameters)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01699}01699\ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01700}01700\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01701}01701\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01708}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a227b78ac33d480b6fd5d8b01b4e1e895}{01708}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a227b78ac33d480b6fd5d8b01b4e1e895}{addColumnDefinition}}(\$definition)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01709}01709\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01710}01710\ \ \ \ \ \ \ \ \ \$this-\/>columns[]\ =\ \$definition;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01711}01711\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01712}01712\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>after)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01713}01713\ \ \ \ \ \ \ \ \ \ \ \ \ \$definition-\/>after(\$this-\/>after);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01714}01714\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01715}01715\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>after\ =\ \$definition-\/>name;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01716}01716\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01717}01717\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01718}01718\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$definition;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01719}01719\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01720}01720\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01728}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a6b879c6209059b223c3b2bb9d92b2065}{01728}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a6b879c6209059b223c3b2bb9d92b2065}{after}}(\$column,\ Closure\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01729}01729\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01730}01730\ \ \ \ \ \ \ \ \ \$this-\/>after\ =\ \$column;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01731}01731\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01732}01732\ \ \ \ \ \ \ \ \ \$callback(\$this);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01733}01733\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01734}01734\ \ \ \ \ \ \ \ \ \$this-\/>after\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01735}01735\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01736}01736\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01743}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9b9d5c303403ad0a4ee54b2a08e2779b}{01743}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a9b9d5c303403ad0a4ee54b2a08e2779b}{removeColumn}}(\$name)}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01744}01744\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01745}01745\ \ \ \ \ \ \ \ \ \$this-\/>columns\ =\ array\_values(array\_filter(\$this-\/>columns,\ \textcolor{keyword}{function}\ (\$c)\ use\ (\$name)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01746}01746\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$c[\textcolor{stringliteral}{'name'}]\ !=\ \$name;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01747}01747\ \ \ \ \ \ \ \ \ \}));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01748}01748\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01749}01749\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01750}01750\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01751}01751\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01759}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae9c9b4b1ff69b4523c8667b50bff5511}{01759}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_ae9c9b4b1ff69b4523c8667b50bff5511}{addCommand}}(\$name,\ array\ \$parameters\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01760}01760\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01761}01761\ \ \ \ \ \ \ \ \ \$this-\/>commands[]\ =\ \$command\ =\ \$this-\/>createCommand(\$name,\ \$parameters);}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01762}01762\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01763}01763\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$command;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01764}01764\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01765}01765\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01773}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af9ba17945bfd8f0b0e70d4701c6ed7f1}{01773}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_af9ba17945bfd8f0b0e70d4701c6ed7f1}{createCommand}}(\$name,\ array\ \$parameters\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01774}01774\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01775}01775\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_fluent}{Fluent}}(array\_merge(compact(\textcolor{stringliteral}{'name'}),\ \$parameters));}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01776}01776\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01777}01777\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01783}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aa0dd4bf57d57bc2a3697e40c9f6bddce}{01783}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_aa0dd4bf57d57bc2a3697e40c9f6bddce}{getTable}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01784}01784\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01785}01785\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>table;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01786}01786\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01787}01787\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01793}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a7a333affb97cf092d50f3e59edaa9066}{01793}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a7a333affb97cf092d50f3e59edaa9066}{getPrefix}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01794}01794\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01795}01795\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>prefix;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01796}01796\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01797}01797\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01803}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a6287262cb9628d7a89d8fc16dcb51177}{01803}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a6287262cb9628d7a89d8fc16dcb51177}{getColumns}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01804}01804\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01805}01805\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>columns;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01806}01806\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01807}01807\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01813}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a82f3474cee57fff1095b279dc4da9fc1}{01813}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a82f3474cee57fff1095b279dc4da9fc1}{getCommands}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01814}01814\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01815}01815\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>commands;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01816}01816\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01817}01817\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01823}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a551ed38a46419762059f01956684fd2d}{01823}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a551ed38a46419762059f01956684fd2d}{getAddedColumns}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01824}01824\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01825}01825\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_filter(\$this-\/>columns,\ \textcolor{keyword}{function}\ (\$column)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01826}01826\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\ \$column-\/>change;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01827}01827\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01828}01828\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01829}01829\ }
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01835}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a2a1816b423720a0937cdf39f4c831675}{01835}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_schema_1_1_blueprint_a2a1816b423720a0937cdf39f4c831675}{getChangedColumns}}()}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01836}01836\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01837}01837\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_filter(\$this-\/>columns,\ \textcolor{keyword}{function}\ (\$column)\ \{}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01838}01838\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{bool})\ \$column-\/>change;}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01839}01839\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01840}01840\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blueprint_8php_source_l01841}01841\ \}}
+
+\end{DoxyCode}

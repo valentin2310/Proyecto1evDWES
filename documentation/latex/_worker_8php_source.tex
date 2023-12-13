@@ -1,0 +1,545 @@
+\doxysection{Worker.\+php}
+\hypertarget{_worker_8php_source}{}\label{_worker_8php_source}\index{vendor/laravel/framework/src/Illuminate/Queue/Worker.php@{vendor/laravel/framework/src/Illuminate/Queue/Worker.php}}
+\mbox{\hyperlink{_worker_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_queue}{Illuminate\(\backslash\)Queue}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00005}00005\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_cache_1_1_repository}{Illuminate\(\backslash\)Contracts\(\backslash\)Cache\(\backslash\)Repository}}\ as\ CacheContract;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00006}00006\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_debug_1_1_exception_handler}{Illuminate\(\backslash\)Contracts\(\backslash\)Debug\(\backslash\)ExceptionHandler}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00007}00007\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_events_1_1_dispatcher}{Illuminate\(\backslash\)Contracts\(\backslash\)Events\(\backslash\)Dispatcher}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00008}00008\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_factory}{Illuminate\(\backslash\)Contracts\(\backslash\)Queue\(\backslash\)Factory}}\ as\ QueueManager;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00009}00009\ use\ Illuminate\(\backslash\)Database\(\backslash\)DetectsLostConnections;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_exception_occurred}{Illuminate\(\backslash\)Queue\(\backslash\)Events\(\backslash\)JobExceptionOccurred}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_popped}{Illuminate\(\backslash\)Queue\(\backslash\)Events\(\backslash\)JobPopped}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00012}00012\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_popping}{Illuminate\(\backslash\)Queue\(\backslash\)Events\(\backslash\)JobPopping}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00013}00013\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_processed}{Illuminate\(\backslash\)Queue\(\backslash\)Events\(\backslash\)JobProcessed}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_processing}{Illuminate\(\backslash\)Queue\(\backslash\)Events\(\backslash\)JobProcessing}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_released_after_exception}{Illuminate\(\backslash\)Queue\(\backslash\)Events\(\backslash\)JobReleasedAfterException}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_timed_out}{Illuminate\(\backslash\)Queue\(\backslash\)Events\(\backslash\)JobTimedOut}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_looping}{Illuminate\(\backslash\)Queue\(\backslash\)Events\(\backslash\)Looping}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_worker_stopping}{Illuminate\(\backslash\)Queue\(\backslash\)Events\(\backslash\)WorkerStopping}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_carbon}{Illuminate\(\backslash\)Support\(\backslash\)Carbon}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00020}00020\ use\ Throwable;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00022}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker}{00022}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker}{Worker}}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00023}00023\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00024}00024\ \ \ \ \ use\ DetectsLostConnections;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00026}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a44a73f871298e7befa219da1d96c4bf8}{00026}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a44a73f871298e7befa219da1d96c4bf8}{EXIT\_SUCCESS}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00027}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a0072a08da382eee32afd352989a3cfc2}{00027}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a0072a08da382eee32afd352989a3cfc2}{EXIT\_ERROR}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00028}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_abab34686efa698b2985ebadc30cb720b}{00028}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_abab34686efa698b2985ebadc30cb720b}{EXIT\_MEMORY\_LIMIT}}\ =\ 12;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00035}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ab2fc40d43824ea3e1ce5d86dee0d763b}{00035}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00042}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4621b1cd69b1417c9fb966c825299de1}{00042}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4621b1cd69b1417c9fb966c825299de1}{\$manager}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00049}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a1bcec9bbd34255927faaf155bf3a940a}{00049}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a1bcec9bbd34255927faaf155bf3a940a}{\$events}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00056}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ac2dc76d756ec398393d4b1d23659276c}{00056}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ac2dc76d756ec398393d4b1d23659276c}{\$cache}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00063}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a7b3cdaf64a0a391d40bc8ecd4008218a}{00063}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a7b3cdaf64a0a391d40bc8ecd4008218a}{\$exceptions}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00070}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a3675720a577da2028ab2d470ecc9437a}{00070}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a3675720a577da2028ab2d470ecc9437a}{\$isDownForMaintenance}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00077}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_acaa743347b566cbbe2b64f62d1d0a2f1}{00077}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_acaa743347b566cbbe2b64f62d1d0a2f1}{\$resetScope}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00084}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aa781226431078592d1e82ed511ddf210}{00084}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aa781226431078592d1e82ed511ddf210}{\$shouldQuit}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00091}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ad88a2e9e6aa66c094a7ee562ba88e93d}{00091}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ad88a2e9e6aa66c094a7ee562ba88e93d}{\$paused}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00098}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a7622601247c961c72ce8f5f4690e5ffd}{00098}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{static}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a7622601247c961c72ce8f5f4690e5ffd}{\$popCallbacks}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00110}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aba22e62b3c3130a0eb48c4c4da3c0032}{00110}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aba22e62b3c3130a0eb48c4c4da3c0032}{\_\_construct}}(\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_manager}{QueueManager}}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4621b1cd69b1417c9fb966c825299de1}{\$manager}},}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_bus_1_1_dispatcher}{Dispatcher}}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a1bcec9bbd34255927faaf155bf3a940a}{\$events}},}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_debug_1_1_exception_handler}{ExceptionHandler}}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a7b3cdaf64a0a391d40bc8ecd4008218a}{\$exceptions}},}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callable\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a3675720a577da2028ab2d470ecc9437a}{\$isDownForMaintenance}},}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ callable\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_acaa743347b566cbbe2b64f62d1d0a2f1}{\$resetScope}}\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00115}00115\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \$this-\/>events\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a1bcec9bbd34255927faaf155bf3a940a}{\$events}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \$this-\/>manager\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4621b1cd69b1417c9fb966c825299de1}{\$manager}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \$this-\/>exceptions\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a7b3cdaf64a0a391d40bc8ecd4008218a}{\$exceptions}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \$this-\/>isDownForMaintenance\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a3675720a577da2028ab2d470ecc9437a}{\$isDownForMaintenance}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \$this-\/>resetScope\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_acaa743347b566cbbe2b64f62d1d0a2f1}{\$resetScope}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00121}00121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00131}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ab3b47736b47810340369d9297cc5afc4}{00131}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ab3b47736b47810340369d9297cc5afc4}{daemon}}(\$connectionName,\ \$queue,\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_options}{WorkerOptions}}\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00132}00132\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$supportsAsyncSignals\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a2b8a191501adad7e203e146968c61150}{supportsAsyncSignals}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a04b2e545359dbb79d4575d15e4ce1874}{listenForSignals}}();}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \$lastRestart\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a8b9c756ee2139ecda96b5280c6cc346d}{getTimestampOfLastQueueRestart}}();}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ [\$startTime,\ \$jobsProcessed]\ =\ [hrtime(\textcolor{keyword}{true})\ /\ 1e9,\ 0];}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Before\ reserving\ any\ jobs,\ we\ will\ make\ sure\ this\ queue\ is\ not\ paused\ and}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ it\ is\ we\ will\ just\ pause\ this\ worker\ for\ a\ given\ amount\ of\ time\ and}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ make\ sure\ we\ do\ not\ need\ to\ kill\ this\ worker\ process\ off\ completely.}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4be6f7a962d74ea58efb132197d20083}{daemonShouldRun}}(\$options,\ \$connectionName,\ \$queue))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$status\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aeb3d1e067cad1639cf776adc73fa5f3a}{pauseWorker}}(\$options,\ \$lastRestart);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$status))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a8a845293237a646aa3eb88a14506a35f}{stop}}(\$status,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>resetScope))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_acaa743347b566cbbe2b64f62d1d0a2f1}{\$this-\/>resetScope}})();}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First,\ we\ will\ attempt\ to\ get\ the\ next\ job\ off\ of\ the\ queue.\ We\ will\ also}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ register\ the\ timeout\ handler\ and\ reset\ the\ alarm\ for\ this\ job\ so\ it\ is}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ not\ stuck\ in\ a\ frozen\ state\ forever.\ Then,\ we\ can\ fire\ off\ this\ job.}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a8af867ca7189f1d2e7a97573d5439b9e}{getNextJob}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>manager-\/>connection(\$connectionName),\ \$queue}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$supportsAsyncSignals)\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a1cb87643232b1c89ecd69286cefd61b8}{registerTimeoutHandler}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$options);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ daemon\ should\ run\ (not\ in\ maintenance\ mode,\ etc.),\ then\ we\ can\ run}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ fire\ off\ this\ job\ for\ processing.\ Otherwise,\ we\ will\ need\ to\ sleep\ the}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ worker\ so\ no\ more\ jobs\ are\ processed\ until\ they\ should\ be\ processed.}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$jobsProcessed++;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a1bc4b59bfec9150b65abd0b291d754a4}{runJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$connectionName,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}-\/>rest\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a176bcee0424f978cd9da5de434bde676}{sleep}}(\$options-\/>rest);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a176bcee0424f978cd9da5de434bde676}{sleep}}(\$options-\/>sleep);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$supportsAsyncSignals)\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ad35eded3350c7ee777d168743f8bbfbf}{resetTimeoutHandler}}();}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Finally,\ we\ will\ check\ to\ see\ if\ we\ have\ exceeded\ our\ memory\ limits\ or\ if}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ queue\ should\ restart\ based\ on\ other\ indications.\ If\ so,\ we'll\ stop}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ worker\ and\ let\ whatever\ is\ "{}monitoring"{}\ it\ restart\ the\ process.}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \$status\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a35ed34af4770e3284d0063e78a482b8a}{stopIfNecessary}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$options,\ \$lastRestart,\ \$startTime,\ \$jobsProcessed,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$status))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a8a845293237a646aa3eb88a14506a35f}{stop}}(\$status,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00200}00200\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00209}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a1cb87643232b1c89ecd69286cefd61b8}{00209}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a1cb87643232b1c89ecd69286cefd61b8}{registerTimeoutHandler}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_options}{WorkerOptions}}\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00210}00210\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ will\ register\ a\ signal\ handler\ for\ the\ alarm\ signal\ so\ that\ we\ can\ kill\ this}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ process\ if\ it\ is\ running\ too\ long\ because\ it\ has\ frozen.\ This\ uses\ the\ async}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ signals\ supported\ in\ recent\ versions\ of\ PHP\ to\ accomplish\ it\ conveniently.}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ pcntl\_signal(SIGALRM,\ \textcolor{keyword}{function}\ ()\ use\ (\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ae73da94c9c4d210e16bf40a2f8261757}{markJobAsFailedIfWillExceedMaxAttempts}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>getConnectionName(),\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ (\textcolor{keywordtype}{int})\ \$options-\/>maxTries,\ \$e\ =\ \$this-\/>timeoutExceededException(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a6884893fc92c6bbae7caa0b25e3645ee}{markJobAsFailedIfWillExceedMaxExceptions}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>getConnectionName(),\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$e}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a88192e656f2c9746efa04866868eb307}{markJobAsFailedIfItShouldFailOnTimeout}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>getConnectionName(),\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$e}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>events-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_timed_out}{JobTimedOut}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>getConnectionName(),\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a02d8cfd88b451bf6bdf2032e6943229b}{kill}}(static::EXIT\_ERROR,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \},\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ pcntl\_alarm(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ max(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_afc31968250e3e7f852e4d76211974a42}{timeoutForJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$options),\ 0)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00239}00239\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00246}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ad35eded3350c7ee777d168743f8bbfbf}{00246}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ad35eded3350c7ee777d168743f8bbfbf}{resetTimeoutHandler}}()}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00247}00247\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ pcntl\_alarm(0);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00249}00249\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00258}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_afc31968250e3e7f852e4d76211974a42}{00258}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_afc31968250e3e7f852e4d76211974a42}{timeoutForJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_options}{WorkerOptions}}\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00259}00259\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}\ \&\&\ !\ is\_null(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>timeout())\ ?\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>timeout()\ :\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}-\/>timeout;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00261}00261\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00271}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4be6f7a962d74ea58efb132197d20083}{00271}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4be6f7a962d74ea58efb132197d20083}{daemonShouldRun}}(\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_options}{WorkerOptions}}\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ \$connectionName,\ \$queue)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00272}00272\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\ (((\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a3675720a577da2028ab2d470ecc9437a}{\$this-\/>isDownForMaintenance}})()\ \&\&\ !\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}-\/>force)\ ||}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>paused\ ||}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>events-\/>until(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_looping}{Looping}}(\$connectionName,\ \$queue))\ ===\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00276}00276\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00285}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aeb3d1e067cad1639cf776adc73fa5f3a}{00285}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aeb3d1e067cad1639cf776adc73fa5f3a}{pauseWorker}}(\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_options}{WorkerOptions}}\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ \$lastRestart)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00286}00286\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a176bcee0424f978cd9da5de434bde676}{sleep}}(\$options-\/>sleep\ >\ 0\ ?\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}-\/>sleep\ :\ 1);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a35ed34af4770e3284d0063e78a482b8a}{stopIfNecessary}}(\$options,\ \$lastRestart);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00290}00290\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00291}00291\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00302}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a35ed34af4770e3284d0063e78a482b8a}{00302}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a35ed34af4770e3284d0063e78a482b8a}{stopIfNecessary}}(\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_options}{WorkerOptions}}\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ \$lastRestart,\ \$startTime\ =\ 0,\ \$jobsProcessed\ =\ 0,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00303}00303\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00304}00304\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ match\ (\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00305}00305\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>shouldQuit\ =>\ static::EXIT\_SUCCESS,}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00306}00306\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a2c7620bf0d0a073b003ad9680abc4865}{memoryExceeded}}(\$options-\/>memory)\ =>\ static::EXIT\_MEMORY\_LIMIT,}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a9315bace8fb1e377ec57aced6efc5e08}{queueShouldRestart}}(\$lastRestart)\ =>\ static::EXIT\_SUCCESS,}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}-\/>stopWhenEmpty\ \&\&\ is\_null(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})\ =>\ static::EXIT\_SUCCESS,}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}-\/>maxTime\ \&\&\ hrtime(\textcolor{keyword}{true})\ /\ 1e9\ -\/\ \$startTime\ >=\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}-\/>maxTime\ =>\ static::EXIT\_SUCCESS,}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}-\/>maxJobs\ \&\&\ \$jobsProcessed\ >=\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}-\/>maxJobs\ =>\ static::EXIT\_SUCCESS,}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}\ =>\ \textcolor{keyword}{null}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00313}00313\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00314}00314\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00323}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ada76bfa321333e496dfd61444f73859a}{00323}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ada76bfa321333e496dfd61444f73859a}{runNextJob}}(\$connectionName,\ \$queue,\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_options}{WorkerOptions}}\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00324}00324\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00325}00325\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a8af867ca7189f1d2e7a97573d5439b9e}{getNextJob}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>manager-\/>connection(\$connectionName),\ \$queue}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00327}00327\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00328}00328\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we're\ able\ to\ pull\ a\ job\ off\ of\ the\ stack,\ we\ will\ process\ it\ and\ then\ return}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ from\ this\ method.\ If\ there\ is\ no\ job\ on\ the\ queue,\ we\ will\ "{}sleep"{}\ the\ worker}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ for\ the\ specified\ number\ of\ seconds,\ then\ keep\ processing\ jobs\ after\ sleep.}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a1bc4b59bfec9150b65abd0b291d754a4}{runJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$connectionName,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a176bcee0424f978cd9da5de434bde676}{sleep}}(\$options-\/>sleep);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00337}00337\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00338}00338\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00346}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a8af867ca7189f1d2e7a97573d5439b9e}{00346}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a8af867ca7189f1d2e7a97573d5439b9e}{getNextJob}}(\$connection,\ \$queue)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00347}00347\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \$popJobCallback\ =\ \textcolor{keyword}{function}\ (\$queue)\ use\ (\$connection)\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$connection-\/>pop(\$queue);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00350}00350\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00351}00351\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a07e4bd00e591f6426d71ff196fca63b7}{raiseBeforeJobPopEvent}}(\$connection-\/>getConnectionName());}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00353}00353\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(static::\$popCallbacks[\$this-\/>name]))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (static::\$popCallbacks[\$this-\/>name])(\$popJobCallback,\ \$queue),}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fn\ (\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})\ =>\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a3e9d5c205a41ce42447f21bda25b1762}{raiseAfterJobPopEvent}}(\$connection-\/>getConnectionName(),\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (explode(\textcolor{charliteral}{','},\ \$queue)\ as\ \$queue)\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}\ =\ \$popJobCallback(\$queue)))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a3e9d5c205a41ce42447f21bda25b1762}{raiseAfterJobPopEvent}}(\$connection-\/>getConnectionName(),\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Throwable\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00370}00370\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>exceptions-\/>report(\$e);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00371}00371\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_afadaacaab30f431605a5b9cc5f45e413}{stopWorkerIfLostConnection}}(\$e);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00374}00374\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a176bcee0424f978cd9da5de434bde676}{sleep}}(1);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00375}00375\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00376}00376\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00377}00377\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00386}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a1bc4b59bfec9150b65abd0b291d754a4}{00386}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a1bc4b59bfec9150b65abd0b291d754a4}{runJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$connectionName,\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_options}{WorkerOptions}}\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00387}00387\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a50c146077b79e3dc125b1c44330b94da}{process}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Throwable\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>exceptions-\/>report(\$e);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_afadaacaab30f431605a5b9cc5f45e413}{stopWorkerIfLostConnection}}(\$e);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00395}00395\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00396}00396\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00403}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_afadaacaab30f431605a5b9cc5f45e413}{00403}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_afadaacaab30f431605a5b9cc5f45e413}{stopWorkerIfLostConnection}}(\$e)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00404}00404\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00405}00405\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>causedByLostConnection(\$e))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>shouldQuit\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00407}00407\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00408}00408\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00409}00409\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00420}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a50c146077b79e3dc125b1c44330b94da}{00420}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a50c146077b79e3dc125b1c44330b94da}{process}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_options}{WorkerOptions}}\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00421}00421\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00422}00422\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First\ we\ will\ raise\ the\ before\ job\ event\ and\ determine\ if\ the\ job\ has\ already\ run}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ over\ its\ maximum\ attempt\ limits,\ which\ could\ primarily\ happen\ when\ this\ job\ is}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ continually\ timing\ out\ and\ not\ actually\ throwing\ any\ exceptions\ from\ itself.}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4df1a552ec18c40f53a9a544fcc60768}{raiseBeforeJobEvent}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a6979afcf9f8c977be2489eba489dd48d}{markJobAsFailedIfAlreadyExceedsMaxAttempts}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ (\textcolor{keywordtype}{int})\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}-\/>maxTries}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00431}00431\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>isDeleted())\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a572c51130d33b8da1fb976f915d926fc}{raiseAfterJobEvent}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00435}00435\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Here\ we\ will\ fire\ off\ the\ job\ and\ let\ it\ process.\ We\ will\ catch\ any\ exceptions,\ so}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ they\ can\ be\ reported\ to\ the\ developer's\ logs,\ etc.\ Once\ the\ job\ is\ finished\ the}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ proper\ events\ will\ be\ fired\ to\ let\ any\ listeners\ know\ this\ job\ has\ completed.}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>fire();}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00440}00440\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a572c51130d33b8da1fb976f915d926fc}{raiseAfterJobEvent}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00442}00442\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Throwable\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_abed13d99a4fa57bccf18c0981cea3233}{handleJobException}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ \$e);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00444}00444\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00445}00445\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00446}00446\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00458}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_abed13d99a4fa57bccf18c0981cea3233}{00458}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_abed13d99a4fa57bccf18c0981cea3233}{handleJobException}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_options}{WorkerOptions}}\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ Throwable\ \$e)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00459}00459\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00460}00460\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First,\ we\ will\ go\ ahead\ and\ mark\ the\ job\ as\ failed\ if\ it\ will\ exceed\ the\ maximum}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ attempts\ it\ is\ allowed\ to\ run\ the\ next\ time\ we\ process\ it.\ If\ so\ we\ will\ just}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ go\ ahead\ and\ mark\ it\ as\ failed\ now\ so\ we\ do\ not\ have\ to\ release\ this\ again.}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>hasFailed())\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ae73da94c9c4d210e16bf40a2f8261757}{markJobAsFailedIfWillExceedMaxAttempts}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ (\textcolor{keywordtype}{int})\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}-\/>maxTries,\ \$e}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00467}00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00468}00468\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a6884893fc92c6bbae7caa0b25e3645ee}{markJobAsFailedIfWillExceedMaxExceptions}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00470}00470\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$e}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00473}00473\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00474}00474\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aee6ab46c0b106f185cb063e0c1026e21}{raiseExceptionOccurredJobEvent}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$e}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{finally}\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ catch\ an\ exception,\ we\ will\ attempt\ to\ release\ the\ job\ back\ onto\ the\ queue}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ so\ it\ is\ not\ lost\ entirely.\ This'll\ let\ the\ job\ be\ retried\ at\ a\ later\ time\ by}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ another\ listener\ (or\ this\ same\ one).\ We\ will\ re-\/throw\ this\ exception\ after.}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>isDeleted()\ \&\&\ !\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>isReleased()\ \&\&\ !\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>hasFailed())\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00482}00482\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>release(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ae054bba2d5aa0ce6a9a95b503ef16973}{calculateBackoff}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$options));}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00483}00483\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>events-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_released_after_exception}{JobReleasedAfterException}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00486}00486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00487}00487\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00489}00489\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00490}00490\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00491}00491\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00492}00492\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00505}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a6979afcf9f8c977be2489eba489dd48d}{00505}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a6979afcf9f8c977be2489eba489dd48d}{markJobAsFailedIfAlreadyExceedsMaxAttempts}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$maxTries)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00506}00506\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00507}00507\ \ \ \ \ \ \ \ \ \$maxTries\ =\ !\ is\_null(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>maxTries())\ ?\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>maxTries()\ :\ \$maxTries;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00508}00508\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00509}00509\ \ \ \ \ \ \ \ \ \$retryUntil\ =\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>retryUntil();}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00510}00510\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00511}00511\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$retryUntil\ \&\&\ Carbon::now()-\/>getTimestamp()\ <=\ \$retryUntil)\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00514}00514\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$retryUntil\ \&\&\ (\$maxTries\ ===\ 0\ ||\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>attempts()\ <=\ \$maxTries))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00518}00518\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a448c59df37c20ff000c202d31e7c9250}{failJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$e\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aeffc1bc1866c21a958b81aaa6c7d75d6}{maxAttemptsExceededException}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}));}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00520}00520\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00522}00522\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00523}00523\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00533}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ae73da94c9c4d210e16bf40a2f8261757}{00533}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ae73da94c9c4d210e16bf40a2f8261757}{markJobAsFailedIfWillExceedMaxAttempts}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$maxTries,\ Throwable\ \$e)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00534}00534\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00535}00535\ \ \ \ \ \ \ \ \ \$maxTries\ =\ !\ is\_null(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>maxTries())\ ?\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>maxTries()\ :\ \$maxTries;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00536}00536\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00537}00537\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>retryUntil()\ \&\&\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>retryUntil()\ <=\ Carbon::now()-\/>getTimestamp())\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00538}00538\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a448c59df37c20ff000c202d31e7c9250}{failJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$e);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00539}00539\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00540}00540\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00541}00541\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>retryUntil()\ \&\&\ \$maxTries\ >\ 0\ \&\&\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>attempts()\ >=\ \$maxTries)\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a448c59df37c20ff000c202d31e7c9250}{failJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$e);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00543}00543\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00544}00544\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00545}00545\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00554}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a6884893fc92c6bbae7caa0b25e3645ee}{00554}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a6884893fc92c6bbae7caa0b25e3645ee}{markJobAsFailedIfWillExceedMaxExceptions}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ Throwable\ \$e)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00555}00555\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00556}00556\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>cache\ ||\ is\_null(\$uuid\ =\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>uuid())\ ||}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00557}00557\ \ \ \ \ \ \ \ \ \ \ \ \ is\_null(\$maxExceptions\ =\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>maxExceptions()))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00558}00558\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00559}00559\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00560}00560\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>cache-\/>get(\textcolor{stringliteral}{'job-\/exceptions:'}.\$uuid))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00562}00562\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>cache-\/>put(\textcolor{stringliteral}{'job-\/exceptions:'}.\$uuid,\ 0,\ Carbon::now()-\/>addDay());}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00563}00563\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00564}00564\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00565}00565\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$maxExceptions\ <=\ \$this-\/>cache-\/>increment(\textcolor{stringliteral}{'job-\/exceptions:'}.\$uuid))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00566}00566\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>cache-\/>forget(\textcolor{stringliteral}{'job-\/exceptions:'}.\$uuid);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00567}00567\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00568}00568\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a448c59df37c20ff000c202d31e7c9250}{failJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$e);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00570}00570\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00571}00571\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00580}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a88192e656f2c9746efa04866868eb307}{00580}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a88192e656f2c9746efa04866868eb307}{markJobAsFailedIfItShouldFailOnTimeout}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ Throwable\ \$e)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00581}00581\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00582}00582\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (method\_exists(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \textcolor{stringliteral}{'shouldFailOnTimeout'})\ ?\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>shouldFailOnTimeout()\ :\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00583}00583\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a448c59df37c20ff000c202d31e7c9250}{failJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$e);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00584}00584\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00585}00585\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00586}00586\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00594}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a448c59df37c20ff000c202d31e7c9250}{00594}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a448c59df37c20ff000c202d31e7c9250}{failJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ Throwable\ \$e)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00595}00595\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>fail(\$e);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00597}00597\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00598}00598\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00606}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ae054bba2d5aa0ce6a9a95b503ef16973}{00606}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ae054bba2d5aa0ce6a9a95b503ef16973}{calculateBackoff}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_options}{WorkerOptions}}\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00607}00607\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00608}00608\ \ \ \ \ \ \ \ \ \$backoff\ =\ explode(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{charliteral}{','},}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \ \ \ \ method\_exists(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \textcolor{stringliteral}{'backoff'})\ \&\&\ !\ is\_null(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>backoff())}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>backoff()}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00612}00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}-\/>backoff}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00613}00613\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00614}00614\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00615}00615\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{int})\ (\$backoff[\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>attempts()\ -\/\ 1]\ ??\ last(\$backoff));}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00616}00616\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00617}00617\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00624}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a07e4bd00e591f6426d71ff196fca63b7}{00624}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a07e4bd00e591f6426d71ff196fca63b7}{raiseBeforeJobPopEvent}}(\$connectionName)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00625}00625\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00626}00626\ \ \ \ \ \ \ \ \ \$this-\/>events-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_popping}{JobPopping}}(\$connectionName));}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00627}00627\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00628}00628\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00636}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a3e9d5c205a41ce42447f21bda25b1762}{00636}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a3e9d5c205a41ce42447f21bda25b1762}{raiseAfterJobPopEvent}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00637}00637\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00638}00638\ \ \ \ \ \ \ \ \ \$this-\/>events-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_popped}{JobPopped}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00639}00639\ \ \ \ \ \ \ \ \ \ \ \ \ \$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00640}00640\ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00641}00641\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00642}00642\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00650}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4df1a552ec18c40f53a9a544fcc60768}{00650}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4df1a552ec18c40f53a9a544fcc60768}{raiseBeforeJobEvent}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00651}00651\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00652}00652\ \ \ \ \ \ \ \ \ \$this-\/>events-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_processing}{JobProcessing}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00653}00653\ \ \ \ \ \ \ \ \ \ \ \ \ \$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00654}00654\ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00655}00655\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00656}00656\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00664}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a572c51130d33b8da1fb976f915d926fc}{00664}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a572c51130d33b8da1fb976f915d926fc}{raiseAfterJobEvent}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00665}00665\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00666}00666\ \ \ \ \ \ \ \ \ \$this-\/>events-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_processed}{JobProcessed}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00667}00667\ \ \ \ \ \ \ \ \ \ \ \ \ \$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00668}00668\ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00669}00669\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00670}00670\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00679}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aee6ab46c0b106f185cb063e0c1026e21}{00679}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aee6ab46c0b106f185cb063e0c1026e21}{raiseExceptionOccurredJobEvent}}(\$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ Throwable\ \$e)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00680}00680\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00681}00681\ \ \ \ \ \ \ \ \ \$this-\/>events-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_exception_occurred}{JobExceptionOccurred}}(}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00682}00682\ \ \ \ \ \ \ \ \ \ \ \ \ \$connectionName,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$e}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00683}00683\ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00684}00684\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00685}00685\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00692}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a9315bace8fb1e377ec57aced6efc5e08}{00692}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a9315bace8fb1e377ec57aced6efc5e08}{queueShouldRestart}}(\$lastRestart)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00693}00693\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00694}00694\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a8b9c756ee2139ecda96b5280c6cc346d}{getTimestampOfLastQueueRestart}}()\ !=\ \$lastRestart;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00695}00695\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00696}00696\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00702}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a8b9c756ee2139ecda96b5280c6cc346d}{00702}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a8b9c756ee2139ecda96b5280c6cc346d}{getTimestampOfLastQueueRestart}}()}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00703}00703\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00704}00704\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>cache)\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00705}00705\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>cache-\/>get(\textcolor{stringliteral}{'illuminate:queue:restart'});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00706}00706\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00707}00707\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00708}00708\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00714}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a04b2e545359dbb79d4575d15e4ce1874}{00714}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a04b2e545359dbb79d4575d15e4ce1874}{listenForSignals}}()}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00715}00715\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00716}00716\ \ \ \ \ \ \ \ \ pcntl\_async\_signals(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00717}00717\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00718}00718\ \ \ \ \ \ \ \ \ pcntl\_signal(SIGQUIT,\ fn\ ()\ =>\ \$this-\/>shouldQuit\ =\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00719}00719\ \ \ \ \ \ \ \ \ pcntl\_signal(SIGTERM,\ fn\ ()\ =>\ \$this-\/>shouldQuit\ =\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00720}00720\ \ \ \ \ \ \ \ \ pcntl\_signal(SIGUSR2,\ fn\ ()\ =>\ \$this-\/>paused\ =\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00721}00721\ \ \ \ \ \ \ \ \ pcntl\_signal(SIGCONT,\ fn\ ()\ =>\ \$this-\/>paused\ =\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00722}00722\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00723}00723\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00729}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a2b8a191501adad7e203e146968c61150}{00729}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a2b8a191501adad7e203e146968c61150}{supportsAsyncSignals}}()}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00730}00730\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00731}00731\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ extension\_loaded(\textcolor{stringliteral}{'pcntl'});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00732}00732\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00733}00733\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00740}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a2c7620bf0d0a073b003ad9680abc4865}{00740}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a2c7620bf0d0a073b003ad9680abc4865}{memoryExceeded}}(\$memoryLimit)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00741}00741\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00742}00742\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (memory\_get\_usage(\textcolor{keyword}{true})\ /\ 1024\ /\ 1024)\ >=\ \$memoryLimit;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00743}00743\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00744}00744\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00752}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a8a845293237a646aa3eb88a14506a35f}{00752}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a8a845293237a646aa3eb88a14506a35f}{stop}}(\$status\ =\ 0,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00753}00753\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00754}00754\ \ \ \ \ \ \ \ \ \$this-\/>events-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_worker_stopping}{WorkerStopping}}(\$status,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}));}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00755}00755\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00756}00756\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$status;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00757}00757\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00758}00758\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00766}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a02d8cfd88b451bf6bdf2032e6943229b}{00766}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a02d8cfd88b451bf6bdf2032e6943229b}{kill}}(\$status\ =\ 0,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00767}00767\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00768}00768\ \ \ \ \ \ \ \ \ \$this-\/>events-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_worker_stopping}{WorkerStopping}}(\$status,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}));}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00769}00769\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00770}00770\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (extension\_loaded(\textcolor{stringliteral}{'posix'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00771}00771\ \ \ \ \ \ \ \ \ \ \ \ \ posix\_kill(getmypid(),\ SIGKILL);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00772}00772\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00773}00773\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00774}00774\ \ \ \ \ \ \ \ \ exit(\$status);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00775}00775\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00776}00776\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00783}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aeffc1bc1866c21a958b81aaa6c7d75d6}{00783}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_aeffc1bc1866c21a958b81aaa6c7d75d6}{maxAttemptsExceededException}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00784}00784\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00785}00785\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_max_attempts_exceeded_exception_a6213fe982a52daae8e5b167314832605}{MaxAttemptsExceededException::forJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00786}00786\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00787}00787\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00794}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ac07788b56079c9547ac7152209320705}{00794}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ac07788b56079c9547ac7152209320705}{timeoutExceededException}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00795}00795\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00796}00796\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_timeout_exceeded_exception_a6213fe982a52daae8e5b167314832605}{TimeoutExceededException::forJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}});}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00797}00797\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00798}00798\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00805}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a176bcee0424f978cd9da5de434bde676}{00805}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a176bcee0424f978cd9da5de434bde676}{sleep}}(\$seconds)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00806}00806\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00807}00807\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$seconds\ <\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00808}00808\ \ \ \ \ \ \ \ \ \ \ \ \ usleep(\$seconds\ *\ 1000000);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00809}00809\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00810}00810\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a176bcee0424f978cd9da5de434bde676}{sleep}}(\$seconds);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00811}00811\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00812}00812\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00813}00813\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00820}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a172ce3386e75727e40085e6ef9fbafae}{00820}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a172ce3386e75727e40085e6ef9fbafae}{setCache}}(CacheContract\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ac2dc76d756ec398393d4b1d23659276c}{\$cache}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00821}00821\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00822}00822\ \ \ \ \ \ \ \ \ \$this-\/>cache\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ac2dc76d756ec398393d4b1d23659276c}{\$cache}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00823}00823\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00824}00824\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00825}00825\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00826}00826\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00833}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a2fe666694997d047711d7653eca2f132}{00833}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a2fe666694997d047711d7653eca2f132}{setName}}(\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00834}00834\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00835}00835\ \ \ \ \ \ \ \ \ \$this-\/>name\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00836}00836\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00837}00837\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00838}00838\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00839}00839\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00847}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ac79b931371e7c23a04e1877db41448d5}{00847}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ac79b931371e7c23a04e1877db41448d5}{popUsing}}(\$workerName,\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00848}00848\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00849}00849\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$callback))\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00850}00850\ \ \ \ \ \ \ \ \ \ \ \ \ unset(static::\$popCallbacks[\$workerName]);}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00851}00851\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00852}00852\ \ \ \ \ \ \ \ \ \ \ \ \ static::\$popCallbacks[\$workerName]\ =\ \$callback;}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00853}00853\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00854}00854\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00855}00855\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00861}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a362a87534635a8d4c3c18d54a3dd01b4}{00861}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a362a87534635a8d4c3c18d54a3dd01b4}{getManager}}()}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00862}00862\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00863}00863\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4621b1cd69b1417c9fb966c825299de1}{\$this-\/>manager}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00864}00864\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00865}00865\ }
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00872}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ab526f664e7ea8163bfb697fac34becf0}{00872}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_ab526f664e7ea8163bfb697fac34becf0}{setManager}}(\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_manager}{QueueManager}}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4621b1cd69b1417c9fb966c825299de1}{\$manager}})}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00873}00873\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00874}00874\ \ \ \ \ \ \ \ \ \$this-\/>manager\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker_a4621b1cd69b1417c9fb966c825299de1}{\$manager}};}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00875}00875\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_worker_8php_source_l00876}00876\ \}}
+
+\end{DoxyCode}

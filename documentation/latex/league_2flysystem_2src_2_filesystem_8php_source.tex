@@ -1,0 +1,277 @@
+\doxysection{Filesystem.\+php}
+\hypertarget{league_2flysystem_2src_2_filesystem_8php_source}{}\label{league_2flysystem_2src_2_filesystem_8php_source}\index{vendor/league/flysystem/src/Filesystem.php@{vendor/league/flysystem/src/Filesystem.php}}
+\mbox{\hyperlink{league_2flysystem_2src_2_filesystem_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00003}00003\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_league_1_1_flysystem}{League\(\backslash\)Flysystem}};}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00007}00007\ use\ DateTimeInterface;}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00008}00008\ use\ Generator;}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_url_generation_1_1_prefix_public_url_generator}{League\(\backslash\)Flysystem\(\backslash\)UrlGeneration\(\backslash\)PrefixPublicUrlGenerator}};}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00010}00010\ use\ \mbox{\hyperlink{interface_league_1_1_flysystem_1_1_url_generation_1_1_public_url_generator}{League\(\backslash\)Flysystem\(\backslash\)UrlGeneration\(\backslash\)PublicUrlGenerator}};}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_url_generation_1_1_sharded_prefix_public_url_generator}{League\(\backslash\)Flysystem\(\backslash\)UrlGeneration\(\backslash\)ShardedPrefixPublicUrlGenerator}};}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00012}00012\ use\ \mbox{\hyperlink{interface_league_1_1_flysystem_1_1_url_generation_1_1_temporary_url_generator}{League\(\backslash\)Flysystem\(\backslash\)UrlGeneration\(\backslash\)TemporaryUrlGenerator}};}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00013}00013\ use\ Throwable;}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ array\_key\_exists;}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00016}00016\ use\ \textcolor{keyword}{function}\ is\_array;}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00018}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem}{00018}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem}{Filesystem}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_league_1_1_flysystem_1_1_filesystem_operator}{FilesystemOperator}}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00019}00019\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00020}00020\ \ \ \ \ use\ \mbox{\hyperlink{namespace_league_1_1_flysystem_a8a2aad9eb1c571b94456c4928c346484}{CalculateChecksumFromStream}};}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_config}{Config}}\ \$config;}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{interface_league_1_1_flysystem_1_1_path_normalizer}{PathNormalizer}}\ \$pathNormalizer;}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00025}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_adbb18ff3b091bf903f659658a2078e8f}{00025}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_adbb18ff3b091bf903f659658a2078e8f}{\_\_construct}}(}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{interface_league_1_1_flysystem_1_1_filesystem_adapter}{FilesystemAdapter}}\ \$adapter,}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00027}00027\ \ \ \ \ \ \ \ \ array\ \$config\ =\ [],}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00028}00028\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{interface_league_1_1_flysystem_1_1_path_normalizer}{PathNormalizer}}\ \$pathNormalizer\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ ?\mbox{\hyperlink{interface_league_1_1_flysystem_1_1_url_generation_1_1_public_url_generator}{PublicUrlGenerator}}\ \$publicUrlGenerator\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ ?\mbox{\hyperlink{interface_league_1_1_flysystem_1_1_url_generation_1_1_temporary_url_generator}{TemporaryUrlGenerator}}\ \$temporaryUrlGenerator\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00031}00031\ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00032}00032\ \ \ \ \ \ \ \ \ \$this-\/>config\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_config}{Config}}(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}});}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00033}00033\ \ \ \ \ \ \ \ \ \$this-\/>pathNormalizer\ =\ \$pathNormalizer\ ??\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_whitespace_path_normalizer}{WhitespacePathNormalizer}}();}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00034}00034\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00036}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a5e8c7e9396fbbe4475516f909d134df4}{00036}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a5e8c7e9396fbbe4475516f909d134df4}{fileExists}}(\textcolor{keywordtype}{string}\ \$location):\ bool}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00037}00037\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00038}00038\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>adapter-\/>fileExists(\$this-\/>pathNormalizer-\/>normalizePath(\$location));}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00039}00039\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00041}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_acd059ac27e869e87bfb342e6da98f19d}{00041}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_acd059ac27e869e87bfb342e6da98f19d}{directoryExists}}(\textcolor{keywordtype}{string}\ \$location):\ bool}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00042}00042\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>adapter-\/>directoryExists(\$this-\/>pathNormalizer-\/>normalizePath(\$location));}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00044}00044\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00046}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_aa1652aeb21d310729029520945650d5e}{00046}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_aa1652aeb21d310729029520945650d5e}{has}}(\textcolor{keywordtype}{string}\ \$location):\ bool}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00047}00047\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \$path\ =\ \$this-\/>pathNormalizer-\/>normalizePath(\$location);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>adapter-\/>fileExists(\$path)\ ||\ \$this-\/>adapter-\/>directoryExists(\$path);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00051}00051\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00053}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a70706cc08a9ba06d74e357939704e540}{00053}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a70706cc08a9ba06d74e357939704e540}{write}}(\textcolor{keywordtype}{string}\ \$location,\ \textcolor{keywordtype}{string}\ \$contents,\ array\ \$config\ =\ []):\ void}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00054}00054\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \$this-\/>adapter-\/>write(}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pathNormalizer-\/>normalizePath(\$location),}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \$contents,}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>config-\/>extend(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}})}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00060}00060\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00062}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a8664e45c63e534ffe96bbefc085bba88}{00062}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a8664e45c63e534ffe96bbefc085bba88}{writeStream}}(\textcolor{keywordtype}{string}\ \$location,\ \$contents,\ array\ \$config\ =\ []):\ void}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00063}00063\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ @var\ resource\ \$contents\ */}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \$this-\/>assertIsResource(\$contents);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \$this-\/>rewindStream(\$contents);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \$this-\/>adapter-\/>writeStream(}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pathNormalizer-\/>normalizePath(\$location),}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \$contents,}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>config-\/>extend(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}})}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00072}00072\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00074}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_af9fd009ae0fe8a858fe42114742347c5}{00074}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_af9fd009ae0fe8a858fe42114742347c5}{read}}(\textcolor{keywordtype}{string}\ \$location):\ string}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00075}00075\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>adapter-\/>read(\$this-\/>pathNormalizer-\/>normalizePath(\$location));}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00077}00077\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00079}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a78a3deebaf45b255c08b6dc8154e7172}{00079}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a78a3deebaf45b255c08b6dc8154e7172}{readStream}}(\textcolor{keywordtype}{string}\ \$location)}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00080}00080\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>adapter-\/>readStream(\$this-\/>pathNormalizer-\/>normalizePath(\$location));}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00082}00082\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00084}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a6914d51dba70298debd7c376035f028c}{00084}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{delete}(\textcolor{keywordtype}{string}\ \$location):\ void}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00085}00085\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \$this-\/>adapter-\/>delete(\$this-\/>pathNormalizer-\/>normalizePath(\$location));}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00087}00087\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00089}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a9ba9fc844b2315f1004d8a611e002b30}{00089}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a9ba9fc844b2315f1004d8a611e002b30}{deleteDirectory}}(\textcolor{keywordtype}{string}\ \$location):\ void}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00090}00090\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \$this-\/>adapter-\/>deleteDirectory(\$this-\/>pathNormalizer-\/>normalizePath(\$location));}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00092}00092\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00094}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a3af35a8a76329c8c67ff3ff64d7b73d2}{00094}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a3af35a8a76329c8c67ff3ff64d7b73d2}{createDirectory}}(\textcolor{keywordtype}{string}\ \$location,\ array\ \$config\ =\ []):\ void}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00095}00095\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \$this-\/>adapter-\/>createDirectory(}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pathNormalizer-\/>normalizePath(\$location),}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>config-\/>extend(\$config)}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00100}00100\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00102}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_ab07bef5e257dbc0a8292b803173bd3fb}{00102}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_ab07bef5e257dbc0a8292b803173bd3fb}{listContents}}(\textcolor{keywordtype}{string}\ \$location,\ \textcolor{keywordtype}{bool}\ \$deep\ =\ self::LIST\_SHALLOW):\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_directory_listing}{DirectoryListing}}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00103}00103\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \$path\ =\ \$this-\/>pathNormalizer-\/>normalizePath(\$location);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \$listing\ =\ \$this-\/>adapter-\/>listContents(\$path,\ \$deep);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_directory_listing}{DirectoryListing}}(\$this-\/>pipeListing(\$location,\ \$deep,\ \$listing));}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00108}00108\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00110}00110\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ pipeListing(\textcolor{keywordtype}{string}\ \$location,\ \textcolor{keywordtype}{bool}\ \$deep,\ iterable\ \$listing):\ Generator}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00111}00111\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$listing\ as\ \$item)\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ yield\ \$item;}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Throwable\ \$exception)\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_unable_to_list_contents_aec9c3785045c67c1a4ee27c91f1826c2}{UnableToListContents::atLocation}}(\$location,\ \$deep,\ \$exception);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00119}00119\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00121}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a9dbd87ec50d9befaee9efcaa97660913}{00121}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a9dbd87ec50d9befaee9efcaa97660913}{move}}(\textcolor{keywordtype}{string}\ \$source,\ \textcolor{keywordtype}{string}\ \$destination,\ array\ \$config\ =\ []):\ void}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00122}00122\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \$config\ =\ \$this-\/>resolveConfigForMoveAndCopy(\$config);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \$from\ =\ \$this-\/>pathNormalizer-\/>normalizePath(\$source);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \$to\ =\ \$this-\/>pathNormalizer-\/>normalizePath(\$destination);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$from\ ===\ \$to)\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \$resolutionStrategy\ =\ \$config-\/>\mbox{\hyperlink{class_league_1_1_flysystem_1_1_config_aa5cf7e626e54210eb308a38255ac2fca}{get}}(\mbox{\hyperlink{class_league_1_1_flysystem_1_1_config_a0dd5abdfa2ce370fb4c99dffdeebc4a0}{Config::OPTION\_MOVE\_IDENTICAL\_PATH}},\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_resolve_identical_path_conflict_af4523286f4ac3c03fc8281316f0d2dcd}{ResolveIdenticalPathConflict::TRY}});}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$resolutionStrategy\ ===\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_resolve_identical_path_conflict_af51bf014241fcd1e8447fe833514b928}{ResolveIdenticalPathConflict::FAIL}})\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_unable_to_move_file_acaf2ac5d12ae69ae86ec7303683e6061}{UnableToMoveFile::sourceAndDestinationAreTheSame}}(\$source,\ \$destination);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$resolutionStrategy\ ===\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_resolve_identical_path_conflict_a39b21c631e47378e5a0d9c3e422d33cb}{ResolveIdenticalPathConflict::IGNORE}})\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \$this-\/>adapter-\/>move(\$from,\ \$to,\ \$config);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00138}00138\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00140}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_ab4eeba45463e98fa0a4055ca5a4544e0}{00140}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_ab4eeba45463e98fa0a4055ca5a4544e0}{copy}}(\textcolor{keywordtype}{string}\ \$source,\ \textcolor{keywordtype}{string}\ \$destination,\ array\ \$config\ =\ []):\ void}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00141}00141\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \$config\ =\ \$this-\/>resolveConfigForMoveAndCopy(\$config);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \$from\ =\ \$this-\/>pathNormalizer-\/>normalizePath(\$source);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \$to\ =\ \$this-\/>pathNormalizer-\/>normalizePath(\$destination);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$from\ ===\ \$to)\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \$resolutionStrategy\ =\ \$config-\/>\mbox{\hyperlink{class_league_1_1_flysystem_1_1_config_aa5cf7e626e54210eb308a38255ac2fca}{get}}(\mbox{\hyperlink{class_league_1_1_flysystem_1_1_config_a4947913b19fe35b75119f08e3d3a95e8}{Config::OPTION\_COPY\_IDENTICAL\_PATH}},\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_resolve_identical_path_conflict_af4523286f4ac3c03fc8281316f0d2dcd}{ResolveIdenticalPathConflict::TRY}});}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$resolutionStrategy\ ===\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_resolve_identical_path_conflict_af51bf014241fcd1e8447fe833514b928}{ResolveIdenticalPathConflict::FAIL}})\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_unable_to_copy_file_acaf2ac5d12ae69ae86ec7303683e6061}{UnableToCopyFile::sourceAndDestinationAreTheSame}}(\$source,\ \$destination);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$resolutionStrategy\ ===\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_resolve_identical_path_conflict_a39b21c631e47378e5a0d9c3e422d33cb}{ResolveIdenticalPathConflict::IGNORE}})\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \$this-\/>adapter-\/>copy(\$from,\ \$to,\ \$config);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00157}00157\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00159}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a5c36e460b3abce1a0182b113483ecf46}{00159}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a5c36e460b3abce1a0182b113483ecf46}{lastModified}}(\textcolor{keywordtype}{string}\ \$path):\ int}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00160}00160\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>adapter-\/>lastModified(\$this-\/>pathNormalizer-\/>normalizePath(\$path))-\/>lastModified();}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00162}00162\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00164}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a28f159cbaf798b8803d2310e442b2c8f}{00164}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a28f159cbaf798b8803d2310e442b2c8f}{fileSize}}(\textcolor{keywordtype}{string}\ \$path):\ int}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00165}00165\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>adapter-\/>fileSize(\$this-\/>pathNormalizer-\/>normalizePath(\$path))-\/>fileSize();}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00167}00167\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00169}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_ac266514ea7a9ca608fe17575e8aefc26}{00169}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_ac266514ea7a9ca608fe17575e8aefc26}{mimeType}}(\textcolor{keywordtype}{string}\ \$path):\ string}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00170}00170\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>adapter-\/>mimeType(\$this-\/>pathNormalizer-\/>normalizePath(\$path))-\/>mimeType();}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00172}00172\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00174}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a87242b9f5827c72f023cfc66b562c802}{00174}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_a87242b9f5827c72f023cfc66b562c802}{setVisibility}}(\textcolor{keywordtype}{string}\ \$path,\ \textcolor{keywordtype}{string}\ \$visibility):\ void}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00175}00175\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \$this-\/>adapter-\/>setVisibility(\$this-\/>pathNormalizer-\/>normalizePath(\$path),\ \$visibility);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00177}00177\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00179}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_acbfbf2ec6d2e5b520e1dff89d6f32a61}{00179}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_acbfbf2ec6d2e5b520e1dff89d6f32a61}{visibility}}(\textcolor{keywordtype}{string}\ \$path):\ string}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00180}00180\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>adapter-\/>visibility(\$this-\/>pathNormalizer-\/>normalizePath(\$path))-\/>visibility();}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00182}00182\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00184}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_adcf7a167214593de4417bd51ba597444}{00184}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_adcf7a167214593de4417bd51ba597444}{publicUrl}}(\textcolor{keywordtype}{string}\ \$path,\ array\ \$config\ =\ []):\ string}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00185}00185\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \$this-\/>publicUrlGenerator\ ??=\ \$this-\/>resolvePublicUrlGenerator()}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ ??\ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_unable_to_generate_public_url_a02ec5f15de45b67940724da1f1e31804}{UnableToGeneratePublicUrl::noGeneratorConfigured}}(\$path);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \$config\ =\ \$this-\/>config-\/>\mbox{\hyperlink{class_league_1_1_flysystem_1_1_config_ab0da375ccf95dea53b48f18f3a5314bd}{extend}}(\$config);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>publicUrlGenerator-\/>publicUrl(\$path,\ \$config);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00191}00191\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00193}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_ac1ab1245e1a3395b59bec0d13b57dec9}{00193}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_ac1ab1245e1a3395b59bec0d13b57dec9}{temporaryUrl}}(\textcolor{keywordtype}{string}\ \$path,\ DateTimeInterface\ \$expiresAt,\ array\ \$config\ =\ []):\ string}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00194}00194\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hamcrest_2hamcrest-php_2generator_2_run_8php_ab328ac5b606185b5e1706aa41380cc76}{\$generator}}\ =\ \$this-\/>temporaryUrlGenerator\ ??\ \$this-\/>adapter;}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{hamcrest_2hamcrest-php_2generator_2_run_8php_ab328ac5b606185b5e1706aa41380cc76}{\$generator}}\ instanceof\ \mbox{\hyperlink{interface_league_1_1_flysystem_1_1_url_generation_1_1_temporary_url_generator}{TemporaryUrlGenerator}})\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{hamcrest_2hamcrest-php_2generator_2_run_8php_ab328ac5b606185b5e1706aa41380cc76}{\$generator}}-\/>temporaryUrl(\$path,\ \$expiresAt,\ \$this-\/>config-\/>extend(\$config));}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_unable_to_generate_temporary_url_a02ec5f15de45b67940724da1f1e31804}{UnableToGenerateTemporaryUrl::noGeneratorConfigured}}(\$path);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00202}00202\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00204}\mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_aa57a336bb84e490964951035e0fda3f5}{00204}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_filesystem_aa57a336bb84e490964951035e0fda3f5}{checksum}}(\textcolor{keywordtype}{string}\ \$path,\ array\ \$config\ =\ []):\ string}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00205}00205\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \$config\ =\ \$this-\/>config-\/>\mbox{\hyperlink{class_league_1_1_flysystem_1_1_config_ab0da375ccf95dea53b48f18f3a5314bd}{extend}}(\$config);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\ !\ \$this-\/>adapter\ instanceof\ \mbox{\hyperlink{interface_league_1_1_flysystem_1_1_checksum_provider}{ChecksumProvider}})\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>calculateChecksumFromStream(\$path,\ \$config);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>adapter-\/>checksum(\$path,\ \$config);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{class_league_1_1_flysystem_1_1_checksum_algo_is_not_supported}{ChecksumAlgoIsNotSupported}})\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>calculateChecksumFromStream(\$path,\ \$config);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00217}00217\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00219}00219\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ resolvePublicUrlGenerator():\ ?\mbox{\hyperlink{interface_league_1_1_flysystem_1_1_url_generation_1_1_public_url_generator}{PublicUrlGenerator}}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00220}00220\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$publicUrl\ =\ \$this-\/>config-\/>get(\textcolor{stringliteral}{'public\_url'}))\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ match\ (\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ is\_array(\$publicUrl)\ =>\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_url_generation_1_1_sharded_prefix_public_url_generator}{ShardedPrefixPublicUrlGenerator}}(\$publicUrl),}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}\ =>\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_league_1_1_flysystem_1_1_url_generation_1_1_prefix_public_url_generator}{PrefixPublicUrlGenerator}}(\$publicUrl),}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>adapter\ instanceof\ PublicUrlGenerator)\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>adapter;}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00233}00233\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00238}00238\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ assertIsResource(\$contents):\ void}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00239}00239\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_resource(\$contents)\ ===\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidStreamProvided(}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Invalid\ stream\ provided,\ expected\ stream\ resource,\ received\ "{}}\ .\ gettype(\$contents)}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$type\ =\ get\_resource\_type(\$contents)\ !==\ \textcolor{stringliteral}{'stream'})\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidStreamProvided(}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Invalid\ stream\ provided,\ expected\ stream\ resource,\ received\ resource\ of\ type\ "{}}\ .\ \$type}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00249}00249\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00254}00254\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ rewindStream(\$resource):\ void}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00255}00255\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ftell(\$resource)\ !==\ 0\ \&\&\ stream\_get\_meta\_data(\$resource)[\textcolor{stringliteral}{'seekable'}])\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ rewind(\$resource);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00259}00259\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00261}00261\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ resolveConfigForMoveAndCopy(array\ \$config):\ Config}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00262}00262\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \$retainVisibility\ =\ \$this-\/>config-\/>get(\textcolor{stringliteral}{'retain\_visibility'},\ \$config[\textcolor{stringliteral}{'retain\_visibility'}]\ ??\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \$fullConfig\ =\ \$this-\/>config-\/>extend(\$config);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00267}00267\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ By\ default,\ we\ retain\ visibility.\ When\ we\ do\ not\ retain\ visibility,\ the\ visibility\ setting}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00268}00268\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ from\ the\ default\ configuration\ is\ ignored.\ Only\ when\ it\ is\ set\ explicitly,\ we\ propagate\ the}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00269}00269\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ setting.}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00270}00270\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$retainVisibility\ \&\&\ !\ array\_key\_exists(\mbox{\hyperlink{class_league_1_1_flysystem_1_1_config_a42ec4b0bc8b22cb43c6ba5d85699cfe9}{Config::OPTION\_VISIBILITY}},\ \$config))\ \{}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \$fullConfig\ =\ \$fullConfig-\/>withoutSettings(\mbox{\hyperlink{class_league_1_1_flysystem_1_1_config_a42ec4b0bc8b22cb43c6ba5d85699cfe9}{Config::OPTION\_VISIBILITY}})-\/>extend(\$config);}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$fullConfig;}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00276}00276\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{league_2flysystem_2src_2_filesystem_8php_source_l00277}00277\ \}}
+
+\end{DoxyCode}

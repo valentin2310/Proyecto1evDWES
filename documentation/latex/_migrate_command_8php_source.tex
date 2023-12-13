@@ -1,0 +1,225 @@
+\doxysection{Migrate\+Command.\+php}
+\hypertarget{_migrate_command_8php_source}{}\label{_migrate_command_8php_source}\index{vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php@{vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php}}
+\mbox{\hyperlink{_migrate_command_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_console_1_1_migrations}{Illuminate\(\backslash\)Database\(\backslash\)Console\(\backslash\)Migrations}};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00005}00005\ use\ Illuminate\(\backslash\)Console\(\backslash\)ConfirmableTrait;}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00006}00006\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_console_1_1_isolatable}{Illuminate\(\backslash\)Contracts\(\backslash\)Console\(\backslash\)Isolatable}};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00007}00007\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_events_1_1_dispatcher}{Illuminate\(\backslash\)Contracts\(\backslash\)Events\(\backslash\)Dispatcher}};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_events_1_1_schema_loaded}{Illuminate\(\backslash\)Database\(\backslash\)Events\(\backslash\)SchemaLoaded}};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_migrations_1_1_migrator}{Illuminate\(\backslash\)Database\(\backslash\)Migrations\(\backslash\)Migrator}};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_s_q_lite_database_does_not_exist_exception}{Illuminate\(\backslash\)Database\(\backslash\)SQLiteDatabaseDoesNotExistException}};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_p_d_o_1_1_sql_server_connection}{Illuminate\(\backslash\)Database\(\backslash\)SqlServerConnection}};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00012}00012\ use\ PDOException;}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00013}00013\ use\ Throwable;}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ Laravel\(\backslash\)Prompts\(\backslash\)confirm;}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00017}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command}{00017}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command}{MigrateCommand}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_base_command}{BaseCommand}}\ implements\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_console_1_1_isolatable}{Isolatable}}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00018}00018\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00019}00019\ \ \ \ \ use\ ConfirmableTrait;}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00026}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a8f34ca1e46a621ab10a3a40addb794f5}{00026}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a8f34ca1e46a621ab10a3a40addb794f5}{\$signature}}\ =\ \textcolor{stringliteral}{'migrate\ \{-\/-\/database=\ :\ The\ database\ connection\ to\ use\}}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00027}00027\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/-\/force\ :\ Force\ the\ operation\ to\ run\ when\ in\ production\}}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00028}00028\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/-\/path=*\ :\ The\ path(s)\ to\ the\ migrations\ files\ to\ be\ executed\}}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00029}00029\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/-\/realpath\ :\ Indicate\ any\ provided\ migration\ file\ paths\ are\ pre-\/resolved\ absolute\ paths\}}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00030}00030\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/-\/schema-\/path=\ :\ The\ path\ to\ a\ schema\ dump\ file\}}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00031}00031\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/-\/pretend\ :\ Dump\ the\ SQL\ queries\ that\ would\ be\ run\}}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00032}00032\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/-\/seed\ :\ Indicates\ if\ the\ seed\ task\ should\ be\ re-\/run\}}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00033}00033\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/-\/seeder=\ :\ The\ class\ name\ of\ the\ root\ seeder\}}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00034}00034\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/-\/step\ :\ Force\ the\ migrations\ to\ be\ run\ so\ they\ can\ be\ rolled\ back\ individually\}'};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00041}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a87b032cba06009e3467abf1c8018d960}{00041}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a87b032cba06009e3467abf1c8018d960}{\$description}}\ =\ \textcolor{stringliteral}{'Run\ the\ database\ migrations'};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00048}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_aec2ba48e5c793e0c168d4a5aaf932968}{00048}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_aec2ba48e5c793e0c168d4a5aaf932968}{\$migrator}};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00055}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_ab1d5b769b8d51cf3de5b1f1c4a9e6298}{00055}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_ab1d5b769b8d51cf3de5b1f1c4a9e6298}{\$dispatcher}};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00064}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a0f8022ea23fbcaa05463080156eff61c}{00064}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a0f8022ea23fbcaa05463080156eff61c}{\_\_construct}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_migrations_1_1_migrator}{Migrator}}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_aec2ba48e5c793e0c168d4a5aaf932968}{\$migrator}},\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_events_1_1_dispatcher}{Dispatcher}}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_ab1d5b769b8d51cf3de5b1f1c4a9e6298}{\$dispatcher}})}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00065}00065\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ parent::\_\_construct();}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \$this-\/>migrator\ =\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_aec2ba48e5c793e0c168d4a5aaf932968}{\$migrator}};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \$this-\/>dispatcher\ =\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_ab1d5b769b8d51cf3de5b1f1c4a9e6298}{\$dispatcher}};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00077}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a66eb7514ea7f7f8a5738a180b14e9b48}{00077}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a66eb7514ea7f7f8a5738a180b14e9b48}{handle}}()}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00078}00078\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>confirmToProceed())\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \$this-\/>migrator-\/>usingConnection(\$this-\/>option(\textcolor{stringliteral}{'database'}),\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a1e110dfb09c24e06df3c43ad207ffb41}{prepareDatabase}}();}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Next,\ we\ will\ check\ to\ see\ if\ a\ path\ option\ has\ been\ defined.\ If\ it\ has}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ will\ use\ the\ path\ relative\ to\ the\ root\ of\ this\ installation\ folder}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ so\ that\ migrations\ may\ be\ run\ for\ any\ path\ within\ the\ applications.}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>migrator-\/>setOutput(\$this-\/>output)}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>run(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_base_command_a6b541c0c38b461599eedc922a6a94dd8}{getMigrationPaths}}(),\ [}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'pretend'}\ =>\ \$this-\/>option(\textcolor{stringliteral}{'pretend'}),}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'step'}\ =>\ \$this-\/>option(\textcolor{stringliteral}{'step'}),}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Finally,\ if\ the\ "{}seed"{}\ option\ has\ been\ given,\ we\ will\ re-\/run\ the\ database}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ seed\ task\ to\ re-\/populate\ the\ database,\ which\ is\ convenient\ when\ adding}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ a\ migration\ and\ a\ seed\ at\ the\ same\ time,\ as\ it\ is\ only\ this\ command.}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>option(\textcolor{stringliteral}{'seed'})\ \&\&\ !\ \$this-\/>option(\textcolor{stringliteral}{'pretend'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>call(\textcolor{stringliteral}{'db:seed'},\ [}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'-\/-\/class'}\ =>\ \$this-\/>option(\textcolor{stringliteral}{'seeder'})\ ?:\ \textcolor{stringliteral}{'Database\(\backslash\)\(\backslash\)Seeders\(\backslash\)\(\backslash\)DatabaseSeeder'},}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'-\/-\/force'}\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00114}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a1e110dfb09c24e06df3c43ad207ffb41}{00114}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a1e110dfb09c24e06df3c43ad207ffb41}{prepareDatabase}}()}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00115}00115\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a76ea3be34a293258ecc23311fe33c145}{repositoryExists}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>info(\textcolor{stringliteral}{'Preparing\ database.'});}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>task(\textcolor{stringliteral}{'Creating\ migration\ table'},\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>callSilent(\textcolor{stringliteral}{'migrate:install'},\ array\_filter([}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'-\/-\/database'}\ =>\ \$this-\/>option(\textcolor{stringliteral}{'database'}),}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ]))\ ==\ 0;}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>newLine();}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>migrator-\/>hasRunAnyMigrations()\ \&\&\ !\ \$this-\/>option(\textcolor{stringliteral}{'pretend'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a505be764cfafdcf692805dbb7a3563d0}{loadSchemaState}}();}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00131}00131\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00138}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a76ea3be34a293258ecc23311fe33c145}{00138}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a76ea3be34a293258ecc23311fe33c145}{repositoryExists}}()}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00139}00139\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ retry(2,\ fn\ ()\ =>\ \$this-\/>migrator-\/>repositoryExists(),\ 0,\ \mbox{\hyperlink{rector-migrate_8php_affc7ca71e2c30ccc9604c2697809c870}{function}}\ (\$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$e-\/>getPrevious()\ instanceof\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_s_q_lite_database_does_not_exist_exception}{SQLiteDatabaseDoesNotExistException}})\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ \$this-\/>createMissingSqliteDatabase(\$e-\/>getPrevious()-\/>path);}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connection\ =\ \$this-\/>migrator-\/>resolveConnection(\$this-\/>option(\textcolor{stringliteral}{'database'}));}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$e-\/>getPrevious()\ instanceof\ PDOException\ \&\&}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$e-\/>getPrevious()-\/>getCode()\ ===\ 1049\ \&\&}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connection-\/>getDriverName()\ ===\ \textcolor{stringliteral}{'mysql'})\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_ac0bf279c2a7eb7c8fbfae0acc0af8fa9}{createMissingMysqlDatabase}}(\$connection);}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Throwable)\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00160}00160\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00168}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a58a28909d43469e20532fd798a1f458b}{00168}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a58a28909d43469e20532fd798a1f458b}{createMissingSqliteDatabase}}(\$path)}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00169}00169\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>option(\textcolor{stringliteral}{'force'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ touch(\$path);}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>option(\textcolor{stringliteral}{'no-\/interaction'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \$this-\/>components-\/>warn(\textcolor{stringliteral}{'The\ SQLite\ database\ does\ not\ exist:\ '}.\$path);}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ confirm(\textcolor{stringliteral}{'Would\ you\ like\ to\ create\ it?'},\ \textcolor{keywordflow}{default}:\ \textcolor{keyword}{false}))\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ touch(\$path);}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00185}00185\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00192}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_ac0bf279c2a7eb7c8fbfae0acc0af8fa9}{00192}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_ac0bf279c2a7eb7c8fbfae0acc0af8fa9}{createMissingMysqlDatabase}}(\$connection)}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00193}00193\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>laravel[\textcolor{stringliteral}{'config'}]-\/>\textcolor{keyword}{get}(\textcolor{stringliteral}{"{}database.connections.\{\$connection-\/>getName()\}.database"{}})\ !==\ \$connection-\/>getDatabaseName())\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>option(\textcolor{stringliteral}{'force'})\ \&\&\ \$this-\/>option(\textcolor{stringliteral}{'no-\/interaction'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>option(\textcolor{stringliteral}{'force'})\ \&\&\ !\ \$this-\/>option(\textcolor{stringliteral}{'no-\/interaction'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>warn(\textcolor{stringliteral}{"{}The\ database\ '\{\$connection-\/>getDatabaseName()\}'\ does\ not\ exist\ on\ the\ '\{\$connection-\/>getName()\}'\ connection."{}});}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ confirm(\textcolor{stringliteral}{'Would\ you\ like\ to\ create\ it?'},\ \textcolor{keywordflow}{default}:\ \textcolor{keyword}{false}))\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>laravel[\textcolor{stringliteral}{'config'}]-\/>set(\textcolor{stringliteral}{"{}database.connections.\{\$connection-\/>getName()\}.database"{}},\ \textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>laravel[\textcolor{stringliteral}{'db'}]-\/>purge();}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \$freshConnection\ =\ \$this-\/>migrator-\/>resolveConnection(\$this-\/>option(\textcolor{stringliteral}{'database'}));}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$freshConnection-\/>unprepared(\textcolor{stringliteral}{"{}CREATE\ DATABASE\ IF\ NOT\ EXISTS\ \`{}\{\$connection-\/>getDatabaseName()\}`"{}}),\ \mbox{\hyperlink{rector-migrate_8php_affc7ca71e2c30ccc9604c2697809c870}{function}}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>laravel[\textcolor{stringliteral}{'db'}]-\/>purge();}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{finally}\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>laravel[\textcolor{stringliteral}{'config'}]-\/>set(\textcolor{stringliteral}{"{}database.connections.\{\$connection-\/>getName()\}.database"{}},\ \$connection-\/>getDatabaseName());}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00223}00223\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00230}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a505be764cfafdcf692805dbb7a3563d0}{00230}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a505be764cfafdcf692805dbb7a3563d0}{loadSchemaState}}()}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00231}00231\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \$connection\ =\ \$this-\/>migrator-\/>resolveConnection(\$this-\/>option(\textcolor{stringliteral}{'database'}));}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First,\ we\ will\ make\ sure\ that\ the\ connection\ supports\ schema\ loading\ and\ that}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ schema\ file\ exists\ before\ we\ proceed\ any\ further.\ If\ not,\ we\ will\ just}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ continue\ with\ the\ standard\ migration\ operation\ as\ normal\ without\ errors.}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$connection\ instanceof\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_sql_server_connection}{SqlServerConnection}}\ ||}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ !\ is\_file(\$path\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a67d6f38b4681ba4225f885095b676f83}{schemaPath}}(\$connection)))\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \$this-\/>components-\/>info(\textcolor{stringliteral}{'Loading\ stored\ database\ schemas.'});}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \$this-\/>components-\/>task(\$path,\ \textcolor{keyword}{function}\ ()\ use\ (\$connection,\ \$path)\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Since\ the\ schema\ file\ will\ create\ the\ "{}migrations"{}\ table\ and\ reload\ it\ to\ its}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ proper\ state,\ we\ need\ to\ delete\ it\ here\ so\ we\ don't\ get\ an\ error\ that\ this}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ table\ already\ exists\ when\ the\ stored\ database\ schema\ file\ gets\ executed.}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>migrator-\/>deleteRepository();}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00249}00249\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \$connection-\/>getSchemaState()-\/>handleOutputUsing(\textcolor{keyword}{function}\ (\$type,\ \$buffer)\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>write(\$buffer);}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \})-\/>load(\$path);}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \$this-\/>newLine();}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Finally,\ we\ will\ fire\ an\ event\ that\ this\ schema\ has\ been\ loaded\ so\ developers}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ can\ perform\ any\ post\ schema\ load\ tasks\ that\ are\ necessary\ in\ listeners\ for}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ event,\ which\ may\ seed\ the\ database\ tables\ with\ some\ necessary\ data.}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \$this-\/>dispatcher-\/>dispatch(}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_events_1_1_schema_loaded}{SchemaLoaded}}(\$connection,\ \$path)}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00263}00263\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00271}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a67d6f38b4681ba4225f885095b676f83}{00271}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_migrations_1_1_migrate_command_a67d6f38b4681ba4225f885095b676f83}{schemaPath}}(\$connection)}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00272}00272\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>option(\textcolor{stringliteral}{'schema-\/path'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>option(\textcolor{stringliteral}{'schema-\/path'});}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00276}00276\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (file\_exists(\$path\ =\ database\_path(\textcolor{stringliteral}{'schema/'}.\$connection-\/>getName().\textcolor{stringliteral}{'-\/schema.dump'})))\ \{}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$path;}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ database\_path(\textcolor{stringliteral}{'schema/'}.\$connection-\/>getName().\textcolor{stringliteral}{'-\/schema.sql'});}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00282}00282\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_migrate_command_8php_source_l00283}00283\ \}}
+
+\end{DoxyCode}

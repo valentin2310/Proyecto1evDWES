@@ -1,0 +1,721 @@
+\doxysection{Pdo\+Session\+Handler.\+php}
+\hypertarget{_pdo_session_handler_8php_source}{}\label{_pdo_session_handler_8php_source}\index{vendor/symfony/http-\/foundation/Session/Storage/Handler/PdoSessionHandler.php@{vendor/symfony/http-\/foundation/Session/Storage/Handler/PdoSessionHandler.php}}
+\mbox{\hyperlink{_pdo_session_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)Session\(\backslash\)Storage\(\backslash\)Handler}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00014}00014\ use\ Doctrine\(\backslash\)DBAL\(\backslash\)Schema\(\backslash\)Schema;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00015}00015\ use\ Doctrine\(\backslash\)DBAL\(\backslash\)Types\(\backslash\)Types;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00044}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler}{00044}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler}{PdoSessionHandler}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_abstract_session_handler}{AbstractSessionHandler}}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00045}00045\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00052}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_a193659f88ba66a761b8020d529ea4e61}{00052}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_a193659f88ba66a761b8020d529ea4e61}{LOCK\_NONE}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00061}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ac59883a59da758a5771ca9df4c61f14e}{00061}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ac59883a59da758a5771ca9df4c61f14e}{LOCK\_ADVISORY}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00069}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_affe6f40a5220ee0fb68fe20e448892eb}{00069}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_affe6f40a5220ee0fb68fe20e448892eb}{LOCK\_TRANSACTIONAL}}\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00071}00071\ \ \ \ \ private\ \(\backslash\)PDO\ \$pdo;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00076}00076\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}|\textcolor{keyword}{false}|\textcolor{keyword}{null}\ \$dsn\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00078}00078\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$driver;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00079}00079\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$table\ =\ \textcolor{stringliteral}{'sessions'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00080}00080\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$idCol\ =\ \textcolor{stringliteral}{'sess\_id'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00081}00081\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$dataCol\ =\ \textcolor{stringliteral}{'sess\_data'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00082}00082\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$lifetimeCol\ =\ \textcolor{stringliteral}{'sess\_lifetime'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00083}00083\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$timeCol\ =\ \textcolor{stringliteral}{'sess\_time'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00088}00088\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}|\(\backslash\)Closure|\textcolor{keyword}{null}\ \$ttl;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00093}00093\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$username\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00098}00098\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$password\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00103}00103\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$connectionOptions\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00108}00108\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$lockMode\ =\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_affe6f40a5220ee0fb68fe20e448892eb}{self::LOCK\_TRANSACTIONAL}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00115}00115\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$unlockStatements\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00120}00120\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$sessionExpired\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00125}00125\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$inTransaction\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00130}00130\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$gcCalled\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00154}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ae388894a0e0e80a1ab7593e630b5ca74}{00154}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ae388894a0e0e80a1ab7593e630b5ca74}{\_\_construct}}(\#[\(\backslash\)SensitiveParameter]\ \(\backslash\)PDO|\textcolor{keywordtype}{string}\ \$pdoOrDsn\ =\ \textcolor{keyword}{null},\ \#[\(\backslash\)SensitiveParameter]\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00155}00155\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$pdoOrDsn\ instanceof\ \(\backslash\)PDO)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)PDO::ERRMODE\_EXCEPTION\ !==\ \$pdoOrDsn-\/>getAttribute(\(\backslash\)PDO::ATTR\_ERRMODE))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(sprintf(\textcolor{stringliteral}{'"{}\%s"{}\ requires\ PDO\ error\ mode\ attribute\ be\ set\ to\ throw\ Exceptions\ (i.e.\ \$pdo-\/>setAttribute(PDO::ATTR\_ERRMODE,\ PDO::ERRMODE\_EXCEPTION)).'},\ \_\_CLASS\_\_));}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pdo\ =\ \$pdoOrDsn;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>driver\ =\ \$this-\/>pdo-\/>getAttribute(\(\backslash\)PDO::ATTR\_DRIVER\_NAME);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \}\ elseif\ (\(\backslash\)is\_string(\$pdoOrDsn)\ \&\&\ str\_contains(\$pdoOrDsn,\ \textcolor{stringliteral}{'://'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>dsn\ =\ \$this-\/>buildDsnFromUrl(\$pdoOrDsn);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>dsn\ =\ \$pdoOrDsn;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \$this-\/>table\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'db\_table'}]\ ??\ \$this-\/>table;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \$this-\/>idCol\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'db\_id\_col'}]\ ??\ \$this-\/>idCol;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \$this-\/>dataCol\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'db\_data\_col'}]\ ??\ \$this-\/>dataCol;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \$this-\/>lifetimeCol\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'db\_lifetime\_col'}]\ ??\ \$this-\/>lifetimeCol;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \$this-\/>timeCol\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'db\_time\_col'}]\ ??\ \$this-\/>timeCol;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \$this-\/>username\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'db\_username'}]\ ??\ \$this-\/>username;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \$this-\/>password\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'db\_password'}]\ ??\ \$this-\/>password;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \$this-\/>connectionOptions\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'db\_connection\_options'}]\ ??\ \$this-\/>connectionOptions;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \$this-\/>lockMode\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'lock\_mode'}]\ ??\ \$this-\/>lockMode;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \$this-\/>ttl\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'ttl'}]\ ??\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00179}00179\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00184}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_a5f6919da39a32083187763da723bb00e}{00184}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_a5f6919da39a32083187763da723bb00e}{configureSchema}}(Schema\ \$schema,\ \(\backslash\)Closure\ \$isSameDatabase\ =\ \textcolor{keyword}{null}):\ void}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00185}00185\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$schema-\/>hasTable(\$this-\/>table)\ ||\ (\$isSameDatabase\ \&\&\ !\$isSameDatabase(\$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ab7a0a080d0e721c656eef11cd641638b}{getConnection}}()-\/>exec(...))))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \$table\ =\ \$schema-\/>createTable(\$this-\/>table);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$this-\/>driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'mysql'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>idCol,\ Types::BINARY)-\/>setLength(128)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>dataCol,\ Types::BLOB)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>lifetimeCol,\ Types::INTEGER)-\/>setUnsigned(\textcolor{keyword}{true})-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>timeCol,\ Types::INTEGER)-\/>setUnsigned(\textcolor{keyword}{true})-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addOption(\textcolor{stringliteral}{'collate'},\ \textcolor{stringliteral}{'utf8mb4\_bin'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addOption(\textcolor{stringliteral}{'engine'},\ \textcolor{stringliteral}{'InnoDB'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'sqlite'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>idCol,\ Types::TEXT)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>dataCol,\ Types::BLOB)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>lifetimeCol,\ Types::INTEGER)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>timeCol,\ Types::INTEGER)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'pgsql'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>idCol,\ Types::STRING)-\/>setLength(128)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>dataCol,\ Types::BINARY)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>lifetimeCol,\ Types::INTEGER)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>timeCol,\ Types::INTEGER)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'oci'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>idCol,\ Types::STRING)-\/>setLength(128)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>dataCol,\ Types::BLOB)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>lifetimeCol,\ Types::INTEGER)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>timeCol,\ Types::INTEGER)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'sqlsrv'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>idCol,\ Types::TEXT)-\/>setLength(128)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>dataCol,\ Types::BLOB)-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>lifetimeCol,\ Types::INTEGER)-\/>setUnsigned(\textcolor{keyword}{true})-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$table-\/>addColumn(\$this-\/>timeCol,\ Types::INTEGER)-\/>setUnsigned(\textcolor{keyword}{true})-\/>setNotnull(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)DomainException(sprintf(\textcolor{stringliteral}{'Creating\ the\ session\ table\ is\ currently\ not\ implemented\ for\ PDO\ driver\ "{}\%s"{}.'},\ \$this-\/>driver));}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \$table-\/>setPrimaryKey([\$this-\/>idCol]);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \$table-\/>addIndex([\$this-\/>lifetimeCol],\ \$this-\/>lifetimeCol.\textcolor{stringliteral}{'\_idx'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00229}00229\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00244}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ad3d7cd058f1bf894920970b2d69098d1}{00244}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ad3d7cd058f1bf894920970b2d69098d1}{createTable}}()}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00245}00245\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ connect\ if\ we\ are\ not\ yet}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ab7a0a080d0e721c656eef11cd641638b}{getConnection}}();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \$sql\ =\ match\ (\$this-\/>driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ use\ varbinary\ for\ the\ ID\ column\ because\ it\ prevents\ unwanted\ conversions:}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/\ character\ set\ conversions\ between\ server\ and\ client}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/\ trailing\ space\ removal}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/\ case-\/insensitivity}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ -\/\ language\ processing\ like\ é\ ==\ e}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'mysql'}\ =>\ \textcolor{stringliteral}{"{}CREATE\ TABLE\ \$this-\/>table\ (\$this-\/>idCol\ VARBINARY(128)\ NOT\ NULL\ PRIMARY\ KEY,\ \$this-\/>dataCol\ BLOB\ NOT\ NULL,\ \$this-\/>lifetimeCol\ INTEGER\ UNSIGNED\ NOT\ NULL,\ \$this-\/>timeCol\ INTEGER\ UNSIGNED\ NOT\ NULL)\ COLLATE\ utf8mb4\_bin,\ ENGINE\ =\ InnoDB"{}},}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'sqlite'}\ =>\ \textcolor{stringliteral}{"{}CREATE\ TABLE\ \$this-\/>table\ (\$this-\/>idCol\ TEXT\ NOT\ NULL\ PRIMARY\ KEY,\ \$this-\/>dataCol\ BLOB\ NOT\ NULL,\ \$this-\/>lifetimeCol\ INTEGER\ NOT\ NULL,\ \$this-\/>timeCol\ INTEGER\ NOT\ NULL)"{}},}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'pgsql'}\ =>\ \textcolor{stringliteral}{"{}CREATE\ TABLE\ \$this-\/>table\ (\$this-\/>idCol\ VARCHAR(128)\ NOT\ NULL\ PRIMARY\ KEY,\ \$this-\/>dataCol\ BYTEA\ NOT\ NULL,\ \$this-\/>lifetimeCol\ INTEGER\ NOT\ NULL,\ \$this-\/>timeCol\ INTEGER\ NOT\ NULL)"{}},}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'oci'}\ =>\ \textcolor{stringliteral}{"{}CREATE\ TABLE\ \$this-\/>table\ (\$this-\/>idCol\ VARCHAR2(128)\ NOT\ NULL\ PRIMARY\ KEY,\ \$this-\/>dataCol\ BLOB\ NOT\ NULL,\ \$this-\/>lifetimeCol\ INTEGER\ NOT\ NULL,\ \$this-\/>timeCol\ INTEGER\ NOT\ NULL)"{}},}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'sqlsrv'}\ =>\ \textcolor{stringliteral}{"{}CREATE\ TABLE\ \$this-\/>table\ (\$this-\/>idCol\ VARCHAR(128)\ NOT\ NULL\ PRIMARY\ KEY,\ \$this-\/>dataCol\ VARBINARY(MAX)\ NOT\ NULL,\ \$this-\/>lifetimeCol\ INTEGER\ NOT\ NULL,\ \$this-\/>timeCol\ INTEGER\ NOT\ NULL)"{}},}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}\ =>\ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)DomainException(sprintf(\textcolor{stringliteral}{'Creating\ the\ session\ table\ is\ currently\ not\ implemented\ for\ PDO\ driver\ "{}\%s"{}.'},\ \$this-\/>driver)),}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pdo-\/>exec(\$sql);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pdo-\/>exec(\textcolor{stringliteral}{"{}CREATE\ INDEX\ \{\$this-\/>lifetimeCol\}\_idx\ ON\ \$this-\/>table\ (\$this-\/>lifetimeCol)"{}});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)PDOException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>rollback();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00271}00271\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00278}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_a1b8f5d33a9bd90eb9ebf791d1336661e}{00278}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_a1b8f5d33a9bd90eb9ebf791d1336661e}{isSessionExpired}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00279}00279\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>sessionExpired;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00281}00281\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00283}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_a133f5fd192306bfb74e4821ceacf1bbe}{00283}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_a133f5fd192306bfb74e4821ceacf1bbe}{open}}(\textcolor{keywordtype}{string}\ \$savePath,\ \textcolor{keywordtype}{string}\ \$sessionName):\ bool}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00284}00284\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00285}00285\ \ \ \ \ \ \ \ \ \$this-\/>sessionExpired\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>pdo))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>connect(\$this-\/>dsn\ ?:\ \$savePath);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00290}00290\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parent::open(\$savePath,\ \$sessionName);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00292}00292\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00294}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ada7c6b4dc754da0f03f86191aa1d9843}{00294}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ada7c6b4dc754da0f03f86191aa1d9843}{read}}(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId):\ string}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00295}00295\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parent::read(\$sessionId);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)PDOException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>rollback();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00302}00302\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00303}00303\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00305}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ae12e2c10297dfb21870c611bbf15b459}{00305}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ae12e2c10297dfb21870c611bbf15b459}{gc}}(\textcolor{keywordtype}{int}\ \$maxlifetime):\ int|false}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00306}00306\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ delay\ gc()\ to\ close()\ so\ that\ it\ is\ executed\ outside\ the\ transactional\ and\ blocking\ read-\/write\ process.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ way,\ pruning\ expired\ sessions\ does\ not\ block\ them\ from\ being\ started\ while\ the\ current\ session\ is\ used.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \$this-\/>gcCalled\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00312}00312\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00314}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_aa2ae497fcf7172eb5517d86b02aeb350}{00314}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_aa2ae497fcf7172eb5517d86b02aeb350}{doDestroy}}(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId):\ bool}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00315}00315\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ delete\ the\ record\ associated\ with\ this\ id}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \$sql\ =\ \textcolor{stringliteral}{"{}DELETE\ FROM\ \$this-\/>table\ WHERE\ \$this-\/>idCol\ =\ :id"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt\ =\ \$this-\/>pdo-\/>prepare(\$sql);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt-\/>bindParam(\textcolor{stringliteral}{':id'},\ \$sessionId,\ \(\backslash\)PDO::PARAM\_STR);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)PDOException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>rollback();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00327}00327\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00328}00328\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00330}00330\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00331}00331\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00332}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_a4376069700ff784813f0309a3536d4c9}{00332}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_a4376069700ff784813f0309a3536d4c9}{doWrite}}(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId,\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}):\ bool}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00333}00333\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \$maxlifetime\ =\ (int)\ ((\$this-\/>ttl\ instanceof\ \(\backslash\)Closure\ ?\ (\$this-\/>ttl)()\ :\ \$this-\/>ttl)\ ??\ \(\backslash\)ini\_get(\textcolor{stringliteral}{'session.gc\_maxlifetime'}));}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ use\ a\ single\ MERGE\ SQL\ query\ when\ supported\ by\ the\ database.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt\ =\ \$this-\/>getMergeStatement(\$sessionId,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$maxlifetime);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$mergeStmt)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00340}00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00344}00344\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ \$updateStmt\ =\ \$this-\/>getUpdateStatement(\$sessionId,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$maxlifetime);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \ \ \$updateStmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00347}00347\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ MERGE\ is\ not\ supported,\ like\ in\ Postgres\ <\ 9.5,\ we\ have\ to\ use\ this\ approach\ that\ can\ result\ in}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ duplicate\ key\ errors\ when\ the\ same\ session\ is\ written\ simultaneously\ (given\ the\ LOCK\_NONE\ behavior).}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ can\ just\ catch\ such\ an\ error\ and\ re-\/execute\ the\ update.\ This\ is\ similar\ to\ a\ serializable}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ transaction\ with\ retry\ logic\ on\ serialization\ failures\ but\ without\ the\ overhead\ and\ without\ possible}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ false\ positives\ due\ to\ longer\ gap\ locking.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$updateStmt-\/>rowCount())\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$insertStmt\ =\ \$this-\/>getInsertStatement(\$sessionId,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$maxlifetime);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$insertStmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)PDOException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Handle\ integrity\ violation\ SQLSTATE\ 23000\ (or\ a\ subclass\ like\ 23505\ in\ Postgres)\ for\ duplicate\ keys}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\$e-\/>getCode(),\ \textcolor{stringliteral}{'23'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$updateStmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)PDOException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>rollback();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00370}00370\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00371}00371\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00373}00373\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00375}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_a6c1e98fdd5a9eaa83c9ad20c9fe2af82}{00375}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_a6c1e98fdd5a9eaa83c9ad20c9fe2af82}{updateTimestamp}}(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId,\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}):\ bool}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00376}00376\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00377}00377\ \ \ \ \ \ \ \ \ \$expiry\ =\ time()\ +\ (int)\ ((\$this-\/>ttl\ instanceof\ \(\backslash\)Closure\ ?\ (\$this-\/>ttl)()\ :\ \$this-\/>ttl)\ ??\ \(\backslash\)ini\_get(\textcolor{stringliteral}{'session.gc\_maxlifetime'}));}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00378}00378\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00379}00379\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00380}00380\ \ \ \ \ \ \ \ \ \ \ \ \ \$updateStmt\ =\ \$this-\/>pdo-\/>prepare(}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}UPDATE\ \$this-\/>table\ SET\ \$this-\/>lifetimeCol\ =\ :expiry,\ \$this-\/>timeCol\ =\ :time\ WHERE\ \$this-\/>idCol\ =\ :id"{}}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \$updateStmt-\/>bindValue(\textcolor{stringliteral}{':id'},\ \$sessionId,\ \(\backslash\)PDO::PARAM\_STR);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ \$updateStmt-\/>bindValue(\textcolor{stringliteral}{':expiry'},\ \$expiry,\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00385}00385\ \ \ \ \ \ \ \ \ \ \ \ \ \$updateStmt-\/>bindValue(\textcolor{stringliteral}{':time'},\ time(),\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \ \ \ \ \$updateStmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)PDOException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>rollback();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00394}00394\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00395}00395\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00396}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_aa69c8bf1f1dcf4e72552efff1fe3e87e}{00396}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_aa69c8bf1f1dcf4e72552efff1fe3e87e}{close}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00397}00397\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00398}00398\ \ \ \ \ \ \ \ \ \$this-\/>commit();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00399}00399\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00400}00400\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\$unlockStmt\ =\ array\_shift(\$this-\/>unlockStatements))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ \$unlockStmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00403}00403\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>gcCalled)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>gcCalled\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00406}00406\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ delete\ the\ session\ records\ that\ have\ expired}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \$sql\ =\ \textcolor{stringliteral}{"{}DELETE\ FROM\ \$this-\/>table\ WHERE\ \$this-\/>lifetimeCol\ <\ :time"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt\ =\ \$this-\/>pdo-\/>prepare(\$sql);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt-\/>bindValue(\textcolor{stringliteral}{':time'},\ time(),\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00412}00412\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00413}00413\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00414}00414\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{false}\ !==\ \$this-\/>dsn)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00415}00415\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$this-\/>pdo,\ \$this-\/>driver);\ \textcolor{comment}{//\ only\ close\ lazy-\/connection}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00416}00416\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00417}00417\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00418}00418\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00419}00419\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00420}00420\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00424}00424\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ connect(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$dsn):\ void}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00425}00425\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00426}00426\ \ \ \ \ \ \ \ \ \$this-\/>pdo\ =\ new\ \(\backslash\)PDO(\$dsn,\ \$this-\/>username,\ \$this-\/>password,\ \$this-\/>connectionOptions);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00427}00427\ \ \ \ \ \ \ \ \ \$this-\/>pdo-\/>setAttribute(\(\backslash\)PDO::ATTR\_ERRMODE,\ \(\backslash\)PDO::ERRMODE\_EXCEPTION);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00428}00428\ \ \ \ \ \ \ \ \ \$this-\/>driver\ =\ \$this-\/>pdo-\/>getAttribute(\(\backslash\)PDO::ATTR\_DRIVER\_NAME);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00429}00429\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00430}00430\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00436}00436\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ buildDsnFromUrl(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$dsnOrUrl):\ string}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00437}00437\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ (pdo\_)?sqlite3?:///...\ =>\ (pdo\_)?sqlite3?://localhost/...\ or\ else\ the\ URL\ will\ be\ invalid}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \$url\ =\ preg\_replace(\textcolor{stringliteral}{'\#\string^((?:pdo\_)?sqlite3?):///\#'},\ \textcolor{stringliteral}{'\$1://localhost/'},\ \$dsnOrUrl);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00440}00440\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00441}00441\ \ \ \ \ \ \ \ \ \$params\ =\ parse\_url(\$url);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00442}00442\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00443}00443\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{false}\ ===\ \$params)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$dsnOrUrl;\ \textcolor{comment}{//\ If\ the\ URL\ is\ not\ valid,\ let's\ assume\ it\ might\ be\ a\ DSN\ already.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00445}00445\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00446}00446\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00447}00447\ \ \ \ \ \ \ \ \ \$params\ =\ array\_map(\textcolor{stringliteral}{'rawurldecode'},\ \$params);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00448}00448\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Override\ the\ default\ username\ and\ password.\ Values\ passed\ through\ options\ will\ still\ win\ over\ these\ in\ the\ constructor.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$params[\textcolor{stringliteral}{'user'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>username\ =\ \$params[\textcolor{stringliteral}{'user'}];}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00452}00452\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00453}00453\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$params[\textcolor{stringliteral}{'pass'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>password\ =\ \$params[\textcolor{stringliteral}{'pass'}];}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00456}00456\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00457}00457\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00458}00458\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$params[\textcolor{stringliteral}{'scheme'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'URLs\ without\ scheme\ are\ not\ supported\ to\ configure\ the\ PdoSessionHandler.'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00460}00460\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00461}00461\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \$driverAliasMap\ =\ [}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'mssql'}\ =>\ \textcolor{stringliteral}{'sqlsrv'},}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'mysql2'}\ =>\ \textcolor{stringliteral}{'mysql'},\ \textcolor{comment}{//\ Amazon\ RDS,\ for\ some\ weird\ reason}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'postgres'}\ =>\ \textcolor{stringliteral}{'pgsql'},}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'postgresql'}\ =>\ \textcolor{stringliteral}{'pgsql'},}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00467}00467\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'sqlite3'}\ =>\ \textcolor{stringliteral}{'sqlite'},}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00468}00468\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00469}00469\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00470}00470\ \ \ \ \ \ \ \ \ \$driver\ =\ \$driverAliasMap[\$params[\textcolor{stringliteral}{'scheme'}]]\ ??\ \$params[\textcolor{stringliteral}{'scheme'}];}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00471}00471\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Doctrine\ DBAL\ supports\ passing\ its\ internal\ pdo\_*\ driver\ names\ directly\ too\ (allowing\ both\ dashes\ and\ underscores).\ This\ allows\ supporting\ the\ same\ here.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00473}00473\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\$driver,\ \textcolor{stringliteral}{'pdo\_'})\ ||\ str\_starts\_with(\$driver,\ \textcolor{stringliteral}{'pdo-\/'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00474}00474\ \ \ \ \ \ \ \ \ \ \ \ \ \$driver\ =\ substr(\$driver,\ 4);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00476}00476\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \$dsn\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'mysql'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dsn\ =\ \textcolor{stringliteral}{'mysql:'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{''}\ !==\ (\$params[\textcolor{stringliteral}{'query'}]\ ??\ \textcolor{stringliteral}{''}))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00482}00482\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$queryParams\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00483}00483\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ parse\_str(\$params[\textcolor{stringliteral}{'query'}],\ \$queryParams);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{''}\ !==\ (\$queryParams[\textcolor{stringliteral}{'charset'}]\ ??\ \textcolor{stringliteral}{''}))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dsn\ .=\ \textcolor{stringliteral}{'charset='}.\$queryParams[\textcolor{stringliteral}{'charset'}].\textcolor{charliteral}{';'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00486}00486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{''}\ !==\ (\$queryParams[\textcolor{stringliteral}{'unix\_socket'}]\ ??\ \textcolor{stringliteral}{''}))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dsn\ .=\ \textcolor{stringliteral}{'unix\_socket='}.\$queryParams[\textcolor{stringliteral}{'unix\_socket'}].\textcolor{charliteral}{';'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00490}00490\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00491}00491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$params[\textcolor{stringliteral}{'path'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00492}00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dbName\ =\ substr(\$params[\textcolor{stringliteral}{'path'}],\ 1);\ \textcolor{comment}{//\ Remove\ the\ leading\ slash}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00493}00493\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dsn\ .=\ \textcolor{stringliteral}{'dbname='}.\$dbName.\textcolor{charliteral}{';'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00495}00495\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$dsn;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00497}00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ "{}unix\_socket"{}\ is\ not\ in\ the\ query,\ we\ continue\ with\ the\ same\ process\ as\ pgsql}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ no\ break}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00501}00501\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'pgsql'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dsn\ ??=\ \textcolor{stringliteral}{'pgsql:'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$params[\textcolor{stringliteral}{'host'}])\ \&\&\ \textcolor{stringliteral}{''}\ !==\ \$params[\textcolor{stringliteral}{'host'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dsn\ .=\ \textcolor{stringliteral}{'host='}.\$params[\textcolor{stringliteral}{'host'}].\textcolor{charliteral}{';'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00506}00506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00507}00507\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00508}00508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$params[\textcolor{stringliteral}{'port'}])\ \&\&\ \textcolor{stringliteral}{''}\ !==\ \$params[\textcolor{stringliteral}{'port'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00509}00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dsn\ .=\ \textcolor{stringliteral}{'port='}.\$params[\textcolor{stringliteral}{'port'}].\textcolor{charliteral}{';'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00511}00511\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$params[\textcolor{stringliteral}{'path'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dbName\ =\ substr(\$params[\textcolor{stringliteral}{'path'}],\ 1);\ \textcolor{comment}{//\ Remove\ the\ leading\ slash}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dsn\ .=\ \textcolor{stringliteral}{'dbname='}.\$dbName.\textcolor{charliteral}{';'};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00516}00516\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$dsn;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00518}00518\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'sqlite'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'sqlite:'}.substr(\$params[\textcolor{stringliteral}{'path'}],\ 1);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00521}00521\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'sqlsrv'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dsn\ =\ \textcolor{stringliteral}{'sqlsrv:server='};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00524}00524\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00525}00525\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$params[\textcolor{stringliteral}{'host'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dsn\ .=\ \$params[\textcolor{stringliteral}{'host'}];}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00527}00527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00528}00528\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$params[\textcolor{stringliteral}{'port'}])\ \&\&\ \textcolor{stringliteral}{''}\ !==\ \$params[\textcolor{stringliteral}{'port'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00530}00530\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dsn\ .=\ \textcolor{charliteral}{','}.\$params[\textcolor{stringliteral}{'port'}];}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00532}00532\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00533}00533\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$params[\textcolor{stringliteral}{'path'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dbName\ =\ substr(\$params[\textcolor{stringliteral}{'path'}],\ 1);\ \textcolor{comment}{//\ Remove\ the\ leading\ slash}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00535}00535\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dsn\ .=\ \textcolor{stringliteral}{';Database='}.\$dbName;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00537}00537\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00538}00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$dsn;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00539}00539\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(sprintf(\textcolor{stringliteral}{'The\ scheme\ "{}\%s"{}\ is\ not\ supported\ by\ the\ PdoSessionHandler\ URL\ configuration.\ Pass\ a\ PDO\ DSN\ directly.'},\ \$params[\textcolor{stringliteral}{'scheme'}]));}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00543}00543\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00544}00544\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00557}00557\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ beginTransaction():\ void}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00558}00558\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00559}00559\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>inTransaction)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00560}00560\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'sqlite'}\ ===\ \$this-\/>driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pdo-\/>exec(\textcolor{stringliteral}{'BEGIN\ IMMEDIATE\ TRANSACTION'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00562}00562\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00563}00563\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'mysql'}\ ===\ \$this-\/>driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pdo-\/>exec(\textcolor{stringliteral}{'SET\ TRANSACTION\ ISOLATION\ LEVEL\ READ\ COMMITTED'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00565}00565\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00566}00566\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pdo-\/>beginTransaction();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00567}00567\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00568}00568\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>inTransaction\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00570}00570\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00571}00571\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00575}00575\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ commit():\ void}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00576}00576\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>inTransaction)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00578}00578\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00579}00579\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ commit\ read-\/write\ transaction\ which\ also\ releases\ the\ lock}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00580}00580\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'sqlite'}\ ===\ \$this-\/>driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pdo-\/>exec(\textcolor{stringliteral}{'COMMIT'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00582}00582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00583}00583\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pdo-\/>commit();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00585}00585\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>inTransaction\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00586}00586\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)PDOException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00587}00587\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>rollback();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00588}00588\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00589}00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00590}00590\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00591}00591\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00592}00592\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00593}00593\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00597}00597\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ rollback():\ void}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00598}00598\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00599}00599\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ only\ need\ to\ rollback\ if\ we\ are\ in\ a\ transaction.\ Otherwise\ the\ resulting}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00600}00600\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error\ would\ hide\ the\ real\ problem\ why\ rollback\ was\ called.\ We\ might\ not\ be}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00601}00601\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ in\ a\ transaction\ when\ not\ using\ the\ transactional\ locking\ behavior\ or\ when}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00602}00602\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ two\ callbacks\ (e.g.\ destroy\ and\ write)\ are\ invoked\ that\ both\ fail.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00603}00603\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>inTransaction)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00604}00604\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'sqlite'}\ ===\ \$this-\/>driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00605}00605\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pdo-\/>exec(\textcolor{stringliteral}{'ROLLBACK'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00606}00606\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00607}00607\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pdo-\/>rollBack();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00608}00608\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>inTransaction\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00611}00611\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00612}00612\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00619}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ad19f491a9534169990e8a8abed25f8eb}{00619}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ad19f491a9534169990e8a8abed25f8eb}{doRead}}(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId):\ string}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00620}00620\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (self::LOCK\_ADVISORY\ ===\ \$this-\/>lockMode)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>unlockStatements[]\ =\ \$this-\/>doAdvisoryLock(\$sessionId);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00623}00623\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00624}00624\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00625}00625\ \ \ \ \ \ \ \ \ \$selectSql\ =\ \$this-\/>getSelectSql();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00626}00626\ \ \ \ \ \ \ \ \ \$selectStmt\ =\ \$this-\/>pdo-\/>prepare(\$selectSql);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00627}00627\ \ \ \ \ \ \ \ \ \$selectStmt-\/>bindParam(\textcolor{stringliteral}{':id'},\ \$sessionId,\ \(\backslash\)PDO::PARAM\_STR);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00628}00628\ \ \ \ \ \ \ \ \ \$insertStmt\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00629}00629\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00630}00630\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00631}00631\ \ \ \ \ \ \ \ \ \ \ \ \ \$selectStmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00632}00632\ \ \ \ \ \ \ \ \ \ \ \ \ \$sessionRows\ =\ \$selectStmt-\/>fetchAll(\(\backslash\)PDO::FETCH\_NUM);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00633}00633\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00634}00634\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$sessionRows)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00635}00635\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$expiry\ =\ (int)\ \$sessionRows[0][1];}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00636}00636\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$expiry\ <\ time())\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00638}00638\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>sessionExpired\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00639}00639\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00640}00640\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00641}00641\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00642}00642\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00643}00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ \(\backslash\)is\_resource(\$sessionRows[0][0])\ ?\ stream\_get\_contents(\$sessionRows[0][0])\ :\ \$sessionRows[0][0];}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00644}00644\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00645}00645\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00646}00646\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$insertStmt)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00647}00647\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>rollback();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00648}00648\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{'Failed\ to\ read\ session:\ INSERT\ reported\ a\ duplicate\ id\ but\ next\ SELECT\ did\ not\ return\ any\ data.'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00649}00649\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00650}00650\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00651}00651\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!filter\_var(\(\backslash\)ini\_get(\textcolor{stringliteral}{'session.use\_strict\_mode'}),\ \(\backslash\)FILTER\_VALIDATE\_BOOL)\ \&\&\ self::LOCK\_TRANSACTIONAL\ ===\ \$this-\/>lockMode\ \&\&\ \textcolor{stringliteral}{'sqlite'}\ !==\ \$this-\/>driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00652}00652\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ In\ strict\ mode,\ session\ fixation\ is\ not\ possible:\ new\ sessions\ always\ start\ with\ a\ unique}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00653}00653\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ random\ id,\ so\ that\ concurrency\ is\ not\ possible\ and\ this\ code\ path\ can\ be\ skipped.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00654}00654\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Exclusive-\/reading\ of\ non-\/existent\ rows\ does\ not\ block,\ so\ we\ need\ to\ do\ an\ insert\ to\ block}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00655}00655\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ until\ other\ connections\ to\ the\ session\ are\ committed.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00656}00656\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00657}00657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$insertStmt\ =\ \$this-\/>getInsertStatement(\$sessionId,\ \textcolor{stringliteral}{''},\ 0);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00658}00658\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$insertStmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00659}00659\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)PDOException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00660}00660\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Catch\ duplicate\ key\ error\ because\ other\ connection\ created\ the\ session\ already.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00661}00661\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ It\ would\ only\ not\ be\ the\ case\ when\ the\ other\ connection\ destroyed\ the\ session.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00662}00662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\$e-\/>getCode(),\ \textcolor{stringliteral}{'23'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00663}00663\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Retrieve\ finished\ session\ data\ written\ by\ concurrent\ connection\ by\ restarting\ the\ loop.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00664}00664\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ have\ to\ start\ a\ new\ transaction\ as\ a\ failed\ query\ will\ mark\ the\ current\ transaction\ as}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00665}00665\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ aborted\ in\ PostgreSQL\ and\ disallow\ further\ queries\ within\ it.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00666}00666\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>rollback();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00667}00667\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>beginTransaction();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00668}00668\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00669}00669\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00670}00670\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00671}00671\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00672}00672\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00673}00673\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00674}00674\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00675}00675\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00676}00676\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00677}00677\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00678}00678\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00690}00690\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ doAdvisoryLock(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId):\ \(\backslash\)PDOStatement}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00691}00691\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00692}00692\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$this-\/>driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00693}00693\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'mysql'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00694}00694\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ MySQL\ 5.7.5\ and\ later\ enforces\ a\ maximum\ length\ on\ lock\ names\ of\ 64\ characters.\ Previously,\ no\ limit\ was\ enforced.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00695}00695\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$lockId\ =\ substr(\$sessionId,\ 0,\ 64);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00696}00696\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ should\ we\ handle\ the\ return\ value?\ 0\ on\ timeout,\ null\ on\ error}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00697}00697\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ use\ a\ timeout\ of\ 50\ seconds\ which\ is\ also\ the\ default\ for\ innodb\_lock\_wait\_timeout}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00698}00698\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt\ =\ \$this-\/>pdo-\/>prepare(\textcolor{stringliteral}{'SELECT\ GET\_LOCK(:key,\ 50)'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00699}00699\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt-\/>bindValue(\textcolor{stringliteral}{':key'},\ \$lockId,\ \(\backslash\)PDO::PARAM\_STR);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00700}00700\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00701}00701\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00702}00702\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$releaseStmt\ =\ \$this-\/>pdo-\/>prepare(\textcolor{stringliteral}{'DO\ RELEASE\_LOCK(:key)'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00703}00703\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$releaseStmt-\/>bindValue(\textcolor{stringliteral}{':key'},\ \$lockId,\ \(\backslash\)PDO::PARAM\_STR);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00704}00704\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00705}00705\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$releaseStmt;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00706}00706\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'pgsql'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00707}00707\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Obtaining\ an\ exclusive\ session\ level\ advisory\ lock\ requires\ an\ integer\ key.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00708}00708\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ session.sid\_bits\_per\_character\ >\ 4,\ the\ session\ id\ can\ contain\ non-\/hex-\/characters.}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00709}00709\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ So\ we\ cannot\ just\ use\ hexdec().}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00710}00710\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (4\ ===\ \(\backslash\)PHP\_INT\_SIZE)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00711}00711\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sessionInt1\ =\ \$this-\/>convertStringToInt(\$sessionId);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00712}00712\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sessionInt2\ =\ \$this-\/>convertStringToInt(substr(\$sessionId,\ 4,\ 4));}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00713}00713\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00714}00714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt\ =\ \$this-\/>pdo-\/>prepare(\textcolor{stringliteral}{'SELECT\ pg\_advisory\_lock(:key1,\ :key2)'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00715}00715\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt-\/>bindValue(\textcolor{stringliteral}{':key1'},\ \$sessionInt1,\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00716}00716\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt-\/>bindValue(\textcolor{stringliteral}{':key2'},\ \$sessionInt2,\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00717}00717\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00718}00718\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00719}00719\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$releaseStmt\ =\ \$this-\/>pdo-\/>prepare(\textcolor{stringliteral}{'SELECT\ pg\_advisory\_unlock(:key1,\ :key2)'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00720}00720\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$releaseStmt-\/>bindValue(\textcolor{stringliteral}{':key1'},\ \$sessionInt1,\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00721}00721\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$releaseStmt-\/>bindValue(\textcolor{stringliteral}{':key2'},\ \$sessionInt2,\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00722}00722\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00723}00723\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sessionBigInt\ =\ \$this-\/>convertStringToInt(\$sessionId);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00724}00724\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00725}00725\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt\ =\ \$this-\/>pdo-\/>prepare(\textcolor{stringliteral}{'SELECT\ pg\_advisory\_lock(:key)'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00726}00726\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt-\/>bindValue(\textcolor{stringliteral}{':key'},\ \$sessionBigInt,\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00727}00727\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stmt-\/>execute();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00728}00728\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00729}00729\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$releaseStmt\ =\ \$this-\/>pdo-\/>prepare(\textcolor{stringliteral}{'SELECT\ pg\_advisory\_unlock(:key)'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00730}00730\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$releaseStmt-\/>bindValue(\textcolor{stringliteral}{':key'},\ \$sessionBigInt,\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00731}00731\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00732}00732\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00733}00733\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$releaseStmt;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00734}00734\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'sqlite'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00735}00735\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)DomainException(\textcolor{stringliteral}{'SQLite\ does\ not\ support\ advisory\ locks.'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00736}00736\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00737}00737\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)DomainException(sprintf(\textcolor{stringliteral}{'Advisory\ locks\ are\ currently\ not\ implemented\ for\ PDO\ driver\ "{}\%s"{}.'},\ \$this-\/>driver));}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00738}00738\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00739}00739\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00740}00740\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00746}00746\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ convertStringToInt(\textcolor{keywordtype}{string}\ \$string):\ int}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00747}00747\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00748}00748\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (4\ ===\ \(\backslash\)PHP\_INT\_SIZE)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00749}00749\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\(\backslash\)ord(\$string[3])\ <<\ 24)\ +\ (\(\backslash\)ord(\$string[2])\ <<\ 16)\ +\ (\(\backslash\)ord(\$string[1])\ <<\ 8)\ +\ \(\backslash\)ord(\$string[0]);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00750}00750\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00751}00751\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00752}00752\ \ \ \ \ \ \ \ \ \$int1\ =\ (\(\backslash\)ord(\$string[7])\ <<\ 24)\ +\ (\(\backslash\)ord(\$string[6])\ <<\ 16)\ +\ (\(\backslash\)ord(\$string[5])\ <<\ 8)\ +\ \(\backslash\)ord(\$string[4]);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00753}00753\ \ \ \ \ \ \ \ \ \$int2\ =\ (\(\backslash\)ord(\$string[3])\ <<\ 24)\ +\ (\(\backslash\)ord(\$string[2])\ <<\ 16)\ +\ (\(\backslash\)ord(\$string[1])\ <<\ 8)\ +\ \(\backslash\)ord(\$string[0]);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00754}00754\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00755}00755\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$int2\ +\ (\$int1\ <<\ 32);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00756}00756\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00757}00757\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00763}00763\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getSelectSql():\ string}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00764}00764\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00765}00765\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (self::LOCK\_TRANSACTIONAL\ ===\ \$this-\/>lockMode)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00766}00766\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>beginTransaction();}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00767}00767\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00768}00768\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$this-\/>driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00769}00769\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'mysql'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00770}00770\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'oci'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00771}00771\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'pgsql'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00772}00772\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}SELECT\ \$this-\/>dataCol,\ \$this-\/>lifetimeCol\ FROM\ \$this-\/>table\ WHERE\ \$this-\/>idCol\ =\ :id\ FOR\ UPDATE"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00773}00773\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'sqlsrv'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00774}00774\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}SELECT\ \$this-\/>dataCol,\ \$this-\/>lifetimeCol\ FROM\ \$this-\/>table\ WITH\ (UPDLOCK,\ ROWLOCK)\ WHERE\ \$this-\/>idCol\ =\ :id"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00775}00775\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'sqlite'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00776}00776\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ already\ locked\ when\ starting\ transaction}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00777}00777\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00778}00778\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00779}00779\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)DomainException(sprintf(\textcolor{stringliteral}{'Transactional\ locks\ are\ currently\ not\ implemented\ for\ PDO\ driver\ "{}\%s"{}.'},\ \$this-\/>driver));}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00780}00780\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00781}00781\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00782}00782\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00783}00783\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}SELECT\ \$this-\/>dataCol,\ \$this-\/>lifetimeCol\ FROM\ \$this-\/>table\ WHERE\ \$this-\/>idCol\ =\ :id"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00784}00784\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00785}00785\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00789}00789\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getInsertStatement(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId,\ \textcolor{keywordtype}{string}\ \$sessionData,\ \textcolor{keywordtype}{int}\ \$maxlifetime):\ \(\backslash\)PDOStatement}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00790}00790\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00791}00791\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$this-\/>driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00792}00792\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'oci'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00793}00793\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ fopen(\textcolor{stringliteral}{'php://memory'},\ \textcolor{stringliteral}{'r+'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00794}00794\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fwrite(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$sessionData);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00795}00795\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rewind(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00796}00796\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sql\ =\ \textcolor{stringliteral}{"{}INSERT\ INTO\ \$this-\/>table\ (\$this-\/>idCol,\ \$this-\/>dataCol,\ \$this-\/>lifetimeCol,\ \$this-\/>timeCol)\ VALUES\ (:id,\ EMPTY\_BLOB(),\ :expiry,\ :time)\ RETURNING\ \$this-\/>dataCol\ into\ :data"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00797}00797\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00798}00798\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00799}00799\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \$sessionData;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00800}00800\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sql\ =\ \textcolor{stringliteral}{"{}INSERT\ INTO\ \$this-\/>table\ (\$this-\/>idCol,\ \$this-\/>dataCol,\ \$this-\/>lifetimeCol,\ \$this-\/>timeCol)\ VALUES\ (:id,\ :data,\ :expiry,\ :time)"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00801}00801\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00802}00802\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00803}00803\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00804}00804\ \ \ \ \ \ \ \ \ \$stmt\ =\ \$this-\/>pdo-\/>prepare(\$sql);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00805}00805\ \ \ \ \ \ \ \ \ \$stmt-\/>bindParam(\textcolor{stringliteral}{':id'},\ \$sessionId,\ \(\backslash\)PDO::PARAM\_STR);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00806}00806\ \ \ \ \ \ \ \ \ \$stmt-\/>bindParam(\textcolor{stringliteral}{':data'},\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \(\backslash\)PDO::PARAM\_LOB);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00807}00807\ \ \ \ \ \ \ \ \ \$stmt-\/>bindValue(\textcolor{stringliteral}{':expiry'},\ time()\ +\ \$maxlifetime,\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00808}00808\ \ \ \ \ \ \ \ \ \$stmt-\/>bindValue(\textcolor{stringliteral}{':time'},\ time(),\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00809}00809\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00810}00810\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$stmt;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00811}00811\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00812}00812\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00816}00816\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getUpdateStatement(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId,\ \textcolor{keywordtype}{string}\ \$sessionData,\ \textcolor{keywordtype}{int}\ \$maxlifetime):\ \(\backslash\)PDOStatement}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00817}00817\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00818}00818\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$this-\/>driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00819}00819\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'oci'}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00820}00820\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ fopen(\textcolor{stringliteral}{'php://memory'},\ \textcolor{stringliteral}{'r+'});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00821}00821\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fwrite(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$sessionData);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00822}00822\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rewind(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00823}00823\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sql\ =\ \textcolor{stringliteral}{"{}UPDATE\ \$this-\/>table\ SET\ \$this-\/>dataCol\ =\ EMPTY\_BLOB(),\ \$this-\/>lifetimeCol\ =\ :expiry,\ \$this-\/>timeCol\ =\ :time\ WHERE\ \$this-\/>idCol\ =\ :id\ RETURNING\ \$this-\/>dataCol\ into\ :data"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00824}00824\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00825}00825\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00826}00826\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \$sessionData;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00827}00827\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sql\ =\ \textcolor{stringliteral}{"{}UPDATE\ \$this-\/>table\ SET\ \$this-\/>dataCol\ =\ :data,\ \$this-\/>lifetimeCol\ =\ :expiry,\ \$this-\/>timeCol\ =\ :time\ WHERE\ \$this-\/>idCol\ =\ :id"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00828}00828\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00829}00829\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00830}00830\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00831}00831\ \ \ \ \ \ \ \ \ \$stmt\ =\ \$this-\/>pdo-\/>prepare(\$sql);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00832}00832\ \ \ \ \ \ \ \ \ \$stmt-\/>bindParam(\textcolor{stringliteral}{':id'},\ \$sessionId,\ \(\backslash\)PDO::PARAM\_STR);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00833}00833\ \ \ \ \ \ \ \ \ \$stmt-\/>bindParam(\textcolor{stringliteral}{':data'},\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \(\backslash\)PDO::PARAM\_LOB);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00834}00834\ \ \ \ \ \ \ \ \ \$stmt-\/>bindValue(\textcolor{stringliteral}{':expiry'},\ time()\ +\ \$maxlifetime,\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00835}00835\ \ \ \ \ \ \ \ \ \$stmt-\/>bindValue(\textcolor{stringliteral}{':time'},\ time(),\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00836}00836\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00837}00837\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$stmt;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00838}00838\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00839}00839\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00843}00843\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getMergeStatement(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId,\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \textcolor{keywordtype}{int}\ \$maxlifetime):\ ?\(\backslash\)PDOStatement}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00844}00844\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00845}00845\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00846}00846\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'mysql'}\ ===\ \$this-\/>driver:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00847}00847\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeSql\ =\ \textcolor{stringliteral}{"{}INSERT\ INTO\ \$this-\/>table\ (\$this-\/>idCol,\ \$this-\/>dataCol,\ \$this-\/>lifetimeCol,\ \$this-\/>timeCol)\ VALUES\ (:id,\ :data,\ :expiry,\ :time)\ "{}}.}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00848}00848\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ON\ DUPLICATE\ KEY\ UPDATE\ \$this-\/>dataCol\ =\ VALUES(\$this-\/>dataCol),\ \$this-\/>lifetimeCol\ =\ VALUES(\$this-\/>lifetimeCol),\ \$this-\/>timeCol\ =\ VALUES(\$this-\/>timeCol)"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00849}00849\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00850}00850\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'sqlsrv'}\ ===\ \$this-\/>driver\ \&\&\ version\_compare(\$this-\/>pdo-\/>getAttribute(\(\backslash\)PDO::ATTR\_SERVER\_VERSION),\ \textcolor{stringliteral}{'10'},\ \textcolor{stringliteral}{'>='}):}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00851}00851\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ MERGE\ is\ only\ available\ since\ SQL\ Server\ 2008\ and\ must\ be\ terminated\ by\ semicolon}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00852}00852\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ It\ also\ requires\ HOLDLOCK\ according\ to\ https://weblogs.sqlteam.com/dang/2009/01/31/upsert-\/race-\/condition-\/with-\/merge/}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00853}00853\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeSql\ =\ \textcolor{stringliteral}{"{}MERGE\ INTO\ \$this-\/>table\ WITH\ (HOLDLOCK)\ USING\ (SELECT\ 1\ AS\ dummy)\ AS\ src\ ON\ (\$this-\/>idCol\ =\ ?)\ "{}}.}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00854}00854\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}WHEN\ NOT\ MATCHED\ THEN\ INSERT\ (\$this-\/>idCol,\ \$this-\/>dataCol,\ \$this-\/>lifetimeCol,\ \$this-\/>timeCol)\ VALUES\ (?,\ ?,\ ?,\ ?)\ "{}}.}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00855}00855\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}WHEN\ MATCHED\ THEN\ UPDATE\ SET\ \$this-\/>dataCol\ =\ ?,\ \$this-\/>lifetimeCol\ =\ ?,\ \$this-\/>timeCol\ =\ ?;"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00856}00856\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00857}00857\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'sqlite'}\ ===\ \$this-\/>driver:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00858}00858\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeSql\ =\ \textcolor{stringliteral}{"{}INSERT\ OR\ REPLACE\ INTO\ \$this-\/>table\ (\$this-\/>idCol,\ \$this-\/>dataCol,\ \$this-\/>lifetimeCol,\ \$this-\/>timeCol)\ VALUES\ (:id,\ :data,\ :expiry,\ :time)"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00859}00859\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00860}00860\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'pgsql'}\ ===\ \$this-\/>driver\ \&\&\ version\_compare(\$this-\/>pdo-\/>getAttribute(\(\backslash\)PDO::ATTR\_SERVER\_VERSION),\ \textcolor{stringliteral}{'9.5'},\ \textcolor{stringliteral}{'>='}):}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00861}00861\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeSql\ =\ \textcolor{stringliteral}{"{}INSERT\ INTO\ \$this-\/>table\ (\$this-\/>idCol,\ \$this-\/>dataCol,\ \$this-\/>lifetimeCol,\ \$this-\/>timeCol)\ VALUES\ (:id,\ :data,\ :expiry,\ :time)\ "{}}.}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00862}00862\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}ON\ CONFLICT\ (\$this-\/>idCol)\ DO\ UPDATE\ SET\ (\$this-\/>dataCol,\ \$this-\/>lifetimeCol,\ \$this-\/>timeCol)\ =\ (EXCLUDED.\$this-\/>dataCol,\ EXCLUDED.\$this-\/>lifetimeCol,\ EXCLUDED.\$this-\/>timeCol)"{}};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00863}00863\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00864}00864\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00865}00865\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ MERGE\ is\ not\ supported\ with\ LOBs:\ https://oracle.com/technetwork/articles/fuecks-\/lobs-\/095315.html}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00866}00866\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00867}00867\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00868}00868\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00869}00869\ \ \ \ \ \ \ \ \ \$mergeStmt\ =\ \$this-\/>pdo-\/>prepare(\$mergeSql);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00870}00870\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00871}00871\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'sqlsrv'}\ ===\ \$this-\/>driver)\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00872}00872\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>bindParam(1,\ \$sessionId,\ \(\backslash\)PDO::PARAM\_STR);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00873}00873\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>bindParam(2,\ \$sessionId,\ \(\backslash\)PDO::PARAM\_STR);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00874}00874\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>bindParam(3,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \(\backslash\)PDO::PARAM\_LOB);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00875}00875\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>bindValue(4,\ time()\ +\ \$maxlifetime,\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00876}00876\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>bindValue(5,\ time(),\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00877}00877\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>bindParam(6,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \(\backslash\)PDO::PARAM\_LOB);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00878}00878\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>bindValue(7,\ time()\ +\ \$maxlifetime,\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00879}00879\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>bindValue(8,\ time(),\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00880}00880\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00881}00881\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>bindParam(\textcolor{stringliteral}{':id'},\ \$sessionId,\ \(\backslash\)PDO::PARAM\_STR);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00882}00882\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>bindParam(\textcolor{stringliteral}{':data'},\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \(\backslash\)PDO::PARAM\_LOB);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00883}00883\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>bindValue(\textcolor{stringliteral}{':expiry'},\ time()\ +\ \$maxlifetime,\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00884}00884\ \ \ \ \ \ \ \ \ \ \ \ \ \$mergeStmt-\/>bindValue(\textcolor{stringliteral}{':time'},\ time(),\ \(\backslash\)PDO::PARAM\_INT);}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00885}00885\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00886}00886\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00887}00887\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$mergeStmt;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00888}00888\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00889}00889\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00893}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ab7a0a080d0e721c656eef11cd641638b}{00893}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_pdo_session_handler_ab7a0a080d0e721c656eef11cd641638b}{getConnection}}():\ \(\backslash\)PDO}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00894}00894\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00895}00895\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>pdo))\ \{}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00896}00896\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>connect(\$this-\/>dsn\ ?:\ \(\backslash\)ini\_get(\textcolor{stringliteral}{'session.save\_path'}));}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00897}00897\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00898}00898\ }
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00899}00899\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>pdo;}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00900}00900\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pdo_session_handler_8php_source_l00901}00901\ \}}
+
+\end{DoxyCode}

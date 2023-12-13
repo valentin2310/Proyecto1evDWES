@@ -1,0 +1,146 @@
+\doxysection{Retry\+Command.\+php}
+\hypertarget{_retry_command_8php_source}{}\label{_retry_command_8php_source}\index{vendor/laravel/framework/src/Illuminate/Queue/Console/RetryCommand.php@{vendor/laravel/framework/src/Illuminate/Queue/Console/RetryCommand.php}}
+\mbox{\hyperlink{_retry_command_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_queue_1_1_console}{Illuminate\(\backslash\)Queue\(\backslash\)Console}};}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00005}00005\ use\ DateTimeInterface;}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00006}00006\ use\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_command}{Illuminate\(\backslash\)Console\(\backslash\)Command}};}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00007}00007\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_encryption_1_1_encrypter}{Illuminate\(\backslash\)Contracts\(\backslash\)Encryption\(\backslash\)Encrypter}};}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_retry_requested}{Illuminate\(\backslash\)Queue\(\backslash\)Events\(\backslash\)JobRetryRequested}};}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_arr}{Illuminate\(\backslash\)Support\(\backslash\)Arr}};}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00010}00010\ use\ RuntimeException;}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_attribute_1_1_as_command}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Attribute\(\backslash\)AsCommand}};}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00013}00013\ \textcolor{preprocessor}{\#[AsCommand(name:\ 'queue:retry')]}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00014}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command}{00014}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command}{RetryCommand}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_command}{Command}}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00015}00015\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00021}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a8f34ca1e46a621ab10a3a40addb794f5}{00021}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a8f34ca1e46a621ab10a3a40addb794f5}{\$signature}}\ =\ \textcolor{stringliteral}{'queue:retry}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00022}00022\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{id?*\ :\ The\ ID\ of\ the\ failed\ job\ or\ "{}all"{}\ to\ retry\ all\ jobs\}}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00023}00023\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/-\/queue=\ :\ Retry\ all\ of\ the\ failed\ jobs\ for\ the\ specified\ queue\}}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00024}00024\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/-\/range=*\ :\ Range\ of\ job\ IDs\ (numeric)\ to\ be\ retried\ (e.g.\ 1-\/5)\}'};}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00031}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a87b032cba06009e3467abf1c8018d960}{00031}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a87b032cba06009e3467abf1c8018d960}{\$description}}\ =\ \textcolor{stringliteral}{'Retry\ a\ failed\ queue\ job'};}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00038}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a66eb7514ea7f7f8a5738a180b14e9b48}{00038}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a66eb7514ea7f7f8a5738a180b14e9b48}{handle}}()}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00039}00039\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \$jobsFound\ =\ count(\$ids\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a35b7b0d1889bd1a6b197d4958c37c2cb}{getJobIds}}())\ >\ 0;}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$jobsFound)\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>info(\textcolor{stringliteral}{'Pushing\ failed\ queue\ jobs\ back\ onto\ the\ queue.'});}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$ids\ as\ \$id)\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}\ =\ \$this-\/>laravel[\textcolor{stringliteral}{'queue.failer'}]-\/>find(\$id);}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>error(\textcolor{stringliteral}{"{}Unable\ to\ find\ failed\ job\ with\ ID\ [\{\$id\}]."{}});}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>laravel[\textcolor{stringliteral}{'events'}]-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_events_1_1_job_retry_requested}{JobRetryRequested}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}));}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>task(\$id,\ fn\ ()\ =>\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a559995dc4564738b7a47f5349ba1a072}{retryJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}));}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>laravel[\textcolor{stringliteral}{'queue.failer'}]-\/>forget(\$id);}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \$jobsFound\ ?\ \$this-\/>newLine()\ :\ \$this-\/>components-\/>info(\textcolor{stringliteral}{'No\ retryable\ jobs\ found.'});}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00061}00061\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00068}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a35b7b0d1889bd1a6b197d4958c37c2cb}{00068}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a35b7b0d1889bd1a6b197d4958c37c2cb}{getJobIds}}()}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00069}00069\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \$ids\ =\ (array)\ \$this-\/>argument(\textcolor{stringliteral}{'id'});}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$ids)\ ===\ 1\ \&\&\ \$ids[0]\ ===\ \textcolor{stringliteral}{'all'})\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Arr::pluck(\$this-\/>laravel[\textcolor{stringliteral}{'queue.failer'}]-\/>all(),\ \textcolor{stringliteral}{'id'});}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$queue\ =\ \$this-\/>option(\textcolor{stringliteral}{'queue'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a8ec96b44a0710e102383494a1be329c7}{getJobIdsByQueue}}(\$queue);}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$ranges\ =\ (array)\ \$this-\/>option(\textcolor{stringliteral}{'range'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \$ids\ =\ array\_merge(\$ids,\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_ad3a8f08b041efcf2a79d8bf1daa85618}{getJobIdsByRanges}}(\$ranges));}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_values(array\_filter(array\_unique(\$ids)));}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00085}00085\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00093}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a8ec96b44a0710e102383494a1be329c7}{00093}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a8ec96b44a0710e102383494a1be329c7}{getJobIdsByQueue}}(\$queue)}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00094}00094\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \$ids\ =\ collect(\$this-\/>laravel[\textcolor{stringliteral}{'queue.failer'}]-\/>all())}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>where(\textcolor{stringliteral}{'queue'},\ \$queue)}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>pluck(\textcolor{stringliteral}{'id'})}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>toArray();}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$ids)\ ===\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>error(\textcolor{stringliteral}{"{}Unable\ to\ find\ failed\ jobs\ for\ queue\ [\{\$queue\}]."{}});}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$ids;}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00105}00105\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00113}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_ad3a8f08b041efcf2a79d8bf1daa85618}{00113}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_ad3a8f08b041efcf2a79d8bf1daa85618}{getJobIdsByRanges}}(array\ \$ranges)}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00114}00114\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \$ids\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$ranges\ as\ \$range)\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (preg\_match(\textcolor{stringliteral}{'/\string^[0-\/9]+\(\backslash\)-\/[0-\/9]+\$/'},\ \$range))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$ids\ =\ array\_merge(\$ids,\ range(...explode(\textcolor{charliteral}{'-\/'},\ \$range)));}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$ids;}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00124}00124\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00132}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a559995dc4564738b7a47f5349ba1a072}{00132}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a559995dc4564738b7a47f5349ba1a072}{retryJob}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00133}00133\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \$this-\/>laravel[\textcolor{stringliteral}{'queue'}]-\/>connection(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>connection)-\/>pushRaw(}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a647bbdcbbca64a37bc89c3c6cb8ce23b}{refreshRetryUntil}}(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_adc2a65f47c3ff725770e97c1fd82b9a4}{resetAttempts}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>payload)),\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>queue}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00137}00137\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00147}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_adc2a65f47c3ff725770e97c1fd82b9a4}{00147}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_adc2a65f47c3ff725770e97c1fd82b9a4}{resetAttempts}}(\$payload)}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00148}00148\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \$payload\ =\ json\_decode(\$payload,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$payload[\textcolor{stringliteral}{'attempts'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \$payload[\textcolor{stringliteral}{'attempts'}]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ json\_encode(\$payload);}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00156}00156\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00166}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a647bbdcbbca64a37bc89c3c6cb8ce23b}{00166}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_console_1_1_retry_command_a647bbdcbbca64a37bc89c3c6cb8ce23b}{refreshRetryUntil}}(\$payload)}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00167}00167\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \$payload\ =\ json\_decode(\$payload,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ isset(\$payload[\textcolor{stringliteral}{'data'}][\textcolor{stringliteral}{'command'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ json\_encode(\$payload);}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\$payload[\textcolor{stringliteral}{'data'}][\textcolor{stringliteral}{'command'}],\ \textcolor{stringliteral}{'O:'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \$instance\ =\ unserialize(\$payload[\textcolor{stringliteral}{'data'}][\textcolor{stringliteral}{'command'}]);}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$this-\/>laravel-\/>bound(Encrypter::class))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \$instance\ =\ unserialize(\$this-\/>laravel-\/>make(Encrypter::class)-\/>decrypt(\$payload[\textcolor{stringliteral}{'data'}][\textcolor{stringliteral}{'command'}]));}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ isset(\$instance))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(\textcolor{stringliteral}{'Unable\ to\ extract\ job\ payload.'});}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_object(\$instance)\ \&\&\ !\ \$instance\ instanceof\ \(\backslash\)\_\_PHP\_Incomplete\_Class\ \&\&\ method\_exists(\$instance,\ \textcolor{stringliteral}{'retryUntil'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \$retryUntil\ =\ \$instance-\/>retryUntil();}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \$payload[\textcolor{stringliteral}{'retryUntil'}]\ =\ \$retryUntil\ instanceof\ DateTimeInterface}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$retryUntil-\/>getTimestamp()}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$retryUntil;}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ json\_encode(\$payload);}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00193}00193\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_command_8php_source_l00194}00194\ \}}
+
+\end{DoxyCode}

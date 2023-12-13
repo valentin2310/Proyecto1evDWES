@@ -1,0 +1,187 @@
+\doxysection{Profiler.\+php}
+\hypertarget{_profiler_8php_source}{}\label{_profiler_8php_source}\index{vendor/symfony/http-\/kernel/Profiler/Profiler.php@{vendor/symfony/http-\/kernel/Profiler/Profiler.php}}
+\mbox{\hyperlink{_profiler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_http_kernel_1_1_profiler}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)Profiler}};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00014}00014\ use\ \mbox{\hyperlink{interface_psr_1_1_log_1_1_logger_interface}{Psr\(\backslash\)Log\(\backslash\)LoggerInterface}};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_exception_1_1_conflicting_headers_exception}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)Exception\(\backslash\)ConflictingHeadersException}};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)Request}};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_response}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)Response}};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00018}00018\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_http_kernel_1_1_data_collector_1_1_data_collector_interface}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)DataCollector\(\backslash\)DataCollectorInterface}};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00019}00019\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_http_kernel_1_1_data_collector_1_1_late_data_collector_interface}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)DataCollector\(\backslash\)LateDataCollectorInterface}};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00020}00020\ use\ \mbox{\hyperlink{interface_symfony_1_1_contracts_1_1_service_1_1_reset_interface}{Symfony\(\backslash\)Contracts\(\backslash\)Service\(\backslash\)ResetInterface}};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00027}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler}{00027}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler}{Profiler}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_symfony_1_1_contracts_1_1_service_1_1_reset_interface}{ResetInterface}}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00028}00028\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_storage_interface}{ProfilerStorageInterface}}\ \$storage;}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00034}00034\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$collectors\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{private}\ ?\mbox{\hyperlink{interface_psr_1_1_log_1_1_logger_interface}{LoggerInterface}}\ \$logger;}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00037}00037\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$initiallyEnabled\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00038}00038\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$enabled\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00040}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a2dcebbf63f2f34013f8777568d46891c}{00040}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a2dcebbf63f2f34013f8777568d46891c}{\_\_construct}}(\mbox{\hyperlink{interface_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_storage_interface}{ProfilerStorageInterface}}\ \$storage,\ \mbox{\hyperlink{interface_psr_1_1_log_1_1_logger_interface}{LoggerInterface}}\ \$logger\ =\ \textcolor{keyword}{null},\ \textcolor{keywordtype}{bool}\ \$enable\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00041}00041\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \$this-\/>storage\ =\ \$storage;}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \$this-\/>logger\ =\ \$logger;}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \$this-\/>initiallyEnabled\ =\ \$this-\/>enabled\ =\ \$enable;}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00045}00045\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00052}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a545341e59cc9a0dafc4e265d60d4b5d6}{00052}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a545341e59cc9a0dafc4e265d60d4b5d6}{disable}}()}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00053}00053\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \$this-\/>enabled\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00055}00055\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00062}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a91e658a6e3fccc3028f2d71122bc4b8f}{00062}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a91e658a6e3fccc3028f2d71122bc4b8f}{enable}}()}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00063}00063\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \$this-\/>enabled\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00065}00065\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00067}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_ad734dc60b64a242fe183e0c23b192790}{00067}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_ad734dc60b64a242fe183e0c23b192790}{isEnabled}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00068}00068\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>enabled;}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00075}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a5aff9244ae6a83d65e53243370e62c54}{00075}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a5aff9244ae6a83d65e53243370e62c54}{loadProfileFromResponse}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_response}{Response}}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}):\ ?\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profile}{Profile}}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00076}00076\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$token\ =\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>get(\textcolor{stringliteral}{'X-\/Debug-\/Token'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a3b8f3a304d702f33557d17bf8b9a1342}{loadProfile}}(\$token);}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00082}00082\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00087}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a3b8f3a304d702f33557d17bf8b9a1342}{00087}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a3b8f3a304d702f33557d17bf8b9a1342}{loadProfile}}(\textcolor{keywordtype}{string}\ \$token):\ ?\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profile}{Profile}}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00088}00088\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>storage-\/>read(\$token);}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00090}00090\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00095}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_ae70d5d74369453d0bcb9a03b247d16b8}{00095}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_ae70d5d74369453d0bcb9a03b247d16b8}{saveProfile}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profile}{Profile}}\ \$profile):\ bool}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00096}00096\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ late\ collect}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$profile-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profile_a89d16306c30c86c0257ccac93a3c4fd3}{getCollectors}}()\ as\ \$collector)\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$collector\ instanceof\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_http_kernel_1_1_data_collector_1_1_late_data_collector_interface}{LateDataCollectorInterface}})\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$collector-\/>lateCollect();}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(\$ret\ =\ \$this-\/>storage-\/>write(\$profile))\ \&\&\ \textcolor{keyword}{null}\ !==\ \$this-\/>logger)\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>logger-\/>warning(\textcolor{stringliteral}{'Unable\ to\ store\ the\ profiler\ information.'},\ [\textcolor{stringliteral}{'configured\_storage'}\ =>\ \$this-\/>storage::class]);}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$ret;}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00109}00109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00116}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_ac400be513972a68ea08ef845d5b16824}{00116}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_ac400be513972a68ea08ef845d5b16824}{purge}}()}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00117}00117\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \$this-\/>storage-\/>purge();}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00119}00119\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00130}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a8ce5007de31ab4c50776a01bc7a02548}{00130}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a8ce5007de31ab4c50776a01bc7a02548}{find}}(?\textcolor{keywordtype}{string}\ \$ip,\ ?\textcolor{keywordtype}{string}\ \$url,\ ?\textcolor{keywordtype}{int}\ \$limit,\ ?\textcolor{keywordtype}{string}\ \$method,\ ?\textcolor{keywordtype}{string}\ \$start,\ ?\textcolor{keywordtype}{string}\ \$end,\ \textcolor{keywordtype}{string}\ \$statusCode\ =\ \textcolor{keyword}{null}):\ array}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00131}00131\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>storage-\/>find(\$ip,\ \$url,\ \$limit,\ \$method,\ \$this-\/>getTimestamp(\$start),\ \$this-\/>getTimestamp(\$end),\ \$statusCode);}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00133}00133\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00138}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a209c4b2052bd9e015d24a64b2eaa163b}{00138}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a209c4b2052bd9e015d24a64b2eaa163b}{collect}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request,\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_response}{Response}}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}},\ \(\backslash\)Throwable\ \$exception\ =\ \textcolor{keyword}{null}):\ ?\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profile}{Profile}}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00139}00139\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{false}\ ===\ \$this-\/>enabled)\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \$profile\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profile}{Profile}}(substr(hash(\textcolor{stringliteral}{'sha256'},\ uniqid(mt\_rand(),\ \textcolor{keyword}{true})),\ 0,\ 6));}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \$profile-\/>setTime(time());}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \$profile-\/>setUrl(\$request-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request_a2ac86cae38fbe15a019d075d485ab702}{getUri}}());}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \$profile-\/>setMethod(\$request-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request_af3e37e1a6ed9b8c87f86f659873a83b7}{getMethod}}());}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \$profile-\/>setStatusCode(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getStatusCode());}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \$profile-\/>setIp(\$request-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request_a634fd25e27c51441792513975338839f}{getClientIp}}());}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_exception_1_1_conflicting_headers_exception}{ConflictingHeadersException}})\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \$profile-\/>setIp(\textcolor{stringliteral}{'Unknown'});}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$prevToken\ =\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>get(\textcolor{stringliteral}{'X-\/Debug-\/Token'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>set(\textcolor{stringliteral}{'X-\/Previous-\/Debug-\/Token'},\ \$prevToken);}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>set(\textcolor{stringliteral}{'X-\/Debug-\/Token'},\ \$profile-\/>getToken());}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>collectors\ as\ \$collector)\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \$collector-\/>collect(\$request,\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}},\ \$exception);}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ need\ to\ clone\ for\ sub-\/requests}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \$profile-\/>addCollector(clone\ \$collector);}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$profile;}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00169}00169\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00174}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a4a20559544fdf4dcb457e258dc976cf8}{00174}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a4a20559544fdf4dcb457e258dc976cf8}{reset}}()}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00175}00175\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>collectors\ as\ \$collector)\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \$collector-\/>reset();}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \$this-\/>enabled\ =\ \$this-\/>initiallyEnabled;}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00180}00180\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00185}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_af9d14e4ae6227970ad603987781573ca}{00185}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_af9d14e4ae6227970ad603987781573ca}{all}}():\ array}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00186}00186\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>collectors;}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00188}00188\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00197}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a700b9bdf86da531996745544f95eb0d2}{00197}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{set}(array\ \$collectors\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00198}00198\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \$this-\/>collectors\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$collectors\ as\ \$collector)\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_afc19a89e4692ef4abb9bcd952321136f}{add}}(\$collector);}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00203}00203\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00210}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_afc19a89e4692ef4abb9bcd952321136f}{00210}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_afc19a89e4692ef4abb9bcd952321136f}{add}}(\mbox{\hyperlink{interface_symfony_1_1_component_1_1_http_kernel_1_1_data_collector_1_1_data_collector_interface}{DataCollectorInterface}}\ \$collector)}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00211}00211\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \$this-\/>collectors[\$collector-\/>\mbox{\hyperlink{interface_symfony_1_1_component_1_1_http_kernel_1_1_data_collector_1_1_data_collector_interface_a3d0963e68bb313b163a73f2803c64600}{getName}}()]\ =\ \$collector;}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00213}00213\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00220}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a36c5aea84ecb000ab035e47ec3f351c3}{00220}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a36c5aea84ecb000ab035e47ec3f351c3}{has}}(\textcolor{keywordtype}{string}\ \$name):\ bool}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00221}00221\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ isset(\$this-\/>collectors[\$name]);}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00223}00223\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00232}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_profiler_1_1_profiler_a004397797e263171281784084cf4a502}{00232}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{get}(\textcolor{keywordtype}{string}\ \$name):\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_http_kernel_1_1_data_collector_1_1_data_collector_interface}{DataCollectorInterface}}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00233}00233\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>collectors[\$name]))\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(sprintf(\textcolor{stringliteral}{'Collector\ "{}\%s"{}\ does\ not\ exist.'},\ \$name));}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>collectors[\$name];}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00239}00239\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00241}00241\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getTimestamp(?\textcolor{keywordtype}{string}\ \$value):\ ?int}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00242}00242\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$value\ ||\ \textcolor{stringliteral}{''}\ ===\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ new\ \(\backslash\)DateTimeImmutable(is\_numeric(\$value)\ ?\ \textcolor{charliteral}{'@'}.\$value\ :\ \$value);}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Exception)\ \{}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value-\/>getTimestamp();}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00254}00254\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_profiler_8php_source_l00255}00255\ \}}
+
+\end{DoxyCode}

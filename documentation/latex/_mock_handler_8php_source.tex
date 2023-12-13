@@ -1,0 +1,163 @@
+\doxysection{Mock\+Handler.\+php}
+\hypertarget{_mock_handler_8php_source}{}\label{_mock_handler_8php_source}\index{vendor/guzzlehttp/guzzle/src/Handler/MockHandler.php@{vendor/guzzlehttp/guzzle/src/Handler/MockHandler.php}}
+\mbox{\hyperlink{_mock_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_guzzle_http_1_1_handler}{GuzzleHttp\(\backslash\)Handler}};}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00005}00005\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_request_exception}{GuzzleHttp\(\backslash\)Exception\(\backslash\)RequestException}};}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00006}00006\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_stack}{GuzzleHttp\(\backslash\)HandlerStack}};}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00007}00007\ use\ \mbox{\hyperlink{namespace_guzzle_http_1_1_promise}{GuzzleHttp\(\backslash\)Promise}}\ as\ \mbox{\hyperlink{namespace_guzzle_http_1_1_promise}{P}};}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00008}00008\ use\ \mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface}{GuzzleHttp\(\backslash\)Promise\(\backslash\)PromiseInterface}};}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_transfer_stats}{GuzzleHttp\(\backslash\)TransferStats}};}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_utils}{GuzzleHttp\(\backslash\)Utils}};}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00011}00011\ use\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{Psr\(\backslash\)Http\(\backslash\)Message\(\backslash\)RequestInterface}};}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00012}00012\ use\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_response_interface}{Psr\(\backslash\)Http\(\backslash\)Message\(\backslash\)ResponseInterface}};}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00013}00013\ use\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_stream_interface}{Psr\(\backslash\)Http\(\backslash\)Message\(\backslash\)StreamInterface}};}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00020}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler}{00020}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler}{MockHandler}}\ \textcolor{keyword}{implements}\ \(\backslash\)Countable}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00021}00021\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00025}00025\ \ \ \ \ \textcolor{keyword}{private}\ \$queue\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{private}\ \$lastRequest;}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00035}00035\ \ \ \ \ \textcolor{keyword}{private}\ \$lastOptions\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00040}00040\ \ \ \ \ \textcolor{keyword}{private}\ \$onFulfilled;}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00045}00045\ \ \ \ \ \textcolor{keyword}{private}\ \$onRejected;}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00055}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_a4a41c208da1bd7c23e8743993de931e8}{00055}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_a4a41c208da1bd7c23e8743993de931e8}{createWithMiddleware}}(array\ \$queue\ =\ \textcolor{keyword}{null},\ callable\ \$onFulfilled\ =\ \textcolor{keyword}{null},\ callable\ \$onRejected\ =\ \textcolor{keyword}{null}):\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_stack}{HandlerStack}}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00056}00056\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_stack_afceaaefd6188eddce46250cbc01c1753}{HandlerStack::create}}(\textcolor{keyword}{new}\ \textcolor{keyword}{self}(\$queue,\ \$onFulfilled,\ \$onRejected));}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00058}00058\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00069}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_aa3d410709af9e4cb942042a5cf7a5af3}{00069}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_aa3d410709af9e4cb942042a5cf7a5af3}{\_\_construct}}(array\ \$queue\ =\ \textcolor{keyword}{null},\ callable\ \$onFulfilled\ =\ \textcolor{keyword}{null},\ callable\ \$onRejected\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00070}00070\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \$this-\/>onFulfilled\ =\ \$onFulfilled;}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \$this-\/>onRejected\ =\ \$onRejected;}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$queue)\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ array\_values\ included\ for\ BC}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_a35faed8cafd9b375f140d80385c59751}{append}}(...array\_values(\$queue));}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00078}00078\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00080}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_a8b41a62c59d4d0d86e7525197f2904f5}{00080}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_a8b41a62c59d4d0d86e7525197f2904f5}{\_\_invoke}}(\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{RequestInterface}}\ \$request,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}):\ \mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface}{PromiseInterface}}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00081}00081\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>queue)\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)OutOfBoundsException(\textcolor{stringliteral}{'Mock\ queue\ is\ empty'});}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'delay'}])\ \&\&\ \(\backslash\)is\_numeric(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'delay'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)usleep((\textcolor{keywordtype}{int})\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'delay'}]\ *\ 1000);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \$this-\/>lastRequest\ =\ \$request;}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \$this-\/>lastOptions\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}};}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \(\backslash\)array\_shift(\$this-\/>queue);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'on\_headers'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)is\_callable(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'on\_headers'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'on\_headers\ must\ be\ callable'});}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'on\_headers'}](\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Exception\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$msg\ =\ \textcolor{stringliteral}{'An\ error\ was\ encountered\ during\ the\ on\_headers\ event'};}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_request_exception}{RequestException}}(\$msg,\ \$request,\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}},\ \$e);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_callable(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ instanceof\ \(\backslash\)Throwable}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ P\(\backslash\)Create::rejectionFor(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ :\ P\(\backslash\)Create::promiseFor(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>then(}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{function}\ (?\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_response_interface}{ResponseInterface}}\ \$value)\ use\ (\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>invokeStats(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ \$value);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>onFulfilled)\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\$this-\/>onFulfilled)(\$value);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ !==\ \textcolor{keyword}{null}\ \&\&\ isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'sink'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$contents\ =\ (string)\ \$value-\/>\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_message_interface_ad7bab1db052fb9fcc8bd0b4f3eac29ac}{getBody}}();}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sink\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'sink'}];}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_resource(\$sink))\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)fwrite(\$sink,\ \$contents);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\(\backslash\)is\_string(\$sink))\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)file\_put\_contents(\$sink,\ \$contents);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$sink\ instanceof\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_stream_interface}{StreamInterface}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sink-\/>write(\$contents);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{function}\ (\$reason)\ use\ (\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>invokeStats(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ \textcolor{keyword}{null},\ \$reason);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>onRejected)\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\$this-\/>onRejected)(\$reason);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ P\(\backslash\)Create::rejectionFor(\$reason);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00145}00145\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00153}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_a35faed8cafd9b375f140d80385c59751}{00153}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_a35faed8cafd9b375f140d80385c59751}{append}}(...\$values):\ void}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00154}00154\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$values\ as\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ instanceof\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_response_interface}{ResponseInterface}}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ \$value\ instanceof\ \(\backslash\)Throwable}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ \$value\ instanceof\ \mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface}{PromiseInterface}}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ \(\backslash\)is\_callable(\$value)}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>queue[]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)TypeError(\textcolor{stringliteral}{'Expected\ a\ Response,\ Promise,\ Throwable\ or\ callable.\ Found\ '}.Utils::describeType(\$value));}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00166}00166\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00171}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_a0e2d8660fa4c6770655f936d3abbe6f4}{00171}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_a0e2d8660fa4c6770655f936d3abbe6f4}{getLastRequest}}():\ ?\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{RequestInterface}}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00172}00172\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>lastRequest;}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00174}00174\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00179}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_ae75434d425ecb5c7f55cf4dc0a5ac9bf}{00179}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_ae75434d425ecb5c7f55cf4dc0a5ac9bf}{getLastOptions}}():\ array}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00180}00180\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>lastOptions;}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00182}00182\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00187}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_ac751e87b3d4c4bf2feb03bee8b092755}{00187}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_ac751e87b3d4c4bf2feb03bee8b092755}{count}}():\ int}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00188}00188\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ return\ \(\backslash\)count(\$this-\/>queue);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00190}00190\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00192}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_a4a20559544fdf4dcb457e258dc976cf8}{00192}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_mock_handler_a4a20559544fdf4dcb457e258dc976cf8}{reset}}():\ void}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00193}00193\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \$this-\/>queue\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00195}00195\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00200}00200\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ invokeStats(}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{RequestInterface}}\ \$request,}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_response_interface}{ResponseInterface}}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \$reason\ =\ \textcolor{keyword}{null}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00205}00205\ \ \ \ \ ):\ void\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_ab7b0934f179386acaa4ad69fb6e3c8e6}{if}}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'on\_stats'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \$transferTime\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'transfer\_time'}]\ ??\ 0;}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \$stats\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_guzzle_http_1_1_transfer_stats}{TransferStats}}(\$request,\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}},\ \$transferTime,\ \$reason);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'on\_stats'}])(\$stats);}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00211}00211\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mock_handler_8php_source_l00212}00212\ \}}
+
+\end{DoxyCode}

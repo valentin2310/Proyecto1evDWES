@@ -1,0 +1,539 @@
+\doxysection{Queries\+Relationships.\+php}
+\hypertarget{_queries_relationships_8php_source}{}\label{_queries_relationships_8php_source}\index{vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/QueriesRelationships.php@{vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/QueriesRelationships.php}}
+\mbox{\hyperlink{_queries_relationships_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Concerns}};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00005}00005\ use\ BadMethodCallException;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00006}00006\ use\ Closure;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_builder}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Builder}};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_collection}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Collection}};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relation_not_found_exception}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)RelationNotFoundException}};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_belongs_to}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)BelongsTo}};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_morph_to}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)MorphTo}};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00012}00012\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_relation}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)Relation}};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00013}00013\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_query_1_1_builder}{Illuminate\(\backslash\)Database\(\backslash\)Query\(\backslash\)Builder}}\ as\ QueryBuilder;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_query_1_1_expression}{Illuminate\(\backslash\)Database\(\backslash\)Query\(\backslash\)Expression}};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_str}{Illuminate\(\backslash\)Support\(\backslash\)Str}};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00016}00016\ use\ InvalidArgumentException;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00018}00018\ trait\ QueriesRelationships}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00019}00019\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_testing_1_1_fluent_1_1_concerns_ac108a8b68b789243cbafb686ce9232b1}{has}}(\$relation,\ \$operator\ =\ \textcolor{stringliteral}{'>='},\ \$count\ =\ 1,\ \$boolean\ =\ \textcolor{stringliteral}{'and'},\ Closure\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00033}00033\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$relation))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$relation,\ \textcolor{charliteral}{'.'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>hasNested(\$relation,\ \$operator,\ \$count,\ \$boolean,\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ \$relation\ =\ \$this-\/>getRelationWithoutConstraints(\$relation);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$relation\ instanceof\ MorphTo)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>hasMorph(\$relation,\ [\textcolor{charliteral}{'*'}],\ \$operator,\ \$count,\ \$boolean,\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ only\ need\ to\ check\ for\ the\ existence\ of\ the\ relation,\ then\ we\ can\ optimize}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ subquery\ to\ only\ run\ a\ "{}where\ exists"{}\ clause\ instead\ of\ this\ full\ "{}count"{}}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ clause.\ This\ will\ make\ these\ queries\ run\ much\ faster\ compared\ with\ a\ count.}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_carbon_1_1_p_h_p_stan_a12661b2fc0f57f97e30a1620889ce9c6}{\$method}}\ =\ \$this-\/>canUseExistsForExistenceCheck(\$operator,\ \$count)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \textcolor{stringliteral}{'getRelationExistenceQuery'}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{stringliteral}{'getRelationExistenceCountQuery'};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \$hasQuery\ =\ \$relation-\/>\{\mbox{\hyperlink{namespace_carbon_1_1_p_h_p_stan_a12661b2fc0f57f97e30a1620889ce9c6}{\$method}}\}(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \$relation-\/>getRelated()-\/>newQueryWithoutRelationships(),\ \$this}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Next\ we\ will\ call\ any\ given\ callback\ as\ an\ "{}anonymous"{}\ scope\ so\ they\ can\ get\ the}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ proper\ logical\ grouping\ of\ the\ where\ clauses\ if\ needed\ by\ this\ Eloquent\ query}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ builder.\ Then,\ we\ will\ be\ ready\ to\ finalize\ and\ return\ this\ query\ instance.}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \$hasQuery-\/>callScope(\$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>addHasWhere(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \$hasQuery,\ \$relation,\ \$operator,\ \$count,\ \$boolean}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00067}00067\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00081}00081\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ hasNested(\$relations,\ \$operator\ =\ \textcolor{stringliteral}{'>='},\ \$count\ =\ 1,\ \$boolean\ =\ \textcolor{stringliteral}{'and'},\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00082}00082\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \$relations\ =\ explode(\textcolor{charliteral}{'.'},\ \$relations);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \$doesntHave\ =\ \$operator\ ===\ \textcolor{charliteral}{'<'}\ \&\&\ \$count\ ===\ 1;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$doesntHave)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \$operator\ =\ \textcolor{stringliteral}{'>='};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \$count\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \$closure\ =\ \textcolor{keyword}{function}\ (\$q)\ use\ (\&\$closure,\ \&\$relations,\ \$operator,\ \$count,\ \$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ In\ order\ to\ nest\ "{}has"{},\ we\ need\ to\ add\ count\ relation\ constraints\ on\ the}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ callback\ Closure.\ We'll\ do\ this\ by\ simply\ passing\ the\ Closure\ its\ own}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ reference\ to\ itself\ so\ it\ calls\ itself\ recursively\ on\ each\ segment.}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ count(\$relations)\ >\ 1}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$q-\/>whereHas(array\_shift(\$relations),\ \$closure)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$q-\/>has(array\_shift(\$relations),\ \$operator,\ \$count,\ \textcolor{stringliteral}{'and'},\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_testing_1_1_fluent_1_1_concerns_ac108a8b68b789243cbafb686ce9232b1}{has}}(array\_shift(\$relations),\ \$doesntHave\ ?\ \textcolor{charliteral}{'<'}\ :\ \textcolor{stringliteral}{'>='},\ 1,\ \$boolean,\ \$closure);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00102}00102\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00112}00112\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orHas(\$relation,\ \$operator\ =\ \textcolor{stringliteral}{'>='},\ \$count\ =\ 1)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00113}00113\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_testing_1_1_fluent_1_1_concerns_ac108a8b68b789243cbafb686ce9232b1}{has}}(\$relation,\ \$operator,\ \$count,\ \textcolor{stringliteral}{'or'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00115}00115\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00125}00125\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ doesntHave(\$relation,\ \$boolean\ =\ \textcolor{stringliteral}{'and'},\ Closure\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00126}00126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_testing_1_1_fluent_1_1_concerns_ac108a8b68b789243cbafb686ce9232b1}{has}}(\$relation,\ \textcolor{charliteral}{'<'},\ 1,\ \$boolean,\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00128}00128\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00136}00136\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orDoesntHave(\$relation)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00137}00137\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>doesntHave(\$relation,\ \textcolor{stringliteral}{'or'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00139}00139\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00150}00150\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ whereHas(\$relation,\ Closure\ \$callback\ =\ \textcolor{keyword}{null},\ \$operator\ =\ \textcolor{stringliteral}{'>='},\ \$count\ =\ 1)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00151}00151\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_testing_1_1_fluent_1_1_concerns_ac108a8b68b789243cbafb686ce9232b1}{has}}(\$relation,\ \$operator,\ \$count,\ \textcolor{stringliteral}{'and'},\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00153}00153\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00166}00166\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ withWhereHas(\$relation,\ Closure\ \$callback\ =\ \textcolor{keyword}{null},\ \$operator\ =\ \textcolor{stringliteral}{'>='},\ \$count\ =\ 1)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00167}00167\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>whereHas(Str::before(\$relation,\ \textcolor{charliteral}{':'}),\ \$callback,\ \$operator,\ \$count)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>with(\$callback\ ?\ [\$relation\ =>\ fn\ (\$query)\ =>\ \$callback(\$query)]\ :\ \$relation);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00170}00170\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00181}00181\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orWhereHas(\$relation,\ Closure\ \$callback\ =\ \textcolor{keyword}{null},\ \$operator\ =\ \textcolor{stringliteral}{'>='},\ \$count\ =\ 1)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00182}00182\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_testing_1_1_fluent_1_1_concerns_ac108a8b68b789243cbafb686ce9232b1}{has}}(\$relation,\ \$operator,\ \$count,\ \textcolor{stringliteral}{'or'},\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00184}00184\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00193}00193\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ whereDoesntHave(\$relation,\ Closure\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00194}00194\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>doesntHave(\$relation,\ \textcolor{stringliteral}{'and'},\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00196}00196\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00205}00205\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orWhereDoesntHave(\$relation,\ Closure\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00206}00206\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>doesntHave(\$relation,\ \textcolor{stringliteral}{'or'},\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00208}00208\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00221}00221\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ hasMorph(\$relation,\ \$types,\ \$operator\ =\ \textcolor{stringliteral}{'>='},\ \$count\ =\ 1,\ \$boolean\ =\ \textcolor{stringliteral}{'and'},\ Closure\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00222}00222\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$relation))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \$relation\ =\ \$this-\/>getRelationWithoutConstraints(\$relation);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \$types\ =\ (array)\ \$types;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$types\ ===\ [\textcolor{charliteral}{'*'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \$types\ =\ \$this-\/>model-\/>newModelQuery()-\/>distinct()-\/>pluck(\$relation-\/>getMorphType())-\/>filter()-\/>all();}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$types))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a31428ddb78f082c4c41e7bb4612884fc}{where}}(\textcolor{keyword}{new}\ Expression(\textcolor{charliteral}{'0'}),\ \$operator,\ \$count,\ \$boolean);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$types\ as\ \&\$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \$type\ =\ Relation::getMorphedModel(\$type)\ ??\ \$type;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a31428ddb78f082c4c41e7bb4612884fc}{where}}(\textcolor{keyword}{function}\ (\$query)\ use\ (\$relation,\ \$callback,\ \$operator,\ \$count,\ \$types)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$types\ as\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>orWhere(\textcolor{keyword}{function}\ (\$query)\ use\ (\$relation,\ \$callback,\ \$operator,\ \$count,\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$belongsTo\ =\ \$this-\/>getBelongsToRelation(\$relation,\ \$type);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$callback\ =\ \textcolor{keyword}{function}\ (\$query)\ use\ (\$callback,\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$callback(\$query,\ \$type);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>where(\$this-\/>qualifyColumn(\$relation-\/>getMorphType()),\ \textcolor{charliteral}{'='},\ (\textcolor{keyword}{new}\ \$type)-\/>getMorphClass())}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>whereHas(\$belongsTo,\ \$callback,\ \$operator,\ \$count);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \},\ \textcolor{keyword}{null},\ \textcolor{keyword}{null},\ \$boolean);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00257}00257\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00266}00266\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ getBelongsToRelation(MorphTo\ \$relation,\ \$type)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00267}00267\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \$belongsTo\ =\ Relation::noConstraints(\textcolor{keyword}{function}\ ()\ use\ (\$relation,\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>model-\/>belongsTo(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$type,}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$relation-\/>getForeignKeyName(),}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$relation-\/>getOwnerKeyName()}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \$belongsTo-\/>getQuery()-\/>mergeConstraintsFrom(\$relation-\/>getQuery());}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$belongsTo;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00279}00279\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00290}00290\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orHasMorph(\$relation,\ \$types,\ \$operator\ =\ \textcolor{stringliteral}{'>='},\ \$count\ =\ 1)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00291}00291\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>hasMorph(\$relation,\ \$types,\ \$operator,\ \$count,\ \textcolor{stringliteral}{'or'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00293}00293\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00294}00294\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00304}00304\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ doesntHaveMorph(\$relation,\ \$types,\ \$boolean\ =\ \textcolor{stringliteral}{'and'},\ Closure\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00305}00305\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00306}00306\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>hasMorph(\$relation,\ \$types,\ \textcolor{charliteral}{'<'},\ 1,\ \$boolean,\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00307}00307\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00308}00308\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00316}00316\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orDoesntHaveMorph(\$relation,\ \$types)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00317}00317\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>doesntHaveMorph(\$relation,\ \$types,\ \textcolor{stringliteral}{'or'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00319}00319\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00320}00320\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00331}00331\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ whereHasMorph(\$relation,\ \$types,\ Closure\ \$callback\ =\ \textcolor{keyword}{null},\ \$operator\ =\ \textcolor{stringliteral}{'>='},\ \$count\ =\ 1)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00332}00332\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>hasMorph(\$relation,\ \$types,\ \$operator,\ \$count,\ \textcolor{stringliteral}{'and'},\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00334}00334\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00346}00346\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orWhereHasMorph(\$relation,\ \$types,\ Closure\ \$callback\ =\ \textcolor{keyword}{null},\ \$operator\ =\ \textcolor{stringliteral}{'>='},\ \$count\ =\ 1)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00347}00347\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>hasMorph(\$relation,\ \$types,\ \$operator,\ \$count,\ \textcolor{stringliteral}{'or'},\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00349}00349\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00350}00350\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00359}00359\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ whereDoesntHaveMorph(\$relation,\ \$types,\ Closure\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00360}00360\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>doesntHaveMorph(\$relation,\ \$types,\ \textcolor{stringliteral}{'and'},\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00362}00362\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00363}00363\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00372}00372\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orWhereDoesntHaveMorph(\$relation,\ \$types,\ Closure\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00373}00373\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00374}00374\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>doesntHaveMorph(\$relation,\ \$types,\ \textcolor{stringliteral}{'or'},\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00375}00375\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00376}00376\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00386}00386\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ whereRelation(\$relation,\ \$column,\ \$operator\ =\ \textcolor{keyword}{null},\ \$value\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00387}00387\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>whereHas(\$relation,\ \textcolor{keyword}{function}\ (\$query)\ use\ (\$column,\ \$operator,\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$column\ instanceof\ Closure)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_validation_1_1_rules_a60e9ae05178c483ab3d9ff5c2399a463}{\$column}}(\$query);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>where(\$column,\ \$operator,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00395}00395\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00396}00396\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00406}00406\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orWhereRelation(\$relation,\ \$column,\ \$operator\ =\ \textcolor{keyword}{null},\ \$value\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00407}00407\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>orWhereHas(\$relation,\ \textcolor{keyword}{function}\ (\$query)\ use\ (\$column,\ \$operator,\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$column\ instanceof\ Closure)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_validation_1_1_rules_a60e9ae05178c483ab3d9ff5c2399a463}{\$column}}(\$query);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>where(\$column,\ \$operator,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00413}00413\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00414}00414\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00415}00415\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00427}00427\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ whereMorphRelation(\$relation,\ \$types,\ \$column,\ \$operator\ =\ \textcolor{keyword}{null},\ \$value\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00428}00428\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00429}00429\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>whereHasMorph(\$relation,\ \$types,\ \textcolor{keyword}{function}\ (\$query)\ use\ (\$column,\ \$operator,\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>where(\$column,\ \$operator,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00432}00432\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00433}00433\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00444}00444\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orWhereMorphRelation(\$relation,\ \$types,\ \$column,\ \$operator\ =\ \textcolor{keyword}{null},\ \$value\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00445}00445\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00446}00446\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>orWhereHasMorph(\$relation,\ \$types,\ \textcolor{keyword}{function}\ (\$query)\ use\ (\$column,\ \$operator,\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00447}00447\ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>where(\$column,\ \$operator,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00448}00448\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00449}00449\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00450}00450\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00458}00458\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ whereMorphedTo(\$relation,\ \$model,\ \$boolean\ =\ \textcolor{stringliteral}{'and'})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00459}00459\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00460}00460\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$relation))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \ \ \$relation\ =\ \$this-\/>getRelationWithoutConstraints(\$relation);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00463}00463\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$model))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af9e57944e833d6ab297d591107b4dbe5}{whereNull}}(\$relation-\/>getMorphType(),\ \$boolean);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00468}00468\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$model))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \ \ \$morphMap\ =\ Relation::morphMap();}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00470}00470\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ empty(\$morphMap)\ \&\&\ in\_array(\$model,\ \$morphMap))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$model\ =\ array\_search(\$model,\ \$morphMap,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00474}00474\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a31428ddb78f082c4c41e7bb4612884fc}{where}}(\$relation-\/>getMorphType(),\ \$model,\ \textcolor{keyword}{null},\ \$boolean);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00477}00477\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a31428ddb78f082c4c41e7bb4612884fc}{where}}(\textcolor{keyword}{function}\ (\$query)\ use\ (\$relation,\ \$model)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>where(\$relation-\/>getMorphType(),\ \$model-\/>getMorphClass())}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>where(\$relation-\/>getForeignKeyName(),\ \$model-\/>getKey());}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ \},\ \textcolor{keyword}{null},\ \textcolor{keyword}{null},\ \$boolean);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00482}00482\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00483}00483\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00491}00491\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ whereNotMorphedTo(\$relation,\ \$model,\ \$boolean\ =\ \textcolor{stringliteral}{'and'})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00492}00492\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00493}00493\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$relation))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \ \ \ \ \$relation\ =\ \$this-\/>getRelationWithoutConstraints(\$relation);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00495}00495\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00496}00496\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00497}00497\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$model))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ \$morphMap\ =\ Relation::morphMap();}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00499}00499\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ empty(\$morphMap)\ \&\&\ in\_array(\$model,\ \$morphMap))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00501}00501\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$model\ =\ array\_search(\$model,\ \$morphMap,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_validation_1_1_rules_a44da966068991cdf78acc02fe355cfc2}{whereNot}}(\$relation-\/>getMorphType(),\ \textcolor{stringliteral}{'<=>'},\ \$model,\ \$boolean);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00505}00505\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00506}00506\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00507}00507\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_validation_1_1_rules_a44da966068991cdf78acc02fe355cfc2}{whereNot}}(\textcolor{keyword}{function}\ (\$query)\ use\ (\$relation,\ \$model)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00508}00508\ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>where(\$relation-\/>getMorphType(),\ \textcolor{stringliteral}{'<=>'},\ \$model-\/>getMorphClass())}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00509}00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>where(\$relation-\/>getForeignKeyName(),\ \textcolor{stringliteral}{'<=>'},\ \$model-\/>getKey());}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \},\ \textcolor{keyword}{null},\ \textcolor{keyword}{null},\ \$boolean);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00511}00511\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00512}00512\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00520}00520\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orWhereMorphedTo(\$relation,\ \$model)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00521}00521\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>whereMorphedTo(\$relation,\ \$model,\ \textcolor{stringliteral}{'or'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00523}00523\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00524}00524\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00532}00532\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orWhereNotMorphedTo(\$relation,\ \$model)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00533}00533\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>whereNotMorphedTo(\$relation,\ \$model,\ \textcolor{stringliteral}{'or'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00535}00535\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00536}00536\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00547}00547\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ whereBelongsTo(\$related,\ \$relationshipName\ =\ \textcolor{keyword}{null},\ \$boolean\ =\ \textcolor{stringliteral}{'and'})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00548}00548\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$related\ instanceof\ Collection)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00550}00550\ \ \ \ \ \ \ \ \ \ \ \ \ \$relatedCollection\ =\ \$related-\/>newCollection([\$related]);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00551}00551\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00552}00552\ \ \ \ \ \ \ \ \ \ \ \ \ \$relatedCollection\ =\ \$related;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00553}00553\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00554}00554\ \ \ \ \ \ \ \ \ \ \ \ \ \$related\ =\ \$relatedCollection-\/>first();}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00555}00555\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00556}00556\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00557}00557\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$relatedCollection-\/>isEmpty())\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00558}00558\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidArgumentException(\textcolor{stringliteral}{'Collection\ given\ to\ whereBelongsTo\ method\ may\ not\ be\ empty.'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00559}00559\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00560}00560\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$relationshipName\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00562}00562\ \ \ \ \ \ \ \ \ \ \ \ \ \$relationshipName\ =\ Str::camel(class\_basename(\$related));}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00563}00563\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00564}00564\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00565}00565\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00566}00566\ \ \ \ \ \ \ \ \ \ \ \ \ \$relationship\ =\ \$this-\/>model-\/>\{\$relationshipName\}();}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00567}00567\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (BadMethodCallException)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00568}00568\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relation_not_found_exception_a3223428365ad2fc60611559e1387fb38}{RelationNotFoundException::make}}(\$this-\/>model,\ \$relationshipName);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00570}00570\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00571}00571\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$relationship\ instanceof\ BelongsTo)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00572}00572\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relation_not_found_exception_a3223428365ad2fc60611559e1387fb38}{RelationNotFoundException::make}}(\$this-\/>model,\ \$relationshipName,\ BelongsTo::class);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00573}00573\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00574}00574\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00575}00575\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a5cabf3e9c84bdb1fe3e0a89cbe8a4cab}{whereIn}}(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00576}00576\ \ \ \ \ \ \ \ \ \ \ \ \ \$relationship-\/>getQualifiedForeignKeyName(),}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \ \ \ \ \$relatedCollection-\/>pluck(\$relationship-\/>getOwnerKeyName())-\/>toArray(),}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00578}00578\ \ \ \ \ \ \ \ \ \ \ \ \ \$boolean,}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00579}00579\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00580}00580\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00582}00582\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00583}00583\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00593}00593\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ orWhereBelongsTo(\$related,\ \$relationshipName\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00594}00594\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00595}00595\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>whereBelongsTo(\$related,\ \$relationshipName,\ \textcolor{stringliteral}{'or'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00596}00596\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00597}00597\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00606}00606\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ withAggregate(\$relations,\ \$column,\ \$function\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00607}00607\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00608}00608\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$relations))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00611}00611\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00612}00612\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$this-\/>query-\/>columns))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00613}00613\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>query-\/>select([\$this-\/>query-\/>from.\textcolor{stringliteral}{'.*'}]);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00614}00614\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00615}00615\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00616}00616\ \ \ \ \ \ \ \ \ \$relations\ =\ is\_array(\$relations)\ ?\ \$relations\ :\ [\$relations];}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00617}00617\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00618}00618\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>parseWithRelations(\$relations)\ as\ \$name\ =>\ \$constraints)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00619}00619\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First\ we\ will\ determine\ if\ the\ name\ has\ been\ aliased\ using\ an\ "{}as"{}\ clause\ on\ the\ name}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00620}00620\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ if\ it\ has\ we\ will\ extract\ the\ actual\ relationship\ name\ and\ the\ desired\ name\ of}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ resulting\ column.\ This\ allows\ multiple\ aggregates\ on\ the\ same\ relationships.}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ \$segments\ =\ explode(\textcolor{charliteral}{'\ '},\ \$name);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00623}00623\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$alias);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00625}00625\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00626}00626\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$segments)\ ===\ 3\ \&\&\ Str::lower(\$segments[1])\ ===\ \textcolor{stringliteral}{'as'})\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00627}00627\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}},\ \$alias]\ =\ [\$segments[0],\ \$segments[2]];}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00628}00628\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00629}00629\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00630}00630\ \ \ \ \ \ \ \ \ \ \ \ \ \$relation\ =\ \$this-\/>getRelationWithoutConstraints(\$name);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00631}00631\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00632}00632\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$function)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00633}00633\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$hashedColumn\ =\ \$this-\/>getRelationHashedColumn(\$column,\ \$relation);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00634}00634\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00635}00635\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$wrappedColumn\ =\ \$this-\/>getQuery()-\/>getGrammar()-\/>wrap(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$column\ ===\ \textcolor{charliteral}{'*'}\ ?\ \$column\ :\ \$relation-\/>getRelated()-\/>qualifyColumn(\$hashedColumn)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00638}00638\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00639}00639\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$expression\ =\ \$function\ ===\ \textcolor{stringliteral}{'exists'}\ ?\ \$wrappedColumn\ :\ sprintf(\textcolor{stringliteral}{'\%s(\%s)'},\ \$function,\ \$wrappedColumn);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00640}00640\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00641}00641\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$expression\ =\ \mbox{\hyperlink{namespace_illuminate_1_1_validation_1_1_rules_a60e9ae05178c483ab3d9ff5c2399a463}{\$column}};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00642}00642\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00643}00643\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00644}00644\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Here,\ we\ will\ grab\ the\ relationship\ sub-\/query\ and\ prepare\ to\ add\ it\ to\ the\ main\ query}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00645}00645\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ as\ a\ sub-\/select.\ First,\ we'll\ get\ the\ "{}has"{}\ query\ and\ use\ that\ to\ get\ the\ relation}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00646}00646\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ sub-\/query.\ We'll\ format\ this\ relationship\ name\ and\ append\ this\ column\ if\ needed.}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00647}00647\ \ \ \ \ \ \ \ \ \ \ \ \ \$query\ =\ \$relation-\/>getRelationExistenceQuery(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00648}00648\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$relation-\/>getRelated()-\/>newQuery(),\ \$this,\ \textcolor{keyword}{new}\ Expression(\$expression)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00649}00649\ \ \ \ \ \ \ \ \ \ \ \ \ )-\/>setBindings([],\ \textcolor{stringliteral}{'select'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00650}00650\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00651}00651\ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>callScope(\$constraints);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00652}00652\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00653}00653\ \ \ \ \ \ \ \ \ \ \ \ \ \$query\ =\ \$query-\/>mergeConstraintsFrom(\$relation-\/>getQuery())-\/>toBase();}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00654}00654\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00655}00655\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ query\ contains\ certain\ elements\ like\ orderings\ /\ more\ than\ one\ column\ selected}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00656}00656\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ then\ we\ will\ remove\ those\ elements\ from\ the\ query\ so\ that\ it\ will\ execute\ properly}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00657}00657\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ when\ given\ to\ the\ database.\ Otherwise,\ we\ may\ receive\ SQL\ errors\ or\ poor\ syntax.}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00658}00658\ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>orders\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00659}00659\ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>setBindings([],\ \textcolor{stringliteral}{'order'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00660}00660\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00661}00661\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$query-\/>columns)\ >\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00662}00662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>columns\ =\ [\$query-\/>columns[0]];}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00663}00663\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>bindings[\textcolor{stringliteral}{'select'}]\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00664}00664\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00665}00665\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00666}00666\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Finally,\ we\ will\ make\ the\ proper\ column\ alias\ to\ the\ query\ and\ run\ this\ sub-\/select\ on}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00667}00667\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ query\ builder.\ Then,\ we\ will\ return\ the\ builder\ instance\ back\ to\ the\ developer}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00668}00668\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ for\ further\ constraint\ chaining\ that\ needs\ to\ take\ place\ on\ the\ query\ as\ needed.}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00669}00669\ \ \ \ \ \ \ \ \ \ \ \ \ \$alias\ ??=\ Str::snake(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00670}00670\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ preg\_replace(\textcolor{stringliteral}{'/[\string^[:alnum:][:space:]\_]/u'},\ \textcolor{stringliteral}{''},\ \textcolor{stringliteral}{"{}\$name\ \$function\ \$column"{}})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00671}00671\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00672}00672\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00673}00673\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$function\ ===\ \textcolor{stringliteral}{'exists'})\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00674}00674\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>selectRaw(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00675}00675\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sprintf(\textcolor{stringliteral}{'exists(\%s)\ as\ \%s'},\ \$query-\/>toSql(),\ \$this-\/>getQuery()-\/>grammar-\/>wrap(\$alias)),}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00676}00676\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>getBindings()}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00677}00677\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )-\/>withCasts([\$alias\ =>\ \textcolor{stringliteral}{'bool'}]);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00678}00678\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00679}00679\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>selectSub(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00680}00680\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$function\ ?\ \$query\ :\ \$query-\/>limit(1),}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00681}00681\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$alias}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00682}00682\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00683}00683\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00684}00684\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00685}00685\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00686}00686\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00687}00687\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00688}00688\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00696}00696\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ getRelationHashedColumn(\$column,\ \$relation)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00697}00697\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00698}00698\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$column,\ \textcolor{charliteral}{'.'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00699}00699\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_validation_1_1_rules_a60e9ae05178c483ab3d9ff5c2399a463}{\$column}};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00700}00700\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00701}00701\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00702}00702\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>getQuery()-\/>from\ ===\ \$relation-\/>getQuery()-\/>getQuery()-\/>from}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00703}00703\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \textcolor{stringliteral}{"{}\{\$relation-\/>getRelationCountHash(false)\}.\$column"{}}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00704}00704\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{namespace_illuminate_1_1_validation_1_1_rules_a60e9ae05178c483ab3d9ff5c2399a463}{\$column}};}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00705}00705\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00706}00706\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00713}00713\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ withCount(\$relations)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00714}00714\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00715}00715\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>withAggregate(is\_array(\$relations)\ ?\ \$relations\ :\ func\_get\_args(),\ \textcolor{stringliteral}{'*'},\ \textcolor{stringliteral}{'count'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00716}00716\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00717}00717\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00725}00725\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ withMax(\$relation,\ \$column)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00726}00726\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00727}00727\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>withAggregate(\$relation,\ \$column,\ \textcolor{stringliteral}{'max'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00728}00728\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00729}00729\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00737}00737\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ withMin(\$relation,\ \$column)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00738}00738\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00739}00739\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>withAggregate(\$relation,\ \$column,\ \textcolor{stringliteral}{'min'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00740}00740\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00741}00741\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00749}00749\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ withSum(\$relation,\ \$column)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00750}00750\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00751}00751\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>withAggregate(\$relation,\ \$column,\ \textcolor{stringliteral}{'sum'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00752}00752\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00753}00753\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00761}00761\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ withAvg(\$relation,\ \$column)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00762}00762\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00763}00763\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>withAggregate(\$relation,\ \$column,\ \textcolor{stringliteral}{'avg'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00764}00764\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00765}00765\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00772}00772\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ withExists(\$relation)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00773}00773\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00774}00774\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>withAggregate(\$relation,\ \textcolor{charliteral}{'*'},\ \textcolor{stringliteral}{'exists'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00775}00775\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00776}00776\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00787}00787\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ addHasWhere(Builder\ \$hasQuery,\ Relation\ \$relation,\ \$operator,\ \$count,\ \$boolean)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00788}00788\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00789}00789\ \ \ \ \ \ \ \ \ \$hasQuery-\/>mergeConstraintsFrom(\$relation-\/>getQuery());}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00790}00790\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00791}00791\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>canUseExistsForExistenceCheck(\$operator,\ \$count)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00792}00792\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$this-\/>addWhereExistsQuery(\$hasQuery-\/>toBase(),\ \$boolean,\ \$operator\ ===\ \textcolor{charliteral}{'<'}\ \&\&\ \$count\ ===\ 1)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00793}00793\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$this-\/>addWhereCountQuery(\$hasQuery-\/>toBase(),\ \$operator,\ \$count,\ \$boolean);}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00794}00794\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00795}00795\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00802}00802\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ mergeConstraintsFrom(Builder\ \$from)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00803}00803\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00804}00804\ \ \ \ \ \ \ \ \ \$whereBindings\ =\ \$from-\/>getQuery()-\/>getRawBindings()[\textcolor{stringliteral}{'where'}]\ ??\ [];}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00805}00805\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00806}00806\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_validation_1_1_rules_ac95d1c24a529a97f334c1e55887099e2}{\$wheres}}\ =\ \$from-\/>getQuery()-\/>from\ !==\ \$this-\/>getQuery()-\/>from}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00807}00807\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$this-\/>requalifyWhereTables(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00808}00808\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$from-\/>getQuery()-\/>wheres,}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00809}00809\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$from-\/>getQuery()-\/>grammar-\/>getValue(\$from-\/>getQuery()-\/>from),}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00810}00810\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>getModel()-\/>getTable()}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00811}00811\ \ \ \ \ \ \ \ \ \ \ \ \ )\ :\ \$from-\/>getQuery()-\/>wheres;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00812}00812\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00813}00813\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Here\ we\ have\ some\ other\ query\ that\ we\ want\ to\ merge\ the\ where\ constraints\ from.\ We\ will}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00814}00814\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ copy\ over\ any\ where\ constraints\ on\ the\ query\ as\ well\ as\ remove\ any\ global\ scopes\ the}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00815}00815\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ query\ might\ have\ removed.\ Then\ we\ will\ return\ ourselves\ with\ the\ finished\ merging.}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00816}00816\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>withoutGlobalScopes(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00817}00817\ \ \ \ \ \ \ \ \ \ \ \ \ \$from-\/>removedScopes()}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00818}00818\ \ \ \ \ \ \ \ \ )-\/>mergeWheres(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00819}00819\ \ \ \ \ \ \ \ \ \ \ \ \ \$wheres,\ \$whereBindings}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00820}00820\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00821}00821\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00822}00822\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00831}00831\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ requalifyWhereTables(array\ \$wheres,\ \textcolor{keywordtype}{string}\ \$from,\ \textcolor{keywordtype}{string}\ \$to):\ array}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00832}00832\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00833}00833\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_abd38cbf58ce99ee77abe51199d143d99}{collect}}(\$wheres)-\/>map(\textcolor{keyword}{function}\ (\$where)\ use\ (\$from,\ \$to)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00834}00834\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_abd38cbf58ce99ee77abe51199d143d99}{collect}}(\$where)-\/>map(\textcolor{keyword}{function}\ (\$value)\ use\ (\$from,\ \$to)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00835}00835\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_string(\$value)\ \&\&\ str\_starts\_with(\$value,\ \$from.\textcolor{charliteral}{'.'})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00836}00836\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$to.\textcolor{charliteral}{'.'}.Str::afterLast(\$value,\ \textcolor{charliteral}{'.'})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00837}00837\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$value;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00838}00838\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00839}00839\ \ \ \ \ \ \ \ \ \})-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a658defb34762c8f40085aec87e16ba1a}{toArray}}();}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00840}00840\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00841}00841\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00851}00851\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ addWhereCountQuery(QueryBuilder\ \$query,\ \$operator\ =\ \textcolor{stringliteral}{'>='},\ \$count\ =\ 1,\ \$boolean\ =\ \textcolor{stringliteral}{'and'})}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00852}00852\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00853}00853\ \ \ \ \ \ \ \ \ \$this-\/>query-\/>addBinding(\$query-\/>getBindings(),\ \textcolor{stringliteral}{'where'});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00854}00854\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00855}00855\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a31428ddb78f082c4c41e7bb4612884fc}{where}}(}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00856}00856\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Expression(\textcolor{charliteral}{'('}.\$query-\/>toSql().\textcolor{charliteral}{')'}),}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00857}00857\ \ \ \ \ \ \ \ \ \ \ \ \ \$operator,}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00858}00858\ \ \ \ \ \ \ \ \ \ \ \ \ is\_numeric(\$count)\ ?\ \textcolor{keyword}{new}\ Expression(\$count)\ :\ \$count,}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00859}00859\ \ \ \ \ \ \ \ \ \ \ \ \ \$boolean}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00860}00860\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00861}00861\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00862}00862\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00869}00869\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ getRelationWithoutConstraints(\$relation)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00870}00870\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00871}00871\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Relation::noConstraints(\textcolor{keyword}{function}\ ()\ use\ (\$relation)\ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00872}00872\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>getModel()-\/>\{\$relation\}();}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00873}00873\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00874}00874\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00875}00875\ }
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00883}00883\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ canUseExistsForExistenceCheck(\$operator,\ \$count)}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00884}00884\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00885}00885\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\$operator\ ===\ \textcolor{stringliteral}{'>='}\ ||\ \$operator\ ===\ \textcolor{charliteral}{'<'})\ \&\&\ \$count\ ===\ 1;}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00886}00886\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queries_relationships_8php_source_l00887}00887\ \}}
+
+\end{DoxyCode}

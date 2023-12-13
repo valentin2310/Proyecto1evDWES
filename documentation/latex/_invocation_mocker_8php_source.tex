@@ -1,0 +1,240 @@
+\doxysection{Invocation\+Mocker.\+php}
+\hypertarget{_invocation_mocker_8php_source}{}\label{_invocation_mocker_8php_source}\index{vendor/phpunit/phpunit/src/Framework/MockObject/Runtime/Builder/InvocationMocker.php@{vendor/phpunit/phpunit/src/Framework/MockObject/Runtime/Builder/InvocationMocker.php}}
+\mbox{\hyperlink{_invocation_mocker_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ PHPUnit.}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Builder}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00012}00012\ use\ \textcolor{keyword}{function}\ array\_flip;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ array\_key\_exists;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ array\_map;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ array\_merge;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00016}00016\ use\ \textcolor{keyword}{function}\ count;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00017}00017\ use\ \textcolor{keyword}{function}\ is\_string;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00018}00018\ use\ \textcolor{keyword}{function}\ strtolower;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_constraint_1_1_constraint}{PHPUnit\(\backslash\)Framework\(\backslash\)Constraint\(\backslash\)Constraint}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_invalid_argument_exception}{PHPUnit\(\backslash\)Framework\(\backslash\)InvalidArgumentException}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_configurable_method}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)ConfigurableMethod}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_incompatible_return_value_exception}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)IncompatibleReturnValueException}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_invocation_handler}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)InvocationHandler}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00024}00024\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_matcher}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Matcher}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00025}00025\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_matcher_already_registered_exception}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)MatcherAlreadyRegisteredException}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00026}00026\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_method_cannot_be_configured_exception}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)MethodCannotBeConfiguredException}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00027}00027\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_method_name_already_configured_exception}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)MethodNameAlreadyConfiguredException}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00028}00028\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_method_name_not_configured_exception}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)MethodNameNotConfiguredException}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00029}00029\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_method_parameters_already_configured_exception}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)MethodParametersAlreadyConfiguredException}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00030}00030\ use\ \mbox{\hyperlink{namespace_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_rule}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Rule}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00031}00031\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_consecutive_calls}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Stub\(\backslash\)ConsecutiveCalls}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00032}00032\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_exception}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Stub\(\backslash\)Exception}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00033}00033\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_return_argument}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Stub\(\backslash\)ReturnArgument}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00034}00034\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_return_callback}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Stub\(\backslash\)ReturnCallback}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00035}00035\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_return_reference}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Stub\(\backslash\)ReturnReference}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00036}00036\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_return_self}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Stub\(\backslash\)ReturnSelf}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00037}00037\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_return_stub}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Stub\(\backslash\)ReturnStub}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00038}00038\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_return_value_map}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Stub\(\backslash\)ReturnValueMap}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00039}00039\ use\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_stub}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Stub\(\backslash\)Stub}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00040}00040\ use\ Throwable;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00045}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker}{00045}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker}{InvocationMocker}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_stubber}{InvocationStubber}},\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_method_name_match}{MethodNameMatch}}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00046}00046\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00047}00047\ \ \ \ \ \textcolor{keyword}{private}\ readonly\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_invocation_handler}{InvocationHandler}}\ \$invocationHandler;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00048}00048\ \ \ \ \ \textcolor{keyword}{private}\ readonly\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_matcher}{Matcher}}\ \$matcher;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{private}\ readonly\ array\ \$configurableMethods;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00058}00058\ \ \ \ \ \textcolor{keyword}{private}\ ?array\ \$configurableMethodNames\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00060}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_ade9692396d53bd99d6cb2481149d857a}{00060}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_ade9692396d53bd99d6cb2481149d857a}{\_\_construct}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_invocation_handler}{InvocationHandler}}\ \$handler,\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_matcher}{Matcher}}\ \$matcher,\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_configurable_method}{ConfigurableMethod}}\ ...\$configurableMethods)}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00061}00061\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \$this-\/>invocationHandler\ \ \ =\ \$handler;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \$this-\/>matcher\ \ \ \ \ \ \ \ \ \ \ \ \ =\ \$matcher;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \$this-\/>configurableMethods\ =\ \$configurableMethods;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00065}00065\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00072}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_ae10c2071df6711b22ade2c9d5f7fbe7e}{00072}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_ae10c2071df6711b22ade2c9d5f7fbe7e}{id}}(\textcolor{keywordtype}{string}\ \$id):\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00073}00073\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \$this-\/>invocationHandler-\/>registerMatcher(\$id,\ \$this-\/>matcher);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00077}00077\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00082}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a3d8471e081aec7f8f9d37af95687a6ca}{00082}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a3d8471e081aec7f8f9d37af95687a6ca}{will}}(\mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_stub}{Stub}}\ \$stub):\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_identity}{Identity}}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00083}00083\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \$this-\/>matcher-\/>setStub(\$stub);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00087}00087\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00092}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_ae7a14c649a1b815c51827885dea74068}{00092}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_ae7a14c649a1b815c51827885dea74068}{willReturn}}(mixed\ \$value,\ mixed\ ...\$nextValues):\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00093}00093\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$nextValues)\ ===\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>ensureTypeOfReturnValues([\$value]);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \$stub\ =\ \$value\ instanceof\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_stub}{Stub}}\ ?\ \$value\ :\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_return_stub}{ReturnStub}}(\$value);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a3d8471e081aec7f8f9d37af95687a6ca}{will}}(\$stub);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \$values\ =\ array\_merge([\$value],\ \$nextValues);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \$this-\/>ensureTypeOfReturnValues(\$values);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \$stub\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_consecutive_calls}{ConsecutiveCalls}}(\$values);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a3d8471e081aec7f8f9d37af95687a6ca}{will}}(\$stub);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00109}00109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00111}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a6b4228d2dd32be8027d9bb04a7090bf4}{00111}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a6b4228d2dd32be8027d9bb04a7090bf4}{willReturnReference}}(mixed\ \&\$reference):\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00112}00112\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \$stub\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_return_reference}{ReturnReference}}(\$reference);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a3d8471e081aec7f8f9d37af95687a6ca}{will}}(\$stub);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00116}00116\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00118}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_ab34703c589f8f81162ac0023eabb6a76}{00118}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_ab34703c589f8f81162ac0023eabb6a76}{willReturnMap}}(array\ \$valueMap):\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00119}00119\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \$stub\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_return_value_map}{ReturnValueMap}}(\$valueMap);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a3d8471e081aec7f8f9d37af95687a6ca}{will}}(\$stub);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00123}00123\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00125}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a86b785d341f4b335bd69da576f2041da}{00125}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a86b785d341f4b335bd69da576f2041da}{willReturnArgument}}(\textcolor{keywordtype}{int}\ \$argumentIndex):\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00126}00126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \$stub\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_return_argument}{ReturnArgument}}(\$argumentIndex);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a3d8471e081aec7f8f9d37af95687a6ca}{will}}(\$stub);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00130}00130\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00132}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a1dbc663d39e9df33d139ad1522bc8dd5}{00132}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a1dbc663d39e9df33d139ad1522bc8dd5}{willReturnCallback}}(callable\ \$callback):\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00133}00133\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \$stub\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_return_callback}{ReturnCallback}}(\$callback);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a3d8471e081aec7f8f9d37af95687a6ca}{will}}(\$stub);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00137}00137\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00139}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_acb4bb039b99907db5e3bc6f883619d0d}{00139}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_acb4bb039b99907db5e3bc6f883619d0d}{willReturnSelf}}():\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00140}00140\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \$stub\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_return_self}{ReturnSelf}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a3d8471e081aec7f8f9d37af95687a6ca}{will}}(\$stub);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00144}00144\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00146}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a5e8265cc27aff875bffad27a13abc836}{00146}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a5e8265cc27aff875bffad27a13abc836}{willReturnOnConsecutiveCalls}}(mixed\ ...\$values):\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00147}00147\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \$stub\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_stub_1_1_consecutive_calls}{ConsecutiveCalls}}(\$values);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a3d8471e081aec7f8f9d37af95687a6ca}{will}}(\$stub);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00151}00151\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00153}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a0013acc3fa867278b0bae27ab2e4e7d0}{00153}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a0013acc3fa867278b0bae27ab2e4e7d0}{willThrowException}}(Throwable\ \$exception):\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00154}00154\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \$stub\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_exception}{Exception}}(\$exception);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a3d8471e081aec7f8f9d37af95687a6ca}{will}}(\$stub);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00158}00158\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00163}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a42548569dba5db774caded5c039ea7d1}{00163}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a42548569dba5db774caded5c039ea7d1}{after}}(\textcolor{keywordtype}{string}\ \$id):\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00164}00164\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \$this-\/>matcher-\/>setAfterMatchBuilderId(\$id);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00168}00168\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00177}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a881f30db2610e3c34c4fdae09e5292f4}{00177}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a881f30db2610e3c34c4fdae09e5292f4}{with}}(mixed\ ...\$arguments):\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00178}00178\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \$this-\/>ensureParametersCanBeConfigured();}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \$this-\/>matcher-\/>setParametersRule(\textcolor{keyword}{new}\ Rule\(\backslash\)\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_rule_1_1_parameters}{Parameters}}(\$arguments));}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00184}00184\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00192}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a9d778819e7c191d54326bf56d1910d7c}{00192}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a9d778819e7c191d54326bf56d1910d7c}{withAnyParameters}}():\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00193}00193\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \$this-\/>ensureParametersCanBeConfigured();}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \$this-\/>matcher-\/>setParametersRule(\textcolor{keyword}{new}\ Rule\(\backslash\)\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_rule_1_1_any_parameters}{AnyParameters}});}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00199}00199\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00208}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a28079ccceaa7b3c6f9bd5b224c61834d}{00208}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_builder_1_1_invocation_mocker_a28079ccceaa7b3c6f9bd5b224c61834d}{method}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_constraint_1_1_constraint}{Constraint}}|\textcolor{keywordtype}{string}\ \$constraint):\ self}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00209}00209\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>matcher-\/>hasMethodNameRule())\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_method_name_already_configured_exception}{MethodNameAlreadyConfiguredException}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$constraint))\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>configurableMethodNames\ ??=\ array\_flip(}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_map(}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ fn\ (\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_configurable_method}{ConfigurableMethod}}\ \$configurable)\ =>\ strtolower(\$configurable-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_configurable_method_a4b516aaa5fa38da4fed24ab6001627e2}{name}}()),}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>configurableMethods,}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!array\_key\_exists(strtolower(\$constraint),\ \$this-\/>configurableMethodNames))\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_method_cannot_be_configured_exception}{MethodCannotBeConfiguredException}}(\$constraint);}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \$this-\/>matcher-\/>setMethodNameRule(\textcolor{keyword}{new}\ Rule\(\backslash\)\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_rule_1_1_method_name}{MethodName}}(\$constraint));}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00230}00230\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00236}00236\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ ensureParametersCanBeConfigured():\ void}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00237}00237\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>matcher-\/>hasMethodNameRule())\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_method_name_not_configured_exception}{MethodNameNotConfiguredException}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>matcher-\/>hasParametersRule())\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_method_parameters_already_configured_exception}{MethodParametersAlreadyConfiguredException}};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00245}00245\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00247}00247\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ configuredMethod():\ ?ConfigurableMethod}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00248}00248\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \$configuredMethod\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>configurableMethods\ as\ \$configurableMethod)\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>matcher-\/>methodNameRule()-\/>matchesName(\$configurableMethod-\/>name()))\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$configuredMethod\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$configuredMethod\ =\ \$configurableMethod;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$configuredMethod;}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00262}00262\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00267}00267\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ ensureTypeOfReturnValues(array\ \$values):\ void}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00268}00268\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \$configuredMethod\ =\ \$this-\/>configuredMethod();}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00270}00270\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$configuredMethod\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$values\ as\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$configuredMethod-\/>mayReturn(\$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ IncompatibleReturnValueException(}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$configuredMethod,}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value,}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00283}00283\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_invocation_mocker_8php_source_l00284}00284\ \}}
+
+\end{DoxyCode}

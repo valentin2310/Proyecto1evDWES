@@ -1,0 +1,645 @@
+\doxysection{Blade\+Compiler.\+php}
+\hypertarget{_blade_compiler_8php_source}{}\label{_blade_compiler_8php_source}\index{vendor/laravel/framework/src/Illuminate/View/Compilers/BladeCompiler.php@{vendor/laravel/framework/src/Illuminate/View/Compilers/BladeCompiler.php}}
+\mbox{\hyperlink{_blade_compiler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00003}\mbox{\hyperlink{namespace_illuminate_1_1_view_1_1_compilers}{00003}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_view_1_1_compilers}{Illuminate\(\backslash\)View\(\backslash\)Compilers}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00005}00005\ use\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container}{Illuminate\(\backslash\)Container\(\backslash\)Container}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00006}00006\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_htmlable}{Illuminate\(\backslash\)Contracts\(\backslash\)Support\(\backslash\)Htmlable}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00007}00007\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_view_1_1_factory}{Illuminate\(\backslash\)Contracts\(\backslash\)View\(\backslash\)Factory}}\ as\ ViewFactory;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00008}00008\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_view_1_1_view}{Illuminate\(\backslash\)Contracts\(\backslash\)View\(\backslash\)View}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_arr}{Illuminate\(\backslash\)Support\(\backslash\)Arr}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_str}{Illuminate\(\backslash\)Support\(\backslash\)Str}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00011}00011\ use\ Illuminate\(\backslash\)Support\(\backslash\)Traits\(\backslash\)ReflectsClosures;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00012}00012\ use\ \mbox{\hyperlink{class_illuminate_1_1_view_1_1_component}{Illuminate\(\backslash\)View\(\backslash\)Component}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00013}00013\ use\ InvalidArgumentException;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00015}00015\ \textcolor{keyword}{class\ }BladeCompiler\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_illuminate_1_1_view_1_1_compilers_1_1_compiler}{Compiler}}\ implements\ \mbox{\hyperlink{interface_illuminate_1_1_view_1_1_compilers_1_1_compiler_interface}{CompilerInterface}}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00016}00016\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00017}00017\ \ \ \ \ use\ Concerns\(\backslash\)CompilesAuthorizations,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00018}00018\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesClasses,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00019}00019\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesComments,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00020}00020\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesComponents,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00021}00021\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesConditionals,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00022}00022\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesEchos,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00023}00023\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesErrors,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00024}00024\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesFragments,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00025}00025\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesHelpers,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00026}00026\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesIncludes,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00027}00027\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesInjections,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00028}00028\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesJson,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00029}00029\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesJs,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00030}00030\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesLayouts,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00031}00031\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesLoops,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00032}00032\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesRawPhp,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00033}00033\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesStacks,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00034}00034\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesStyles,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00035}00035\ \ \ \ \ \ \ \ \ Concerns\(\backslash\)CompilesTranslations,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00036}00036\ \ \ \ \ \ \ \ \ ReflectsClosures;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00043}00043\ \ \ \ \ \textcolor{keyword}{protected}\ \$extensions\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00050}00050\ \ \ \ \ \textcolor{keyword}{protected}\ \$customDirectives\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00057}00057\ \ \ \ \ \textcolor{keyword}{protected}\ \$conditions\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00064}00064\ \ \ \ \ \textcolor{keyword}{protected}\ \$prepareStringsForCompilationUsing\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{protected}\ \$precompilers\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00078}00078\ \ \ \ \ \textcolor{keyword}{protected}\ \$path;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00085}00085\ \ \ \ \ \textcolor{keyword}{protected}\ \$compilers\ =\ [}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 'Comments',}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Extensions'},}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Statements'},}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Echos'},}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00090}00090\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00097}00097\ \ \ \ \ \textcolor{keyword}{protected}\ \$rawTags\ =\ [\textcolor{stringliteral}{'\{!!'},\ \textcolor{stringliteral}{'!!\}'}];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00104}00104\ \ \ \ \ \textcolor{keyword}{protected}\ \$contentTags\ =\ [\textcolor{stringliteral}{'\{\{'},\ \textcolor{stringliteral}{'\}\}'}];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00111}00111\ \ \ \ \ \textcolor{keyword}{protected}\ \$escapedTags\ =\ [\textcolor{stringliteral}{'\{\{\{'},\ \textcolor{stringliteral}{'\}\}\}'}];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00118}00118\ \ \ \ \ \textcolor{keyword}{protected}\ \$echoFormat\ =\ \textcolor{stringliteral}{'e(\%s)'};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00125}00125\ \ \ \ \ \textcolor{keyword}{protected}\ \$footer\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00132}00132\ \ \ \ \ \textcolor{keyword}{protected}\ \$rawBlocks\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00139}00139\ \ \ \ \ \textcolor{keyword}{protected}\ \$anonymousComponentPaths\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00146}00146\ \ \ \ \ \textcolor{keyword}{protected}\ \$anonymousComponentNamespaces\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00153}00153\ \ \ \ \ \textcolor{keyword}{protected}\ \$classComponentAliases\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00160}00160\ \ \ \ \ \textcolor{keyword}{protected}\ \$classComponentNamespaces\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00167}00167\ \ \ \ \ \textcolor{keyword}{protected}\ \$compilesComponentTags\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00175}00175\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ compile(\$path\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00176}00176\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$path)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>setPath(\$path);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$this-\/>cachePath))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \$contents\ =\ \$this-\/>compileString(\$this-\/>files-\/>get(\$this-\/>getPath()));}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ empty(\$this-\/>getPath()))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$contents\ =\ \$this-\/>appendFilePath(\$contents);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>ensureCompiledDirectoryExists(}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$compiledPath\ =\ \$this-\/>getCompiledPath(\$this-\/>getPath())}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>files-\/>put(\$compiledPath,\ \$contents);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00194}00194\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00202}00202\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ appendFilePath(\$contents)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00203}00203\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}\ =\ \$this-\/>getOpenAndClosingPhpTokens(\$contents);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}-\/>isNotEmpty()\ \&\&\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}-\/>last()\ !==\ T\_CLOSE\_TAG)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \$contents\ .=\ \textcolor{stringliteral}{'\ ?>'};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$contents.\textcolor{stringliteral}{"{}<?php\ /**PATH\ \{\$this-\/>getPath()\}\ ENDPATH**/\ ?>"{}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00211}00211\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00219}00219\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ getOpenAndClosingPhpTokens(\$contents)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00220}00220\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_abd38cbf58ce99ee77abe51199d143d99}{collect}}(token\_get\_all(\$contents))}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>pluck(0)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>filter(\textcolor{keyword}{function}\ (\$token)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ in\_array(\$token,\ [T\_OPEN\_TAG,\ T\_OPEN\_TAG\_WITH\_ECHO,\ T\_CLOSE\_TAG]);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00226}00226\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00233}00233\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ getPath()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00234}00234\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>path;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00236}00236\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00244}00244\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ setPath(\$path)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00245}00245\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_http_a3b05eec13add53df44e232273d718ae4}{path}}\ =\ \$path;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00247}00247\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00255}00255\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ compileString(\$value)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00256}00256\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ [\$this-\/>footer,\ \$result]\ =\ [[],\ \textcolor{stringliteral}{''}];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>prepareStringsForCompilationUsing\ as\ \$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \$callback(\$value);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \$value\ =\ \$this-\/>storeUncompiledBlocks(\$value);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First\ we\ will\ compile\ the\ Blade\ component\ tags.\ This\ is\ a\ precompile\ style}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ step\ which\ compiles\ the\ component\ Blade\ tags\ into\ @component\ directives}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ that\ may\ be\ used\ by\ Blade.\ Then\ we\ should\ call\ any\ other\ precompilers.}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \$value\ =\ \$this-\/>compileComponentTags(}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>compileComments(\$value)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>precompilers\ as\ \$precompiler)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \$precompiler(\$value);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Here\ we\ will\ loop\ through\ all\ of\ the\ tokens\ returned\ by\ the\ Zend\ lexer\ and}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ parse\ each\ one\ into\ the\ corresponding\ valid\ PHP.\ We\ will\ then\ have\ this}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ template\ as\ the\ correctly\ rendered\ PHP\ that\ can\ be\ rendered\ natively.}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (token\_get\_all(\$value)\ as\ \$token)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \$result\ .=\ is\_array(\$token)\ ?\ \$this-\/>parseToken(\$token)\ :\ \$token;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ empty(\$this-\/>rawBlocks))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \$result\ =\ \$this-\/>restoreRawContent(\$result);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00285}00285\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ there\ are\ any\ footer\ lines\ that\ need\ to\ get\ added\ to\ a\ template\ we\ will}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00288}00288\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ add\ them\ here\ at\ the\ end\ of\ the\ template.\ This\ gets\ used\ mainly\ for\ the}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ template\ inheritance\ via\ the\ extends\ keyword\ that\ should\ be\ appended.}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00290}00290\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$this-\/>footer)\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \$result\ =\ \$this-\/>addFooters(\$result);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ empty(\$this-\/>echoHandlers))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \$result\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_view_1_1_compilers_1_1_concerns_ad80875017f92c909182d0c18a69ccfff}{addBladeCompilerVariable}}(\$result);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str\_replace(}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'\#\#BEGIN-\/COMPONENT-\/CLASS\#\#'},\ \textcolor{stringliteral}{'\#\#END-\/COMPONENT-\/CLASS\#\#'}],}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00300}00300\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{''},}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \$result);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00302}00302\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00312}00312\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ render(\$string,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [],\ \$deleteCachedView\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00313}00313\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \$component\ =\ \textcolor{keyword}{new}\ \textcolor{keyword}{class}(\$string)\ extends\ Component}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{protected}\ \$template;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_testing_1_1_concerns_a17ea103c75f2b56cb4ebd89dbf59d2d6}{\_\_construct}}(\$template)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\textcolor{keyword}{template}\ =\ \$template;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ render()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>template;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00327}00327\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00328}00328\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \$view\ =\ Container::getInstance()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>make(ViewFactory::class)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>make(\$component-\/>resolveView(),\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a26a23e2d5cb3fa8059177af91fe58407}{tap}}(\$view-\/>render(),\ \mbox{\hyperlink{rector-migrate_8php_affc7ca71e2c30ccc9604c2697809c870}{function}}\ ()\ use\ (\$view,\ \$deleteCachedView)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$deleteCachedView)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unlink(\$view-\/>getPath());}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00338}00338\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00346}00346\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_view_1_1_concerns_a87919ccd6310d925bec5301f7a785d75}{renderComponent}}(Component\ \$component)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00347}00347\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \$component-\/>data();}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00350}00350\ \ \ \ \ \ \ \ \ \$view\ =\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a3f200fdf9641e6aa8934d7b044ee6295}{value}}(\$component-\/>resolveView(),\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00351}00351\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$view\ instanceof\ View)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$view-\/>with(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})-\/>render();}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$view\ instanceof\ Htmlable)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$view-\/>toHtml();}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00356}00356\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Container::getInstance()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>make(ViewFactory::class)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>make(\$view,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>render();}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00362}00362\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00363}00363\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00370}00370\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ storeUncompiledBlocks(\$value)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00371}00371\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$value,\ \textcolor{stringliteral}{'@verbatim'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \$this-\/>storeVerbatimBlocks(\$value);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00374}00374\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00375}00375\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00376}00376\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$value,\ \textcolor{stringliteral}{'@php'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00377}00377\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \$this-\/>storePhpBlocks(\$value);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00378}00378\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00379}00379\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00380}00380\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00381}00381\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00382}00382\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00389}00389\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ storeVerbatimBlocks(\$value)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00390}00390\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ preg\_replace\_callback(\textcolor{stringliteral}{'/(?<!@)@verbatim(.*?)@endverbatim/s'},\ \textcolor{keyword}{function}\ (\$matches)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>storeRawBlock(\$matches[1]);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \},\ \$value);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00394}00394\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00395}00395\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00402}00402\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ storePhpBlocks(\$value)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00403}00403\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ preg\_replace\_callback(\textcolor{stringliteral}{'/(?<!@)@php(.*?)@endphp/s'},\ \textcolor{keyword}{function}\ (\$matches)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>storeRawBlock(\textcolor{stringliteral}{"{}<?php\{\$matches[1]\}?>"{}});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00406}00406\ \ \ \ \ \ \ \ \ \},\ \$value);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00407}00407\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00408}00408\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00415}00415\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ storeRawBlock(\$value)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00416}00416\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>getRawPlaceholder(}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00418}00418\ \ \ \ \ \ \ \ \ \ \ \ \ array\_push(\$this-\/>rawBlocks,\ \$value)\ -\/\ 1}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00419}00419\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00420}00420\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00421}00421\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00428}00428\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ compileComponentTags(\$value)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00429}00429\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>compilesComponentTags)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00433}00433\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{new}\ ComponentTagCompiler(}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>classComponentAliases,\ \$this-\/>classComponentNamespaces,\ \$this}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ ))-\/>compile(\$value);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00437}00437\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00438}00438\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00445}00445\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ restoreRawContent(\$result)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00446}00446\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00447}00447\ \ \ \ \ \ \ \ \ \$result\ =\ preg\_replace\_callback(\textcolor{charliteral}{'/'}.\$this-\/>getRawPlaceholder(\textcolor{stringliteral}{'(\(\backslash\)d+)'}).\textcolor{charliteral}{'/'},\ \textcolor{keyword}{function}\ (\$matches)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>rawBlocks[\$matches[1]];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \},\ \$result);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00450}00450\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \$this-\/>rawBlocks\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$result;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00454}00454\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00455}00455\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00462}00462\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ getRawPlaceholder(\$replace)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00463}00463\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str\_replace(\textcolor{charliteral}{'\#'},\ \$replace,\ \textcolor{stringliteral}{'@\_\_raw\_block\_\#\_\_@'});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00465}00465\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00466}00466\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00473}00473\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ addFooters(\$result)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00474}00474\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ltrim(\$result,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\textcolor{stringliteral}{"{}\(\backslash\)n"{}}.implode(\textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ array\_reverse(\$this-\/>footer));}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00477}00477\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00478}00478\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00485}00485\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ parseToken(\$token)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00486}00486\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00487}00487\ \ \ \ \ \ \ \ \ [\$id,\ \$content]\ =\ \$token;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00488}00488\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$id\ ==\ T\_INLINE\_HTML)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00490}00490\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>compilers\ as\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00491}00491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$content\ =\ \$this-\/>\{\textcolor{stringliteral}{"{}compile\{\$type\}"{}}\}(\$content);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00492}00492\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00493}00493\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00494}00494\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00495}00495\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$content;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00496}00496\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00497}00497\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00504}00504\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ compileExtensions(\$value)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00505}00505\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00506}00506\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>extensions\ as\ \$compiler)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00507}00507\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \$compiler(\$value,\ \$this);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00508}00508\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00511}00511\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00512}00512\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00519}00519\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ compileStatements(\$template)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00520}00520\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ preg\_match\_all(\textcolor{stringliteral}{'/\(\backslash\)B@(@?\(\backslash\)w+(?:::\(\backslash\)w+)?)([\ \(\backslash\)t]*)(\(\backslash\)(\ (\ [\(\backslash\)S\(\backslash\)s]*?\ )\ \(\backslash\)))?/x'},\ \$template,\ \$matches);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00522}00522\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00523}00523\ \ \ \ \ \ \ \ \ \$offset\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00524}00524\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00525}00525\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 0;\ isset(\$matches[0][\$i]);\ \$i++)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \ \ \ \ \$match\ =\ [}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00527}00527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$matches[0][\$i],}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00528}00528\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$matches[1][\$i],}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$matches[2][\$i],}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00530}00530\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$matches[3][\$i]\ ?:\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$matches[4][\$i]\ ?:\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00533}00533\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Here\ we\ check\ to\ see\ if\ we\ have\ properly\ found\ the\ closing\ parenthesis\ by}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00535}00535\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ regex\ pattern\ or\ not,\ and\ will\ recursively\ continue\ on\ to\ the\ next\ "{})"{}}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ then\ check\ again\ until\ the\ tokenizer\ confirms\ we\ find\ the\ right\ one.}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00537}00537\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (isset(\$match[4])\ \&\&}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00538}00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Str::endsWith(\$match[0],\ \textcolor{charliteral}{')'})\ \&\&}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00539}00539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !\ \$this-\/>hasEvenNumberOfParentheses(\$match[0]))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\$after\ =\ Str::after(\$template,\ \$match[0]))\ ===\ \$template)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00543}00543\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$rest\ =\ Str::before(\$after,\ \textcolor{charliteral}{')'});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00545}00545\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$matches[0][\$i\ +\ 1])\ \&\&\ Str::contains(\$rest.\textcolor{charliteral}{')'},\ \$matches[0][\$i\ +\ 1]))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00547}00547\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$matches[0][\$i\ +\ 1]);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00548}00548\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$i++;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00550}00550\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00551}00551\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$match[0]\ =\ \$match[0].\$rest.\textcolor{charliteral}{')'};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00552}00552\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$match[3]\ =\ \$match[3].\$rest.\textcolor{charliteral}{')'};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00553}00553\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$match[4]\ =\ \$match[4].\$rest;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00554}00554\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00555}00555\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00556}00556\ \ \ \ \ \ \ \ \ \ \ \ \ [\$template,\ \$offset]\ =\ \$this-\/>replaceFirstStatement(}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00557}00557\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$match[0],}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00558}00558\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>compileStatement(\$match),}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00559}00559\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$template,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00560}00560\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$offset}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00562}00562\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00563}00563\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$template;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00565}00565\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00566}00566\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00576}00576\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ replaceFirstStatement(\$search,\ \$replace,\ \$subject,\ \$offset)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00577}00577\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00578}00578\ \ \ \ \ \ \ \ \ \$search\ =\ (string)\ \$search;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00579}00579\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00580}00580\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$search\ ===\ \textcolor{stringliteral}{''})\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$subject;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00582}00582\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00583}00583\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00584}00584\ \ \ \ \ \ \ \ \ \$position\ =\ strpos(\$subject,\ \$search,\ \$offset);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00585}00585\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00586}00586\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$position\ !==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00587}00587\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00588}00588\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ substr\_replace(\$subject,\ \$replace,\ \$position,\ strlen(\$search)),}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00589}00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$position\ +\ strlen(\$replace),}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00590}00590\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00591}00591\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00592}00592\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00593}00593\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\$subject,\ 0];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00594}00594\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00595}00595\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00602}00602\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ hasEvenNumberOfParentheses(\textcolor{keywordtype}{string}\ \$expression)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00603}00603\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00604}00604\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}\ =\ token\_get\_all(\textcolor{stringliteral}{'<?php\ '}.\$expression);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00605}00605\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00606}00606\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Arr::last(\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}})\ !==\ \textcolor{charliteral}{')'})\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00607}00607\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00608}00608\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00609}00609\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \$opening\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \$closing\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00612}00612\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00613}00613\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}\ as\ \$token)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00614}00614\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$token\ ==\ \textcolor{charliteral}{')'})\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00615}00615\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$closing++;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00616}00616\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$token\ ==\ \textcolor{charliteral}{'('})\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00617}00617\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$opening++;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00618}00618\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00619}00619\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00620}00620\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$opening\ ===\ \$closing;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00622}00622\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00623}00623\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00630}00630\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ compileStatement(\$match)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00631}00631\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00632}00632\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$match[1],\ \textcolor{charliteral}{'@'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00633}00633\ \ \ \ \ \ \ \ \ \ \ \ \ \$match[0]\ =\ isset(\$match[3])\ ?\ \$match[1].\$match[3]\ :\ \$match[1];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00634}00634\ \ \ \ \ \ \ \ \ \}\ elseif\ (isset(\$this-\/>customDirectives[\$match[1]]))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00635}00635\ \ \ \ \ \ \ \ \ \ \ \ \ \$match[0]\ =\ \$this-\/>callCustomDirective(\$match[1],\ Arr::get(\$match,\ 3));}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00636}00636\ \ \ \ \ \ \ \ \ \}\ elseif\ (method\_exists(\$this,\ \$method\ =\ \textcolor{stringliteral}{'compile'}.ucfirst(\$match[1])))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \ \ \$match[0]\ =\ \$this-\/>\mbox{\hyperlink{namespace_carbon_1_1_p_h_p_stan_a12661b2fc0f57f97e30a1620889ce9c6}{\$method}}(Arr::get(\$match,\ 3));}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00638}00638\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00639}00639\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$match[0];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00640}00640\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00641}00641\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00642}00642\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ isset(\$match[3])\ ?\ \$match[0]\ :\ \$match[0].\$match[2];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00643}00643\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00644}00644\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00652}00652\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ callCustomDirective(\$name,\ \$value)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00653}00653\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00654}00654\ \ \ \ \ \ \ \ \ \$value\ ??=\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00655}00655\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00656}00656\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\$value,\ \textcolor{charliteral}{'('})\ \&\&\ str\_ends\_with(\$value,\ \textcolor{charliteral}{')'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00657}00657\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ Str::substr(\$value,\ 1,\ -\/1);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00658}00658\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00659}00659\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00660}00660\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ call\_user\_func(\$this-\/>customDirectives[\$name],\ trim(\$value));}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00661}00661\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00662}00662\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00669}00669\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ stripParentheses(\$expression)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00670}00670\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00671}00671\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Str::startsWith(\$expression,\ \textcolor{charliteral}{'('}))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00672}00672\ \ \ \ \ \ \ \ \ \ \ \ \ \$expression\ =\ substr(\$expression,\ 1,\ -\/1);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00673}00673\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00674}00674\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00675}00675\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$expression;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00676}00676\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00677}00677\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00684}00684\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ extend(callable\ \$compiler)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00685}00685\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00686}00686\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespaceconf_ac2adb9cb4fae2807baaf6a3fb59cbebb}{extensions}}[]\ =\ \$compiler;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00687}00687\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00688}00688\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00694}00694\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ getExtensions()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00695}00695\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00696}00696\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>extensions;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00697}00697\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00698}00698\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00706}00706\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keywordflow}{if}(\$name,\ callable\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00707}00707\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00708}00708\ \ \ \ \ \ \ \ \ \$this-\/>conditions[\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}}]\ =\ \$callback;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00709}00709\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00710}00710\ \ \ \ \ \ \ \ \ \$this-\/>directive(\$name,\ \textcolor{keyword}{function}\ (\$expression)\ use\ (\$name)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00711}00711\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$expression\ !==\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00712}00712\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \textcolor{stringliteral}{"{}<?php\ if\ (\(\backslash\)Illuminate\(\backslash\)Support\(\backslash\)Facades\(\backslash\)Blade::check('\{\$name\}',\ \{\$expression\})):\ ?>"{}}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00713}00713\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{stringliteral}{"{}<?php\ if\ (\(\backslash\)Illuminate\(\backslash\)Support\(\backslash\)Facades\(\backslash\)Blade::check('\{\$name\}')):\ ?>"{}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00714}00714\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00715}00715\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00716}00716\ \ \ \ \ \ \ \ \ \$this-\/>directive(\textcolor{stringliteral}{'unless'}.\$name,\ \textcolor{keyword}{function}\ (\$expression)\ use\ (\$name)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00717}00717\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$expression\ !==\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00718}00718\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \textcolor{stringliteral}{"{}<?php\ if\ (!\ \(\backslash\)Illuminate\(\backslash\)Support\(\backslash\)Facades\(\backslash\)Blade::check('\{\$name\}',\ \{\$expression\})):\ ?>"{}}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00719}00719\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{stringliteral}{"{}<?php\ if\ (!\ \(\backslash\)Illuminate\(\backslash\)Support\(\backslash\)Facades\(\backslash\)Blade::check('\{\$name\}')):\ ?>"{}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00720}00720\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00721}00721\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00722}00722\ \ \ \ \ \ \ \ \ \$this-\/>directive(\textcolor{stringliteral}{'else'}.\$name,\ \textcolor{keyword}{function}\ (\$expression)\ use\ (\$name)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00723}00723\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$expression\ !==\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00724}00724\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \textcolor{stringliteral}{"{}<?php\ elseif\ (\(\backslash\)Illuminate\(\backslash\)Support\(\backslash\)Facades\(\backslash\)Blade::check('\{\$name\}',\ \{\$expression\})):\ ?>"{}}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00725}00725\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{stringliteral}{"{}<?php\ elseif\ (\(\backslash\)Illuminate\(\backslash\)Support\(\backslash\)Facades\(\backslash\)Blade::check('\{\$name\}')):\ ?>"{}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00726}00726\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00727}00727\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00728}00728\ \ \ \ \ \ \ \ \ \$this-\/>directive(\textcolor{stringliteral}{'end'}.\$name,\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00729}00729\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'<?php\ endif;\ ?>'};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00730}00730\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00731}00731\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00732}00732\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00740}00740\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_auth_a5fb1933974ac9aae8c7ac4d3344caca6}{check}}(\$name,\ ...\$parameters)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00741}00741\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00742}00742\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ call\_user\_func(\$this-\/>conditions[\$name],\ ...\$parameters);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00743}00743\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00744}00744\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00753}00753\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ component(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}},\ \$alias\ =\ \textcolor{keyword}{null},\ \$prefix\ =\ \textcolor{stringliteral}{''})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00754}00754\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00755}00755\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$alias)\ \&\&\ str\_contains(\$alias,\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00756}00756\ \ \ \ \ \ \ \ \ \ \ \ \ [\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}},\ \$alias]\ =\ [\$alias,\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00757}00757\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00758}00758\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00759}00759\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$alias))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00760}00760\ \ \ \ \ \ \ \ \ \ \ \ \ \$alias\ =\ str\_contains(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}},\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)View\(\backslash\)\(\backslash\)Components\(\backslash\)\(\backslash\)'})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00761}00761\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_abd38cbf58ce99ee77abe51199d143d99}{collect}}(explode(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ Str::after(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}},\ \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)View\(\backslash\)\(\backslash\)Components\(\backslash\)\(\backslash\)'})))-\/>map(\textcolor{keyword}{function}\ (\$segment)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00762}00762\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Str::kebab(\$segment);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00763}00763\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \})-\/>implode(\textcolor{charliteral}{':'})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00764}00764\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ Str::kebab(class\_basename(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}));}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00765}00765\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00766}00766\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00767}00767\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ empty(\$prefix))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00768}00768\ \ \ \ \ \ \ \ \ \ \ \ \ \$alias\ =\ \$prefix.\textcolor{charliteral}{'-\/'}.\$alias;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00769}00769\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00770}00770\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00771}00771\ \ \ \ \ \ \ \ \ \$this-\/>classComponentAliases[\$alias]\ =\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00772}00772\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00773}00773\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00781}00781\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ components(array\ \$components,\ \$prefix\ =\ \textcolor{stringliteral}{''})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00782}00782\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00783}00783\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$components\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00784}00784\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_numeric(\$key))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00785}00785\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>component(\$value,\ \textcolor{keyword}{null},\ \$prefix);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00786}00786\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00787}00787\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>component(\$key,\ \$value,\ \$prefix);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00788}00788\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00789}00789\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00790}00790\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00791}00791\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00797}00797\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ getClassComponentAliases()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00798}00798\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00799}00799\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>classComponentAliases;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00800}00800\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00801}00801\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00809}00809\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ anonymousComponentPath(\textcolor{keywordtype}{string}\ \$path,\ \textcolor{keywordtype}{string}\ \$prefix\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00810}00810\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00811}00811\ \ \ \ \ \ \ \ \ \$prefixHash\ =\ md5(\$prefix\ ?:\ \$path);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00812}00812\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00813}00813\ \ \ \ \ \ \ \ \ \$this-\/>anonymousComponentPaths[]\ =\ [}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00814}00814\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'path'}\ =>\ \$path,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00815}00815\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'prefix'}\ =>\ \$prefix,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00816}00816\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'prefixHash'}\ =>\ \$prefixHash,}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00817}00817\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00818}00818\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00819}00819\ \ \ \ \ \ \ \ \ Container::getInstance()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00820}00820\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>make(ViewFactory::class)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00821}00821\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>addNamespace(\$prefixHash,\ \$path);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00822}00822\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00823}00823\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00831}00831\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ anonymousComponentNamespace(\textcolor{keywordtype}{string}\ \$directory,\ \textcolor{keywordtype}{string}\ \$prefix\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00832}00832\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00833}00833\ \ \ \ \ \ \ \ \ \$prefix\ ??=\ \$directory;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00834}00834\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00835}00835\ \ \ \ \ \ \ \ \ \$this-\/>anonymousComponentNamespaces[\$prefix]\ =\ Str::of(\$directory)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00836}00836\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>replace(\textcolor{charliteral}{'/'},\ \textcolor{charliteral}{'.'})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00837}00837\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>trim(\textcolor{stringliteral}{'.\ '})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00838}00838\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>toString();}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00839}00839\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00840}00840\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00848}00848\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ componentNamespace(\mbox{\hyperlink{traces_8html_8php_a3825c9b9060c2d6ef594385997cd60aa}{\$namespace}},\ \$prefix)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00849}00849\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00850}00850\ \ \ \ \ \ \ \ \ \$this-\/>classComponentNamespaces[\$prefix]\ =\ \mbox{\hyperlink{traces_8html_8php_a3825c9b9060c2d6ef594385997cd60aa}{\$namespace}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00851}00851\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00852}00852\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00858}00858\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ getAnonymousComponentPaths()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00859}00859\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00860}00860\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>anonymousComponentPaths;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00861}00861\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00862}00862\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00868}00868\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ getAnonymousComponentNamespaces()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00869}00869\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00870}00870\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>anonymousComponentNamespaces;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00871}00871\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00872}00872\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00878}00878\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ getClassComponentNamespaces()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00879}00879\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00880}00880\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>classComponentNamespaces;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00881}00881\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00882}00882\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00890}00890\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ aliasComponent(\$path,\ \$alias\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00891}00891\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00892}00892\ \ \ \ \ \ \ \ \ \$alias\ =\ \$alias\ ?:\ Arr::last(explode(\textcolor{charliteral}{'.'},\ \$path));}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00893}00893\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00894}00894\ \ \ \ \ \ \ \ \ \$this-\/>directive(\$alias,\ \textcolor{keyword}{function}\ (\$expression)\ use\ (\$path)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00895}00895\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$expression}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00896}00896\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \textcolor{stringliteral}{"{}<?php\ \(\backslash\)\$\_\_env-\/>startComponent('\{\$path\}',\ \{\$expression\});\ ?>"{}}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00897}00897\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{stringliteral}{"{}<?php\ \(\backslash\)\$\_\_env-\/>startComponent('\{\$path\}');\ ?>"{}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00898}00898\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00899}00899\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00900}00900\ \ \ \ \ \ \ \ \ \$this-\/>directive(\textcolor{stringliteral}{'end'}.\$alias,\ \textcolor{keyword}{function}\ (\$expression)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00901}00901\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'<?php\ echo\ \$\_\_env-\/>renderComponent();\ ?>'};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00902}00902\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00903}00903\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00904}00904\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00912}00912\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ include(\$path,\ \$alias\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00913}00913\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00914}00914\ \ \ \ \ \ \ \ \ \$this-\/>aliasInclude(\$path,\ \$alias);}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00915}00915\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00916}00916\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00924}00924\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ aliasInclude(\$path,\ \$alias\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00925}00925\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00926}00926\ \ \ \ \ \ \ \ \ \$alias\ =\ \$alias\ ?:\ Arr::last(explode(\textcolor{charliteral}{'.'},\ \$path));}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00927}00927\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00928}00928\ \ \ \ \ \ \ \ \ \$this-\/>directive(\$alias,\ \textcolor{keyword}{function}\ (\$expression)\ use\ (\$path)\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00929}00929\ \ \ \ \ \ \ \ \ \ \ \ \ \$expression\ =\ \$this-\/>stripParentheses(\$expression)\ ?:\ \textcolor{stringliteral}{'[]'};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00930}00930\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00931}00931\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}<?php\ echo\ \(\backslash\)\$\_\_env-\/>make('\{\$path\}',\ \{\$expression\},\ \(\backslash\)Illuminate\(\backslash\)Support\(\backslash\)Arr::except(get\_defined\_vars(),\ ['\_\_data',\ '\_\_path']))-\/>render();\ ?>"{}};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00932}00932\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00933}00933\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00934}00934\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00944}00944\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ directive(\$name,\ callable\ \$handler)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00945}00945\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00946}00946\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ preg\_match(\textcolor{stringliteral}{'/\string^\(\backslash\)w+(?:::\(\backslash\)w+)?\$/x'},\ \$name))\ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00947}00947\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidArgumentException(\textcolor{stringliteral}{"{}The\ directive\ name\ [\{\$name\}]\ is\ not\ valid.\ Directive\ names\ must\ only\ contain\ alphanumeric\ characters\ and\ underscores."{}});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00948}00948\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00949}00949\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00950}00950\ \ \ \ \ \ \ \ \ \$this-\/>customDirectives[\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}}]\ =\ \$handler;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00951}00951\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00952}00952\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00958}00958\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ getCustomDirectives()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00959}00959\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00960}00960\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>customDirectives;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00961}00961\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00962}00962\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00969}00969\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ prepareStringsForCompilationUsing(callable\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00970}00970\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00971}00971\ \ \ \ \ \ \ \ \ \$this-\/>prepareStringsForCompilationUsing[]\ =\ \$callback;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00972}00972\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00973}00973\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00974}00974\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00975}00975\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00982}00982\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ precompiler(callable\ \$precompiler)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00983}00983\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00984}00984\ \ \ \ \ \ \ \ \ \$this-\/>precompilers[]\ =\ \$precompiler;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00985}00985\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00986}00986\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00993}00993\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ setEchoFormat(\$format)}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00994}00994\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00995}00995\ \ \ \ \ \ \ \ \ \$this-\/>echoFormat\ =\ \$format;}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00996}00996\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l00997}00997\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01003}01003\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ withDoubleEncoding()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01004}01004\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01005}01005\ \ \ \ \ \ \ \ \ \$this-\/>setEchoFormat(\textcolor{stringliteral}{'e(\%s,\ true)'});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01006}01006\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01007}01007\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01013}01013\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ withoutDoubleEncoding()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01014}01014\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01015}01015\ \ \ \ \ \ \ \ \ \$this-\/>setEchoFormat(\textcolor{stringliteral}{'e(\%s,\ false)'});}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01016}01016\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01017}01017\ }
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01023}01023\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ withoutComponentTags()}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01024}01024\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01025}01025\ \ \ \ \ \ \ \ \ \$this-\/>compilesComponentTags\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01026}01026\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_blade_compiler_8php_source_l01027}01027\ \}}
+
+\end{DoxyCode}

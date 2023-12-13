@@ -1,0 +1,238 @@
+\chapter{Mockery}
+\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e}{}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e}\index{Mockery@{Mockery}}
+\href{https://github.com/mockery/mockery/actions}{\texttt{ }} \href{https://www.php.net/supported-versions}{\texttt{ }} \href{https://codecov.io/gh/mockery/mockery}{\texttt{ }} \href{https://shepherd.dev/github/mockery/mockery}{\texttt{ }} \href{https://packagist.org/packages/mockery/mockery}{\texttt{ }} \href{https://packagist.org/packages/mockery/mockery}{\texttt{ }}
+
+\doxylink{namespace_mockery}{Mockery} is a simple yet flexible PHP mock object framework for use in unit testing with \doxylink{namespace_p_h_p_unit}{PHPUnit}, PHPSpec or any other testing framework. Its core goal is to offer a test double framework with a succinct API capable of clearly defining all possible object operations and interactions using a human readable Domain Specific Language (DSL). Designed as a drop in alternative to \doxylink{namespace_p_h_p_unit}{PHPUnit}\textquotesingle{}s phpunit-\/mock-\/objects library, \doxylink{namespace_mockery}{Mockery} is easy to integrate with \doxylink{namespace_p_h_p_unit}{PHPUnit} and can operate alongside phpunit-\/mock-\/objects without the World ending.
+
+\doxylink{namespace_mockery}{Mockery} is released under a New BSD License.\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1145}{}\doxysection{\texorpdfstring{Installation}{Installation}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1145}
+To install \doxylink{namespace_mockery}{Mockery}, run the command below and you will get the latest version
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{composer\ require\ -\/-\/dev\ mockery/mockery}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1146}{}\doxysection{\texorpdfstring{Documentation}{Documentation}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1146}
+In older versions, this README file was the documentation for \doxylink{namespace_mockery}{Mockery}. Over time we have improved this, and have created an extensive documentation for you. Please use this README file as a starting point for \doxylink{namespace_mockery}{Mockery}, but do read the documentation to learn how to use \doxylink{namespace_mockery}{Mockery}.
+
+The current version can be seen at \href{http://docs.mockery.io}{\texttt{ docs.\+mockery.\+io}}.\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1147}{}\doxysection{\texorpdfstring{PHPUnit Integration}{PHPUnit Integration}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1147}
+\doxylink{namespace_mockery}{Mockery} ships with some helpers if you are using \doxylink{namespace_p_h_p_unit}{PHPUnit}. You can extend the \href{library/Mockery/Adapter/Phpunit/MockeryTestCase.php}{\texttt{ {\ttfamily Mockery\textbackslash{}Adapter\textbackslash{}Phpunit\textbackslash{}Mockery\+Test\+Case}}} class instead of {\ttfamily \doxylink{namespace_p_h_p_unit}{PHPUnit}\textbackslash{}Framework\textbackslash{}Test\+Case}, or if you are already using a custom base class for your tests, take a look at the traits available in the \href{library/Mockery/Adapter/Phpunit}{\texttt{ {\ttfamily Mockery\textbackslash{}Adapter\textbackslash{}Phpunit}}} namespace.\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1148}{}\doxysection{\texorpdfstring{Test Doubles}{Test Doubles}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1148}
+Test doubles (often called mocks) simulate the behaviour of real objects. They are commonly utilised to offer test isolation, to stand in for objects which do not yet exist, or to allow for the exploratory design of class APIs without requiring actual implementation up front.
+
+The benefits of a test double framework are to allow for the flexible generation and configuration of test doubles. They allow the setting of expected method calls and/or return values using a flexible API which is capable of capturing every possible real object behaviour in way that is stated as close as possible to a natural language description. Use the {\ttfamily Mockery\+::mock} method to create a test double.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{\$double\ =\ Mockery::mock();}
+
+\end{DoxyCode}
+
+
+If you need \doxylink{namespace_mockery}{Mockery} to create a test double to satisfy a particular type hint, you can pass the type to the {\ttfamily mock} method.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{class\ Book\ \{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{interface\ BookRepository\ \{}
+\DoxyCodeLine{\ \ \ \ function\ find(\$id):\ Book;}
+\DoxyCodeLine{\ \ \ \ function\ findAll():\ array;}
+\DoxyCodeLine{\ \ \ \ function\ add(Book\ \$book):\ void;}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$double\ =\ Mockery::mock(BookRepository::class);}
+
+\end{DoxyCode}
+
+
+A detailed explanation of creating and working with test doubles is given in the documentation, \href{http://docs.mockery.io/en/latest/reference/creating_test_doubles.html}{\texttt{ Creating test doubles}} section.\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1149}{}\doxysection{\texorpdfstring{Method Stubs 🎫}{Method Stubs 🎫}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1149}
+A method stub is a mechanism for having your test double return canned responses to certain method calls. With stubs, you don\textquotesingle{}t care how many times, if at all, the method is called. Stubs are used to provide indirect input to the system under test.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{\$double-\/>allows()-\/>find(123)-\/>andReturns(new\ Book());}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$book\ =\ \$double-\/>find(123);}
+
+\end{DoxyCode}
+
+
+If you have used \doxylink{namespace_mockery}{Mockery} before, you might see something new in the example above --- we created a method stub using {\ttfamily allows}, instead of the "{}old"{} {\ttfamily should\+Receive} syntax. This is a new feature of \doxylink{namespace_mockery}{Mockery} v1, but fear not, the trusty ol\textquotesingle{} {\ttfamily should\+Receive} is still here.
+
+For new users of \doxylink{namespace_mockery}{Mockery}, the above example can also be written as\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{\$double-\/>shouldReceive('find')-\/>with(123)-\/>andReturn(new\ Book());}
+\DoxyCodeLine{\$book\ =\ \$double-\/>find(123);}
+
+\end{DoxyCode}
+
+
+If your stub doesn\textquotesingle{}t require specific arguments, you can also use this shortcut for setting up multiple calls at once\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{\$double-\/>allows([}
+\DoxyCodeLine{\ \ \ \ "{}findAll"{}\ =>\ [new\ Book(),\ new\ Book()],}
+\DoxyCodeLine{]);}
+
+\end{DoxyCode}
+
+
+or
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{\$double-\/>shouldReceive('findAll')}
+\DoxyCodeLine{\ \ \ \ -\/>andReturn([new\ Book(),\ new\ Book()]);}
+
+\end{DoxyCode}
+
+
+You can also use this shortcut, which creates a double and sets up some stubs in one call\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{\$double\ =\ Mockery::mock(BookRepository::class,\ [}
+\DoxyCodeLine{\ \ \ \ "{}findAll"{}\ =>\ [new\ Book(),\ new\ Book()],}
+\DoxyCodeLine{]);}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1150}{}\doxysection{\texorpdfstring{Method Call Expectations 📲}{Method Call Expectations 📲}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1150}
+A Method call expectation is a mechanism to allow you to verify that a particular method has been called. You can specify the parameters and you can also specify how many times you expect it to be called. Method call expectations are used to verify indirect output of the system under test.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{\$book\ =\ new\ Book();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$double\ =\ Mockery::mock(BookRepository::class);}
+\DoxyCodeLine{\$double-\/>expects()-\/>add(\$book);}
+
+\end{DoxyCode}
+
+
+During the test, \doxylink{namespace_mockery}{Mockery} accept calls to the {\ttfamily add} method as prescribed. After you have finished exercising the system under test, you need to tell \doxylink{namespace_mockery}{Mockery} to check that the method was called as expected, using the {\ttfamily Mockery\+::close} method. One way to do that is to add it to your {\ttfamily tear\+Down} method in \doxylink{namespace_p_h_p_unit}{PHPUnit}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{}
+\DoxyCodeLine{public\ function\ tearDown()}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ Mockery::close();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+The {\ttfamily expects()} method automatically sets up an expectation that the method call (and matching parameters) is called {\bfseries{once and once only}}. You can choose to change this if you are expecting more calls.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{\$double-\/>expects()-\/>add(\$book)-\/>twice();}
+
+\end{DoxyCode}
+
+
+If you have used \doxylink{namespace_mockery}{Mockery} before, you might see something new in the example above --- we created a method expectation using {\ttfamily expects}, instead of the "{}old"{} {\ttfamily should\+Receive} syntax. This is a new feature of \doxylink{namespace_mockery}{Mockery} v1, but same as with {\ttfamily allows} in the previous section, it can be written in the "{}old"{} style.
+
+For new users of \doxylink{namespace_mockery}{Mockery}, the above example can also be written as\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{\$double-\/>shouldReceive('find')}
+\DoxyCodeLine{\ \ \ \ -\/>with(123)}
+\DoxyCodeLine{\ \ \ \ -\/>once()}
+\DoxyCodeLine{\ \ \ \ -\/>andReturn(new\ Book());}
+\DoxyCodeLine{\$book\ =\ \$double-\/>find(123);}
+
+\end{DoxyCode}
+
+
+A detailed explanation of declaring expectations on method calls, please read the documentation, the \href{http://docs.mockery.io/en/latest/reference/expectations.html}{\texttt{ Expectation declarations}} section. After that, you can also learn about the new {\ttfamily allows} and {\ttfamily expects} methods in the \href{http://docs.mockery.io/en/latest/reference/alternative_should_receive_syntax.html}{\texttt{ Alternative should\+Receive syntax}} section.
+
+It is worth mentioning that one way of setting up expectations is no better or worse than the other. Under the hood, {\ttfamily allows} and {\ttfamily expects} are doing the same thing as {\ttfamily should\+Receive}, at times in "{}less words"{}, and as such it comes to a personal preference of the programmer which way to use.\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1151}{}\doxysection{\texorpdfstring{Test Spies 🕵️}{Test Spies 🕵️}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1151}
+By default, all test doubles created with the {\ttfamily Mockery\+::mock} method will only accept calls that they have been configured to {\ttfamily allow} or {\ttfamily expect} (or in other words, calls that they {\ttfamily should\+Receive}). Sometimes we don\textquotesingle{}t necessarily care about all of the calls that are going to be made to an object. To facilitate this, we can tell \doxylink{namespace_mockery}{Mockery} to ignore any calls it has not been told to expect or allow. To do so, we can tell a test double {\ttfamily should\+Ignore\+Missing}, or we can create the double using the {\ttfamily Mocker\+::spy} shortcut.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{//\ \$double\ =\ Mockery::mock()-\/>shouldIgnoreMissing();}
+\DoxyCodeLine{\$double\ =\ Mockery::spy();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$double-\/>foo();\ //\ null}
+\DoxyCodeLine{\$double-\/>bar();\ //\ null}
+
+\end{DoxyCode}
+
+
+Further to this, sometimes we want to have the object accept any call during the test execution and then verify the calls afterwards. For these purposes, we need our test double to act as a Spy. All mockery test doubles record the calls that are made to them for verification afterwards by default\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{\$double-\/>baz(123);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$double-\/>shouldHaveReceived()-\/>baz(123);\ //\ null}
+\DoxyCodeLine{\$double-\/>shouldHaveReceived()-\/>baz(12345);\ //\ Uncaught\ Exception\ Mockery\(\backslash\)Exception\(\backslash\)InvalidCountException...}
+
+\end{DoxyCode}
+
+
+Please refer to the \href{http://docs.mockery.io/en/latest/reference/spies.html}{\texttt{ Spies}} section of the documentation to learn more about the spies.\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1152}{}\doxysection{\texorpdfstring{Utilities 🔌}{Utilities 🔌}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1152}
+\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1153}{}\doxysubsection{\texorpdfstring{Global Helpers}{Global Helpers}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1153}
+\doxylink{namespace_mockery}{Mockery} ships with a handful of global helper methods, you just need to ask \doxylink{namespace_mockery}{Mockery} to declare them.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{Mockery::globalHelpers();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$mock\ =\ mock(Some::class);}
+\DoxyCodeLine{\$spy\ =\ spy(Some::class);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$spy-\/>shouldHaveReceived()}
+\DoxyCodeLine{\ \ \ \ -\/>foo(anyArgs());}
+
+\end{DoxyCode}
+
+
+All of the global helpers are wrapped in a {\ttfamily !function\+\_\+exists} call to avoid conflicts. So if you already have a global function called {\ttfamily spy}, \doxylink{namespace_mockery}{Mockery} will silently skip the declaring its own {\ttfamily spy} function.\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1154}{}\doxysubsection{\texorpdfstring{Testing Traits}{Testing Traits}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1154}
+As \doxylink{namespace_mockery}{Mockery} ships with code generation capabilities, it was trivial to add functionality allowing users to create objects on the fly that use particular traits. Any abstract methods defined by the trait will be created and can have expectations or stubs configured like normal Test Doubles.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ php}
+\DoxyCodeLine{trait\ Foo\ \{}
+\DoxyCodeLine{\ \ \ \ function\ foo()\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ return\ \$this-\/>doFoo();}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ abstract\ function\ doFoo();}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$double\ =\ Mockery::mock(Foo::class);}
+\DoxyCodeLine{\$double-\/>allows()-\/>doFoo()-\/>andReturns(123);}
+\DoxyCodeLine{\$double-\/>foo();\ //\ int(123)}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1155}{}\doxysection{\texorpdfstring{Versioning}{Versioning}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1155}
+The \doxylink{namespace_mockery}{Mockery} team attempts to adhere to \href{http://semver.org}{\texttt{ Semantic Versioning}}, however, some of \doxylink{namespace_mockery}{Mockery}\textquotesingle{}s internals are considered private and will be open to change at any time. Just because a class isn\textquotesingle{}t final, or a method isn\textquotesingle{}t marked private, does not mean it constitutes part of the API we guarantee under the versioning scheme.\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1156}{}\doxysubsection{\texorpdfstring{Alternative Runtimes}{Alternative Runtimes}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1156}
+\doxylink{namespace_mockery}{Mockery} 1.\+3 was the last version to support HHVM 3 and PHP 5. There is no support for HHVM 4+.\hypertarget{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1157}{}\doxysection{\texorpdfstring{A new home for Mockery}{A new home for Mockery}}\label{md_vendor_2mockery_2mockery_2_r_e_a_d_m_e_autotoc_md1157}
+⚠️️ Update your remotes! \doxylink{namespace_mockery}{Mockery} has transferred to a new location. While it was once at {\ttfamily padraic/mockery}, it is now at {\ttfamily mockery/mockery}. While your existing repositories will redirect transparently for any operations, take some time to transition to the new URL. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$\ git\ remote\ set-\/url\ upstream\ https://github.com/mockery/mockery.git}
+
+\end{DoxyCode}
+ Replace {\ttfamily upstream} with the name of the remote you use locally; {\ttfamily upstream} is commonly used but you may be using something else. Run {\ttfamily git remote -\/v} to see what you\textquotesingle{}re actually using. 

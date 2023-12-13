@@ -1,0 +1,231 @@
+\doxysection{Event\+Dispatcher.\+php}
+\hypertarget{_event_dispatcher_8php_source}{}\label{_event_dispatcher_8php_source}\index{vendor/symfony/event-\/dispatcher/EventDispatcher.php@{vendor/symfony/event-\/dispatcher/EventDispatcher.php}}
+\mbox{\hyperlink{_event_dispatcher_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_event_dispatcher}{Symfony\(\backslash\)Component\(\backslash\)EventDispatcher}};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00014}00014\ use\ \mbox{\hyperlink{interface_psr_1_1_event_dispatcher_1_1_stoppable_event_interface}{Psr\(\backslash\)EventDispatcher\(\backslash\)StoppableEventInterface}};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener}{Symfony\(\backslash\)Component\(\backslash\)EventDispatcher\(\backslash\)Debug\(\backslash\)WrappedListener}};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00032}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher}{00032}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher}{EventDispatcher}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_interface}{EventDispatcherInterface}}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00033}00033\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00034}00034\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$listeners\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00035}00035\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$sorted\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$optimized;}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00038}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a095c5d389db211932136b53f25f39685}{00038}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a095c5d389db211932136b53f25f39685}{\_\_construct}}()}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00039}00039\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_\_CLASS\_\_\ ===\ static::class)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>optimized\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00043}00043\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00045}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a8793008dd0985c016943c0babe46d0cf}{00045}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a8793008dd0985c016943c0babe46d0cf}{dispatch}}(\textcolor{keywordtype}{object}\ \$event,\ \textcolor{keywordtype}{string}\ \$eventName\ =\ \textcolor{keyword}{null}):\ object}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00046}00046\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \$eventName\ ??=\ \$event::class;}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>optimized))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \$listeners\ =\ \$this-\/>optimized[\$eventName]\ ??\ (empty(\$this-\/>listeners[\$eventName])\ ?\ []\ :\ \$this-\/>optimizeListeners(\$eventName));}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \$listeners\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a132ee1e5c1bdf1fb4248b61dbf5cf987}{getListeners}}(\$eventName);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$listeners)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_aa8094909881b8aeb2be2ee8b41cf982d}{callListeners}}(\$listeners,\ \$eventName,\ \$event);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$event;}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00060}00060\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00062}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a132ee1e5c1bdf1fb4248b61dbf5cf987}{00062}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a132ee1e5c1bdf1fb4248b61dbf5cf987}{getListeners}}(\textcolor{keywordtype}{string}\ \$eventName\ =\ \textcolor{keyword}{null}):\ array}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00063}00063\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$eventName)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$this-\/>listeners[\$eventName]))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>sorted[\$eventName]))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>sortListeners(\$eventName);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>sorted[\$eventName];}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>listeners\ as\ \$eventName\ =>\ \$eventListeners)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>sorted[\$eventName]))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>sortListeners(\$eventName);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_filter(\$this-\/>sorted);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00085}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a5caa2fb371b15f50007020b7948a0c9e}{00085}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a5caa2fb371b15f50007020b7948a0c9e}{getListenerPriority}}(\textcolor{keywordtype}{string}\ \$eventName,\ callable|array\ \$listener):\ ?int}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00086}00086\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$this-\/>listeners[\$eventName]))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_array(\$listener)\ \&\&\ isset(\$listener[0])\ \&\&\ \$listener[0]\ instanceof\ \(\backslash\)Closure\ \&\&\ 2\ >=\ \(\backslash\)count(\$listener))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \$listener[0]\ =\ \$listener[0]();}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \$listener[1]\ ??=\ \textcolor{stringliteral}{'\_\_invoke'};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>listeners[\$eventName]\ as\ \$priority\ =>\ \&\$listeners)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$listeners\ as\ \&\$v)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$v\ !==\ \$listener\ \&\&\ \(\backslash\)is\_array(\$v)\ \&\&\ isset(\$v[0])\ \&\&\ \$v[0]\ instanceof\ \(\backslash\)Closure\ \&\&\ 2\ >=\ \(\backslash\)count(\$v))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$v[0]\ =\ \$v[0]();}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$v[1]\ ??=\ \textcolor{stringliteral}{'\_\_invoke'};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$v\ ===\ \$listener\ ||\ (\$listener\ instanceof\ \(\backslash\)Closure\ \&\&\ \$v\ ==\ \$listener))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$priority;}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00109}00109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00111}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_ab0d9aab0567b30f62ce0384b93915bcd}{00111}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_ab0d9aab0567b30f62ce0384b93915bcd}{hasListeners}}(\textcolor{keywordtype}{string}\ \$eventName\ =\ \textcolor{keyword}{null}):\ bool}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00112}00112\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$eventName)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !empty(\$this-\/>listeners[\$eventName]);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>listeners\ as\ \$eventListeners)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$eventListeners)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00124}00124\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00129}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a6846af88a45494203b88634db7f2fb15}{00129}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a6846af88a45494203b88634db7f2fb15}{addListener}}(\textcolor{keywordtype}{string}\ \$eventName,\ callable|array\ \$listener,\ \textcolor{keywordtype}{int}\ \$priority\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00130}00130\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \$this-\/>listeners[\$eventName][\$priority][]\ =\ \$listener;}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ unset(\$this-\/>sorted[\$eventName],\ \$this-\/>optimized[\$eventName]);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00133}00133\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00138}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a998aec23411fcc35f6b105fa8722a198}{00138}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a998aec23411fcc35f6b105fa8722a198}{removeListener}}(\textcolor{keywordtype}{string}\ \$eventName,\ callable|array\ \$listener)}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00139}00139\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$this-\/>listeners[\$eventName]))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_array(\$listener)\ \&\&\ isset(\$listener[0])\ \&\&\ \$listener[0]\ instanceof\ \(\backslash\)Closure\ \&\&\ 2\ >=\ \(\backslash\)count(\$listener))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \$listener[0]\ =\ \$listener[0]();}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \$listener[1]\ ??=\ \textcolor{stringliteral}{'\_\_invoke'};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>listeners[\$eventName]\ as\ \$priority\ =>\ \&\$listeners)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$listeners\ as\ \$k\ =>\ \&\$v)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$v\ !==\ \$listener\ \&\&\ \(\backslash\)is\_array(\$v)\ \&\&\ isset(\$v[0])\ \&\&\ \$v[0]\ instanceof\ \(\backslash\)Closure\ \&\&\ 2\ >=\ \(\backslash\)count(\$v))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$v[0]\ =\ \$v[0]();}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$v[1]\ ??=\ \textcolor{stringliteral}{'\_\_invoke'};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$v\ ===\ \$listener\ ||\ (\$listener\ instanceof\ \(\backslash\)Closure\ \&\&\ \$v\ ==\ \$listener))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$listeners[\$k],\ \$this-\/>sorted[\$eventName],\ \$this-\/>optimized[\$eventName]);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$listeners)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$this-\/>listeners[\$eventName][\$priority]);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00164}00164\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00169}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a2f54737e2e4b383a901cae736143bd2d}{00169}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a2f54737e2e4b383a901cae736143bd2d}{addSubscriber}}(\mbox{\hyperlink{interface_symfony_1_1_component_1_1_event_dispatcher_1_1_event_subscriber_interface}{EventSubscriberInterface}}\ \$subscriber)}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00170}00170\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$subscriber-\/>\mbox{\hyperlink{interface_symfony_1_1_component_1_1_event_dispatcher_1_1_event_subscriber_interface_af1f63475927bbcb3bd21b58712076104}{getSubscribedEvents}}()\ as\ \$eventName\ =>\ \$params)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_string(\$params))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a6846af88a45494203b88634db7f2fb15}{addListener}}(\$eventName,\ [\$subscriber,\ \$params]);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\(\backslash\)is\_string(\$params[0]))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a6846af88a45494203b88634db7f2fb15}{addListener}}(\$eventName,\ [\$subscriber,\ \$params[0]],\ \$params[1]\ ??\ 0);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$params\ as\ \$listener)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a6846af88a45494203b88634db7f2fb15}{addListener}}(\$eventName,\ [\$subscriber,\ \$listener[0]],\ \$listener[1]\ ??\ 0);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00182}00182\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00187}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a34aa2b525612f9c0d3b6b7e9c72c6393}{00187}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a34aa2b525612f9c0d3b6b7e9c72c6393}{removeSubscriber}}(\mbox{\hyperlink{interface_symfony_1_1_component_1_1_event_dispatcher_1_1_event_subscriber_interface}{EventSubscriberInterface}}\ \$subscriber)}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00188}00188\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$subscriber-\/>\mbox{\hyperlink{interface_symfony_1_1_component_1_1_event_dispatcher_1_1_event_subscriber_interface_af1f63475927bbcb3bd21b58712076104}{getSubscribedEvents}}()\ as\ \$eventName\ =>\ \$params)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_array(\$params)\ \&\&\ \(\backslash\)is\_array(\$params[0]))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$params\ as\ \$listener)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a998aec23411fcc35f6b105fa8722a198}{removeListener}}(\$eventName,\ [\$subscriber,\ \$listener[0]]);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_a998aec23411fcc35f6b105fa8722a198}{removeListener}}(\$eventName,\ [\$subscriber,\ \(\backslash\)is\_string(\$params)\ ?\ \$params\ :\ \$params[0]]);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00198}00198\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00212}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_aa8094909881b8aeb2be2ee8b41cf982d}{00212}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_aa8094909881b8aeb2be2ee8b41cf982d}{callListeners}}(iterable\ \$listeners,\ \textcolor{keywordtype}{string}\ \$eventName,\ \textcolor{keywordtype}{object}\ \$event)}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00213}00213\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \$stoppable\ =\ \$event\ instanceof\ \mbox{\hyperlink{interface_psr_1_1_event_dispatcher_1_1_stoppable_event_interface}{StoppableEventInterface}};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$listeners\ as\ \$listener)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$stoppable\ \&\&\ \$event-\/>isPropagationStopped())\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \$listener(\$event,\ \$eventName,\ \$this);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00222}00222\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00227}00227\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ sortListeners(\textcolor{keywordtype}{string}\ \$eventName):\ void}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00228}00228\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ krsort(\$this-\/>listeners[\$eventName]);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \$this-\/>sorted[\$eventName]\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>listeners[\$eventName]\ as\ \&\$listeners)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$listeners\ as\ \&\$listener)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_array(\$listener)\ \&\&\ isset(\$listener[0])\ \&\&\ \$listener[0]\ instanceof\ \(\backslash\)Closure\ \&\&\ 2\ >=\ \(\backslash\)count(\$listener))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$listener[0]\ =\ \$listener[0]();}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$listener[1]\ ??=\ \textcolor{stringliteral}{'\_\_invoke'};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>sorted[\$eventName][]\ =\ \$listener;}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00241}00241\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00246}00246\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ optimizeListeners(\textcolor{keywordtype}{string}\ \$eventName):\ array}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00247}00247\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ krsort(\$this-\/>listeners[\$eventName]);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \$this-\/>optimized[\$eventName]\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>listeners[\$eventName]\ as\ \&\$listeners)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$listeners\ as\ \&\$listener)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$closure\ =\ \&\$this-\/>optimized[\$eventName][];}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_array(\$listener)\ \&\&\ isset(\$listener[0])\ \&\&\ \$listener[0]\ instanceof\ \(\backslash\)Closure\ \&\&\ 2\ >=\ \(\backslash\)count(\$listener))\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$closure\ =\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (...\$args)\ use\ (\&\$listener,\ \&\$closure)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$listener[0]\ instanceof\ \(\backslash\)Closure)\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$listener[0]\ =\ \$listener[0]();}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$listener[1]\ ??=\ \textcolor{stringliteral}{'\_\_invoke'};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\$closure\ =\ \$listener(...))(...\$args);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$closure\ =\ \$listener\ instanceof\ WrappedListener\ ?\ \$listener\ :\ \$listener(...);}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>optimized[\$eventName];}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00269}00269\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_event_dispatcher_8php_source_l00270}00270\ \}}
+
+\end{DoxyCode}

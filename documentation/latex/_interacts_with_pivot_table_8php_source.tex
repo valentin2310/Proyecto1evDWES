@@ -1,0 +1,480 @@
+\doxysection{Interacts\+With\+Pivot\+Table.\+php}
+\hypertarget{_interacts_with_pivot_table_8php_source}{}\label{_interacts_with_pivot_table_8php_source}\index{vendor/laravel/framework/src/Illuminate/Database/Eloquent/Relations/Concerns/InteractsWithPivotTable.php@{vendor/laravel/framework/src/Illuminate/Database/Eloquent/Relations/Concerns/InteractsWithPivotTable.php}}
+\mbox{\hyperlink{_interacts_with_pivot_table_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_concerns}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)Concerns}};}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00005}00005\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_collection}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Collection}};}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00006}00006\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Model}};}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_pivot}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)Pivot}};}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_collection}{Illuminate\(\backslash\)Support\(\backslash\)Collection}}\ as\ BaseCollection;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00010}00010\ trait\ InteractsWithPivotTable}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00011}00011\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ toggle(\$ids,\ \$touch\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00022}00022\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00023}00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a61118d08e00173733188a48686ab6fe9}{\$changes}}\ =\ [}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'attached'}\ =>\ [],\ \textcolor{stringliteral}{'detached'}\ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00025}00025\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00027}00027\ \ \ \ \ \ \ \ \ \$records\ =\ \$this-\/>formatRecordsList(\$this-\/>parseIds(\$ids));}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Next,\ we\ will\ determine\ which\ IDs\ should\ get\ removed\ from\ the\ join\ table\ by}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ checking\ which\ of\ the\ given\ ID/records\ is\ in\ the\ list\ of\ current\ records}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ removing\ all\ of\ those\ rows\ from\ this\ "{}intermediate"{}\ joining\ table.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00032}00032\ \ \ \ \ \ \ \ \ \$detach\ =\ array\_values(array\_intersect(}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>newPivotQuery()-\/>pluck(\$this-\/>relatedPivotKey)-\/>all(),}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ array\_keys(\$records)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00035}00035\ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$detach)\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>detach(\$detach,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a61118d08e00173733188a48686ab6fe9}{\$changes}}[\textcolor{stringliteral}{'detached'}]\ =\ \$this-\/>castKeys(\$detach);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Finally,\ for\ all\ of\ the\ records\ which\ were\ not\ "{}detached"{},\ we'll\ attach\ the}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ records\ into\ the\ intermediate\ table.\ Then,\ we\ will\ add\ those\ attaches\ to}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ change\ list\ and\ get\ ready\ to\ return\ these\ results\ to\ the\ callers.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \$attach\ =\ array\_diff\_key(\$records,\ array\_flip(\$detach));}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$attach)\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>attach(\$attach,\ [],\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a61118d08e00173733188a48686ab6fe9}{\$changes}}[\textcolor{stringliteral}{'attached'}]\ =\ array\_keys(\$attach);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Once\ we\ have\ finished\ attaching\ or\ detaching\ the\ records,\ we\ will\ see\ if\ we}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ have\ done\ any\ attaching\ or\ detaching,\ and\ if\ we\ have\ we\ will\ touch\ these}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ relationships\ if\ they\ are\ configured\ to\ touch\ on\ any\ database\ updates.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$touch\ \&\&\ (count(\$changes[\textcolor{stringliteral}{'attached'}])\ ||}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count(\$changes[\textcolor{stringliteral}{'detached'}])))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>touchIfTouching();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a61118d08e00173733188a48686ab6fe9}{\$changes}};}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00063}00063\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ syncWithoutDetaching(\$ids)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00072}00072\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>sync(\$ids,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00074}00074\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00083}00083\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ sync(\$ids,\ \$detaching\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00084}00084\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a61118d08e00173733188a48686ab6fe9}{\$changes}}\ =\ [}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'attached'}\ =>\ [],\ \textcolor{stringliteral}{'detached'}\ =>\ [],\ \textcolor{stringliteral}{'updated'}\ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First\ we\ need\ to\ attach\ any\ of\ the\ associated\ models\ that\ are\ not\ currently}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ in\ this\ joining\ table.\ We'll\ spin\ through\ the\ given\ IDs,\ checking\ to\ see}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ they\ exist\ in\ the\ array\ of\ current\ ones,\ and\ if\ not\ we\ will\ insert.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_a2c4c58e377f6c66ca38c8ea97666fc5e}{\$current}}\ =\ \$this-\/>getCurrentlyAttachedPivots()}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>pluck(\$this-\/>relatedPivotKey)-\/>all();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \$records\ =\ \$this-\/>formatRecordsList(\$this-\/>parseIds(\$ids));}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Next,\ we\ will\ take\ the\ differences\ of\ the\ currents\ and\ given\ IDs\ and\ detach}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ all\ of\ the\ entities\ that\ exist\ in\ the\ "{}current"{}\ array\ but\ are\ not\ in\ the}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ array\ of\ the\ new\ IDs\ given\ to\ the\ method\ which\ will\ complete\ the\ sync.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$detaching)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \$detach\ =\ array\_diff(\mbox{\hyperlink{update__mime__types_8php_a2c4c58e377f6c66ca38c8ea97666fc5e}{\$current}},\ array\_keys(\$records));}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$detach)\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>detach(\$detach);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a61118d08e00173733188a48686ab6fe9}{\$changes}}[\textcolor{stringliteral}{'detached'}]\ =\ \$this-\/>castKeys(\$detach);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Now\ we\ are\ finally\ ready\ to\ attach\ the\ new\ records.\ Note\ that\ we'll\ disable}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ touching\ until\ after\ the\ entire\ operation\ is\ complete\ so\ we\ don't\ fire\ a}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ton\ of\ touch\ operations\ until\ we\ are\ totally\ done\ syncing\ the\ records.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a61118d08e00173733188a48686ab6fe9}{\$changes}}\ =\ array\_merge(}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \$changes,\ \$this-\/>attachNew(\$records,\ \mbox{\hyperlink{update__mime__types_8php_a2c4c58e377f6c66ca38c8ea97666fc5e}{\$current}},\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Once\ we\ have\ finished\ attaching\ or\ detaching\ the\ records,\ we\ will\ see\ if\ we}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ have\ done\ any\ attaching\ or\ detaching,\ and\ if\ we\ have\ we\ will\ touch\ these}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ relationships\ if\ they\ are\ configured\ to\ touch\ on\ any\ database\ updates.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$changes[\textcolor{stringliteral}{'attached'}])\ ||}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ count(\$changes[\textcolor{stringliteral}{'updated'}])\ ||}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ count(\$changes[\textcolor{stringliteral}{'detached'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>touchIfTouching();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a61118d08e00173733188a48686ab6fe9}{\$changes}};}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00127}00127\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00137}00137\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ syncWithPivotValues(\$ids,\ array\ \$values,\ \textcolor{keywordtype}{bool}\ \$detaching\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00138}00138\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>sync(\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_abd38cbf58ce99ee77abe51199d143d99}{collect}}(\$this-\/>parseIds(\$ids))-\/>mapWithKeys(\textcolor{keyword}{function}\ (\$id)\ use\ (\$values)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\$id\ =>\ \$values];}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \}),\ \$detaching);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00142}00142\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00150}00150\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ formatRecordsList(array\ \$records)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00151}00151\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_abd38cbf58ce99ee77abe51199d143d99}{collect}}(\$records)-\/>mapWithKeys(\textcolor{keyword}{function}\ (\$attributes,\ \$id)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_array(\$attributes))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\$id,\ \$attributes]\ =\ [\$attributes,\ []];}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\$id\ =>\ \$attributes];}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \})-\/>all();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00159}00159\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00169}00169\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ attachNew(array\ \$records,\ array\ \mbox{\hyperlink{update__mime__types_8php_a2c4c58e377f6c66ca38c8ea97666fc5e}{\$current}},\ \$touch\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00170}00170\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a61118d08e00173733188a48686ab6fe9}{\$changes}}\ =\ [\textcolor{stringliteral}{'attached'}\ =>\ [],\ \textcolor{stringliteral}{'updated'}\ =>\ []];}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$records\ as\ \$id\ =>\ \$attributes)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ ID\ is\ not\ in\ the\ list\ of\ existing\ pivot\ IDs,\ we\ will\ insert\ a\ new\ pivot}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ record,\ otherwise,\ we\ will\ just\ update\ this\ existing\ record\ on\ this\ joining}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ table,\ so\ that\ the\ developers\ will\ easily\ update\ these\ records\ pain\ free.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ in\_array(\$id,\ \mbox{\hyperlink{update__mime__types_8php_a2c4c58e377f6c66ca38c8ea97666fc5e}{\$current}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>attach(\$id,\ \$attributes,\ \$touch);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a61118d08e00173733188a48686ab6fe9}{\$changes}}[\textcolor{stringliteral}{'attached'}][]\ =\ \$this-\/>castKey(\$id);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Now\ we'll\ try\ to\ update\ an\ existing\ pivot\ record\ with\ the\ attributes\ that\ were}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ given\ to\ the\ method.\ If\ the\ model\ is\ actually\ updated\ we\ will\ add\ it\ to\ the}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ list\ of\ updated\ pivot\ records\ so\ we\ return\ them\ back\ out\ to\ the\ consumer.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ elseif\ (count(\$attributes)\ >\ 0\ \&\&}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>updateExistingPivot(\$id,\ \$attributes,\ \$touch))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a61118d08e00173733188a48686ab6fe9}{\$changes}}[\textcolor{stringliteral}{'updated'}][]\ =\ \$this-\/>castKey(\$id);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a61118d08e00173733188a48686ab6fe9}{\$changes}};}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00193}00193\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00203}00203\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ updateExistingPivot(\$id,\ array\ \$attributes,\ \$touch\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00204}00204\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\textcolor{keyword}{using}\ \&\&}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ empty(\$this-\/>pivotWheres)\ \&\&}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ empty(\$this-\/>pivotWhereIns)\ \&\&}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ empty(\$this-\/>pivotWhereNulls))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>updateExistingPivotUsingCustomClass(\$id,\ \$attributes,\ \$touch);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>hasPivotColumn(\$this-\/>updatedAt()))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \$attributes\ =\ \$this-\/>addTimestampsToAttachment(\$attributes,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_a350e6204882f10ca369aebe31e9e1b6a}{\$updated}}\ =\ \$this-\/>newPivotStatementForId(\$this-\/>parseId(\$id))-\/>update(}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>castAttributes(\$attributes)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$touch)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>touchIfTouching();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{update__mime__types_8php_a350e6204882f10ca369aebe31e9e1b6a}{\$updated}};}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00225}00225\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00235}00235\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ updateExistingPivotUsingCustomClass(\$id,\ array\ \$attributes,\ \$touch)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00236}00236\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \$pivot\ =\ \$this-\/>getCurrentlyAttachedPivots()}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>where(\$this-\/>foreignPivotKey,\ \$this-\/>parent-\/>\{\$this-\/>parentKey\})}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a31428ddb78f082c4c41e7bb4612884fc}{where}}(\$this-\/>relatedPivotKey,\ \$this-\/>parseId(\$id))}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>first();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_a350e6204882f10ca369aebe31e9e1b6a}{\$updated}}\ =\ \$pivot\ ?\ \$pivot-\/>fill(\$attributes)-\/>isDirty()\ :\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{update__mime__types_8php_a350e6204882f10ca369aebe31e9e1b6a}{\$updated}})\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \$pivot-\/>save();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$touch)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>touchIfTouching();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{int})\ \mbox{\hyperlink{update__mime__types_8php_a350e6204882f10ca369aebe31e9e1b6a}{\$updated}};}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00253}00253\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00263}00263\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ attach(\$id,\ array\ \$attributes\ =\ [],\ \$touch\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00264}00264\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\textcolor{keyword}{using})\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>attachUsingCustomClass(\$id,\ \$attributes);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Here\ we\ will\ insert\ the\ attachment\ records\ into\ the\ pivot\ table.\ Once\ we\ have}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ inserted\ the\ records,\ we\ will\ touch\ the\ relationships\ if\ necessary\ and\ the}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ function\ will\ return.\ We\ can\ parse\ the\ IDs\ before\ inserting\ the\ records.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>newPivotStatement()-\/>insert(\$this-\/>formatAttachRecords(}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>parseIds(\$id),\ \$attributes}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$touch)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>touchIfTouching();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00279}00279\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00288}00288\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ attachUsingCustomClass(\$id,\ array\ \$attributes)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00289}00289\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00290}00290\ \ \ \ \ \ \ \ \ \$records\ =\ \$this-\/>formatAttachRecords(}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>parseIds(\$id),\ \$attributes}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$records\ as\ \$record)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>newPivot(\$record,\ \textcolor{keyword}{false})-\/>save();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00297}00297\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00298}00298\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00306}00306\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ formatAttachRecords(\$ids,\ array\ \$attributes)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00307}00307\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \$records\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \$hasTimestamps\ =\ (\$this-\/>hasPivotColumn(\$this-\/>createdAt())\ ||}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasPivotColumn(\$this-\/>updatedAt()));}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00312}00312\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00313}00313\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ To\ create\ the\ attachment\ records,\ we\ will\ simply\ spin\ through\ the\ IDs\ given}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ create\ a\ new\ record\ to\ insert\ for\ each\ ID.\ Each\ ID\ may\ actually\ be\ a}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ key\ in\ the\ array,\ with\ extra\ attributes\ to\ be\ placed\ in\ other\ columns.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$ids\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \$records[]\ =\ \$this-\/>formatAttachRecord(}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$key,\ \$value,\ \$attributes,\ \$hasTimestamps}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00321}00321\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$records;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00323}00323\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00324}00324\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00334}00334\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ formatAttachRecord(\$key,\ \$value,\ \$attributes,\ \$hasTimestamps)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00335}00335\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ [\$id,\ \$attributes]\ =\ \$this-\/>extractAttachIdAndAttributes(\$key,\ \$value,\ \$attributes);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_merge(}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>baseAttachRecord(\$id,\ \$hasTimestamps),\ \$this-\/>castAttributes(\$attributes)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00340}00340\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00341}00341\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00342}00342\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00351}00351\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ extractAttachIdAndAttributes(\$key,\ \$value,\ array\ \$attributes)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00352}00352\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00353}00353\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_array(\$value)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ [\$key,\ array\_merge(\$value,\ \$attributes)]}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ [\$value,\ \$attributes];}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00356}00356\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00357}00357\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00365}00365\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ baseAttachRecord(\$id,\ \$timed)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00366}00366\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \$record[\$this-\/>relatedPivotKey]\ =\ \$id;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \$record[\$this-\/>foreignPivotKey]\ =\ \$this-\/>parent-\/>\{\$this-\/>parentKey\};}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00370}00370\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00371}00371\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ record\ needs\ to\ have\ creation\ and\ update\ timestamps,\ we\ will\ make}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ them\ by\ calling\ the\ parent\ model's\ "{}freshTimestamp"{}\ method\ which\ will}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ provide\ us\ with\ a\ fresh\ timestamp\ in\ this\ model's\ preferred\ format.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00374}00374\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$timed)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00375}00375\ \ \ \ \ \ \ \ \ \ \ \ \ \$record\ =\ \$this-\/>addTimestampsToAttachment(\$record);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00376}00376\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00377}00377\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00378}00378\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>pivotValues\ as\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \ \ \$record[\$value[\textcolor{stringliteral}{'column'}]]\ =\ \$value[\textcolor{stringliteral}{'value'}];}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00380}00380\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00381}00381\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$record;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00383}00383\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00384}00384\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00392}00392\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ addTimestampsToAttachment(array\ \$record,\ \$exists\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00393}00393\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \$fresh\ =\ \$this-\/>parent-\/>freshTimestamp();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00395}00395\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00396}00396\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\textcolor{keyword}{using})\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \ \ \$pivotModel\ =\ \textcolor{keyword}{new}\ \$this-\/>using;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \ \ \ \$fresh\ =\ \$pivotModel-\/>fromDateTime(\$fresh);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00400}00400\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00401}00401\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$exists\ \&\&\ \$this-\/>hasPivotColumn(\$this-\/>createdAt()))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \$record[\$this-\/>createdAt()]\ =\ \$fresh;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00405}00405\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00406}00406\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>hasPivotColumn(\$this-\/>updatedAt()))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ \$record[\$this-\/>updatedAt()]\ =\ \$fresh;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00409}00409\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00410}00410\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$record;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00411}00411\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00412}00412\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00419}00419\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ hasPivotColumn(\$column)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00420}00420\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00421}00421\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ in\_array(\$column,\ \$this-\/>pivotColumns);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00422}00422\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00423}00423\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00431}00431\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ detach(\$ids\ =\ \textcolor{keyword}{null},\ \$touch\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00432}00432\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\textcolor{keyword}{using}\ \&\&}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ !\ empty(\$ids)\ \&\&}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ empty(\$this-\/>pivotWheres)\ \&\&}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ empty(\$this-\/>pivotWhereIns)\ \&\&}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ empty(\$this-\/>pivotWhereNulls))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \$results\ =\ \$this-\/>detachUsingCustomClass(\$ids);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ \$query\ =\ \$this-\/>newPivotQuery();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ associated\ IDs\ were\ passed\ to\ the\ method\ we\ will\ only\ delete\ those}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ associations,\ otherwise\ all\ of\ the\ association\ ties\ will\ be\ broken.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We'll\ return\ the\ numbers\ of\ affected\ rows\ when\ we\ do\ the\ deletes.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00445}00445\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$ids))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00446}00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$ids\ =\ \$this-\/>parseIds(\$ids);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00447}00447\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$ids))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00451}00451\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00452}00452\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>whereIn(\$this-\/>getQualifiedRelatedPivotKeyName(),\ (array)\ \$ids);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00454}00454\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Once\ we\ have\ all\ of\ the\ conditions\ set\ on\ the\ statement,\ we\ are\ ready}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ run\ the\ delete\ on\ the\ pivot\ table.\ Then,\ if\ the\ touch\ parameter}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ is\ true,\ we\ will\ go\ ahead\ and\ touch\ all\ related\ models\ to\ sync.}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \ \ \$results\ =\ \$query-\/>delete();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00459}00459\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00460}00460\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00461}00461\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$touch)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>touchIfTouching();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00463}00463\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00464}00464\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$results;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00466}00466\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00474}00474\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ detachUsingCustomClass(\$ids)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00475}00475\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \$results\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00477}00477\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>parseIds(\$ids)\ as\ \$id)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \$results\ +=\ \$this-\/>newPivot([}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>foreignPivotKey\ =>\ \$this-\/>parent-\/>\{\$this-\/>parentKey\},}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>relatedPivotKey\ =>\ \$id,}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00482}00482\ \ \ \ \ \ \ \ \ \ \ \ \ ],\ \textcolor{keyword}{true})-\/>\textcolor{keyword}{delete}();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00483}00483\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00484}00484\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00485}00485\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$results;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00486}00486\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00493}00493\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ getCurrentlyAttachedPivots()}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00494}00494\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00495}00495\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>newPivotQuery()-\/>get()-\/>map(\textcolor{keyword}{function}\ (\$record)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}\ =\ \$this-\/>\textcolor{keyword}{using\ }?:\ Pivot::class;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00497}00497\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ \$pivot\ =\ \$class::fromRawAttributes(\$this-\/>parent,\ (array)\ \$record,\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_concerns_aa0dd4bf57d57bc2a3697e40c9f6bddce}{getTable}}(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00499}00499\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$pivot-\/>setPivotKeys(\$this-\/>foreignPivotKey,\ \$this-\/>relatedPivotKey);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00501}00501\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00502}00502\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00511}00511\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ newPivot(array\ \$attributes\ =\ [],\ \$exists\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00512}00512\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \$attributes\ =\ array\_merge(array\_column(\$this-\/>pivotValues,\ \textcolor{stringliteral}{'value'},\ \textcolor{stringliteral}{'column'}),\ \$attributes);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00514}00514\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \$pivot\ =\ \$this-\/>related-\/>newPivot(}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>parent,\ \$attributes,\ \$this-\/>table,\ \$exists,\ \$this-\/>\textcolor{keyword}{using}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00518}00518\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$pivot-\/>setPivotKeys(\$this-\/>foreignPivotKey,\ \$this-\/>relatedPivotKey);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00520}00520\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00521}00521\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00528}00528\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ newExistingPivot(array\ \$attributes\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00529}00529\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00530}00530\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>newPivot(\$attributes,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00531}00531\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00532}00532\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00538}00538\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ newPivotStatement()}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00539}00539\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>query-\/>getQuery()-\/>newQuery()-\/>from(\$this-\/>table);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00541}00541\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00542}00542\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00549}00549\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ newPivotStatementForId(\$id)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00550}00550\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00551}00551\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>newPivotQuery()-\/>whereIn(\$this-\/>relatedPivotKey,\ \$this-\/>parseIds(\$id));}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00552}00552\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00553}00553\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00559}00559\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ newPivotQuery()}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00560}00560\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \$query\ =\ \$this-\/>newPivotStatement();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00563}00563\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>pivotWheres\ as\ \$arguments)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>where(...\$arguments);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00565}00565\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00566}00566\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00567}00567\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>pivotWhereIns\ as\ \$arguments)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00568}00568\ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>whereIn(...\$arguments);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00570}00570\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00571}00571\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>pivotWhereNulls\ as\ \$arguments)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00572}00572\ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>whereNull(...\$arguments);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00573}00573\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00574}00574\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00575}00575\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$query-\/>where(\$this-\/>getQualifiedForeignPivotKeyName(),\ \$this-\/>parent-\/>\{\$this-\/>parentKey\});}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00576}00576\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00577}00577\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00584}00584\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ withPivot(\$columns)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00585}00585\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00586}00586\ \ \ \ \ \ \ \ \ \$this-\/>pivotColumns\ =\ array\_merge(}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00587}00587\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pivotColumns,\ is\_array(\$columns)\ ?\ \$columns\ :\ func\_get\_args()}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00588}00588\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00589}00589\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00590}00590\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00591}00591\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00592}00592\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00599}00599\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ parseIds(\$value)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00600}00600\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00601}00601\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ instanceof\ Model)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\$value-\/>\{\$this-\/>relatedKey\}];}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00603}00603\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00604}00604\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00605}00605\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ instanceof\ Collection)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00606}00606\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value-\/>pluck(\$this-\/>relatedKey)-\/>all();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00607}00607\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00608}00608\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00609}00609\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ instanceof\ BaseCollection)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value-\/>toArray();}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00612}00612\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00613}00613\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (array)\ \$value;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00614}00614\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00615}00615\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00622}00622\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ parseId(\$value)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00623}00623\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00624}00624\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value\ instanceof\ Model\ ?\ \$value-\/>\{\$this-\/>relatedKey\}\ :\ \$value;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00625}00625\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00626}00626\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00633}00633\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ castKeys(array\ \$keys)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00634}00634\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00635}00635\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_map(\textcolor{keyword}{function}\ (\$v)\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>castKey(\$v);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00637}00637\ \ \ \ \ \ \ \ \ \},\ \$keys);}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00638}00638\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00639}00639\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00646}00646\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ castKey(\$key)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00647}00647\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00648}00648\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>getTypeSwapValue(}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00649}00649\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>related-\/>getKeyType(),}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00650}00650\ \ \ \ \ \ \ \ \ \ \ \ \ \$key}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00651}00651\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00652}00652\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00653}00653\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00660}00660\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ castAttributes(\$attributes)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00661}00661\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00662}00662\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\textcolor{keyword}{using}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00663}00663\ \textcolor{keyword}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }?\ \$this-\/>newPivot()-\/>fill(\$attributes)-\/>getAttributes()}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00664}00664\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$attributes;}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00665}00665\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00666}00666\ }
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00674}00674\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ getTypeSwapValue(\$type,\ \$value)}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00675}00675\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00676}00676\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_matcher_1_1_dumper_a7a70639bfd8072d5dd9df7a818f4129e}{match}}\ (strtolower(\$type))\ \{}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00677}00677\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'int'},\ \textcolor{stringliteral}{'integer'}\ =>\ (int)\ \$value,}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00678}00678\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'real'},\ \textcolor{stringliteral}{'float'},\ \textcolor{stringliteral}{'double'}\ =>\ (\textcolor{keywordtype}{float})\ \$value,}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00679}00679\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'string'}\ =>\ (string)\ \$value,}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00680}00680\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}\ =>\ \$value,}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00681}00681\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00682}00682\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_interacts_with_pivot_table_8php_source_l00683}00683\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,867 @@
+\doxysection{Pending\+Request.\+php}
+\hypertarget{_pending_request_8php_source}{}\label{_pending_request_8php_source}\index{vendor/laravel/framework/src/Illuminate/Http/Client/PendingRequest.php@{vendor/laravel/framework/src/Illuminate/Http/Client/PendingRequest.php}}
+\mbox{\hyperlink{_pending_request_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_http_1_1_client}{Illuminate\(\backslash\)Http\(\backslash\)Client}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00005}00005\ use\ Closure;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00006}00006\ use\ Exception;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_client}{GuzzleHttp\(\backslash\)Client}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_cookie_1_1_cookie_jar}{GuzzleHttp\(\backslash\)Cookie\(\backslash\)CookieJar}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_connect_exception}{GuzzleHttp\(\backslash\)Exception\(\backslash\)ConnectException}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_request_exception}{GuzzleHttp\(\backslash\)Exception\(\backslash\)RequestException}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_transfer_exception}{GuzzleHttp\(\backslash\)Exception\(\backslash\)TransferException}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00012}00012\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_stack}{GuzzleHttp\(\backslash\)HandlerStack}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00013}00013\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_middleware}{GuzzleHttp\(\backslash\)Middleware}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_uri_template_1_1_uri_template}{GuzzleHttp\(\backslash\)UriTemplate\(\backslash\)UriTemplate}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00015}00015\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_arrayable}{Illuminate\(\backslash\)Contracts\(\backslash\)Support\(\backslash\)Arrayable}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_events_1_1_connection_failed}{Illuminate\(\backslash\)Http\(\backslash\)Client\(\backslash\)Events\(\backslash\)ConnectionFailed}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_events_1_1_request_sending}{Illuminate\(\backslash\)Http\(\backslash\)Client\(\backslash\)Events\(\backslash\)RequestSending}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_events_1_1_response_received}{Illuminate\(\backslash\)Http\(\backslash\)Client\(\backslash\)Events\(\backslash\)ResponseReceived}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_arr}{Illuminate\(\backslash\)Support\(\backslash\)Arr}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_collection}{Illuminate\(\backslash\)Support\(\backslash\)Collection}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_str}{Illuminate\(\backslash\)Support\(\backslash\)Str}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_stringable}{Illuminate\(\backslash\)Support\(\backslash\)Stringable}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00023}00023\ use\ Illuminate\(\backslash\)Support\(\backslash\)Traits\(\backslash\)Conditionable;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00024}00024\ use\ Illuminate\(\backslash\)Support\(\backslash\)Traits\(\backslash\)Macroable;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00025}00025\ use\ JsonSerializable;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00026}00026\ use\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_message_interface}{Psr\(\backslash\)Http\(\backslash\)Message\(\backslash\)MessageInterface}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00027}00027\ use\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{Psr\(\backslash\)Http\(\backslash\)Message\(\backslash\)RequestInterface}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00028}00028\ use\ RuntimeException;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00029}00029\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_var_dumper_1_1_var_dumper}{Symfony\(\backslash\)Component\(\backslash\)VarDumper\(\backslash\)VarDumper}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00031}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request}{00031}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request}{PendingRequest}}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00032}00032\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00033}00033\ \ \ \ \ use\ Conditionable,\ Macroable;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00040}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a099b374dc664ee043fffcd6ea05e3e70}{00040}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a099b374dc664ee043fffcd6ea05e3e70}{\$factory}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00047}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ad1405dc1ba2e288764378e79bff7a87d}{00047}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ad1405dc1ba2e288764378e79bff7a87d}{\$client}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00054}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{00054}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{\$handler}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00061}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3f46653370faceec6ea1f4999c3a9ca2}{00061}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3f46653370faceec6ea1f4999c3a9ca2}{\$baseUrl}}\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00068}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5f2665746d5e2974b62c52aad277105a}{00068}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5f2665746d5e2974b62c52aad277105a}{\$urlParameters}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00075}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aaae144cc80e5a0e2a17c20dd6250d427}{00075}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aaae144cc80e5a0e2a17c20dd6250d427}{\$bodyFormat}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00082}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af63c29fed9cadcee371b349c8514720f}{00082}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af63c29fed9cadcee371b349c8514720f}{\$pendingBody}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00089}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5da0f4e6d3a0a300dd177f9ec3938f05}{00089}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5da0f4e6d3a0a300dd177f9ec3938f05}{\$pendingFiles}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00096}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aef9f7eafd54f6e36423347bed723c67e}{00096}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aef9f7eafd54f6e36423347bed723c67e}{\$cookies}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00103}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6cd60da853b09cc490ba32039b3c00bd}{00103}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6cd60da853b09cc490ba32039b3c00bd}{\$transferStats}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00110}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{00110}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00117}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9af8875275bf83fbd4f719546c595866}{00117}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9af8875275bf83fbd4f719546c595866}{\$throwCallback}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00124}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af332399cf2517da4c8c396f4e55fa2dc}{00124}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af332399cf2517da4c8c396f4e55fa2dc}{\$throwIfCallback}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00131}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6f93c614f3a908999ccfe3b65a6ebee4}{00131}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6f93c614f3a908999ccfe3b65a6ebee4}{\$tries}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00138}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aa7b592c3768b6d79bc4ec1ae4307d122}{00138}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aa7b592c3768b6d79bc4ec1ae4307d122}{\$retryDelay}}\ =\ 100;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00145}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a7046c3059cd4da5e72cd1b8d0c294681}{00145}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a7046c3059cd4da5e72cd1b8d0c294681}{\$retryThrow}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00152}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aecce821cee2f4a07566c9a58ab85b0e8}{00152}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aecce821cee2f4a07566c9a58ab85b0e8}{\$retryWhenCallback}}\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00159}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a8ec90d53d42431c32338546aa3f836c4}{00159}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a8ec90d53d42431c32338546aa3f836c4}{\$beforeSendingCallbacks}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00166}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af543b35e395c5b84e00e670f1af55d3f}{00166}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af543b35e395c5b84e00e670f1af55d3f}{\$stubCallbacks}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00173}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_affa9cb74d6b9dbae96f4f43397876a60}{00173}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_affa9cb74d6b9dbae96f4f43397876a60}{\$preventStrayRequests}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00180}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a36a993ea76b635c84749f6e5e6562344}{00180}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a36a993ea76b635c84749f6e5e6562344}{\$middleware}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00187}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3974a351d8a18df695923d4021e1f136}{00187}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3974a351d8a18df695923d4021e1f136}{\$async}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00194}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6a18d4f69295d7e80881215d95a3fbd4}{00194}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6a18d4f69295d7e80881215d95a3fbd4}{\$promise}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00201}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{00201}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00208}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5b4838da1f9ea052e45bacb01c3820de}{00208}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5b4838da1f9ea052e45bacb01c3820de}{\$mergableOptions}}\ =\ [}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'cookies'},}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'form\_params'},}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'headers'},}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'json'},}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'multipart'},}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'query'},}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00215}00215\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00224}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_adef7b0e37318418f9f521c3c015991d2}{00224}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_adef7b0e37318418f9f521c3c015991d2}{\_\_construct}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_factory}{Factory}}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a099b374dc664ee043fffcd6ea05e3e70}{\$factory}}\ =\ \textcolor{keyword}{null},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a36a993ea76b635c84749f6e5e6562344}{\$middleware}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00225}00225\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \$this-\/>factory\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a099b374dc664ee043fffcd6ea05e3e70}{\$factory}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \$this-\/>middleware\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_collection}{Collection}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a36a993ea76b635c84749f6e5e6562344}{\$middleware}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a76381dbee9d69057e040452e7590daf0}{asJson}}();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \$this-\/>options\ =\ [}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'connect\_timeout'}\ =>\ 10,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'http\_errors'}\ =>\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'timeout'}\ =>\ 30,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \$this-\/>beforeSendingCallbacks\ =\ collect([\textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_request}{Request}}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ array\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request}{PendingRequest}}\ \$pendingRequest)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \$pendingRequest-\/>request\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \$pendingRequest-\/>cookies\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\textcolor{stringliteral}{'cookies'}];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \$pendingRequest-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ae1d8ff9d0453aee0edaf21a2c6a1b4d6}{dispatchRequestSendingEvent}}();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \}]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00243}00243\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00251}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a2743d9c292ac018beb4c9c506dfb43e3}{00251}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a2743d9c292ac018beb4c9c506dfb43e3}{baseUrl}}(\textcolor{keywordtype}{string}\ \$url)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00252}00252\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a2743d9c292ac018beb4c9c506dfb43e3}{baseUrl}}\ =\ \$url;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00256}00256\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00265}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aabfbd1952ae23b09560b113029740a4f}{00265}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aabfbd1952ae23b09560b113029740a4f}{withBody}}(\$content,\ \$contentType\ =\ \textcolor{stringliteral}{'application/json'})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00266}00266\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{bodyFormat}}(\textcolor{stringliteral}{'body'});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \$this-\/>pendingBody\ =\ \$content;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00270}00270\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a355f3542d889c4f39112c3c7ce2d01c8}{contentType}}(\$contentType);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00274}00274\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00281}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a76381dbee9d69057e040452e7590daf0}{00281}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a76381dbee9d69057e040452e7590daf0}{asJson}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00282}00282\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{bodyFormat}}(\textcolor{stringliteral}{'json'})-\/>contentType(\textcolor{stringliteral}{'application/json'});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00284}00284\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00291}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ad56b352de951edbba356c8d2baac1b68}{00291}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ad56b352de951edbba356c8d2baac1b68}{asForm}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00292}00292\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{bodyFormat}}(\textcolor{stringliteral}{'form\_params'})-\/>contentType(\textcolor{stringliteral}{'application/x-\/www-\/form-\/urlencoded'});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00294}00294\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00305}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3b50fcbddf69d4e71f0db3e463b1c21e}{00305}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3b50fcbddf69d4e71f0db3e463b1c21e}{attach}}(\$name,\ \$contents\ =\ \textcolor{stringliteral}{''},\ \$filename\ =\ \textcolor{keyword}{null},\ array\ \$headers\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00306}00306\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$name))\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$name\ as\ \$file)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3b50fcbddf69d4e71f0db3e463b1c21e}{attach}}(...\$file);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00311}00311\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00313}00313\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00314}00314\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a0eb62451fa927eff28f5da9582746ab3}{asMultipart}}();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00316}00316\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \$this-\/>pendingFiles[]\ =\ array\_filter([}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ \$name,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'contents'}\ =>\ \$contents,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'headers'}\ =>\ \$headers,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'filename'}\ =>\ \$filename,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00325}00325\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00326}00326\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00332}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a0eb62451fa927eff28f5da9582746ab3}{00332}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a0eb62451fa927eff28f5da9582746ab3}{asMultipart}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00333}00333\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{bodyFormat}}(\textcolor{stringliteral}{'multipart'});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00335}00335\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00336}00336\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00343}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{00343}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{bodyFormat}}(\textcolor{keywordtype}{string}\ \$format)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00344}00344\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$format)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{bodyFormat}}\ =\ \$format;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00348}00348\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00356}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a165fe65cd618e44c1bdd5ca1337ad750}{00356}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a165fe65cd618e44c1bdd5ca1337ad750}{withQueryParameters}}(array\ \$parameters)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00357}00357\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$parameters)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options\ =\ array\_merge\_recursive(\$this-\/>options,\ [}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'query'}\ =>\ \$parameters,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00363}00363\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00371}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a355f3542d889c4f39112c3c7ce2d01c8}{00371}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a355f3542d889c4f39112c3c7ce2d01c8}{contentType}}(\textcolor{keywordtype}{string}\ \$contentType)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00372}00372\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'headers'}][\textcolor{stringliteral}{'Content-\/Type'}]\ =\ \$contentType;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00375}00375\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00376}00376\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00377}00377\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00383}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6e90140adf3490d209c4308d54043150}{00383}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6e90140adf3490d209c4308d54043150}{acceptJson}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00384}00384\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00385}00385\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a2e2cb1b5deb674e132ca7129d488800f}{accept}}(\textcolor{stringliteral}{'application/json'});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00386}00386\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00394}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a2e2cb1b5deb674e132ca7129d488800f}{00394}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a2e2cb1b5deb674e132ca7129d488800f}{accept}}(\$contentType)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00395}00395\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00396}00396\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a4180a84d424c470be7b2710fb5005bee}{withHeaders}}([\textcolor{stringliteral}{'Accept'}\ =>\ \$contentType]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00397}00397\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00405}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a4180a84d424c470be7b2710fb5005bee}{00405}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a4180a84d424c470be7b2710fb5005bee}{withHeaders}}(array\ \$headers)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00406}00406\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00407}00407\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$headers)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options\ =\ array\_merge\_recursive(\$this-\/>options,\ [}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'headers'}\ =>\ \$headers,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00411}00411\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00412}00412\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00413}00413\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00421}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a7bcc16e8478896e34d4c54cfb3c5eab5}{00421}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a7bcc16e8478896e34d4c54cfb3c5eab5}{withHeader}}(\$name,\ \$value)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00422}00422\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00423}00423\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a4180a84d424c470be7b2710fb5005bee}{withHeaders}}([\$name\ =>\ \$value]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00424}00424\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00425}00425\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00432}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a495dd709a3b49cae3682b2a74221c3ec}{00432}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a495dd709a3b49cae3682b2a74221c3ec}{replaceHeaders}}(array\ \$headers)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00433}00433\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'headers'}]\ =\ array\_merge(\$this-\/>options[\textcolor{stringliteral}{'headers'}]\ ??\ [],\ \$headers);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00435}00435\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00437}00437\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00438}00438\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00446}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ae316adb7b9d7f79037793c12cf04a5bb}{00446}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ae316adb7b9d7f79037793c12cf04a5bb}{withBasicAuth}}(\textcolor{keywordtype}{string}\ \$username,\ \textcolor{keywordtype}{string}\ \$password)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00447}00447\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00448}00448\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$username,\ \$password)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'auth'}]\ =\ [\$username,\ \$password];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00451}00451\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00460}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a408a3a350163e3e354f5e6f331d07ad8}{00460}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a408a3a350163e3e354f5e6f331d07ad8}{withDigestAuth}}(\$username,\ \$password)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00461}00461\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$username,\ \$password)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'auth'}]\ =\ [\$username,\ \$password,\ \textcolor{stringliteral}{'digest'}];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00465}00465\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00466}00466\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00474}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a73add1a7360a371747958755268106db}{00474}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a73add1a7360a371747958755268106db}{withToken}}(\$token,\ \$type\ =\ \textcolor{stringliteral}{'Bearer'})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00475}00475\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$token,\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'headers'}][\textcolor{stringliteral}{'Authorization'}]\ =\ trim(\$type.\textcolor{charliteral}{'\ '}.\$token);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00479}00479\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00480}00480\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00487}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9ba4b4f9aca7fc1e73f6912b8af2cfc0}{00487}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9ba4b4f9aca7fc1e73f6912b8af2cfc0}{withUserAgent}}(\$userAgent)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00488}00488\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$userAgent)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00490}00490\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'headers'}][\textcolor{stringliteral}{'User-\/Agent'}]\ =\ trim(\$userAgent);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00491}00491\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00492}00492\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00493}00493\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00500}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abf023855e5b958484eb1cc6f15b3a1c6}{00500}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abf023855e5b958484eb1cc6f15b3a1c6}{withUrlParameters}}(array\ \$parameters\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00501}00501\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00502}00502\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$parameters)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00503}00503\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>urlParameters\ =\ \$parameters;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00505}00505\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00506}00506\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00514}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a20a17d4d15ae9c4c8481481737d429c0}{00514}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a20a17d4d15ae9c4c8481481737d429c0}{withCookies}}(array\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aef9f7eafd54f6e36423347bed723c67e}{\$cookies}},\ \textcolor{keywordtype}{string}\ \$domain)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00515}00515\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aef9f7eafd54f6e36423347bed723c67e}{\$cookies}},\ \$domain)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options\ =\ array\_merge\_recursive(\$this-\/>options,\ [}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00518}00518\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'cookies'}\ =>\ CookieJar::fromArray(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aef9f7eafd54f6e36423347bed723c67e}{\$cookies}},\ \$domain),}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00521}00521\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00522}00522\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00529}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ae18cf0165544954c971db9747df2865b}{00529}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ae18cf0165544954c971db9747df2865b}{maxRedirects}}(\textcolor{keywordtype}{int}\ \$max)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00530}00530\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$max)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'allow\_redirects'}][\textcolor{stringliteral}{'max'}]\ =\ \$max;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00533}00533\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00534}00534\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00535}00535\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00541}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ae110a114af8c96e79e40cdd1be016234}{00541}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ae110a114af8c96e79e40cdd1be016234}{withoutRedirecting}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00542}00542\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00543}00543\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'allow\_redirects'}]\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00546}00546\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00547}00547\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00553}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a7be38834dcad1a05e9831d3e806bb1d2}{00553}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a7be38834dcad1a05e9831d3e806bb1d2}{withoutVerifying}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00554}00554\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00555}00555\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00556}00556\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'verify'}]\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00557}00557\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00558}00558\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00559}00559\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00566}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af6eee5949c587e04000ca624ca00a31b}{00566}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af6eee5949c587e04000ca624ca00a31b}{sink}}(\$to)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00567}00567\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00568}00568\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$to)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'sink'}]\ =\ \$to;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00570}00570\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00571}00571\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00572}00572\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00579}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aff67adeda787dda800a4d169b134e82a}{00579}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aff67adeda787dda800a4d169b134e82a}{timeout}}(\textcolor{keywordtype}{int}\ \$seconds)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00580}00580\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$seconds)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00582}00582\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'timeout'}]\ =\ \$seconds;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00583}00583\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00584}00584\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00585}00585\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00592}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a89af1dde6674e821e99993ba1f14d23e}{00592}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a89af1dde6674e821e99993ba1f14d23e}{connectTimeout}}(\textcolor{keywordtype}{int}\ \$seconds)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00593}00593\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00594}00594\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$seconds)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00595}00595\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'connect\_timeout'}]\ =\ \$seconds;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00597}00597\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00598}00598\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00608}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a124b9f3e8871d285c749759a88380c64}{00608}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a124b9f3e8871d285c749759a88380c64}{retry}}(\textcolor{keywordtype}{int}\ \$times,\ Closure|\textcolor{keywordtype}{int}\ \$sleepMilliseconds\ =\ 0,\ ?callable\ \$when\ =\ \textcolor{keyword}{null},\ \textcolor{keywordtype}{bool}\ \$throw\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00609}00609\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \$this-\/>tries\ =\ \$times;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \$this-\/>retryDelay\ =\ \$sleepMilliseconds;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00612}00612\ \ \ \ \ \ \ \ \ \$this-\/>retryThrow\ =\ \$throw;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00613}00613\ \ \ \ \ \ \ \ \ \$this-\/>retryWhenCallback\ =\ \$when;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00614}00614\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00615}00615\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00616}00616\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00617}00617\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00624}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ab1e3f9b945e082ddc58f767301d1a81b}{00624}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ab1e3f9b945e082ddc58f767301d1a81b}{withOptions}}(array\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00625}00625\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00626}00626\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00627}00627\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options\ =\ array\_replace\_recursive(}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00628}00628\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_merge\_recursive(\$this-\/>options,\ Arr::only(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}},\ \$this-\/>mergableOptions)),}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00629}00629\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00630}00630\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00631}00631\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00632}00632\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00633}00633\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00640}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aac29aa78648c77a6e404c1e25325b4b6}{00640}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aac29aa78648c77a6e404c1e25325b4b6}{withMiddleware}}(callable\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a36a993ea76b635c84749f6e5e6562344}{\$middleware}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00641}00641\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00642}00642\ \ \ \ \ \ \ \ \ \$this-\/>middleware-\/>push(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a36a993ea76b635c84749f6e5e6562344}{\$middleware}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00643}00643\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00644}00644\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00645}00645\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00646}00646\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00653}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a7fe1ec0d759f9e287cb54ef15109dc0c}{00653}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a7fe1ec0d759f9e287cb54ef15109dc0c}{withRequestMiddleware}}(callable\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a36a993ea76b635c84749f6e5e6562344}{\$middleware}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00654}00654\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00655}00655\ \ \ \ \ \ \ \ \ \$this-\/>middleware-\/>push(Middleware::mapRequest(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a36a993ea76b635c84749f6e5e6562344}{\$middleware}}));}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00656}00656\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00657}00657\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00658}00658\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00659}00659\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00666}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6271349d0167601279c84e552f5e4e10}{00666}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6271349d0167601279c84e552f5e4e10}{withResponseMiddleware}}(callable\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a36a993ea76b635c84749f6e5e6562344}{\$middleware}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00667}00667\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00668}00668\ \ \ \ \ \ \ \ \ \$this-\/>middleware-\/>push(Middleware::mapResponse(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a36a993ea76b635c84749f6e5e6562344}{\$middleware}}));}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00669}00669\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00670}00670\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00671}00671\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00672}00672\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00679}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a1bf026b892313ff13d672891dc48f1de}{00679}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a1bf026b892313ff13d672891dc48f1de}{beforeSending}}(\$callback)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00680}00680\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00681}00681\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this,\ \textcolor{keyword}{function}\ ()\ use\ (\$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00682}00682\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>beforeSendingCallbacks[]\ =\ \$callback;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00683}00683\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00684}00684\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00685}00685\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00692}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a73d12db01af56fecf381fe9fecb37271}{00692}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keywordflow}{throw}(callable\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00693}00693\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00694}00694\ \ \ \ \ \ \ \ \ \$this-\/>throwCallback\ =\ \$callback\ ?:\ fn\ ()\ =>\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00695}00695\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00696}00696\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00697}00697\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00698}00698\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00706}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a0b1a24ba0ffb41933bf1567d0ff3cb98}{00706}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a0b1a24ba0ffb41933bf1567d0ff3cb98}{throwIf}}(\$condition)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00707}00707\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00708}00708\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_callable(\$condition))\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00709}00709\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>throwIfCallback\ =\ \$condition;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00710}00710\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00711}00711\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00712}00712\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$condition\ ?\ \$this-\/>\textcolor{keywordflow}{throw}(func\_get\_args()[1]\ ??\ \textcolor{keyword}{null})\ :\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00713}00713\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00714}00714\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00721}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a09c4439612656dfe5b4d04cf354bc1c9}{00721}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a09c4439612656dfe5b4d04cf354bc1c9}{throwUnless}}(\$condition)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00722}00722\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00723}00723\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a0b1a24ba0ffb41933bf1567d0ff3cb98}{throwIf}}(!\ \$condition);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00724}00724\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00725}00725\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00731}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5bf63e4ac70cfd9d97e3f2eab936ec8b}{00731}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5bf63e4ac70cfd9d97e3f2eab936ec8b}{dump}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00732}00732\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00733}00733\ \ \ \ \ \ \ \ \ \$values\ =\ func\_get\_args();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00734}00734\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00735}00735\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a1bf026b892313ff13d672891dc48f1de}{beforeSending}}(\textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_request}{Request}}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ array\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})\ use\ (\$values)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00736}00736\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (array\_merge(\$values,\ [\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}])\ as\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00737}00737\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ VarDumper::dump(\$value);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00738}00738\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00739}00739\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00740}00740\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00741}00741\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00747}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ab8bded9253c481cadc72d4df086e52b7}{00747}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ab8bded9253c481cadc72d4df086e52b7}{dd}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00748}00748\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00749}00749\ \ \ \ \ \ \ \ \ \$values\ =\ func\_get\_args();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00750}00750\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00751}00751\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a1bf026b892313ff13d672891dc48f1de}{beforeSending}}(\textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_request}{Request}}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ array\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})\ use\ (\$values)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00752}00752\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (array\_merge(\$values,\ [\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}])\ as\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00753}00753\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ VarDumper::dump(\$value);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00754}00754\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00755}00755\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00756}00756\ \ \ \ \ \ \ \ \ \ \ \ \ exit(1);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00757}00757\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00758}00758\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00759}00759\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00767}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abf4df4c08b778592c2acf103c169a475}{00767}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{get}(\textcolor{keywordtype}{string}\ \$url,\ \$query\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00768}00768\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00769}00769\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3ef2ca31341772bc3838c10e9a6e3c12}{send}}(\textcolor{stringliteral}{'GET'},\ \$url,\ func\_num\_args()\ ===\ 1\ ?\ []\ :\ [}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00770}00770\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'query'}\ =>\ \$query,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00771}00771\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00772}00772\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00773}00773\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00781}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a05575d5e2e807810514d0766c852c315}{00781}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a05575d5e2e807810514d0766c852c315}{head}}(\textcolor{keywordtype}{string}\ \$url,\ \$query\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00782}00782\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00783}00783\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3ef2ca31341772bc3838c10e9a6e3c12}{send}}(\textcolor{stringliteral}{'HEAD'},\ \$url,\ func\_num\_args()\ ===\ 1\ ?\ []\ :\ [}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00784}00784\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'query'}\ =>\ \$query,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00785}00785\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00786}00786\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00787}00787\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00795}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af3eaa8a03d259e9fa6ce8c34d4c42fba}{00795}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af3eaa8a03d259e9fa6ce8c34d4c42fba}{post}}(\textcolor{keywordtype}{string}\ \$url,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00796}00796\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00797}00797\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3ef2ca31341772bc3838c10e9a6e3c12}{send}}(\textcolor{stringliteral}{'POST'},\ \$url,\ [}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00798}00798\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{bodyFormat}}\ =>\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00799}00799\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00800}00800\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00801}00801\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00809}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ab5b3ea662cc91871c79c7b21e010c875}{00809}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ab5b3ea662cc91871c79c7b21e010c875}{patch}}(\textcolor{keywordtype}{string}\ \$url,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00810}00810\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00811}00811\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3ef2ca31341772bc3838c10e9a6e3c12}{send}}(\textcolor{stringliteral}{'PATCH'},\ \$url,\ [}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00812}00812\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{bodyFormat}}\ =>\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00813}00813\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00814}00814\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00815}00815\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00823}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ae306416abdcb8db778152ca934e52676}{00823}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ae306416abdcb8db778152ca934e52676}{put}}(\textcolor{keywordtype}{string}\ \$url,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00824}00824\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00825}00825\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3ef2ca31341772bc3838c10e9a6e3c12}{send}}(\textcolor{stringliteral}{'PUT'},\ \$url,\ [}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00826}00826\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{bodyFormat}}\ =>\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00827}00827\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00828}00828\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00829}00829\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00837}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_acfb842749030b8cc0d816273f2a97215}{00837}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{delete}(\textcolor{keywordtype}{string}\ \$url,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00838}00838\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00839}00839\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3ef2ca31341772bc3838c10e9a6e3c12}{send}}(\textcolor{stringliteral}{'DELETE'},\ \$url,\ empty(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})\ ?\ []\ :\ [}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00840}00840\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{bodyFormat}}\ =>\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00841}00841\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00842}00842\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00843}00843\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00850}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a4e17b7f8bfd65de3b7e71078071f4290}{00850}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a4e17b7f8bfd65de3b7e71078071f4290}{pool}}(callable\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00851}00851\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00852}00852\ \ \ \ \ \ \ \ \ \$results\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00853}00853\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00854}00854\ \ \ \ \ \ \ \ \ \$requests\ =\ tap(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pool}{Pool}}(\$this-\/>factory),\ \$callback)-\/>getRequests();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00855}00855\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00856}00856\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$requests\ as\ \$key\ =>\ \$item)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00857}00857\ \ \ \ \ \ \ \ \ \ \ \ \ \$results[\$key]\ =\ \$item\ instanceof\ \textcolor{keyword}{static}\ ?\ \$item-\/>getPromise()-\/>wait()\ :\ \$item-\/>wait();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00858}00858\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00859}00859\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00860}00860\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$results;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00861}00861\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00862}00862\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00873}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3ef2ca31341772bc3838c10e9a6e3c12}{00873}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3ef2ca31341772bc3838c10e9a6e3c12}{send}}(\textcolor{keywordtype}{string}\ \$method,\ \textcolor{keywordtype}{string}\ \$url,\ array\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00874}00874\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00875}00875\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ Str::startsWith(\$url,\ [\textcolor{stringliteral}{'http://'},\ \textcolor{stringliteral}{'https://'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00876}00876\ \ \ \ \ \ \ \ \ \ \ \ \ \$url\ =\ ltrim(rtrim(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a2743d9c292ac018beb4c9c506dfb43e3}{baseUrl}},\ \textcolor{charliteral}{'/'}).\textcolor{charliteral}{'/'}.ltrim(\$url,\ \textcolor{charliteral}{'/'}),\ \textcolor{charliteral}{'/'});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00877}00877\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00878}00878\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00879}00879\ \ \ \ \ \ \ \ \ \$url\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9cdb4c83c4ac319b74cd73184d8a233a}{expandUrlParameters}}(\$url);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00880}00880\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00881}00881\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_acc9203beb8427543030a0f3fed3befa9}{parseHttpOptions}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00882}00882\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00883}00883\ \ \ \ \ \ \ \ \ [\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af63c29fed9cadcee371b349c8514720f}{\$this-\/>pendingBody}},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5da0f4e6d3a0a300dd177f9ec3938f05}{\$this-\/>pendingFiles}}]\ =\ [\textcolor{keyword}{null},\ []];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00884}00884\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00885}00885\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5ed36d572b90ba1b07ea55d2afe8d333}{async}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00886}00886\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a619e01b30cd75b8c47d913135ee73a0b}{makePromise}}(\$method,\ \$url,\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00887}00887\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00888}00888\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00889}00889\ \ \ \ \ \ \ \ \ \$shouldRetry\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00890}00890\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00891}00891\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a124b9f3e8871d285c749759a88380c64}{retry}}(\$this-\/>tries\ ??\ 1,\ \textcolor{keyword}{function}\ (\$attempt)\ use\ (\$method,\ \$url,\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}},\ \&\$shouldRetry)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00892}00892\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00893}00893\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a8a6557f5db026a8418db4e920fbf7f99}{newResponse}}(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af7023a3ecde054c1b5eca9306b62cf5d}{sendRequest}}(\$method,\ \$url,\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})),\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})\ use\ (\$attempt,\ \&\$shouldRetry)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00894}00894\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ab1de4055a4a88e2a503f2d032c285f83}{populateResponse}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00895}00895\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00896}00896\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ad3f0edffd67313cce4f4cb301b9bc6d2}{dispatchResponseReceivedEvent}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00897}00897\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00898}00898\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>successful())\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00899}00899\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00900}00900\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$shouldRetry\ =\ \$this-\/>retryWhenCallback\ ?\ call\_user\_func(\$this-\/>retryWhenCallback,\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>toException(),\ \$this)\ :\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00901}00901\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Exception\ \mbox{\hyperlink{namespace_illuminate_1_1_http_a7b8c95284212c3072a7a96bd4233eb79}{\$exception}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00902}00902\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$shouldRetry\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00903}00903\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00904}00904\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{namespace_illuminate_1_1_http_a7b8c95284212c3072a7a96bd4233eb79}{\$exception}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00905}00905\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00906}00906\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00907}00907\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>throwCallback\ \&\&}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00908}00908\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\$this-\/>throwIfCallback\ ===\ \textcolor{keyword}{null}\ ||}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00909}00909\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ call\_user\_func(\$this-\/>throwIfCallback,\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})))\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00910}00910\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>throw(\$this-\/>throwCallback);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00911}00911\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00912}00912\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00913}00913\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$attempt\ <\ \$this-\/>tries\ \&\&\ \$shouldRetry)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00914}00914\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>throw();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00915}00915\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00916}00916\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00917}00917\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>tries\ >\ 1\ \&\&\ \$this-\/>retryThrow)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00918}00918\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>throw();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00919}00919\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00920}00920\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00921}00921\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00922}00922\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_connect_exception}{ConnectException}}\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00923}00923\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a2be3097d005365affc83110c8c6ff08c}{dispatchConnectionFailedEvent}}();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00924}00924\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00925}00925\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_connection_exception}{ConnectionException}}(\$e-\/>getMessage(),\ 0,\ \$e);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00926}00926\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00927}00927\ \ \ \ \ \ \ \ \ \},\ \$this-\/>retryDelay\ ??\ 100,\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{namespace_illuminate_1_1_http_a7b8c95284212c3072a7a96bd4233eb79}{\$exception}})\ use\ (\&\$shouldRetry)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00928}00928\ \ \ \ \ \ \ \ \ \ \ \ \ \$result\ =\ \$shouldRetry\ ??\ (\$this-\/>retryWhenCallback\ ?\ call\_user\_func(\$this-\/>retryWhenCallback,\ \mbox{\hyperlink{namespace_illuminate_1_1_http_a7b8c95284212c3072a7a96bd4233eb79}{\$exception}},\ \$this)\ :\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00929}00929\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00930}00930\ \ \ \ \ \ \ \ \ \ \ \ \ \$shouldRetry\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00931}00931\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00932}00932\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$result;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00933}00933\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00934}00934\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00935}00935\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00942}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9cdb4c83c4ac319b74cd73184d8a233a}{00942}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9cdb4c83c4ac319b74cd73184d8a233a}{expandUrlParameters}}(\textcolor{keywordtype}{string}\ \$url)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00943}00943\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00944}00944\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ UriTemplate::expand(\$url,\ \$this-\/>urlParameters);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00945}00945\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00946}00946\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00953}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_acc9203beb8427543030a0f3fed3befa9}{00953}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_acc9203beb8427543030a0f3fed3befa9}{parseHttpOptions}}(array\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00954}00954\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00955}00955\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{bodyFormat}}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00956}00956\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>bodyFormat\ ===\ \textcolor{stringliteral}{'multipart'})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00957}00957\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aaae144cc80e5a0e2a17c20dd6250d427}{\$this-\/>bodyFormat}}]\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a113d5c84f44de87ae46cf3e0f5da310d}{parseMultipartBodyFormat}}(\$options[\$this-\/>bodyFormat]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00958}00958\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$this-\/>bodyFormat\ ===\ \textcolor{stringliteral}{'body'})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00959}00959\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aaae144cc80e5a0e2a17c20dd6250d427}{\$this-\/>bodyFormat}}]\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af63c29fed9cadcee371b349c8514720f}{\$this-\/>pendingBody}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00960}00960\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00961}00961\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00962}00962\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\$this-\/>bodyFormat]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00963}00963\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aaae144cc80e5a0e2a17c20dd6250d427}{\$this-\/>bodyFormat}}]\ =\ array\_merge(}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00964}00964\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\$this-\/>bodyFormat],\ \$this-\/>pendingFiles}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00965}00965\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00966}00966\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00967}00967\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00968}00968\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aaae144cc80e5a0e2a17c20dd6250d427}{\$this-\/>bodyFormat}}]\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af63c29fed9cadcee371b349c8514720f}{\$this-\/>pendingBody}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00969}00969\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00970}00970\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00971}00971\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})-\/>map(\textcolor{keyword}{function}\ (\$value,\ \$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00972}00972\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$key\ ===\ \textcolor{stringliteral}{'json'}\ \&\&\ \$value\ instanceof\ JsonSerializable)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00973}00973\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00974}00974\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00975}00975\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00976}00976\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_arrayable}{Arrayable}}\ ?\ \$value-\/>\mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_arrayable_a658defb34762c8f40085aec87e16ba1a}{toArray}}()\ :\ \$value;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00977}00977\ \ \ \ \ \ \ \ \ \})-\/>all();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00978}00978\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00979}00979\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00986}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a113d5c84f44de87ae46cf3e0f5da310d}{00986}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a113d5c84f44de87ae46cf3e0f5da310d}{parseMultipartBodyFormat}}(array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00987}00987\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00988}00988\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})-\/>map(\textcolor{keyword}{function}\ (\$value,\ \$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00989}00989\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_array(\$value)\ ?\ \$value\ :\ [\textcolor{stringliteral}{'name'}\ =>\ \$key,\ \textcolor{stringliteral}{'contents'}\ =>\ \$value];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00990}00990\ \ \ \ \ \ \ \ \ \})-\/>values()-\/>all();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00991}00991\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l00992}00992\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01001}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a619e01b30cd75b8c47d913135ee73a0b}{01001}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a619e01b30cd75b8c47d913135ee73a0b}{makePromise}}(\textcolor{keywordtype}{string}\ \$method,\ \textcolor{keywordtype}{string}\ \$url,\ array\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01002}01002\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01003}01003\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>promise\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af7023a3ecde054c1b5eca9306b62cf5d}{sendRequest}}(\$method,\ \$url,\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01004}01004\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>then(\textcolor{keyword}{function}\ (\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_message_interface}{MessageInterface}}\ \$message)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01005}01005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a8a6557f5db026a8418db4e920fbf7f99}{newResponse}}(\$message),\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01006}01006\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ab1de4055a4a88e2a503f2d032c285f83}{populateResponse}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01007}01007\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ad3f0edffd67313cce4f4cb301b9bc6d2}{dispatchResponseReceivedEvent}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01008}01008\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01009}01009\ \ \ \ \ \ \ \ \ \ \ \ \ \})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01010}01010\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>otherwise(\textcolor{keyword}{function}\ (\mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_transfer_exception}{TransferException}}\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01011}01011\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$e\ instanceof\ \mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_connect_exception}{ConnectException}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01012}01012\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a2be3097d005365affc83110c8c6ff08c}{dispatchConnectionFailedEvent}}();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01013}01013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01014}01014\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01015}01015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$e\ instanceof\ \mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_request_exception}{RequestException}}\ \&\&\ \$e-\/>hasResponse()\ ?\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ab1de4055a4a88e2a503f2d032c285f83}{populateResponse}}(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a8a6557f5db026a8418db4e920fbf7f99}{newResponse}}(\$e-\/>getResponse()))\ :\ \$e;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01016}01016\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01017}01017\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01018}01018\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01029}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af7023a3ecde054c1b5eca9306b62cf5d}{01029}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_af7023a3ecde054c1b5eca9306b62cf5d}{sendRequest}}(\textcolor{keywordtype}{string}\ \$method,\ \textcolor{keywordtype}{string}\ \$url,\ array\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01030}01030\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01031}01031\ \ \ \ \ \ \ \ \ \$clientMethod\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5ed36d572b90ba1b07ea55d2afe8d333}{async}}\ ?\ \textcolor{stringliteral}{'requestAsync'}\ :\ \textcolor{stringliteral}{'request'};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01032}01032\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01033}01033\ \ \ \ \ \ \ \ \ \$laravelData\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a0aab3bf514ac0eb6c9fb6755daa440b3}{parseRequestData}}(\$method,\ \$url,\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01034}01034\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01035}01035\ \ \ \ \ \ \ \ \ \$onStats\ =\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6cd60da853b09cc490ba32039b3c00bd}{\$transferStats}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01036}01036\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\$callback\ =\ (\$this-\/>options[\textcolor{stringliteral}{'on\_stats'}]\ ??\ \textcolor{keyword}{false}))\ instanceof\ Closure)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01037}01037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6cd60da853b09cc490ba32039b3c00bd}{\$transferStats}}\ =\ \$callback(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6cd60da853b09cc490ba32039b3c00bd}{\$transferStats}})\ ?:\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6cd60da853b09cc490ba32039b3c00bd}{\$transferStats}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01038}01038\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01039}01039\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01040}01040\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>transferStats\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6cd60da853b09cc490ba32039b3c00bd}{\$transferStats}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01041}01041\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01042}01042\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01043}01043\ \ \ \ \ \ \ \ \ \$mergedOptions\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5f3a04aa4f0aa5d04fa1d1dc1995be91}{normalizeRequestOptions}}(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a34cea109b7d440c66ff33fcc9299a31b}{mergeOptions}}([}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01044}01044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'laravel\_data'}\ =>\ \$laravelData,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01045}01045\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'on\_stats'}\ =>\ \$onStats,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01046}01046\ \ \ \ \ \ \ \ \ ],\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}));}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01047}01047\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01048}01048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ac95c3f10f90446450afa9563d993ee31}{buildClient}}()-\/>\$clientMethod(\$method,\ \$url,\ \$mergedOptions);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01049}01049\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01050}01050\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01059}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a0aab3bf514ac0eb6c9fb6755daa440b3}{01059}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a0aab3bf514ac0eb6c9fb6755daa440b3}{parseRequestData}}(\$method,\ \$url,\ array\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01060}01060\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01061}01061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aedb3e2b6ab93797a08070614db734a7e}{bodyFormat}}\ ===\ \textcolor{stringliteral}{'body'})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01062}01062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01063}01063\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01064}01064\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01065}01065\ \ \ \ \ \ \ \ \ \$laravelData\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aaae144cc80e5a0e2a17c20dd6250d427}{\$this-\/>bodyFormat}}]\ ??\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\textcolor{stringliteral}{'query'}]\ ??\ [];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01066}01066\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01067}01067\ \ \ \ \ \ \ \ \ \$urlString\ =\ Str::of(\$url);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01068}01068\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01069}01069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$laravelData)\ \&\&\ \$method\ ===\ \textcolor{stringliteral}{'GET'}\ \&\&\ \$urlString-\/>contains(\textcolor{charliteral}{'?'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01070}01070\ \ \ \ \ \ \ \ \ \ \ \ \ \$laravelData\ =\ (string)\ \$urlString-\/>after(\textcolor{charliteral}{'?'});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01071}01071\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01072}01072\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01073}01073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$laravelData))\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01074}01074\ \ \ \ \ \ \ \ \ \ \ \ \ parse\_str(\$laravelData,\ \$parsedData);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01075}01075\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01076}01076\ \ \ \ \ \ \ \ \ \ \ \ \ \$laravelData\ =\ is\_array(\$parsedData)\ ?\ \$parsedData\ :\ [];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01077}01077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01078}01078\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01079}01079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$laravelData\ instanceof\ JsonSerializable)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01080}01080\ \ \ \ \ \ \ \ \ \ \ \ \ \$laravelData\ =\ \$laravelData-\/>jsonSerialize();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01081}01081\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01082}01082\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01083}01083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_array(\$laravelData)\ ?\ \$laravelData\ :\ [];}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01084}01084\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01085}01085\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01092}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5f3a04aa4f0aa5d04fa1d1dc1995be91}{01092}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5f3a04aa4f0aa5d04fa1d1dc1995be91}{normalizeRequestOptions}}(array\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01093}01093\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01094}01094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01095}01095\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\$key]\ =\ match\ (\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01096}01096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ is\_array(\$value)\ =>\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5f3a04aa4f0aa5d04fa1d1dc1995be91}{normalizeRequestOptions}}(\$value),}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01097}01097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ instanceof\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_stringable}{Stringable}}\ =>\ \$value-\/>\mbox{\hyperlink{class_illuminate_1_1_support_1_1_stringable_a5558c5d549f41597377fa1ea8a1cefa3}{toString}}(),}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01098}01098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}\ =>\ \$value,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01099}01099\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01100}01100\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01101}01101\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01102}01102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01103}01103\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01104}01104\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01111}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ab1de4055a4a88e2a503f2d032c285f83}{01111}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ab1de4055a4a88e2a503f2d032c285f83}{populateResponse}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_response}{Response}}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01112}01112\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01113}01113\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>cookies\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aef9f7eafd54f6e36423347bed723c67e}{\$this-\/>cookies}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01114}01114\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01115}01115\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>transferStats\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6cd60da853b09cc490ba32039b3c00bd}{\$this-\/>transferStats}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01116}01116\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01117}01117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01118}01118\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01119}01119\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01125}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ac95c3f10f90446450afa9563d993ee31}{01125}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ac95c3f10f90446450afa9563d993ee31}{buildClient}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01126}01126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01127}01127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>client\ ??\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a285281fe54bba64b85328e847d50b903}{createClient}}(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aa524ba2d02f7240fb3b9f305ea17126c}{buildHandlerStack}}());}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01128}01128\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01129}01129\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01135}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a1396bbfbeac2c3be91bcddb1e65e93e1}{01135}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a1396bbfbeac2c3be91bcddb1e65e93e1}{requestsReusableClient}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01136}01136\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01137}01137\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\ is\_null(\$this-\/>client)\ ||\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3974a351d8a18df695923d4021e1f136}{\$this-\/>async}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01138}01138\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01139}01139\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01145}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a184bfcaf170eaf925c325f1421208ca6}{01145}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a184bfcaf170eaf925c325f1421208ca6}{getReusableClient}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01146}01146\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01147}01147\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>client\ =\ \$this-\/>client\ ?:\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a285281fe54bba64b85328e847d50b903}{createClient}}(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aa524ba2d02f7240fb3b9f305ea17126c}{buildHandlerStack}}());}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01148}01148\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01149}01149\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01156}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a285281fe54bba64b85328e847d50b903}{01156}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a285281fe54bba64b85328e847d50b903}{createClient}}(\$handlerStack)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01157}01157\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01158}01158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_guzzle_http_1_1_client}{Client}}([}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01159}01159\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'handler'}\ =>\ \$handlerStack,}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01160}01160\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'cookies'}\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01161}01161\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01162}01162\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01163}01163\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01169}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aa524ba2d02f7240fb3b9f305ea17126c}{01169}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aa524ba2d02f7240fb3b9f305ea17126c}{buildHandlerStack}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01170}01170\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01171}01171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_afb548483a477f368824aacafb770c60f}{pushHandlers}}(HandlerStack::create(\$this-\/>handler));}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01172}01172\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01173}01173\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01180}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_afb548483a477f368824aacafb770c60f}{01180}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_afb548483a477f368824aacafb770c60f}{pushHandlers}}(\$handlerStack)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01181}01181\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01182}01182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$handlerStack,\ \textcolor{keyword}{function}\ (\$stack)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01183}01183\ \ \ \ \ \ \ \ \ \ \ \ \ \$stack-\/>push(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6f2d24e8d50376c2caf4424010bd715c}{buildBeforeSendingHandler}}());}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01184}01184\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01185}01185\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>middleware-\/>each(\textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a36a993ea76b635c84749f6e5e6562344}{\$middleware}})\ use\ (\$stack)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01186}01186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stack-\/>push(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a36a993ea76b635c84749f6e5e6562344}{\$middleware}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01187}01187\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01188}01188\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01189}01189\ \ \ \ \ \ \ \ \ \ \ \ \ \$stack-\/>push(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6cb89752394ed1005f88b7bd6bfbd44b}{buildRecorderHandler}}());}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01190}01190\ \ \ \ \ \ \ \ \ \ \ \ \ \$stack-\/>push(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a950459442c01a9625781880a2da23392}{buildStubHandler}}());}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01191}01191\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01192}01192\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01193}01193\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01199}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6f2d24e8d50376c2caf4424010bd715c}{01199}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6f2d24e8d50376c2caf4424010bd715c}{buildBeforeSendingHandler}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01200}01200\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01201}01201\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{\$handler}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01202}01202\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})\ use\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{\$handler}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01203}01203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{\$handler}}(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9ed4bd23f70e59e9ba9d1ad03710410f}{runBeforeSendingCallbacks}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}),\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01204}01204\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01205}01205\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01206}01206\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01207}01207\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01213}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6cb89752394ed1005f88b7bd6bfbd44b}{01213}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6cb89752394ed1005f88b7bd6bfbd44b}{buildRecorderHandler}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01214}01214\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01215}01215\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{\$handler}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01216}01216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})\ use\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{\$handler}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01217}01217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6a18d4f69295d7e80881215d95a3fbd4}{\$promise}}\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{\$handler}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01218}01218\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01219}01219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6a18d4f69295d7e80881215d95a3fbd4}{\$promise}}-\/>then(\textcolor{keyword}{function}\ (\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})\ use\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01220}01220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>factory?-\/>recordRequestResponsePair(}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01221}01221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_request}{Request}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}}))-\/>withData(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\textcolor{stringliteral}{'laravel\_data'}]),}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01222}01222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a8a6557f5db026a8418db4e920fbf7f99}{newResponse}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01223}01223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01224}01224\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01225}01225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01226}01226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01227}01227\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01228}01228\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01229}01229\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01230}01230\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01236}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a950459442c01a9625781880a2da23392}{01236}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a950459442c01a9625781880a2da23392}{buildStubHandler}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01237}01237\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01238}01238\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{\$handler}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01239}01239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})\ use\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{\$handler}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01240}01240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ (\$this-\/>stubCallbacks\ ??\ collect())}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01241}01241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>map}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01242}01242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>\_\_invoke((\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_request}{Request}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}}))-\/>withData(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\textcolor{stringliteral}{'laravel\_data'}]),\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01243}01243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>filter()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01244}01244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>first();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01245}01245\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01246}01246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01247}01247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aaa970b899096f624e0bec38b3311855b}{preventStrayRequests}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01248}01248\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(\textcolor{stringliteral}{'Attempted\ request\ to\ ['}.(\textcolor{keywordtype}{string})\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}}-\/>getUri().\textcolor{stringliteral}{']\ without\ a\ matching\ fake.'});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01249}01249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01250}01250\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01251}01251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{\$handler}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01252}01252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01253}01253\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01254}01254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ is\_array(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})\ ?\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_factory_a19c9c4d95e846b7d85e7a37d10b2e87b}{Factory::response}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})\ :\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01255}01255\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01256}01256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sink\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\textcolor{stringliteral}{'sink'}]\ ??\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01257}01257\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01258}01258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$sink)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01259}01259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>then(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a549dcb1cd3d04d9698438a15486222f9}{sinkStubHandler}}(\$sink));}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01260}01260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01261}01261\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01262}01262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01263}01263\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01264}01264\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01265}01265\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01266}01266\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01273}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a549dcb1cd3d04d9698438a15486222f9}{01273}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a549dcb1cd3d04d9698438a15486222f9}{sinkStubHandler}}(\$sink)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01274}01274\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01275}01275\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})\ use\ (\$sink)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01276}01276\ \ \ \ \ \ \ \ \ \ \ \ \ \$body\ =\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getBody()-\/>getContents();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01277}01277\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01278}01278\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$sink))\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01279}01279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ file\_put\_contents(\$sink,\ \$body);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01280}01280\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01281}01281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01282}01282\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01283}01283\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01284}01284\ \ \ \ \ \ \ \ \ \ \ \ \ fwrite(\$sink,\ \$body);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01285}01285\ \ \ \ \ \ \ \ \ \ \ \ \ rewind(\$sink);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01286}01286\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01287}01287\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01288}01288\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01296}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9ed4bd23f70e59e9ba9d1ad03710410f}{01296}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9ed4bd23f70e59e9ba9d1ad03710410f}{runBeforeSendingCallbacks}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ array\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01297}01297\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01298}01298\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ \textcolor{keyword}{function}\ (\&\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}})\ use\ (\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01299}01299\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>beforeSendingCallbacks-\/>each(\textcolor{keyword}{function}\ (\$callback)\ use\ (\&\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}},\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01300}01300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$callbackResult\ =\ call\_user\_func(}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01301}01301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$callback,\ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_request}{Request}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}}))-\/>withData(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}[\textcolor{stringliteral}{'laravel\_data'}]),\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}},\ \$this}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01302}01302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01303}01303\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01304}01304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$callbackResult\ instanceof\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{RequestInterface}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01305}01305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}}\ =\ \$callbackResult;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01306}01306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$callbackResult\ instanceof\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_request}{Request}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01307}01307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abb35c8495a232b510389fa6d7b15d38a}{\$request}}\ =\ \$callbackResult-\/>toPsrRequest();}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01308}01308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01309}01309\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01310}01310\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01311}01311\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01312}01312\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01319}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a34cea109b7d440c66ff33fcc9299a31b}{01319}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a34cea109b7d440c66ff33fcc9299a31b}{mergeOptions}}(...\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01320}01320\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01321}01321\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_replace\_recursive(}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01322}01322\ \ \ \ \ \ \ \ \ \ \ \ \ array\_merge\_recursive(\$this-\/>options,\ Arr::only(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}},\ \$this-\/>mergableOptions)),}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01323}01323\ \ \ \ \ \ \ \ \ \ \ \ \ ...\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$options}}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01324}01324\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01325}01325\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01326}01326\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01333}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a8a6557f5db026a8418db4e920fbf7f99}{01333}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a8a6557f5db026a8418db4e920fbf7f99}{newResponse}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01334}01334\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01335}01335\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_response}{Response}}(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01336}01336\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01337}01337\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01344}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a191188c25d65aa7682f14fe3cca1984f}{01344}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a191188c25d65aa7682f14fe3cca1984f}{stub}}(\$callback)}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01345}01345\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01346}01346\ \ \ \ \ \ \ \ \ \$this-\/>stubCallbacks\ =\ collect(\$callback);}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01347}01347\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01348}01348\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01349}01349\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01350}01350\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01357}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aaa970b899096f624e0bec38b3311855b}{01357}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aaa970b899096f624e0bec38b3311855b}{preventStrayRequests}}(\$prevent\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01358}01358\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01359}01359\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_aaa970b899096f624e0bec38b3311855b}{preventStrayRequests}}\ =\ \$prevent;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01360}01360\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01361}01361\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01362}01362\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01363}01363\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01370}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5ed36d572b90ba1b07ea55d2afe8d333}{01370}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5ed36d572b90ba1b07ea55d2afe8d333}{async}}(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3974a351d8a18df695923d4021e1f136}{\$async}}\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01371}01371\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01372}01372\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a5ed36d572b90ba1b07ea55d2afe8d333}{async}}\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a3974a351d8a18df695923d4021e1f136}{\$async}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01373}01373\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01374}01374\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01375}01375\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01376}01376\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01382}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9afd2e35be9e87f7d14be57a48c230e3}{01382}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9afd2e35be9e87f7d14be57a48c230e3}{getPromise}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01383}01383\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01384}01384\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a6a18d4f69295d7e80881215d95a3fbd4}{\$this-\/>promise}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01385}01385\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01386}01386\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01392}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ae1d8ff9d0453aee0edaf21a2c6a1b4d6}{01392}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ae1d8ff9d0453aee0edaf21a2c6a1b4d6}{dispatchRequestSendingEvent}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01393}01393\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01394}01394\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$dispatcher\ =\ \$this-\/>factory?-\/>getDispatcher())\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01395}01395\ \ \ \ \ \ \ \ \ \ \ \ \ \$dispatcher-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_events_1_1_request_sending}{RequestSending}}(\$this-\/>request));}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01396}01396\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01397}01397\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01398}01398\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01405}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ad3f0edffd67313cce4f4cb301b9bc6d2}{01405}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ad3f0edffd67313cce4f4cb301b9bc6d2}{dispatchResponseReceivedEvent}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_response}{Response}}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01406}01406\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01407}01407\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ (\$dispatcher\ =\ \$this-\/>factory?-\/>getDispatcher())\ ||}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01408}01408\ \ \ \ \ \ \ \ \ \ \ \ \ !\ \$this-\/>request)\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01409}01409\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01410}01410\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01411}01411\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01412}01412\ \ \ \ \ \ \ \ \ \$dispatcher-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_events_1_1_response_received}{ResponseReceived}}(\$this-\/>request,\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}));}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01413}01413\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01414}01414\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01420}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a2be3097d005365affc83110c8c6ff08c}{01420}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a2be3097d005365affc83110c8c6ff08c}{dispatchConnectionFailedEvent}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01421}01421\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01422}01422\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$dispatcher\ =\ \$this-\/>factory?-\/>getDispatcher())\ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01423}01423\ \ \ \ \ \ \ \ \ \ \ \ \ \$dispatcher-\/>dispatch(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_events_1_1_connection_failed}{ConnectionFailed}}(\$this-\/>request));}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01424}01424\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01425}01425\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01426}01426\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01433}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a41ff7010a6e15ce5881b64b3454d31f2}{01433}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a41ff7010a6e15ce5881b64b3454d31f2}{setClient}}(\mbox{\hyperlink{class_guzzle_http_1_1_client}{Client}}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ad1405dc1ba2e288764378e79bff7a87d}{\$client}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01434}01434\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01435}01435\ \ \ \ \ \ \ \ \ \$this-\/>client\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_ad1405dc1ba2e288764378e79bff7a87d}{\$client}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01436}01436\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01437}01437\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01438}01438\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01439}01439\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01446}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abdaf9853215bff927f89e910dc2e2a1b}{01446}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_abdaf9853215bff927f89e910dc2e2a1b}{setHandler}}(\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{\$handler}})}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01447}01447\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01448}01448\ \ \ \ \ \ \ \ \ \$this-\/>handler\ =\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a9285a7f684c72e9bb78fdef1bcbe3fd0}{\$handler}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01449}01449\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01450}01450\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01451}01451\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01452}01452\ }
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01458}\mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a1a49b8dded6e91a52e2fd07195d334da}{01458}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a1a49b8dded6e91a52e2fd07195d334da}{getOptions}}()}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01459}01459\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01460}01460\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_http_1_1_client_1_1_pending_request_a011800c63ece4cbbfa77136a20607023}{\$this-\/>options}};}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01461}01461\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pending_request_8php_source_l01462}01462\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,775 @@
+\doxysection{Phpt\+Test\+Case.\+php}
+\hypertarget{_phpt_test_case_8php_source}{}\label{_phpt_test_case_8php_source}\index{vendor/phpunit/phpunit/src/Runner/PhptTestCase.php@{vendor/phpunit/phpunit/src/Runner/PhptTestCase.php}}
+\mbox{\hyperlink{_phpt_test_case_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ PHPUnit.}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_p_h_p_unit_1_1_runner}{PHPUnit\(\backslash\)Runner}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00012}00012\ use\ \textcolor{keyword}{const}\ DEBUG\_BACKTRACE\_IGNORE\_ARGS;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00013}00013\ use\ \textcolor{keyword}{const}\ DIRECTORY\_SEPARATOR;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ array\_merge;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ basename;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00016}00016\ use\ \textcolor{keyword}{function}\ debug\_backtrace;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00017}00017\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_laravel_1_1_serializable_closure_1_1_support_a0b5ee6f176cd47e84b04710f2181e3ff}{defined}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00018}00018\ use\ \textcolor{keyword}{function}\ dirname;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00019}00019\ use\ \textcolor{keyword}{function}\ explode;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00020}00020\ use\ \textcolor{keyword}{function}\ extension\_loaded;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00021}00021\ use\ \textcolor{keyword}{function}\ file;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00022}00022\ use\ \textcolor{keyword}{function}\ file\_get\_contents;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00023}00023\ use\ \textcolor{keyword}{function}\ file\_put\_contents;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00024}00024\ use\ \textcolor{keyword}{function}\ is\_array;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00025}00025\ use\ \textcolor{keyword}{function}\ is\_file;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00026}00026\ use\ \textcolor{keyword}{function}\ is\_readable;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00027}00027\ use\ \textcolor{keyword}{function}\ is\_string;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00028}00028\ use\ \textcolor{keyword}{function}\ ltrim;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00029}00029\ use\ \textcolor{keyword}{function}\ preg\_match;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00030}00030\ use\ \textcolor{keyword}{function}\ preg\_replace;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00031}00031\ use\ \textcolor{keyword}{function}\ preg\_split;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00032}00032\ use\ \textcolor{keyword}{function}\ realpath;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00033}00033\ use\ \textcolor{keyword}{function}\ rtrim;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00034}00034\ use\ \textcolor{keyword}{function}\ str\_contains;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00035}00035\ use\ \textcolor{keyword}{function}\ str\_replace;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00036}00036\ use\ \textcolor{keyword}{function}\ str\_starts\_with;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00037}00037\ use\ \textcolor{keyword}{function}\ strncasecmp;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00038}00038\ use\ \textcolor{keyword}{function}\ substr;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00039}00039\ use\ \textcolor{keyword}{function}\ trim;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00040}00040\ use\ \textcolor{keyword}{function}\ unlink;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00041}00041\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_ramsey_1_1_uuid_1_1_fields_a429f38a9f871921ed271c9cf73498ce0}{unserialize}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00042}00042\ use\ \textcolor{keyword}{function}\ var\_export;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00043}00043\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_phpt}{PHPUnit\(\backslash\)Event\(\backslash\)Code\(\backslash\)Phpt}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00044}00044\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_throwable_builder}{PHPUnit\(\backslash\)Event\(\backslash\)Code\(\backslash\)ThrowableBuilder}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00045}00045\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade}{PHPUnit\(\backslash\)Event\(\backslash\)Facade}}\ as\ EventFacade;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00046}00046\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_no_previous_throwable_exception}{PHPUnit\(\backslash\)Event\(\backslash\)NoPreviousThrowableException}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00047}00047\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert}{PHPUnit\(\backslash\)Framework\(\backslash\)Assert}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00048}00048\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assertion_failed_error}{PHPUnit\(\backslash\)Framework\(\backslash\)AssertionFailedError}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00049}00049\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_execution_order_dependency}{PHPUnit\(\backslash\)Framework\(\backslash\)ExecutionOrderDependency}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00050}00050\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_expectation_failed_exception}{PHPUnit\(\backslash\)Framework\(\backslash\)ExpectationFailedException}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00051}00051\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_incomplete_test_error}{PHPUnit\(\backslash\)Framework\(\backslash\)IncompleteTestError}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00052}00052\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_phpt_assertion_failed_error}{PHPUnit\(\backslash\)Framework\(\backslash\)PhptAssertionFailedError}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00053}00053\ use\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_reorderable}{PHPUnit\(\backslash\)Framework\(\backslash\)Reorderable}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00054}00054\ use\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_self_describing}{PHPUnit\(\backslash\)Framework\(\backslash\)SelfDescribing}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00055}00055\ use\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_test}{PHPUnit\(\backslash\)Framework\(\backslash\)Test}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00056}00056\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_registry}{PHPUnit\(\backslash\)TextUI\(\backslash\)Configuration\(\backslash\)Registry}}\ as\ ConfigurationRegistry;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00057}00057\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process}{PHPUnit\(\backslash\)Util\(\backslash\)PHP\(\backslash\)AbstractPhpProcess}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00058}00058\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_raw_code_coverage_data}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)Data\(\backslash\)RawCodeCoverageData}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00059}00059\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_invalid_argument_exception}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)InvalidArgumentException}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00060}00060\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_cache_not_configured_exception}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)StaticAnalysisCacheNotConfiguredException}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00061}00061\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_size_1_1_test_size}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)Test\(\backslash\)TestSize\(\backslash\)TestSize}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00062}00062\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_status_1_1_test_status}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)Test\(\backslash\)TestStatus\(\backslash\)TestStatus}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00063}00063\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_id_missing_exception}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)TestIdMissingException}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00064}00064\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_unintentionally_covered_code_exception}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)UnintentionallyCoveredCodeException}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00065}00065\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_template_1_1_template}{SebastianBergmann\(\backslash\)Template\(\backslash\)Template}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00066}00066\ use\ Throwable;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00071}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case}{00071}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case}{PhptTestCase}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_reorderable}{Reorderable}},\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_self_describing}{SelfDescribing}},\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_framework_1_1_test}{Test}}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00072}00072\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00076}00076\ \ \ \ \ \textcolor{keyword}{private}\ readonly\ \textcolor{keywordtype}{string}\ \$filename;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00077}00077\ \ \ \ \ \textcolor{keyword}{private}\ readonly\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process}{AbstractPhpProcess}}\ \$phpUtil;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00078}00078\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$output\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00087}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_ab8ae2397861421855f93a1c17b81ca29}{00087}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_ab8ae2397861421855f93a1c17b81ca29}{\_\_construct}}(\textcolor{keywordtype}{string}\ \$filename,\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process}{AbstractPhpProcess}}\ \$phpUtil\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00088}00088\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_file(\$filename))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_file_does_not_exist_exception}{FileDoesNotExistException}}(\$filename);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \$this-\/>filename\ =\ \$filename;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \$this-\/>phpUtil\ \ =\ \$phpUtil\ ?:\ AbstractPhpProcess::factory();}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00095}00095\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00100}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_ac751e87b3d4c4bf2feb03bee8b092755}{00100}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_ac751e87b3d4c4bf2feb03bee8b092755}{count}}():\ int}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00101}00101\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00103}00103\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00120}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_afb0fafe7e02a3ae1993c01c19fad2bae}{00120}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_afb0fafe7e02a3ae1993c01c19fad2bae}{run}}():\ void}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00121}00121\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \$emitter\ =\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade_a72dbe005bd689460a70770c42bddc02f}{EventFacade::emitter}}();}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \$emitter-\/>testPreparationStarted(}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{valueObjectForEvents}}(),}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \$sections\ =\ \$this-\/>parse();}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{interface_p_h_p_unit_1_1_event_1_1_exception}{Exception}}\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \$emitter-\/>testPrepared(\$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{valueObjectForEvents}}());}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \$emitter-\/>testErrored(\$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{valueObjectForEvents}}(),\ ThrowableBuilder::from(\$e));}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \$emitter-\/>testFinished(\$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{valueObjectForEvents}}(),\ 0);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \$code\ \ \ \ \ =\ \$this-\/>render(\$sections[\textcolor{stringliteral}{'FILE'}]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \$xfail\ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \$settings\ =\ \$this-\/>parseIniSection(\$this-\/>settings(\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_code_coverage_a0deb004950b8dc4f51836316fd19c111}{CodeCoverage::instance}}()-\/>isActive()));}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \$emitter-\/>testPrepared(\$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{valueObjectForEvents}}());}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$sections[\textcolor{stringliteral}{'INI'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \$settings\ =\ \$this-\/>parseIniSection(\$sections[\textcolor{stringliteral}{'INI'}],\ \$settings);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$sections[\textcolor{stringliteral}{'ENV'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \$env\ =\ \$this-\/>parseEnvSection(\$sections[\textcolor{stringliteral}{'ENV'}]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>phpUtil-\/>setEnv(\$env);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \$this-\/>phpUtil-\/>setUseStderrRedirection(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>shouldTestBeSkipped(\$sections,\ \$settings))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$sections[\textcolor{stringliteral}{'XFAIL'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \$xfail\ =\ trim(\$sections[\textcolor{stringliteral}{'XFAIL'}]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$sections[\textcolor{stringliteral}{'STDIN'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>phpUtil-\/>setStdin(\$sections[\textcolor{stringliteral}{'STDIN'}]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$sections[\textcolor{stringliteral}{'ARGS'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>phpUtil-\/>setArgs(\$sections[\textcolor{stringliteral}{'ARGS'}]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_code_coverage_a0deb004950b8dc4f51836316fd19c111}{CodeCoverage::instance}}()-\/>isActive())\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \$codeCoverageCacheDirectory\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_code_coverage_a0deb004950b8dc4f51836316fd19c111}{CodeCoverage::instance}}()-\/>codeCoverage()-\/>cachesStaticAnalysis())\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$codeCoverageCacheDirectory\ =\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_code_coverage_a0deb004950b8dc4f51836316fd19c111}{CodeCoverage::instance}}()-\/>codeCoverage()-\/>cacheDirectory();}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>renderForCoverage(}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$code,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_code_coverage_a0deb004950b8dc4f51836316fd19c111}{CodeCoverage::instance}}()-\/>codeCoverage()-\/>collectsBranchAndPathCoverage(),}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$codeCoverageCacheDirectory,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \$jobResult\ \ \ \ =\ \$this-\/>phpUtil-\/>runJob(\$code,\ \$this-\/>stringifyIni(\$settings));}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a3939045b11b9aaefdf692feb963f0dfc}{output}}\ =\ \$jobResult[\textcolor{stringliteral}{'stdout'}]\ ??\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_code_coverage_a0deb004950b8dc4f51836316fd19c111}{CodeCoverage::instance}}()-\/>isActive()\ \&\&\ (\$coverage\ =\ \$this-\/>cleanupForCoverage()))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_code_coverage_a0deb004950b8dc4f51836316fd19c111}{CodeCoverage::instance}}()-\/>codeCoverage()-\/>start(\$this-\/>filename,\ TestSize::large());}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_code_coverage_a0deb004950b8dc4f51836316fd19c111}{CodeCoverage::instance}}()-\/>codeCoverage()-\/>append(}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverage,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>filename,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestStatus::unknown(),}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>assertPhptExpectation(\$sections,\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a3939045b11b9aaefdf692feb963f0dfc}{output}});}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assertion_failed_error}{AssertionFailedError}}\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \$failure\ =\ \$e;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$xfail\ !==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$failure\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_incomplete_test_error}{IncompleteTestError}}(\$xfail,\ 0,\ \$e);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$e\ instanceof\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_expectation_failed_exception}{ExpectationFailedException}})\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$comparisonFailure\ =\ \$e-\/>getComparisonFailure();}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$comparisonFailure)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$diff\ =\ \$comparisonFailure-\/>getDiff();}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$diff\ =\ \$e-\/>getMessage();}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$hint\ \ \ \ =\ \$this-\/>getLocationHintFromDiff(\$diff,\ \$sections);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$trace\ \ \ =\ array\_merge(\$hint,\ debug\_backtrace(DEBUG\_BACKTRACE\_IGNORE\_ARGS));}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$failure\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_phpt_assertion_failed_error}{PhptAssertionFailedError}}(}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$e-\/>getMessage(),}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$trace[0][\textcolor{stringliteral}{'file'}],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$trace[0][\textcolor{stringliteral}{'line'}],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$trace,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$comparisonFailure\ ?\ \$diff\ :\ \textcolor{stringliteral}{''},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$failure\ instanceof\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_incomplete_test_error}{IncompleteTestError}})\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$emitter-\/>testMarkedAsIncomplete(\$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{valueObjectForEvents}}(),\ ThrowableBuilder::from(\$failure));}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$emitter-\/>testFailed(\$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{valueObjectForEvents}}(),\ ThrowableBuilder::from(\$failure),\ \textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_throwable}{Throwable}}\ \$t)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \$emitter-\/>testErrored(\$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{valueObjectForEvents}}(),\ ThrowableBuilder::from(\$t));}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \$this-\/>runClean(\$sections,\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_code_coverage_a0deb004950b8dc4f51836316fd19c111}{CodeCoverage::instance}}()-\/>isActive());}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \$emitter-\/>testFinished(\$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{valueObjectForEvents}}(),\ 1);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00241}00241\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00246}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a3d0963e68bb313b163a73f2803c64600}{00246}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a3d0963e68bb313b163a73f2803c64600}{getName}}():\ string}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00247}00247\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a5558c5d549f41597377fa1ea8a1cefa3}{toString}}();}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00249}00249\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00254}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a5558c5d549f41597377fa1ea8a1cefa3}{00254}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a5558c5d549f41597377fa1ea8a1cefa3}{toString}}():\ string}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00255}00255\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>filename;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00257}00257\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00259}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_aaceec449a3d3d496a69aa56450adbfeb}{00259}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_aaceec449a3d3d496a69aa56450adbfeb}{usesDataProvider}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00260}00260\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00262}00262\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00264}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a160b6c3eb75e81cf80196591c81f9c3d}{00264}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a160b6c3eb75e81cf80196591c81f9c3d}{numberOfAssertionsPerformed}}():\ int}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00265}00265\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00267}00267\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00269}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a3939045b11b9aaefdf692feb963f0dfc}{00269}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a3939045b11b9aaefdf692feb963f0dfc}{output}}():\ string}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00270}00270\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>output;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00272}00272\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00274}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a40c1f31b3561484d42b06a2061273192}{00274}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a40c1f31b3561484d42b06a2061273192}{hasOutput}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00275}00275\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !empty(\$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a3939045b11b9aaefdf692feb963f0dfc}{output}});}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00277}00277\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00278}00278\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00279}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a4bee1553847d115c273409bd4ca9e44a}{00279}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a4bee1553847d115c273409bd4ca9e44a}{sortId}}():\ string}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00280}00280\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>filename;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00282}00282\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00287}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a121c1b201a74841aa007403c17e87c0b}{00287}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a121c1b201a74841aa007403c17e87c0b}{provides}}():\ array}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00288}00288\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00290}00290\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00291}00291\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00295}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_aca36b68c12b6c6204e5f925a7ab3233d}{00295}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{requires}():\ array}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00296}00296\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00298}00298\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00303}\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{00303}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{valueObjectForEvents}}():\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_phpt}{Phpt}}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00304}00304\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00305}00305\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_phpt}{Phpt}}(\$this-\/>filename);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00306}00306\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00307}00307\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00311}00311\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ parseIniSection(array|\textcolor{keywordtype}{string}\ \$content,\ array\ \$ini\ =\ []):\ array}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00312}00312\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00313}00313\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$content))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \$content\ =\ explode(\textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ trim(\$content));}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00316}00316\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$content\ as\ \$setting)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!str\_contains(\$setting,\ \textcolor{charliteral}{'='}))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00321}00321\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ \$setting\ =\ explode(\textcolor{charliteral}{'='},\ \$setting,\ 2);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ \$name\ \ \ \ =\ trim(\$setting[0]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ \ \ =\ trim(\$setting[1]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$name\ ===\ \textcolor{stringliteral}{'extension'}\ ||\ \$name\ ===\ \textcolor{stringliteral}{'zend\_extension'})\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00327}00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$ini[\$name]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$ini[\$name]\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$ini[\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}}][]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \$ini[\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}}]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00338}00338\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00339}00339\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$ini;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00340}00340\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00342}00342\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ parseEnvSection(\textcolor{keywordtype}{string}\ \$content):\ array}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00343}00343\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00344}00344\ \ \ \ \ \ \ \ \ \$env\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00345}00345\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (explode(\textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ trim(\$content))\ as\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \ \ \ \ \$e\ =\ explode(\textcolor{charliteral}{'='},\ trim(\$e),\ 2);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00348}00348\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!empty(\$e[0])\ \&\&\ isset(\$e[1]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$env[\$e[0]]\ =\ \$e[1];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00353}00353\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$env;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00355}00355\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00356}00356\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00361}00361\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ assertPhptExpectation(array\ \$sections,\ \textcolor{keywordtype}{string}\ \$output):\ void}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00362}00362\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \$assertions\ =\ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECT'}\ \ \ \ \ \ =>\ \textcolor{stringliteral}{'assertEquals'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECTF'}\ \ \ \ \ =>\ \textcolor{stringliteral}{'assertStringMatchesFormat'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECTREGEX'}\ =>\ \textcolor{stringliteral}{'assertMatchesRegularExpression'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \$actual\ =\ preg\_replace(\textcolor{stringliteral}{'/\(\backslash\)r\(\backslash\)n/'},\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ trim(\$output));}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00370}00370\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00371}00371\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$assertions\ as\ \$sectionName\ =>\ \$sectionAssertion)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$sections[\$sectionName]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sectionContent\ =\ preg\_replace(\textcolor{stringliteral}{'/\(\backslash\)r\(\backslash\)n/'},\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ trim(\$sections[\$sectionName]));}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00374}00374\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$expected\ \ \ \ \ \ \ =\ \$sectionName\ ===\ \textcolor{stringliteral}{'EXPECTREGEX'}\ ?\ \textcolor{stringliteral}{"{}/\{\$sectionContent\}/"{}}\ :\ \$sectionContent;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00375}00375\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00376}00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Assert::\$sectionAssertion(\$expected,\ \$actual);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00377}00377\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00380}00380\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00381}00381\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidPhptFileException;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00383}00383\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00384}00384\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00385}00385\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ shouldTestBeSkipped(array\ \$sections,\ array\ \$settings):\ bool}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00386}00386\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$sections[\textcolor{stringliteral}{'SKIPIF'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00390}00390\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \$skipif\ \ \ \ =\ \$this-\/>render(\$sections[\textcolor{stringliteral}{'SKIPIF'}]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \$jobResult\ =\ \$this-\/>phpUtil-\/>runJob(\$skipif,\ \$this-\/>stringifyIni(\$settings));}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00393}00393\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!strncasecmp(\textcolor{stringliteral}{'skip'},\ ltrim(\$jobResult[\textcolor{stringliteral}{'stdout'}]),\ 4))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00396}00396\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (preg\_match(\textcolor{stringliteral}{'/\string^\(\backslash\)s*skip\(\backslash\)s*(.+)\(\backslash\)s*/i'},\ \$jobResult[\textcolor{stringliteral}{'stdout'}],\ \$skipMatch))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00398}00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ substr(\$skipMatch[1],\ 2);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade_a72dbe005bd689460a70770c42bddc02f}{EventFacade::emitter}}()-\/>testSkipped(}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{valueObjectForEvents}}(),}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00405}00405\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade_a72dbe005bd689460a70770c42bddc02f}{EventFacade::emitter}}()-\/>testFinished(\$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_phpt_test_case_a0930e5fb41f28f31b4f5c0c34fe997c8}{valueObjectForEvents}}(),\ 0);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00407}00407\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00409}00409\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00410}00410\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00411}00411\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00412}00412\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00413}00413\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00414}00414\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ runClean(array\ \$sections,\ \textcolor{keywordtype}{bool}\ \$collectCoverage):\ void}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00415}00415\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00416}00416\ \ \ \ \ \ \ \ \ \$this-\/>phpUtil-\/>setStdin(\textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \$this-\/>phpUtil-\/>setArgs(\textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00419}00419\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$sections[\textcolor{stringliteral}{'CLEAN'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ \$cleanCode\ =\ \$this-\/>render(\$sections[\textcolor{stringliteral}{'CLEAN'}]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00421}00421\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>phpUtil-\/>runJob(\$cleanCode,\ \$this-\/>settings(\$collectCoverage));}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00423}00423\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00424}00424\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00425}00425\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00429}00429\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ parse():\ array}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00430}00430\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \$sections\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \$section\ \ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00433}00433\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \$unsupportedSections\ =\ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'CGI'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'COOKIE'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'DEFLATE\_POST'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECTHEADERS'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXTENSIONS'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'GET'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'GZIP\_POST'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'HEADERS'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'PHPDBG'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'POST'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00445}00445\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'POST\_RAW'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00446}00446\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'PUT'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00447}00447\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'REDIRECTTEST'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'REQUEST'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00450}00450\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \$lineNr\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (file(\$this-\/>filename)\ as\ \$line)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ \$lineNr++;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00455}00455\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (preg\_match(\textcolor{stringliteral}{'/\string^-\/-\/([\_A-\/Z]+)-\/-\//'},\ \$line,\ \$result))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$section\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \$result[1];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sections[\$section]\ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sections[\$section\ .\ \textcolor{stringliteral}{'\_offset'}]\ =\ \$lineNr;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00460}00460\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00463}00463\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$section))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidPhptFileException;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00468}00468\ \ \ \ \ \ \ \ \ \ \ \ \ \$sections[\$section]\ .=\ \$line;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00470}00470\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$sections[\textcolor{stringliteral}{'FILEEOF'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \$sections[\textcolor{stringliteral}{'FILE'}]\ =\ rtrim(\$sections[\textcolor{stringliteral}{'FILEEOF'}],\ \textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$sections[\textcolor{stringliteral}{'FILEEOF'}]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00474}00474\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00475}00475\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \$this-\/>parseExternal(\$sections);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00477}00477\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>validate(\$sections))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidPhptFileException;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00481}00481\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00482}00482\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$unsupportedSections\ as\ \$section)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00483}00483\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$sections[\$section]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ UnsupportedPhptSectionException(\$section);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00486}00486\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$sections;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00489}00489\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00490}00490\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00494}00494\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ parseExternal(array\ \&\$sections):\ void}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00495}00495\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \$allowSections\ =\ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00497}00497\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'FILE'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECT'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECTF'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECTREGEX'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00501}00501\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00502}00502\ \ \ \ \ \ \ \ \ \$testDirectory\ =\ dirname(\$this-\/>filename)\ .\ DIRECTORY\_SEPARATOR;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$allowSections\ as\ \$section)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$sections[\$section\ .\ \textcolor{stringliteral}{'\_EXTERNAL'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00506}00506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$externalFilename\ =\ trim(\$sections[\$section\ .\ \textcolor{stringliteral}{'\_EXTERNAL'}]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00507}00507\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00508}00508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_file(\$testDirectory\ .\ \$externalFilename)\ ||}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00509}00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !is\_readable(\$testDirectory\ .\ \$externalFilename))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ PhptExternalFileCannotBeLoadedException(}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$section,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testDirectory\ .\ \$externalFilename,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00515}00515\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sections[\$section]\ =\ file\_get\_contents(\$testDirectory\ .\ \$externalFilename);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00518}00518\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00519}00519\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00520}00520\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00521}00521\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ validate(array\ \$sections):\ bool}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00522}00522\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00523}00523\ \ \ \ \ \ \ \ \ \$requiredSections\ =\ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00524}00524\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'FILE'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00525}00525\ \ \ \ \ \ \ \ \ \ \ \ \ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECT'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00527}00527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECTF'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00528}00528\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECTREGEX'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00530}00530\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00531}00531\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$requiredSections\ as\ \$section)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00533}00533\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$section))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$foundSection\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00535}00535\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$section\ as\ \$anySection)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00537}00537\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$sections[\$anySection]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00538}00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$foundSection\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00539}00539\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00543}00543\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$foundSection)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00547}00547\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00548}00548\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00550}00550\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00551}00551\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$sections[\$section]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00552}00552\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00553}00553\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00554}00554\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00555}00555\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00556}00556\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00557}00557\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00558}00558\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00559}00559\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ render(\textcolor{keywordtype}{string}\ \$code):\ string}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00560}00560\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str\_replace(}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00562}00562\ \ \ \ \ \ \ \ \ \ \ \ \ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00563}00563\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_\_DIR\_\_'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_\_FILE\_\_'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00565}00565\ \ \ \ \ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00566}00566\ \ \ \ \ \ \ \ \ \ \ \ \ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00567}00567\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}'"{}}\ .\ dirname(\$this-\/>filename)\ .\ \textcolor{stringliteral}{"{}'"{}},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00568}00568\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}'"{}}\ .\ \$this-\/>filename\ .\ \textcolor{stringliteral}{"{}'"{}},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00570}00570\ \ \ \ \ \ \ \ \ \ \ \ \ \$code,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00571}00571\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00572}00572\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00573}00573\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00574}00574\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getCoverageFiles():\ array}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00575}00575\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00576}00576\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{autoload__classmap_8php_a873fc20cf44ad2f766893e95aab8df78}{\$baseDir}}\ \ =\ dirname(realpath(\$this-\/>filename))\ .\ DIRECTORY\_SEPARATOR;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \$basename\ =\ basename(\$this-\/>filename,\ \textcolor{stringliteral}{'phpt'});}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00578}00578\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00579}00579\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00580}00580\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'coverage'}\ =>\ \mbox{\hyperlink{autoload__classmap_8php_a873fc20cf44ad2f766893e95aab8df78}{\$baseDir}}\ .\ \$basename\ .\ \textcolor{stringliteral}{'coverage'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'job'}\ \ \ \ \ \ =>\ \mbox{\hyperlink{autoload__classmap_8php_a873fc20cf44ad2f766893e95aab8df78}{\$baseDir}}\ .\ \$basename\ .\ \textcolor{stringliteral}{'php'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00582}00582\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00583}00583\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00584}00584\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00588}00588\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ renderForCoverage(\textcolor{keywordtype}{string}\ \&\$job,\ \textcolor{keywordtype}{bool}\ \$pathCoverage,\ ?\textcolor{keywordtype}{string}\ \$codeCoverageCacheDirectory):\ void}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00589}00589\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00590}00590\ \ \ \ \ \ \ \ \ \$files\ =\ \$this-\/>getCoverageFiles();}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00591}00591\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00592}00592\ \ \ \ \ \ \ \ \ \$template\ =\ \textcolor{keyword}{new}\ Template(}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00593}00593\ \ \ \ \ \ \ \ \ \ \ \ \ \_\_DIR\_\_\ .\ \textcolor{stringliteral}{'/../Util/PHP/Template/PhptTestCase.tpl'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00594}00594\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00595}00595\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \$composerAutoload\ =\ \textcolor{charliteral}{'\(\backslash\)'}\(\backslash\)\textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00597}00597\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00598}00598\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_laravel_1_1_serializable_closure_1_1_support_a0b5ee6f176cd47e84b04710f2181e3ff}{defined}}(\textcolor{stringliteral}{'PHPUNIT\_COMPOSER\_INSTALL'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00599}00599\ \ \ \ \ \ \ \ \ \ \ \ \ \$composerAutoload\ =\ var\_export(PHPUNIT\_COMPOSER\_INSTALL,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00600}00600\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00601}00601\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00602}00602\ \ \ \ \ \ \ \ \ \$phar\ =\ \textcolor{charliteral}{'\(\backslash\)'}\(\backslash\)\textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00603}00603\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00604}00604\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_laravel_1_1_serializable_closure_1_1_support_a0b5ee6f176cd47e84b04710f2181e3ff}{defined}}(\textcolor{stringliteral}{'\_\_PHPUNIT\_PHAR\_\_'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00605}00605\ \ \ \ \ \ \ \ \ \ \ \ \ \$phar\ =\ var\_export(\_\_PHPUNIT\_PHAR\_\_,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00606}00606\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00607}00607\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00608}00608\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$codeCoverageCacheDirectory\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \ \ \$codeCoverageCacheDirectory\ =\ \textcolor{stringliteral}{'null'};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \ \ \ \ \$codeCoverageCacheDirectory\ =\ \textcolor{stringliteral}{"{}'"{}}\ .\ \$codeCoverageCacheDirectory\ .\ \textcolor{stringliteral}{"{}'"{}};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00612}00612\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00613}00613\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00614}00614\ \ \ \ \ \ \ \ \ \$bootstrap\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00615}00615\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00616}00616\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_registry_a5ba61361bf0695a285bbaefefc427191}{ConfigurationRegistry::get}}()-\/>hasBootstrap())\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00617}00617\ \ \ \ \ \ \ \ \ \ \ \ \ \$bootstrap\ =\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_registry_a5ba61361bf0695a285bbaefefc427191}{ConfigurationRegistry::get}}()-\/>bootstrap();}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00618}00618\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00619}00619\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00620}00620\ \ \ \ \ \ \ \ \ \$template-\/>setVar(}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \ \ \ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'bootstrap'}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$bootstrap,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00623}00623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'composerAutoload'}\ \ \ \ \ \ \ \ \ \ \ =>\ \$composerAutoload,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'phar'}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$phar,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00625}00625\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'job'}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$files[\textcolor{stringliteral}{'job'}],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00626}00626\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'coverageFile'}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$files[\textcolor{stringliteral}{'coverage'}],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00627}00627\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'driverMethod'}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$pathCoverage\ ?\ \textcolor{stringliteral}{'forLineAndPathCoverage'}\ :\ \textcolor{stringliteral}{'forLineCoverage'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00628}00628\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'codeCoverageCacheDirectory'}\ =>\ \$codeCoverageCacheDirectory,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00629}00629\ \ \ \ \ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00630}00630\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00631}00631\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00632}00632\ \ \ \ \ \ \ \ \ file\_put\_contents(\$files[\textcolor{stringliteral}{'job'}],\ \$job);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00633}00633\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00634}00634\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}\ =\ \$template-\/>render();}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00635}00635\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00636}00636\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00637}00637\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ cleanupForCoverage():\ RawCodeCoverageData}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00638}00638\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00639}00639\ \ \ \ \ \ \ \ \ \$coverage\ =\ RawCodeCoverageData::fromXdebugWithoutPathCoverage([]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00640}00640\ \ \ \ \ \ \ \ \ \$files\ \ \ \ =\ \$this-\/>getCoverageFiles();}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00641}00641\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00642}00642\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_file(\$files[\textcolor{stringliteral}{'coverage'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00643}00643\ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ =\ @file\_get\_contents(\$files[\textcolor{stringliteral}{'coverage'}]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00644}00644\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00645}00645\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$buffer\ !==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00646}00646\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverage\ =\ @\mbox{\hyperlink{namespace_ramsey_1_1_uuid_1_1_fields_a429f38a9f871921ed271c9cf73498ce0}{unserialize}}(\$buffer);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00647}00647\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00648}00648\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$coverage\ ===\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00649}00649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverage\ =\ RawCodeCoverageData::fromXdebugWithoutPathCoverage([]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00650}00650\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00651}00651\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00652}00652\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00653}00653\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00654}00654\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$files\ as\ \$file)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00655}00655\ \ \ \ \ \ \ \ \ \ \ \ \ @unlink(\$file);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00656}00656\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00657}00657\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00658}00658\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$coverage;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00659}00659\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00660}00660\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00661}00661\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ stringifyIni(array\ \$ini):\ array}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00662}00662\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00663}00663\ \ \ \ \ \ \ \ \ \$settings\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00664}00664\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00665}00665\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$ini\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00666}00666\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00667}00667\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$value\ as\ \$val)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00668}00668\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$settings[]\ =\ \$key\ .\ \textcolor{charliteral}{'='}\ .\ \$val;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00669}00669\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00670}00670\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00671}00671\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00672}00672\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00673}00673\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00674}00674\ \ \ \ \ \ \ \ \ \ \ \ \ \$settings[]\ =\ \$key\ .\ \textcolor{charliteral}{'='}\ .\ \$value;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00675}00675\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00676}00676\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00677}00677\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$settings;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00678}00678\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00679}00679\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00680}00680\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getLocationHintFromDiff(\textcolor{keywordtype}{string}\ \$message,\ array\ \$sections):\ array}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00681}00681\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00682}00682\ \ \ \ \ \ \ \ \ \$needle\ \ \ \ \ \ \ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00683}00683\ \ \ \ \ \ \ \ \ \$previousLine\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00684}00684\ \ \ \ \ \ \ \ \ \$block\ \ \ \ \ \ \ \ =\ \textcolor{stringliteral}{'message'};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00685}00685\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00686}00686\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (preg\_split(\textcolor{stringliteral}{'/\(\backslash\)r\(\backslash\)n|\(\backslash\)r|\(\backslash\)n/'},\ \$message)\ as\ \$line)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00687}00687\ \ \ \ \ \ \ \ \ \ \ \ \ \$line\ =\ trim(\$line);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00688}00688\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00689}00689\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$block\ ===\ \textcolor{stringliteral}{'message'}\ \&\&\ \$line\ ===\ \textcolor{stringliteral}{'-\/-\/-\/\ Expected'})\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00690}00690\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$block\ =\ \textcolor{stringliteral}{'expected'};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00691}00691\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00692}00692\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00693}00693\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$block\ ===\ \textcolor{stringliteral}{'expected'}\ \&\&\ \$line\ ===\ \textcolor{stringliteral}{'@@\ @@'})\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00694}00694\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$block\ =\ \textcolor{stringliteral}{'diff'};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00695}00695\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00696}00696\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00697}00697\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$block\ ===\ \textcolor{stringliteral}{'diff'})\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00698}00698\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\$line,\ \textcolor{charliteral}{'+'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00699}00699\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$needle\ =\ \$this-\/>getCleanDiffLine(\$previousLine);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00700}00700\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00701}00701\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00702}00702\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00703}00703\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00704}00704\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\$line,\ \textcolor{charliteral}{'-\/'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00705}00705\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$needle\ =\ \$this-\/>getCleanDiffLine(\$line);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00706}00706\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00707}00707\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00708}00708\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00709}00709\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00710}00710\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00711}00711\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!empty(\$line))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00712}00712\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$previousLine\ =\ \$line;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00713}00713\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00714}00714\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00715}00715\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00716}00716\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>getLocationHint(\$needle,\ \$sections);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00717}00717\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00718}00718\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00719}00719\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getCleanDiffLine(\textcolor{keywordtype}{string}\ \$line):\ string}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00720}00720\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00721}00721\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (preg\_match(\textcolor{stringliteral}{'/\string^[\(\backslash\)-\/+]([\(\backslash\)'\(\backslash\)"{}]?)(.*)\(\backslash\)1\$/'},\ \$line,\ \$matches))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00722}00722\ \ \ \ \ \ \ \ \ \ \ \ \ \$line\ =\ \$matches[2];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00723}00723\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00724}00724\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00725}00725\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$line;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00726}00726\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00727}00727\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00728}00728\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getLocationHint(\textcolor{keywordtype}{string}\ \$needle,\ array\ \$sections):\ array}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00729}00729\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00730}00730\ \ \ \ \ \ \ \ \ \$needle\ =\ trim(\$needle);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00731}00731\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00732}00732\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$needle))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00733}00733\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [[}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00734}00734\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'file'}\ =>\ realpath(\$this-\/>filename),}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00735}00735\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'line'}\ =>\ 1,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00736}00736\ \ \ \ \ \ \ \ \ \ \ \ \ ]];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00737}00737\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00738}00738\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00739}00739\ \ \ \ \ \ \ \ \ \$search\ =\ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00740}00740\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 'FILE',}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00741}00741\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECT'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00742}00742\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECTF'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00743}00743\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'EXPECTREGEX'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00744}00744\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00745}00745\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00746}00746\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$search\ as\ \$section)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00747}00747\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$sections[\$section]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00748}00748\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00749}00749\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00750}00750\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00751}00751\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$sections[\$section\ .\ \textcolor{stringliteral}{'\_EXTERNAL'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00752}00752\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$externalFile\ =\ trim(\$sections[\$section\ .\ \textcolor{stringliteral}{'\_EXTERNAL'}]);}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00753}00753\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00754}00754\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00755}00755\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00756}00756\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'file'}\ =>\ realpath(dirname(\$this-\/>filename)\ .\ DIRECTORY\_SEPARATOR\ .\ \$externalFile),}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00757}00757\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'line'}\ =>\ 1,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00758}00758\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00759}00759\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00760}00760\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'file'}\ =>\ realpath(\$this-\/>filename),}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00761}00761\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'line'}\ =>\ (\$sections[\$section\ .\ \textcolor{stringliteral}{'\_EXTERNAL\_offset'}]\ ??\ 0)\ +\ 1,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00762}00762\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00763}00763\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00764}00764\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00765}00765\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00766}00766\ \ \ \ \ \ \ \ \ \ \ \ \ \$sectionOffset\ =\ \$sections[\$section\ .\ \textcolor{stringliteral}{'\_offset'}]\ ??\ 0;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00767}00767\ \ \ \ \ \ \ \ \ \ \ \ \ \$offset\ \ \ \ \ \ \ \ =\ \$sectionOffset\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00768}00768\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00769}00769\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (preg\_split(\textcolor{stringliteral}{'/\(\backslash\)r\(\backslash\)n|\(\backslash\)r|\(\backslash\)n/'},\ \$sections[\$section])\ as\ \$line)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00770}00770\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$line,\ \$needle))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00771}00771\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00772}00772\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00773}00773\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'file'}\ =>\ realpath(\$this-\/>filename),}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00774}00774\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'line'}\ =>\ \$offset,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00775}00775\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00776}00776\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00777}00777\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00778}00778\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00779}00779\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$offset++;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00780}00780\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00781}00781\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00782}00782\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00783}00783\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00784}00784\ \ \ \ \ \ \ \ \ \ \ \ \ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00785}00785\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'file'}\ =>\ realpath(\$this-\/>filename),}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00786}00786\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'line'}\ =>\ 1,}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00787}00787\ \ \ \ \ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00788}00788\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00789}00789\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00790}00790\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00794}00794\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ settings(\textcolor{keywordtype}{bool}\ \$collectCoverage):\ array}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00795}00795\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00796}00796\ \ \ \ \ \ \ \ \ \$settings\ =\ [}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00797}00797\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'allow\_url\_fopen=1'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00798}00798\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'auto\_append\_file='},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00799}00799\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'auto\_prepend\_file='},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00800}00800\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'disable\_functions='},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00801}00801\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'display\_errors=1'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00802}00802\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'docref\_ext=.html'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00803}00803\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'docref\_root='},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00804}00804\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'error\_append\_string='},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00805}00805\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'error\_prepend\_string='},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00806}00806\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'error\_reporting=-\/1'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00807}00807\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'html\_errors=0'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00808}00808\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'log\_errors=0'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00809}00809\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'open\_basedir='},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00810}00810\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'output\_buffering=Off'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00811}00811\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'output\_handler='},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00812}00812\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'report\_memleaks=0'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00813}00813\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'report\_zend\_debug=0'},}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00814}00814\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00815}00815\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00816}00816\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (extension\_loaded(\textcolor{stringliteral}{'pcov'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00817}00817\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$collectCoverage)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00818}00818\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$settings[]\ =\ \textcolor{stringliteral}{'pcov.enabled=1'};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00819}00819\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00820}00820\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$settings[]\ =\ \textcolor{stringliteral}{'pcov.enabled=0'};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00821}00821\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00822}00822\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00823}00823\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00824}00824\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (extension\_loaded(\textcolor{stringliteral}{'xdebug'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00825}00825\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$collectCoverage)\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00826}00826\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$settings[]\ =\ \textcolor{stringliteral}{'xdebug.mode=coverage'};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00827}00827\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00828}00828\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$settings[]\ =\ \textcolor{stringliteral}{'xdebug.mode=off'};}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00829}00829\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00830}00830\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00831}00831\ }
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00832}00832\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$settings;}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00833}00833\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_phpt_test_case_8php_source_l00834}00834\ \}}
+
+\end{DoxyCode}

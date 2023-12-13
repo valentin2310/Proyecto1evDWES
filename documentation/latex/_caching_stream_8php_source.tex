@@ -1,0 +1,141 @@
+\doxysection{Caching\+Stream.\+php}
+\hypertarget{_caching_stream_8php_source}{}\label{_caching_stream_8php_source}\index{vendor/guzzlehttp/psr7/src/CachingStream.php@{vendor/guzzlehttp/psr7/src/CachingStream.php}}
+\mbox{\hyperlink{_caching_stream_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00003}00003\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_guzzle_http_1_1_psr7}{GuzzleHttp\(\backslash\)Psr7}};}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00007}00007\ use\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_stream_interface}{Psr\(\backslash\)Http\(\backslash\)Message\(\backslash\)StreamInterface}};}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00013}\mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream}{00013}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream}{CachingStream}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_stream_interface}{StreamInterface}}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00014}00014\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00015}00015\ \ \ \ \ use\ StreamDecoratorTrait;}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{private}\ \$remoteStream;}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{private}\ \$skipReadBytes\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00026}00026\ \ \ \ \ \textcolor{keyword}{private}\ \$stream;}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00034}\mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_aa8b5f4e6d8ddde09231c581d75b86677}{00034}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_aa8b5f4e6d8ddde09231c581d75b86677}{\_\_construct}}(}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00035}00035\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_stream_interface}{StreamInterface}}\ \$stream,}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00036}00036\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_stream_interface}{StreamInterface}}\ \$target\ =\ \textcolor{keyword}{null}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00037}00037\ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00038}00038\ \ \ \ \ \ \ \ \ \$this-\/>remoteStream\ =\ \$stream;}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \$this-\/>stream\ =\ \$target\ ?:\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_stream}{Stream}}(Utils::tryFopen(\textcolor{stringliteral}{'php://temp'},\ \textcolor{stringliteral}{'r+'}));}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00040}00040\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00042}\mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_a75cce10cdf81be6dc84881c28b3379b7}{00042}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_a75cce10cdf81be6dc84881c28b3379b7}{getSize}}():\ ?int}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00043}00043\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \$remoteSize\ =\ \$this-\/>remoteStream-\/>getSize();}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$remoteSize)\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ max(\$this-\/>stream-\/>getSize(),\ \$remoteSize);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00051}00051\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00053}\mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_ae619dcf2218c21549cb65d875bbc6c9c}{00053}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_ae619dcf2218c21549cb65d875bbc6c9c}{rewind}}():\ void}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00054}00054\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_aa2ee0a47a0c37ae7ca7a04df34fc6d7a}{seek}}(0);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00056}00056\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00058}\mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_aa2ee0a47a0c37ae7ca7a04df34fc6d7a}{00058}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_aa2ee0a47a0c37ae7ca7a04df34fc6d7a}{seek}}(\$offset,\ \$whence\ =\ SEEK\_SET):\ void}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00059}00059\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$whence\ ===\ SEEK\_SET)\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \$byte\ =\ \$offset;}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$whence\ ===\ SEEK\_CUR)\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \$byte\ =\ \$offset\ +\ \$this-\/>\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_stream_interface_a8153e55ed7b27a62988843a2dd66c845}{tell}}();}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$whence\ ===\ SEEK\_END)\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \$size\ =\ \$this-\/>remoteStream-\/>getSize();}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$size\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$size\ =\ \$this-\/>cacheEntireStream();}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \$byte\ =\ \$size\ +\ \$offset;}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'Invalid\ whence'});}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \$diff\ =\ \$byte\ -\/\ \$this-\/>stream-\/>getSize();}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$diff\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Read\ the\ remoteStream\ until\ we\ have\ read\ in\ at\ least\ the\ amount}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ of\ bytes\ requested,\ or\ we\ reach\ the\ end\ of\ the\ file.}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\$diff\ >\ 0\ \&\&\ !\$this-\/>remoteStream-\/>eof())\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_a2acacba716a933935d63b2bacf52cff6}{read}}(\$diff);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$diff\ =\ \$byte\ -\/\ \$this-\/>stream-\/>getSize();}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We\ can\ just\ do\ a\ normal\ seek\ since\ we've\ already\ seen\ this\ byte.}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>stream-\/>seek(\$byte);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00087}00087\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00089}\mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_a2acacba716a933935d63b2bacf52cff6}{00089}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_a2acacba716a933935d63b2bacf52cff6}{read}}(\$length):\ string}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00090}00090\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Perform\ a\ regular\ read\ on\ any\ previously\ read\ data\ from\ the\ buffer}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \$this-\/>stream-\/>read(\$length);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \$remaining\ =\ \$length\ -\/\ strlen(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ More\ data\ was\ requested\ so\ read\ from\ the\ remote\ stream}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$remaining)\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ data\ was\ written\ to\ the\ buffer\ in\ a\ position\ that\ would\ have}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ been\ filled\ from\ the\ remote\ stream,\ then\ we\ must\ skip\ bytes\ on}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ remote\ stream\ to\ emulate\ overwriting\ bytes\ from\ that}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ position.\ This\ mimics\ the\ behavior\ of\ other\ PHP\ stream\ wrappers.}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \$remoteData\ =\ \$this-\/>remoteStream-\/>read(}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$remaining\ +\ \$this-\/>skipReadBytes}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>skipReadBytes)\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$len\ =\ strlen(\$remoteData);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$remoteData\ =\ substr(\$remoteData,\ \$this-\/>skipReadBytes);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>skipReadBytes\ =\ max(0,\ \$this-\/>skipReadBytes\ -\/\ \$len);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ .=\ \$remoteData;}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>stream-\/>write(\$remoteData);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}};}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00116}00116\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00118}\mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_abf9a4eaa4b5194cc450e80c1a0c23a5a}{00118}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_abf9a4eaa4b5194cc450e80c1a0c23a5a}{write}}(\$string):\ int}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00119}00119\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ appending\ to\ the\ end\ of\ the\ currently\ read\ stream,\ you'll\ want}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ skip\ bytes\ from\ being\ read\ from\ the\ remote\ stream\ to\ emulate}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ other\ stream\ wrappers.\ Basically\ replacing\ bytes\ of\ data\ of\ a\ fixed}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ length.}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \$overflow\ =\ (strlen(\$string)\ +\ \$this-\/>\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_stream_interface_a8153e55ed7b27a62988843a2dd66c845}{tell}}())\ -\/\ \$this-\/>remoteStream-\/>tell();}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$overflow\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>skipReadBytes\ +=\ \$overflow;}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>stream-\/>write(\$string);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00130}00130\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00132}\mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_ada3799f740f09e3689d0054629e87feb}{00132}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_ada3799f740f09e3689d0054629e87feb}{eof}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00133}00133\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>stream-\/>eof()\ \&\&\ \$this-\/>remoteStream-\/>eof();}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00135}00135\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00140}\mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_aa69c8bf1f1dcf4e72552efff1fe3e87e}{00140}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_caching_stream_aa69c8bf1f1dcf4e72552efff1fe3e87e}{close}}():\ void}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00141}00141\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \$this-\/>remoteStream-\/>close();}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \$this-\/>stream-\/>close();}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00144}00144\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00146}00146\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ cacheEntireStream():\ int}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00147}00147\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \$target\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_fn_stream}{FnStream}}([\textcolor{stringliteral}{'write'}\ =>\ \textcolor{stringliteral}{'strlen'}]);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_utils_aed44d1cc43986827467f87cee9447b6a}{Utils::copyToStream}}(\$this,\ \$target);}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_stream_interface_a8153e55ed7b27a62988843a2dd66c845}{tell}}();}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00152}00152\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_caching_stream_8php_source_l00153}00153\ \}}
+
+\end{DoxyCode}

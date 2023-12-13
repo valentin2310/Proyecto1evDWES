@@ -1,0 +1,203 @@
+\doxysection{Redirect\+Middleware.\+php}
+\hypertarget{_redirect_middleware_8php_source}{}\label{_redirect_middleware_8php_source}\index{vendor/guzzlehttp/guzzle/src/RedirectMiddleware.php@{vendor/guzzlehttp/guzzle/src/RedirectMiddleware.php}}
+\mbox{\hyperlink{_redirect_middleware_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_guzzle_http}{GuzzleHttp}};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00005}00005\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_bad_response_exception}{GuzzleHttp\(\backslash\)Exception\(\backslash\)BadResponseException}};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00006}00006\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_too_many_redirects_exception}{GuzzleHttp\(\backslash\)Exception\(\backslash\)TooManyRedirectsException}};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00007}00007\ use\ \mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface}{GuzzleHttp\(\backslash\)Promise\(\backslash\)PromiseInterface}};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00008}00008\ use\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{Psr\(\backslash\)Http\(\backslash\)Message\(\backslash\)RequestInterface}};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00009}00009\ use\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_response_interface}{Psr\(\backslash\)Http\(\backslash\)Message\(\backslash\)ResponseInterface}};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00010}00010\ use\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_uri_interface}{Psr\(\backslash\)Http\(\backslash\)Message\(\backslash\)UriInterface}};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00020}\mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware}{00020}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware}{RedirectMiddleware}}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00021}00021\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00022}\mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware_a8eea7bbd605110590daa002571fdb109}{00022}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ HISTORY\_HEADER\ =\ \textcolor{stringliteral}{'X-\/Guzzle-\/Redirect-\/History'};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00024}\mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware_aaa7e616e76bf32d7771b33833f2a8168}{00024}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ STATUS\_HISTORY\_HEADER\ =\ \textcolor{stringliteral}{'X-\/Guzzle-\/Redirect-\/Status-\/History'};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00029}\mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware_ae78ff9a7441ec528d91eb0e587353bc7}{00029}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \$defaultSettings\ =\ [}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'max'}\ =>\ 5,}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'protocols'}\ =>\ [\textcolor{stringliteral}{'http'},\ \textcolor{stringliteral}{'https'}],}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'strict'}\ =>\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'referer'}\ =>\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'track\_redirects'}\ =>\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00035}00035\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00040}00040\ \ \ \ \ \textcolor{keyword}{private}\ \$nextHandler;}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00045}\mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware_a4811f42b1f191b8210b024306512445a}{00045}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware_a4811f42b1f191b8210b024306512445a}{\_\_construct}}(callable\ \$nextHandler)}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00046}00046\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \$this-\/>nextHandler\ =\ \$nextHandler;}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00048}00048\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00050}\mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware_a8b41a62c59d4d0d86e7525197f2904f5}{00050}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware_a8b41a62c59d4d0d86e7525197f2904f5}{\_\_invoke}}(\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{RequestInterface}}\ \$request,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}):\ \mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface}{PromiseInterface}}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00051}00051\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \$fn\ =\ \$this-\/>nextHandler;}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$fn(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}]\ ===\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}]\ =\ self::\$defaultSettings;}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \}\ elseif\ (!\(\backslash\)is\_array(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'allow\_redirects\ must\ be\ true,\ false,\ or\ array'});}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Merge\ the\ default\ settings\ with\ the\ provided\ settings}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}]\ +=\ self::\$defaultSettings;}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}][\textcolor{stringliteral}{'max'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$fn(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$fn(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>then(\textcolor{keyword}{function}\ (\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_response_interface}{ResponseInterface}}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})\ use\ (\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>checkRedirect(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00075}00075\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00080}\mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware_a7a5934dc028108f2b0ec0c462614e46d}{00080}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware_a7a5934dc028108f2b0ec0c462614e46d}{checkRedirect}}(\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{RequestInterface}}\ \$request,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_response_interface}{ResponseInterface}}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00081}00081\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)strpos((\textcolor{keywordtype}{string})\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getStatusCode(),\ \textcolor{charliteral}{'3'})\ !==\ 0}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ ||\ !\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>hasHeader(\textcolor{stringliteral}{'Location'})}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \$this-\/>guardMax(\$request,\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}},\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \$nextRequest\ =\ \$this-\/>modifyRequest(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ authorization\ is\ handled\ by\ curl,\ unset\ it\ if\ URI\ is\ cross-\/origin.}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Psr7\(\backslash\)UriComparator::isCrossOrigin(\$request-\/>\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface_a2ac86cae38fbe15a019d075d485ab702}{getUri}}(),\ \$nextRequest-\/>getUri())\ \&\&\ defined(\textcolor{stringliteral}{'\(\backslash\)CURLOPT\_HTTPAUTH'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ unset(}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'curl'}][\(\backslash\)CURLOPT\_HTTPAUTH],}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'curl'}][\(\backslash\)CURLOPT\_USERPWD]}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}][\textcolor{stringliteral}{'on\_redirect'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}][\textcolor{stringliteral}{'on\_redirect'}])(}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$request,}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}},}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$nextRequest-\/>\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface_a2ac86cae38fbe15a019d075d485ab702}{getUri}}()}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \$promise\ =\ \$this(\$nextRequest,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ headers\ to\ be\ able\ to\ track\ history\ of\ redirects.}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!empty(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}][\textcolor{stringliteral}{'track\_redirects'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>withTracking(}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$promise,}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{string})\ \$nextRequest-\/>getUri(),}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getStatusCode()}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$promise;}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00119}00119\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00124}00124\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ withTracking(\mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface}{PromiseInterface}}\ \$promise,\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \textcolor{keywordtype}{int}\ \$statusCode):\ \mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface}{PromiseInterface}}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00125}00125\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$promise-\/>\mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface_a4feb652e6c84c7767347fb21cf496c73}{then}}(}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_response_interface}{ResponseInterface}}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})\ use\ (\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \$statusCode)\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Note\ that\ we\ are\ pushing\ to\ the\ front\ of\ the\ list\ as\ this}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ would\ be\ an\ earlier\ response\ than\ what\ is\ currently\ present}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ in\ the\ history\ header.}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$historyHeader\ =\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getHeader(self::HISTORY\_HEADER);}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$statusHeader\ =\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getHeader(self::STATUS\_HISTORY\_HEADER);}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)array\_unshift(\$historyHeader,\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}});}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)array\_unshift(\$statusHeader,\ (\textcolor{keywordtype}{string})\ \$statusCode);}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>withHeader(self::HISTORY\_HEADER,\ \$historyHeader)}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>withHeader(self::STATUS\_HISTORY\_HEADER,\ \$statusHeader);}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00140}00140\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00147}00147\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ guardMax(RequestInterface\ \$request,\ ResponseInterface\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}},\ array\ \&\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}):\ void}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00148}00148\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_a2c4c58e377f6c66ca38c8ea97666fc5e}{\$current}}\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'\_\_redirect\_count'}]}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ ??\ 0;}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'\_\_redirect\_count'}]\ =\ \mbox{\hyperlink{update__mime__types_8php_a2c4c58e377f6c66ca38c8ea97666fc5e}{\$current}}\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \$max\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}][\textcolor{stringliteral}{'max'}];}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'\_\_redirect\_count'}]\ >\ \$max)\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ TooManyRedirectsException(\textcolor{stringliteral}{"{}Will\ not\ follow\ more\ than\ \{\$max\}\ redirects"{}},\ \$request,\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00157}00157\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00159}\mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware_a243b5ded51bb59a2246cef3a4a3c6972}{00159}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_redirect_middleware_a243b5ded51bb59a2246cef3a4a3c6972}{modifyRequest}}(\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{RequestInterface}}\ \$request,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_response_interface}{ResponseInterface}}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}):\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{RequestInterface}}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00160}00160\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Request\ modifications\ to\ apply.}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \$modify\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \$protocols\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}][\textcolor{stringliteral}{'protocols'}];}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Use\ a\ GET\ request\ if\ this\ is\ an\ entity\ enclosing\ request\ and\ we\ are}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ not\ forcing\ RFC\ compliance,\ but\ rather\ emulating\ what\ all\ browsers}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ would\ do.}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \$statusCode\ =\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getStatusCode();}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$statusCode\ ==\ 303}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ ||\ (\$statusCode\ <=\ 302\ \&\&\ !\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}][\textcolor{stringliteral}{'strict'}])}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \$safeMethods\ =\ [\textcolor{stringliteral}{'GET'},\ \textcolor{stringliteral}{'HEAD'},\ \textcolor{stringliteral}{'OPTIONS'}];}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \$requestMethod\ =\ \$request-\/>\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface_af3e37e1a6ed9b8c87f86f659873a83b7}{getMethod}}();}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \$modify[\textcolor{stringliteral}{'method'}]\ =\ in\_array(\$requestMethod,\ \$safeMethods)\ ?\ \$requestMethod\ :\ \textcolor{stringliteral}{'GET'};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \$modify[\textcolor{stringliteral}{'body'}]\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}}\ =\ self::redirectUri(\$request,\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}},\ \$protocols);}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'idn\_conversion'}])\ \&\&\ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'idn\_conversion'}]\ !==\ \textcolor{keyword}{false}))\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \$idnOptions\ =\ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'idn\_conversion'}]\ ===\ \textcolor{keyword}{true})\ ?\ \(\backslash\)IDNA\_DEFAULT\ :\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'idn\_conversion'}];}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}}\ =\ Utils::idnUriConvert(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \$idnOptions);}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \$modify[\textcolor{stringliteral}{'uri'}]\ =\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ Psr7\(\backslash\)Message::rewindBody(\$request);}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ the\ Referer\ header\ if\ it\ is\ told\ to\ do\ so\ and\ only}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ add\ the\ header\ if\ we\ are\ not\ redirecting\ from\ https\ to\ http.}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'allow\_redirects'}][\textcolor{stringliteral}{'referer'}]}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ \$modify[\textcolor{stringliteral}{'uri'}]-\/>getScheme()\ ===\ \$request-\/>\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface_a2ac86cae38fbe15a019d075d485ab702}{getUri}}()-\/>getScheme()}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}}\ =\ \$request-\/>\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface_a2ac86cae38fbe15a019d075d485ab702}{getUri}}()-\/>withUserInfo(\textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \$modify[\textcolor{stringliteral}{'set\_headers'}][\textcolor{stringliteral}{'Referer'}]\ =\ (string)\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \$modify[\textcolor{stringliteral}{'remove\_headers'}][]\ =\ \textcolor{stringliteral}{'Referer'};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Remove\ Authorization\ and\ Cookie\ headers\ if\ URI\ is\ cross-\/origin.}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Psr7\(\backslash\)UriComparator::isCrossOrigin(\$request-\/>\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface_a2ac86cae38fbe15a019d075d485ab702}{getUri}}(),\ \$modify[\textcolor{stringliteral}{'uri'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \$modify[\textcolor{stringliteral}{'remove\_headers'}][]\ =\ \textcolor{stringliteral}{'Authorization'};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \$modify[\textcolor{stringliteral}{'remove\_headers'}][]\ =\ \textcolor{stringliteral}{'Cookie'};}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Psr7\(\backslash\)Utils::modifyRequest(\$request,\ \$modify);}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00206}00206\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00211}00211\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ redirectUri(}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{RequestInterface}}\ \$request,}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_response_interface}{ResponseInterface}}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}},}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ array\ \$protocols}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00215}00215\ \ \ \ \ ):\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_uri_interface}{UriInterface}}\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \$location\ =\ Psr7\(\backslash\)UriResolver::resolve(}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \$request-\/>getUri(),}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ new\ Psr7\(\backslash\)Uri(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getHeaderLine(\textcolor{stringliteral}{'Location'}))}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Ensure\ that\ the\ redirect\ URI\ is\ allowed\ based\ on\ the\ protocols.}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)in\_array(\$location-\/>getScheme(),\ \$protocols))\ \{}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_bad_response_exception}{BadResponseException}}(\(\backslash\)sprintf(\textcolor{stringliteral}{'Redirect\ URI,\ \%s,\ does\ not\ use\ one\ of\ the\ allowed\ redirect\ protocols:\ \%s'},\ \$location,\ \(\backslash\)implode(\textcolor{stringliteral}{',\ '},\ \$protocols)),\ \$request,\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$location;}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00227}00227\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redirect_middleware_8php_source_l00228}00228\ \}}
+
+\end{DoxyCode}

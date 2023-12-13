@@ -1,0 +1,155 @@
+\doxysection{Default\+Php\+Process.\+php}
+\hypertarget{_default_php_process_8php_source}{}\label{_default_php_process_8php_source}\index{vendor/phpunit/phpunit/src/Util/PHP/DefaultPhpProcess.php@{vendor/phpunit/phpunit/src/Util/PHP/DefaultPhpProcess.php}}
+\mbox{\hyperlink{_default_php_process_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ PHPUnit.}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_p_h_p_unit_1_1_util_1_1_p_h_p}{PHPUnit\(\backslash\)Util\(\backslash\)PHP}};}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00012}00012\ use\ \textcolor{keyword}{function}\ array\_merge;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ fclose;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ file\_put\_contents;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ fwrite;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00016}00016\ use\ \textcolor{keyword}{function}\ is\_array;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00017}00017\ use\ \textcolor{keyword}{function}\ is\_resource;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00018}00018\ use\ \textcolor{keyword}{function}\ proc\_close;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00019}00019\ use\ \textcolor{keyword}{function}\ proc\_open;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00020}00020\ use\ \textcolor{keyword}{function}\ rewind;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00021}00021\ use\ \textcolor{keyword}{function}\ stream\_get\_contents;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00022}00022\ use\ \textcolor{keyword}{function}\ sys\_get\_temp\_dir;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00023}00023\ use\ \textcolor{keyword}{function}\ tempnam;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00024}00024\ use\ \textcolor{keyword}{function}\ unlink;}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00025}00025\ use\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_event_1_1_exception}{PHPUnit\(\backslash\)Framework\(\backslash\)Exception}};}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00030}\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process}{00030}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process}{DefaultPhpProcess}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process}{AbstractPhpProcess}}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00031}00031\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}\ ?\textcolor{keywordtype}{string}\ \$tempFile\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00042}\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_a0a9c693369fd9aad2d672cc0840e2cd8}{00042}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_a0a9c693369fd9aad2d672cc0840e2cd8}{runJob}}(\textcolor{keywordtype}{string}\ \$job,\ array\ \$settings\ =\ []):\ array}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00043}00043\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>stdin\ ||\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_abcc115e411cf97d8d801a7161fa05f4f}{useTemporaryFile}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(\$this-\/>tempFile\ =\ tempnam(sys\_get\_temp\_dir(),\ \textcolor{stringliteral}{'phpunit\_'}))\ ||}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ file\_put\_contents(\$this-\/>tempFile,\ \$job)\ ===\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_php_process_exception}{PhpProcessException}}(}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Unable\ to\ write\ temporary\ file'},}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \$job\ =\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process_a591d5f7d1fd7b779b07a64efce0b0c0a}{\$this-\/>stdin}};}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_a12c1d8f227f5ce508999a331cbaefe45}{runProcess}}(\$job,\ \$settings);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00056}00056\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00061}\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_ae5dbd216c09bda4ea76d2ca28e27eb00}{00061}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_ae5dbd216c09bda4ea76d2ca28e27eb00}{getHandles}}():\ array}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00062}00062\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00064}00064\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00074}\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_a12c1d8f227f5ce508999a331cbaefe45}{00074}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_a12c1d8f227f5ce508999a331cbaefe45}{runProcess}}(\textcolor{keywordtype}{string}\ \$job,\ array\ \$settings):\ array}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00075}00075\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \$handles\ =\ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_ae5dbd216c09bda4ea76d2ca28e27eb00}{getHandles}}();}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process_ae28922d56c6115bcba22f4197b738bd6}{\$env}}\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>env)\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process_ae28922d56c6115bcba22f4197b738bd6}{\$env}}\ =\ \$\_SERVER\ ??\ [];}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process_ae28922d56c6115bcba22f4197b738bd6}{\$env}}[\textcolor{stringliteral}{'argv'}],\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process_ae28922d56c6115bcba22f4197b738bd6}{\$env}}[\textcolor{stringliteral}{'argc'}]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process_ae28922d56c6115bcba22f4197b738bd6}{\$env}}\ =\ array\_merge(\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process_ae28922d56c6115bcba22f4197b738bd6}{\$env}},\ \$this-\/>env);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process_ae28922d56c6115bcba22f4197b738bd6}{\$env}}\ as\ \$envKey\ =>\ \$envVar)\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$envVar))\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process_ae28922d56c6115bcba22f4197b738bd6}{\$env}}[\$envKey]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \$pipeSpec\ =\ [}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ 0\ =>\ \$handles[0]\ ??\ [\textcolor{stringliteral}{'pipe'},\ \textcolor{charliteral}{'r'}],}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ 1\ =>\ \$handles[1]\ ??\ [\textcolor{stringliteral}{'pipe'},\ \textcolor{charliteral}{'w'}],}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ 2\ =>\ \$handles[2]\ ??\ [\textcolor{stringliteral}{'pipe'},\ \textcolor{charliteral}{'w'}],}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \$process\ =\ proc\_open(}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process_ad3c671afbfbf9fb5c53d949e14331f95}{getCommand}}(\$settings,\ \$this-\/>tempFile),}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \$pipeSpec,}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \$pipes,}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_abstract_php_process_ae28922d56c6115bcba22f4197b738bd6}{\$env}},}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_resource(\$process))\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_php_process_exception}{PhpProcessException}}(}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Unable\ to\ spawn\ worker\ process'},}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$job)\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_a303ba8e46da12551abb18519c2ce2786}{process}}(\$pipes[0],\ \$job);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ fclose(\$pipes[0]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \$stderr\ =\ \$stdout\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$pipes[1]))\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \$stdout\ =\ stream\_get\_contents(\$pipes[1]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$pipes[1]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$pipes[2]))\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \$stderr\ =\ stream\_get\_contents(\$pipes[2]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$pipes[2]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$handles[1]))\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ rewind(\$handles[1]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \$stdout\ =\ stream\_get\_contents(\$handles[1]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$handles[1]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$handles[2]))\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ rewind(\$handles[2]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \$stderr\ =\ stream\_get\_contents(\$handles[2]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$handles[2]);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ proc\_close(\$process);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_aff07c1d29d6d6a540c726948254a1764}{cleanup}}();}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\textcolor{stringliteral}{'stdout'}\ =>\ \$stdout,\ \textcolor{stringliteral}{'stderr'}\ =>\ \$stderr];}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00153}00153\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00158}\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_a303ba8e46da12551abb18519c2ce2786}{00158}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_a303ba8e46da12551abb18519c2ce2786}{process}}(\$pipe,\ \textcolor{keywordtype}{string}\ \$job):\ void}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00159}00159\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ fwrite(\$pipe,\ \$job);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00161}00161\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00163}\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_aff07c1d29d6d6a540c726948254a1764}{00163}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_aff07c1d29d6d6a540c726948254a1764}{cleanup}}():\ void}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00164}00164\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>tempFile)\ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ unlink(\$this-\/>tempFile);}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00168}00168\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00170}\mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_abcc115e411cf97d8d801a7161fa05f4f}{00170}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_p_h_p_1_1_default_php_process_abcc115e411cf97d8d801a7161fa05f4f}{useTemporaryFile}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00171}00171\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00173}00173\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_php_process_8php_source_l00174}00174\ \}}
+
+\end{DoxyCode}

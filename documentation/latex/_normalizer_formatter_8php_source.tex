@@ -1,0 +1,260 @@
+\doxysection{Normalizer\+Formatter.\+php}
+\hypertarget{_normalizer_formatter_8php_source}{}\label{_normalizer_formatter_8php_source}\index{vendor/monolog/monolog/src/Monolog/Formatter/NormalizerFormatter.php@{vendor/monolog/monolog/src/Monolog/Formatter/NormalizerFormatter.php}}
+\mbox{\hyperlink{_normalizer_formatter_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Monolog\ package.}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Jordi\ Boggiano\ <j.boggiano@seld.be>}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_monolog_1_1_formatter}{Monolog\(\backslash\)Formatter}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_monolog_1_1_date_time_immutable}{Monolog\(\backslash\)DateTimeImmutable}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_monolog_1_1_utils}{Monolog\(\backslash\)Utils}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00016}00016\ use\ Throwable;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_monolog_1_1_log_record}{Monolog\(\backslash\)LogRecord}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00024}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter}{00024}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter}{NormalizerFormatter}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{FormatterInterface}}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00025}00025\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00026}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_abc0f4fada3cb818e2458cc95fd6305f2}{00026}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_abc0f4fada3cb818e2458cc95fd6305f2}{SIMPLE\_DATE}}\ =\ \textcolor{stringliteral}{"{}Y-\/m-\/d\(\backslash\)TH:i:sP"{}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00028}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_aa3019e9779c19e86521b87ffb3a54de1}{00028}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_aa3019e9779c19e86521b87ffb3a54de1}{\$dateFormat}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00029}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a387b0c117153f376eae2de722645f844}{00029}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a387b0c117153f376eae2de722645f844}{\$maxNormalizeDepth}}\ =\ 9;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00030}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_afc5a18565eeac083fe4261b1159a376d}{00030}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_afc5a18565eeac083fe4261b1159a376d}{\$maxNormalizeItemCount}}\ =\ 1000;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$jsonEncodeOptions\ =\ \mbox{\hyperlink{class_monolog_1_1_utils_a4072eafd798c09b5895ef533b6ec72cf}{Utils::DEFAULT\_JSON\_FLAGS}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00038}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_abfcd0c26d66c4c41cd1d46b2e3833be1}{00038}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_abfcd0c26d66c4c41cd1d46b2e3833be1}{\_\_construct}}(?\textcolor{keywordtype}{string}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_aa3019e9779c19e86521b87ffb3a54de1}{\$dateFormat}}\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00039}00039\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \$this-\/>dateFormat\ =\ \textcolor{keyword}{null}\ ===\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_aa3019e9779c19e86521b87ffb3a54de1}{\$dateFormat}}\ ?\ static::SIMPLE\_DATE\ :\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_aa3019e9779c19e86521b87ffb3a54de1}{\$dateFormat}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!function\_exists(\textcolor{stringliteral}{'json\_encode'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{'PHP\(\backslash\)'s\ json\ extension\ is\ required\ to\ use\ Monolog\(\backslash\)'s\ NormalizerFormatter'});}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00044}00044\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00049}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_ab6d88f2cce9dadb57de1322da02c0a15}{00049}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_ab6d88f2cce9dadb57de1322da02c0a15}{format}}(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record)}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00050}00050\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>normalizeRecord(\$record);}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00052}00052\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00059}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_af59d81cca0ebb2fedcdb207a2d18185d}{00059}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_af59d81cca0ebb2fedcdb207a2d18185d}{normalizeValue}}(mixed\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}):\ mixed}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00060}00060\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>normalize(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00067}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a11f3cde7544eac9e23b0517d513a362b}{00067}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a11f3cde7544eac9e23b0517d513a362b}{formatBatch}}(array\ \$records)}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00068}00068\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$records\ as\ \$key\ =>\ \$record)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \$records[\$key]\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_ab6d88f2cce9dadb57de1322da02c0a15}{format}}(\$record);}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$records;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00074}00074\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00076}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_ac8d28832fbeea9d3a9e4e591c9af4c93}{00076}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_ac8d28832fbeea9d3a9e4e591c9af4c93}{getDateFormat}}():\ string}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00077}00077\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_aa3019e9779c19e86521b87ffb3a54de1}{\$this-\/>dateFormat}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00079}00079\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00084}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_aece8800acc8bc77d5f138cb0e64c3e8b}{00084}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_aece8800acc8bc77d5f138cb0e64c3e8b}{setDateFormat}}(\textcolor{keywordtype}{string}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_aa3019e9779c19e86521b87ffb3a54de1}{\$dateFormat}}):\ self}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00085}00085\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \$this-\/>dateFormat\ =\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_aa3019e9779c19e86521b87ffb3a54de1}{\$dateFormat}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00089}00089\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00094}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_ac188ed5dfd742587298dc74eefb26fd4}{00094}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_ac188ed5dfd742587298dc74eefb26fd4}{getMaxNormalizeDepth}}():\ int}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00095}00095\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a387b0c117153f376eae2de722645f844}{\$this-\/>maxNormalizeDepth}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00097}00097\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00102}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a0b2a387b10f99121cc487231b522d8bc}{00102}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a0b2a387b10f99121cc487231b522d8bc}{setMaxNormalizeDepth}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a387b0c117153f376eae2de722645f844}{\$maxNormalizeDepth}}):\ self}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00103}00103\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \$this-\/>maxNormalizeDepth\ =\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a387b0c117153f376eae2de722645f844}{\$maxNormalizeDepth}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00112}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_ac23a7a250ed29675a928f6fc26b255db}{00112}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_ac23a7a250ed29675a928f6fc26b255db}{getMaxNormalizeItemCount}}():\ int}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00113}00113\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_afc5a18565eeac083fe4261b1159a376d}{\$this-\/>maxNormalizeItemCount}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00115}00115\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00120}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a85bbd8998d6630db62fcfe179f2132e7}{00120}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a85bbd8998d6630db62fcfe179f2132e7}{setMaxNormalizeItemCount}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_afc5a18565eeac083fe4261b1159a376d}{\$maxNormalizeItemCount}}):\ self}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00121}00121\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \$this-\/>maxNormalizeItemCount\ =\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_afc5a18565eeac083fe4261b1159a376d}{\$maxNormalizeItemCount}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00125}00125\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00132}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_aa1c1494840caf3c3cc75be7e714f05a9}{00132}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_aa1c1494840caf3c3cc75be7e714f05a9}{setJsonPrettyPrint}}(\textcolor{keywordtype}{bool}\ \$enable):\ self}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00133}00133\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$enable)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>jsonEncodeOptions\ |=\ JSON\_PRETTY\_PRINT;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>jsonEncodeOptions\ \&=\ \string~JSON\_PRETTY\_PRINT;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00141}00141\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00151}00151\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ normalizeRecord(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record):\ array}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00152}00152\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \$normalized\ =\ \$this-\/>normalize(\$record-\/>\mbox{\hyperlink{class_monolog_1_1_log_record_a658defb34762c8f40085aec87e16ba1a}{toArray}}());}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$normalized;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00157}00157\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00162}00162\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ normalize(mixed\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \textcolor{keywordtype}{int}\ \$depth\ =\ 0):\ mixed}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00163}00163\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$depth\ >\ \$this-\/>maxNormalizeDepth)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'Over\ '}\ .\ \$this-\/>maxNormalizeDepth\ .\ \textcolor{stringliteral}{'\ levels\ deep,\ aborting\ normalization'};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ ||\ is\_scalar(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_float(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_infinite(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ >\ 0\ ?\ \textcolor{stringliteral}{''}\ :\ \textcolor{stringliteral}{'-\/'})\ .\ \textcolor{stringliteral}{'INF'};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_nan(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'NaN'};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \$normalized\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \$count\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$count++\ >\ \$this-\/>maxNormalizeItemCount)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$normalized[\textcolor{stringliteral}{'...'}]\ =\ \textcolor{stringliteral}{'Over\ '}\ .\ \$this-\/>maxNormalizeItemCount\ .\ \textcolor{stringliteral}{'\ items\ ('}.count(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}).\textcolor{stringliteral}{'\ total),\ aborting\ normalization'};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$normalized[\$key]\ =\ \$this-\/>normalize(\$value,\ \$depth\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$normalized;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ instanceof\ \(\backslash\)DateTimeInterface)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a1f4a4c92ae2b33b2586f29be6de5da31}{formatDate}}(\$data);}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_object(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ instanceof\ Throwable)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a5e6a2c0909a65cbc711a38ece36c8190}{normalizeException}}(\$data,\ \$depth);}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ instanceof\ \(\backslash\)JsonSerializable)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}-\/>jsonSerialize();}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\(\backslash\)get\_class(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})\ ===\ \textcolor{stringliteral}{'\_\_PHP\_Incomplete\_Class'})\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$accessor\ =\ new\ \(\backslash\)ArrayObject(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ (string)\ \$accessor[\textcolor{stringliteral}{'\_\_PHP\_Incomplete\_Class\_Name'}];}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (method\_exists(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \textcolor{stringliteral}{'\_\_toString'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}-\/>\_\_toString();}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ rest\ is\ normalized\ by\ json\ encoding\ and\ decoding\ it}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \mbox{\hyperlink{namespace_guzzle_http_a876abc2eb3d34a4cfd10abf0f7e3949f}{json\_decode}}(\$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a924968eb82e6df597cc6b74bd2c0b488}{toJson}}(\$data,\ \textcolor{keyword}{true}),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\mbox{\hyperlink{class_monolog_1_1_utils_ab18b88929d1e210e006940c48af10743}{Utils::getClass}}(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})\ =>\ \$value];}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_resource(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sprintf(\textcolor{stringliteral}{'[resource(\%s)]'},\ get\_resource\_type(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}));}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'[unknown('}.gettype(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}).\textcolor{stringliteral}{')]'};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00229}00229\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00234}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a5e6a2c0909a65cbc711a38ece36c8190}{00234}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a5e6a2c0909a65cbc711a38ece36c8190}{normalizeException}}(Throwable\ \$e,\ \textcolor{keywordtype}{int}\ \$depth\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00235}00235\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$depth\ >\ \$this-\/>maxNormalizeDepth)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\textcolor{stringliteral}{'Over\ '}\ .\ \$this-\/>maxNormalizeDepth\ .\ \textcolor{stringliteral}{'\ levels\ deep,\ aborting\ normalization'}];}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$e\ instanceof\ \(\backslash\)JsonSerializable)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (array)\ \$e-\/>jsonSerialize();}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'class'}\ =>\ \mbox{\hyperlink{class_monolog_1_1_utils_ab18b88929d1e210e006940c48af10743}{Utils::getClass}}(\$e),}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'message'}\ =>\ \$e-\/>getMessage(),}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'code'}\ =>\ (int)\ \$e-\/>getCode(),}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'file'}\ =>\ \$e-\/>getFile().\textcolor{charliteral}{':'}.\$e-\/>getLine(),}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$e\ instanceof\ \(\backslash\)SoapFault)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$e-\/>faultcode))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'faultcode'}]\ =\ \$e-\/>faultcode;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$e-\/>faultactor))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'faultactor'}]\ =\ \$e-\/>faultactor;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$e-\/>detail))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$e-\/>detail))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'detail'}]\ =\ \$e-\/>detail;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (is\_object(\$e-\/>detail)\ ||\ is\_array(\$e-\/>detail))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'detail'}]\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a924968eb82e6df597cc6b74bd2c0b488}{toJson}}(\$e-\/>detail,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \$trace\ =\ \$e-\/>getTrace();}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$trace\ as\ \$frame)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$frame[\textcolor{stringliteral}{'file'}],\ \$frame[\textcolor{stringliteral}{'line'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'trace'}][]\ =\ \$frame[\textcolor{stringliteral}{'file'}].\textcolor{charliteral}{':'}.\$frame[\textcolor{stringliteral}{'line'}];}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\$previous\ =\ \$e-\/>getPrevious())\ instanceof\ \(\backslash\)Throwable)\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'previous'}]\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a5e6a2c0909a65cbc711a38ece36c8190}{normalizeException}}(\$previous,\ \$depth\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}};}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00281}00281\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00290}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a924968eb82e6df597cc6b74bd2c0b488}{00290}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a924968eb82e6df597cc6b74bd2c0b488}{toJson}}(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \textcolor{keywordtype}{bool}\ \$ignoreErrors\ =\ \textcolor{keyword}{false}):\ string}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00291}00291\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_monolog_1_1_utils_ad10eeb69895cb168d8f9ef89d9b2edbc}{Utils::jsonEncode}}(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$this-\/>jsonEncodeOptions,\ \$ignoreErrors);}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00293}00293\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00294}00294\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00295}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a1f4a4c92ae2b33b2586f29be6de5da31}{00295}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a1f4a4c92ae2b33b2586f29be6de5da31}{formatDate}}(\(\backslash\)DateTimeInterface\ \$date):\ string}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00296}00296\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ in\ case\ the\ date\ format\ isn't\ custom\ then\ we\ defer\ to\ the\ custom\ DateTimeImmutable}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ formatting\ logic,\ which\ will\ pick\ the\ right\ format\ based\ on\ whether\ useMicroseconds\ is\ on}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00299}00299\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>dateFormat\ ===\ self::SIMPLE\_DATE\ \&\&\ \$date\ instanceof\ \mbox{\hyperlink{class_monolog_1_1_date_time_immutable}{DateTimeImmutable}})\ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00300}00300\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{string})\ \$date;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00301}00301\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00303}00303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$date-\/>format(\$this-\/>dateFormat);}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00304}00304\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00309}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a25a2f24c4e503c007e90f8ddd218df78}{00309}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a25a2f24c4e503c007e90f8ddd218df78}{addJsonEncodeOption}}(\textcolor{keywordtype}{int}\ \$option):\ self}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00310}00310\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \$this-\/>jsonEncodeOptions\ |=\ \$option;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00312}00312\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00313}00313\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00314}00314\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00315}00315\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00319}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a39a75fd68c5b8b5fbf3da17ad18cef18}{00319}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_normalizer_formatter_a39a75fd68c5b8b5fbf3da17ad18cef18}{removeJsonEncodeOption}}(\textcolor{keywordtype}{int}\ \$option):\ self}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00320}00320\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \$this-\/>jsonEncodeOptions\ \&=\ \string~\$option;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00324}00324\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_normalizer_formatter_8php_source_l00325}00325\ \}}
+
+\end{DoxyCode}

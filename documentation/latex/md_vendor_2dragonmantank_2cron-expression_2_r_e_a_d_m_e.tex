@@ -1,0 +1,75 @@
+\chapter{PHP Cron Expression Parser}
+\hypertarget{md_vendor_2dragonmantank_2cron-expression_2_r_e_a_d_m_e}{}\label{md_vendor_2dragonmantank_2cron-expression_2_r_e_a_d_m_e}\index{PHP Cron Expression Parser@{PHP Cron Expression Parser}}
+\href{https://packagist.org/packages/dragonmantank/cron-expression}{\texttt{ }} \href{https://packagist.org/packages/dragonmantank/cron-expression}{\texttt{ }} \href{http://travis-ci.org/dragonmantank/cron-expression}{\texttt{ }} \href{https://github.styleci.io/repos/103715337}{\texttt{ }}
+
+The PHP cron expression parser can parse a CRON expression, determine if it is due to run, calculate the next run date of the expression, and calculate the previous run date of the expression. You can calculate dates far into the future or past by skipping {\bfseries{n}} number of matching dates.
+
+The parser can handle increments of ranges (e.\+g. \texorpdfstring{$\ast$}{*}/12, 2-\/59/3), intervals (e.\+g. 0-\/9), lists (e.\+g. 1,2,3), {\bfseries{W}} to find the nearest weekday for a given day of the month, {\bfseries{L}} to find the last day of the month, {\bfseries{L}} to find the last given weekday of a month, and hash (\#) to find the nth weekday of a given month.
+
+More information about this fork can be found in the blog post \href{http://ctankersley.com/2017/10/12/cron-expression-update/}{\texttt{ here}}. tl;dr -\/ v2.\+0.\+0 is a major breaking change, and @dragonmantank can better take care of the project in a separate fork.\hypertarget{md_vendor_2dragonmantank_2cron-expression_2_r_e_a_d_m_e_autotoc_md171}{}\doxysection{\texorpdfstring{Installing}{Installing}}\label{md_vendor_2dragonmantank_2cron-expression_2_r_e_a_d_m_e_autotoc_md171}
+Add the dependency to your project\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{composer\ require\ dragonmantank/cron-\/expression}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2dragonmantank_2cron-expression_2_r_e_a_d_m_e_autotoc_md172}{}\doxysection{\texorpdfstring{Usage}{Usage}}\label{md_vendor_2dragonmantank_2cron-expression_2_r_e_a_d_m_e_autotoc_md172}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{<?php}
+\DoxyCodeLine{}
+\DoxyCodeLine{require\_once\ \textcolor{stringliteral}{'/vendor/autoload.php'};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Works\ with\ predefined\ scheduling\ definitions}}
+\DoxyCodeLine{\$cron\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_cron_1_1_cron_expression}{Cron\(\backslash\)CronExpression}}(\textcolor{stringliteral}{'@daily'});}
+\DoxyCodeLine{\$cron-\/>isDue();}
+\DoxyCodeLine{echo\ \$cron-\/>getNextRunDate()-\/>format(\textcolor{stringliteral}{'Y-\/m-\/d\ H:i:s'});}
+\DoxyCodeLine{echo\ \$cron-\/>getPreviousRunDate()-\/>format(\textcolor{stringliteral}{'Y-\/m-\/d\ H:i:s'});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Works\ with\ complex\ expressions}}
+\DoxyCodeLine{\$cron\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_cron_1_1_cron_expression}{Cron\(\backslash\)CronExpression}}(\textcolor{stringliteral}{'3-\/59/15\ 6-\/12\ */15\ 1\ 2-\/5'});}
+\DoxyCodeLine{echo\ \$cron-\/>getNextRunDate()-\/>format(\textcolor{stringliteral}{'Y-\/m-\/d\ H:i:s'});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Calculate\ a\ run\ date\ two\ iterations\ into\ the\ future}}
+\DoxyCodeLine{\$cron\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_cron_1_1_cron_expression}{Cron\(\backslash\)CronExpression}}(\textcolor{stringliteral}{'@daily'});}
+\DoxyCodeLine{echo\ \$cron-\/>getNextRunDate(\textcolor{keyword}{null},\ 2)-\/>format(\textcolor{stringliteral}{'Y-\/m-\/d\ H:i:s'});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Calculate\ a\ run\ date\ relative\ to\ a\ specific\ time}}
+\DoxyCodeLine{\$cron\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_cron_1_1_cron_expression}{Cron\(\backslash\)CronExpression}}(\textcolor{stringliteral}{'@monthly'});}
+\DoxyCodeLine{echo\ \$cron-\/>getNextRunDate(\textcolor{stringliteral}{'2010-\/01-\/12\ 00:00:00'})-\/>format(\textcolor{stringliteral}{'Y-\/m-\/d\ H:i:s'});}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2dragonmantank_2cron-expression_2_r_e_a_d_m_e_autotoc_md173}{}\doxysection{\texorpdfstring{CRON Expressions}{CRON Expressions}}\label{md_vendor_2dragonmantank_2cron-expression_2_r_e_a_d_m_e_autotoc_md173}
+A CRON expression is a string representing the schedule for a particular command to execute. The parts of a CRON schedule are as follows\+: \begin{DoxyVerb}*    *    *    *    *
+-    -    -    -    -
+|    |    |    |    |
+|    |    |    |    |
+|    |    |    |    +----- day of week (0 - 7) (Sunday=0 or 7)
+|    |    |    +---------- month (1 - 12)
+|    |    +--------------- day of month (1 - 31)
+|    +-------------------- hour (0 - 23)
++------------------------- min (0 - 59)
+\end{DoxyVerb}
+ This library also supports a few macros\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily @yearly}, {\ttfamily @annually} -\/ Run once a year, midnight, Jan. 1 -\/ {\ttfamily 0 0 1 1 \texorpdfstring{$\ast$}{*}}
+\item {\ttfamily @monthly} -\/ Run once a month, midnight, first of month -\/ {\ttfamily 0 0 1 \texorpdfstring{$\ast$}{*} \texorpdfstring{$\ast$}{*}}
+\item {\ttfamily @weekly} -\/ Run once a week, midnight on Sun -\/ {\ttfamily 0 0 \texorpdfstring{$\ast$}{*} \texorpdfstring{$\ast$}{*} 0}
+\item {\ttfamily @daily}, {\ttfamily @midnight} -\/ Run once a day, midnight -\/ {\ttfamily 0 0 \texorpdfstring{$\ast$}{*} \texorpdfstring{$\ast$}{*} \texorpdfstring{$\ast$}{*}}
+\item {\ttfamily @hourly} -\/ Run once an hour, first minute -\/ {\ttfamily 0 \texorpdfstring{$\ast$}{*} \texorpdfstring{$\ast$}{*} \texorpdfstring{$\ast$}{*} \texorpdfstring{$\ast$}{*}}
+\end{DoxyItemize}\hypertarget{md_vendor_2dragonmantank_2cron-expression_2_r_e_a_d_m_e_autotoc_md174}{}\doxysection{\texorpdfstring{Requirements}{Requirements}}\label{md_vendor_2dragonmantank_2cron-expression_2_r_e_a_d_m_e_autotoc_md174}
+
+\begin{DoxyItemize}
+\item PHP 7.\+2+
+\item \doxylink{namespace_p_h_p_unit}{PHPUnit} is required to run the unit tests
+\item \doxylink{namespace_composer}{Composer} is required to run the unit tests
+\end{DoxyItemize}\hypertarget{md_vendor_2dragonmantank_2cron-expression_2_r_e_a_d_m_e_autotoc_md175}{}\doxysection{\texorpdfstring{Projects that Use cron-\/expression}{Projects that Use cron-expression}}\label{md_vendor_2dragonmantank_2cron-expression_2_r_e_a_d_m_e_autotoc_md175}
+
+\begin{DoxyItemize}
+\item Part of the \href{https://github.com/laravel/framework/}{\texttt{ Laravel Framework}}
+\item Available as a \href{https://github.com/Setono/CronExpressionBundle}{\texttt{ Symfony Bundle -\/ setono/cron-\/expression-\/bundle}}
+\item Framework agnostic, PHP-\/based job scheduler -\/ \href{https://github.com/crunzphp/crunz}{\texttt{ Crunz}} 
+\end{DoxyItemize}

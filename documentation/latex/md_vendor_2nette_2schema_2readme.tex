@@ -1,0 +1,575 @@
+\chapter{readme}
+\hypertarget{md_vendor_2nette_2schema_2readme}{}\label{md_vendor_2nette_2schema_2readme}\index{readme@{readme}}
+\doxylink{namespace_nette}{Nette} Schema \DoxyHorRuler{0}
+
+
+\href{https://packagist.org/packages/nette/schema}{\texttt{ }} \href{https://github.com/nette/schema/actions}{\texttt{ }} \href{https://coveralls.io/github/nette/schema?branch=master}{\texttt{ }} \href{https://github.com/nette/schema/releases}{\texttt{ }} \href{https://github.com/nette/schema/blob/master/license.md}{\texttt{ }}\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1291}{}\doxysection{\texorpdfstring{Introduction}{Introduction}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1291}
+A practical library for validation and normalization of data structures against a given schema with a smart \& easy-\/to-\/understand API.
+
+Documentation can be found on the \href{https://doc.nette.org/schema}{\texttt{ website}}.
+
+Installation\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{composer\ require\ nette/schema}
+
+\end{DoxyCode}
+
+
+It requires PHP version 7.\+1 and supports PHP up to 8.\+3.\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1292}{}\doxysubsection{\texorpdfstring{$<$a href="{}https\+://github.\+com/sponsors/dg"{} $>$\+Support Me$<$/a$>$}{<a href="https://github.com/sponsors/dg" >Support Me</a>}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1292}
+Do you like \doxylink{namespace_nette}{Nette} Schema? Are you looking forward to the new features?
+
+\href{https://github.com/sponsors/dg}{\texttt{ }}
+
+Thank you!\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1293}{}\doxysubsection{\texorpdfstring{Basic Usage}{Basic Usage}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1293}
+In variable {\ttfamily \$schema} we have a validation schema (what exactly this means and how to create it we will say later) and in variable {\ttfamily \$data} we have a data structure that we want to validate and normalize. This can be, for example, data sent by the user through an API, configuration file, etc.
+
+The task is handled by the \href{https://api.nette.org/schema/master/Nette/Schema/Processor.html}{\texttt{ Nette\textbackslash{}\+Schema\textbackslash{}\+Processor}} class, which processes the input and either returns normalized data or throws an \href{https://api.nette.org/schema/master/Nette/Schema/ValidationException.html}{\texttt{ Nette\textbackslash{}\+Schema\textbackslash{}\+Validation\+Exception}} exception on error.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$processor\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_nette_1_1_schema_1_1_processor}{Nette\(\backslash\)Schema\(\backslash\)Processor}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\ \ \ \ \$normalized\ =\ \$processor-\/>\mbox{\hyperlink{class_nette_1_1_schema_1_1_processor_aa31ab587f0fc3c1478662f0901dff21a}{process}}(\$schema,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{namespace_nette}{Nette}}\(\backslash\)Schema\(\backslash\)ValidationException\ \$e)\ \{}
+\DoxyCodeLine{\ \ \ \ echo\ \textcolor{stringliteral}{'Data\ is\ invalid:\ '}\ .\ \$e-\/>getMessage();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Method {\ttfamily \$e-\/\texorpdfstring{$>$}{>}get\+Messages()} returns array of all message strings and {\ttfamily \$e-\/\texorpdfstring{$>$}{>}get\+Message\+Objects()} return all messages as \href{https://api.nette.org/schema/master/Nette/Schema/Message.html}{\texttt{ Nette\textbackslash{}\+Schema\textbackslash{}\+Message}} objects.\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1294}{}\doxysubsection{\texorpdfstring{Defining Schema}{Defining Schema}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1294}
+And now let\textquotesingle{}s create a schema. The class \href{https://api.nette.org/schema/master/Nette/Schema/Expect.html}{\texttt{ Nette\textbackslash{}\+Schema\textbackslash{}\+Expect}} is used to define it, we actually define expectations of what the data should look like. Let\textquotesingle{}s say that the input data must be a structure (e.\+g. an array) containing elements {\ttfamily process\+Refund} of type bool and {\ttfamily refund\+Amount} of type int.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_nette_1_1_schema_1_1_expect}{Nette\(\backslash\)Schema\(\backslash\)Expect}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$schema\ =\ Expect::structure([}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'processRefund'}\ =>\ Expect::bool(),}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'refundAmount'}\ =>\ Expect::int(),}
+\DoxyCodeLine{]);}
+
+\end{DoxyCode}
+
+
+We believe that the schema definition looks clear, even if you see it for the very first time.
+
+Lets send the following data for validation\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'processRefund'}\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'refundAmount'}\ =>\ 17,}
+\DoxyCodeLine{];}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$normalized\ =\ \$processor-\/>process(\$schema,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});\ \textcolor{comment}{//\ OK,\ it\ passes}}
+
+\end{DoxyCode}
+
+
+The output, i.\+e. the value {\ttfamily \$normalized}, is the object {\ttfamily std\+Class}. If we want the output to be an array, we add a cast to schema `Expect\+::structure(\mbox{[}...\mbox{]})-\/\texorpdfstring{$>$}{>}cast\+To(\textquotesingle{}array')\`{}.
+
+All elements of the structure are optional and have a default value {\ttfamily null}. Example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'refundAmount'}\ =>\ 17,}
+\DoxyCodeLine{];}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$normalized\ =\ \$processor-\/>process(\$schema,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});\ \textcolor{comment}{//\ OK,\ it\ passes}}
+\DoxyCodeLine{\textcolor{comment}{//\ \$normalized\ =\ \{'processRefund'\ =>\ null,\ 'refundAmount'\ =>\ 17\}}}
+
+\end{DoxyCode}
+
+
+The fact that the default value is {\ttfamily null} does not mean that it would be accepted in the input data `\textquotesingle{}process\+Refund' =\texorpdfstring{$>$}{>} null{\ttfamily . No, the input must be boolean, i.\+e. only}true{\ttfamily or}false{\ttfamily . We would have to explicitly allow}null{\ttfamily via}Expect\+::bool()-\/\texorpdfstring{$>$}{>}nullable()\`{}.
+
+An item can be made mandatory using {\ttfamily Expect\+::bool()-\/\texorpdfstring{$>$}{>}required()}. We change the default value to {\ttfamily false} using {\ttfamily Expect\+::bool()-\/\texorpdfstring{$>$}{>}default(false)} or shortly using {\ttfamily Expect\+::bool(false)}.
+
+And what if we wanted to accept {\ttfamily 1} and {\ttfamily 0} besides booleans? Then we list the allowed values, which we will also normalize to boolean\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::structure([}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'processRefund'}\ =>\ Expect::anyOf(\textcolor{keyword}{true},\ \textcolor{keyword}{false},\ 1,\ 0)-\/>\mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a95659337ca70fbf5779cf7790aa5a99f}{castTo}}(\textcolor{stringliteral}{'bool'}),}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'refundAmount'}\ =>\ Expect::int(),}
+\DoxyCodeLine{]);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$normalized\ =\ \$processor-\/>process(\$schema,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{is\_bool(\$normalized-\/>processRefund);\ \textcolor{comment}{//\ true}}
+
+\end{DoxyCode}
+
+
+Now you know the basics of how the schema is defined and how the individual elements of the structure behave. We will now show what all the other elements can be used in defining a schema.\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1295}{}\doxysubsection{\texorpdfstring{Data Types\+: type()}{Data Types: type()}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1295}
+All standard PHP data types can be listed in the schema\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Expect::string(\$default\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{Expect::\textcolor{keywordtype}{int}(\$default\ =\ null)}
+\DoxyCodeLine{Expect::\textcolor{keywordtype}{float}(\$default\ =\ null)}
+\DoxyCodeLine{Expect::\textcolor{keywordtype}{bool}(\$default\ =\ null)}
+\DoxyCodeLine{Expect::null()}
+\DoxyCodeLine{Expect::array(\$default\ =\ [])}
+
+\end{DoxyCode}
+
+
+And then all types \href{https://doc.nette.org/validators\#toc-validation-rules}{\texttt{ supported by the Validators}} via `Expect\+::type(\textquotesingle{}scalar'){\ttfamily or abbreviated}Expect\+::scalar(){\ttfamily . Also class or interface names are accepted, e.\+g.}Expect\+::type(\textquotesingle{}Address\+Entity\textquotesingle{})\`{}.
+
+You can also use union notation\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Expect::type(\textcolor{stringliteral}{'bool|string|array'})}
+
+\end{DoxyCode}
+
+
+The default value is always {\ttfamily null} except for {\ttfamily array} and {\ttfamily list}, where it is an empty array. (A list is an array indexed in ascending order of numeric keys from zero, that is, a non-\/associative array).\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1296}{}\doxysubsection{\texorpdfstring{Array of Values\+: array\+Of() list\+Of()}{Array of Values: arrayOf() listOf()}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1296}
+The array is too general structure, it is more useful to specify exactly what elements it can contain. For example, an array whose elements can only be strings\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::arrayOf(\textcolor{stringliteral}{'string'});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'hello'},\ \textcolor{stringliteral}{'world'}]);\ \textcolor{comment}{//\ OK}}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{charliteral}{'a'}\ =>\ \textcolor{stringliteral}{'hello'},\ \textcolor{charliteral}{'b'}\ =>\ \textcolor{stringliteral}{'world'}]);\ \textcolor{comment}{//\ OK}}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'key'}\ =>\ 123]);\ \textcolor{comment}{//\ ERROR:\ 123\ is\ not\ a\ string}}
+
+\end{DoxyCode}
+
+
+The second parameter can be used to specify keys (since version 1.\+2)\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::arrayOf(\textcolor{stringliteral}{'string'},\ \textcolor{stringliteral}{'int'});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'hello'},\ \textcolor{stringliteral}{'world'}]);\ \textcolor{comment}{//\ OK}}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{charliteral}{'a'}\ =>\ \textcolor{stringliteral}{'hello'}]);\ \textcolor{comment}{//\ ERROR:\ 'a'\ is\ not\ int}}
+
+\end{DoxyCode}
+
+
+The list is an indexed array\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::listOf(\textcolor{stringliteral}{'string'});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{charliteral}{'a'},\ \textcolor{charliteral}{'b'}]);\ \textcolor{comment}{//\ OK}}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{charliteral}{'a'},\ 123]);\ \textcolor{comment}{//\ ERROR:\ 123\ is\ not\ a\ string}}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'key'}\ =>\ \textcolor{charliteral}{'a'}]);\ \textcolor{comment}{//\ ERROR:\ is\ not\ a\ list}}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [1\ =>\ \textcolor{charliteral}{'a'},\ 0\ =>\ \textcolor{charliteral}{'b'}]);\ \textcolor{comment}{//\ ERROR:\ is\ not\ a\ list}}
+
+\end{DoxyCode}
+
+
+The parameter can also be a schema, so we can write\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Expect::arrayOf(Expect::bool())}
+
+\end{DoxyCode}
+
+
+The default value is an empty array. If you specify a default value, it will be merged with the passed data. This can be disabled using {\ttfamily merge\+Defaults(false)}.\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1297}{}\doxysubsection{\texorpdfstring{Enumeration\+: any\+Of()}{Enumeration: anyOf()}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1297}
+{\ttfamily any\+Of()} is a set of values ​​or schemas that a value can be. Here\textquotesingle{}s how to write an array of elements that can be either `\textquotesingle{}a'{\ttfamily ,}true{\ttfamily , or}null\`{}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::listOf(}
+\DoxyCodeLine{\ \ \ \ Expect::anyOf(\textcolor{charliteral}{'a'},\ \textcolor{keyword}{true},\ \textcolor{keyword}{null}),}
+\DoxyCodeLine{);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{charliteral}{'a'},\ \textcolor{keyword}{true},\ \textcolor{keyword}{null},\ \textcolor{charliteral}{'a'}]);\ \textcolor{comment}{//\ OK}}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{charliteral}{'a'},\ \textcolor{keyword}{false}]);\ \textcolor{comment}{//\ ERROR:\ false\ does\ not\ belong\ there}}
+
+\end{DoxyCode}
+
+
+The enumeration elements can also be schemas\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::listOf(}
+\DoxyCodeLine{\ \ \ \ Expect::anyOf(Expect::string(),\ \textcolor{keyword}{true},\ \textcolor{keyword}{null}),}
+\DoxyCodeLine{);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'foo'},\ \textcolor{keyword}{true},\ \textcolor{keyword}{null},\ \textcolor{stringliteral}{'bar'}]);\ \textcolor{comment}{//\ OK}}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [123]);\ \textcolor{comment}{//\ ERROR}}
+
+\end{DoxyCode}
+
+
+The {\ttfamily any\+Of()} method accepts variants as individual parameters, not as array. To pass it an array of values, use the unpacking operator {\ttfamily any\+Of(...\$variants)}.
+
+The default value is {\ttfamily null}. Use the {\ttfamily first\+Is\+Default()} method to make the first element the default\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ default\ is\ 'hello'}}
+\DoxyCodeLine{Expect::anyOf(Expect::string(\textcolor{stringliteral}{'hello'}),\ \textcolor{keyword}{true},\ \textcolor{keyword}{null})-\/>firstIsDefault();}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1298}{}\doxysubsection{\texorpdfstring{Structures}{Structures}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1298}
+Structures are objects with defined keys. Each of these key =\texorpdfstring{$>$}{>} value pairs is referred to as a "{}property"{}\+:
+
+Structures accept arrays and objects and return objects {\ttfamily std\+Class} (unless you change it with `cast\+To(\textquotesingle{}array')\`{}, etc.).
+
+By default, all properties are optional and have a default value of {\ttfamily null}. You can define mandatory properties using {\ttfamily required()}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::structure([}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'required'}\ =>\ Expect::string()-\/>\mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a9d75995195563fb3283e5fd88ed4e6b7}{required}}(),}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'optional'}\ =>\ Expect::string(),\ \textcolor{comment}{//\ the\ default\ value\ is\ null}}
+\DoxyCodeLine{]);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'optional'}\ =>\ \textcolor{stringliteral}{''}]);}
+\DoxyCodeLine{\textcolor{comment}{//\ ERROR:\ option\ 'required'\ is\ missing}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'required'}\ =>\ \textcolor{stringliteral}{'foo'}]);}
+\DoxyCodeLine{\textcolor{comment}{//\ OK,\ returns\ \{'required'\ =>\ 'foo',\ 'optional'\ =>\ null\}}}
+
+\end{DoxyCode}
+
+
+If you do not want to output properties with only a default value, use {\ttfamily skip\+Defaults()}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::structure([}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'required'}\ =>\ Expect::string()-\/>\mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a9d75995195563fb3283e5fd88ed4e6b7}{required}}(),}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'optional'}\ =>\ Expect::string(),}
+\DoxyCodeLine{])-\/>skipDefaults();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'required'}\ =>\ \textcolor{stringliteral}{'foo'}]);}
+\DoxyCodeLine{\textcolor{comment}{//\ OK,\ returns\ \{'required'\ =>\ 'foo'\}}}
+
+\end{DoxyCode}
+
+
+Although {\ttfamily null} is the default value of the {\ttfamily optional} property, it is not allowed in the input data (the value must be a string). Properties accepting {\ttfamily null} are defined using {\ttfamily nullable()}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::structure([}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'optional'}\ =>\ Expect::string(),}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'nullable'}\ =>\ Expect::string()-\/>nullable(),}
+\DoxyCodeLine{]);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'optional'}\ =>\ \textcolor{keyword}{null}]);}
+\DoxyCodeLine{\textcolor{comment}{//\ ERROR:\ 'optional'\ expects\ to\ be\ string,\ null\ given.}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'nullable'}\ =>\ \textcolor{keyword}{null}]);}
+\DoxyCodeLine{\textcolor{comment}{//\ OK,\ returns\ \{'optional'\ =>\ null,\ 'nullable'\ =>\ null\}}}
+
+\end{DoxyCode}
+
+
+By default, there can be no extra items in the input data\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::structure([}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'key'}\ =>\ Expect::string(),}
+\DoxyCodeLine{]);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'additional'}\ =>\ 1]);}
+\DoxyCodeLine{\textcolor{comment}{//\ ERROR:\ Unexpected\ item\ 'additional'}}
+
+\end{DoxyCode}
+
+
+Which we can change with {\ttfamily other\+Items()}. As a parameter, we will specify the schema for each extra element\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::structure([}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'key'}\ =>\ Expect::string(),}
+\DoxyCodeLine{])-\/>otherItems(Expect::int());}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'additional'}\ =>\ 1]);\ \textcolor{comment}{//\ OK}}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'additional'}\ =>\ \textcolor{keyword}{true}]);\ \textcolor{comment}{//\ ERROR}}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1299}{}\doxysubsection{\texorpdfstring{Deprecations}{Deprecations}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1299}
+You can deprecate property using the {\ttfamily deprecated(\mbox{[}string \$message\mbox{]})} method. Deprecation notices are returned by {\ttfamily \$processor-\/\texorpdfstring{$>$}{>}get\+Warnings()}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::structure([}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'old'}\ =>\ Expect::int()-\/>\mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a22afbf3de67f4d43f1341f8d8ff2f860}{deprecated}}(\textcolor{stringliteral}{'The\ item\ \%path\%\ is\ deprecated'}),}
+\DoxyCodeLine{]);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{stringliteral}{'old'}\ =>\ 1]);\ \textcolor{comment}{//\ OK}}
+\DoxyCodeLine{\$processor-\/>getWarnings();\ \textcolor{comment}{//\ ["{}The\ item\ 'old'\ is\ deprecated"{}]}}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1300}{}\doxysubsection{\texorpdfstring{Ranges\+: min() max()}{Ranges: min() max()}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1300}
+Use {\ttfamily min()} and {\ttfamily max()} to limit the number of elements for arrays\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ array,\ at\ least\ 10\ items,\ maximum\ 20\ items}}
+\DoxyCodeLine{Expect::array()-\/>min(10)-\/>max(20);}
+
+\end{DoxyCode}
+
+
+For strings, limit their length\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ string,\ at\ least\ 10\ characters\ long,\ maximum\ 20\ characters}}
+\DoxyCodeLine{Expect::string()-\/>min(10)-\/>max(20);}
+
+\end{DoxyCode}
+
+
+For numbers, limit their value\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ integer,\ between\ 10\ and\ 20\ inclusive}}
+\DoxyCodeLine{Expect::int()-\/>min(10)-\/>max(20);}
+
+\end{DoxyCode}
+
+
+Of course, it is possible to mention only {\ttfamily min()}, or only {\ttfamily max()}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ string,\ maximum\ 20\ characters}}
+\DoxyCodeLine{Expect::string()-\/>max(20);}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1301}{}\doxysubsection{\texorpdfstring{Regular Expressions\+: pattern()}{Regular Expressions: pattern()}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1301}
+Using {\ttfamily pattern()}, you can specify a regular expression which the {\bfseries{whole}} input string must match (i.\+e. as if it were wrapped in characters {\ttfamily \texorpdfstring{$^\wedge$}{\string^}} a {\ttfamily \$})\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ just\ 9\ digits}}
+\DoxyCodeLine{Expect::string()-\/>pattern(\textcolor{stringliteral}{'\(\backslash\)d\{9\}'});}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1302}{}\doxysubsection{\texorpdfstring{Custom Assertions\+: assert()}{Custom Assertions: assert()}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1302}
+You can add any other restrictions using {\ttfamily assert(callable \$fn)}.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$countIsEven\ =\ fn(\$v)\ =>\ count(\$v)\ \%\ 2\ ===\ 0;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$schema\ =\ Expect::arrayOf(\textcolor{stringliteral}{'string'})}
+\DoxyCodeLine{\ \ \ \ -\/>assert(\$countIsEven);\ \textcolor{comment}{//\ the\ count\ must\ be\ even}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{charliteral}{'a'},\ \textcolor{charliteral}{'b'}]);\ \textcolor{comment}{//\ OK}}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{charliteral}{'a'},\ \textcolor{charliteral}{'b'},\ \textcolor{charliteral}{'c'}]);\ \textcolor{comment}{//\ ERROR:\ 3\ is\ not\ even}}
+
+\end{DoxyCode}
+
+
+Or
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Expect::string()-\/>assert(\textcolor{stringliteral}{'is\_file'});\ \textcolor{comment}{//\ the\ file\ must\ exist}}
+
+\end{DoxyCode}
+
+
+You can add your own description for each assertion. It will be part of the error message.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::arrayOf(\textcolor{stringliteral}{'string'})}
+\DoxyCodeLine{\ \ \ \ -\/>assert(\$countIsEven,\ \textcolor{stringliteral}{'Even\ items\ in\ array'});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$processor-\/>process(\$schema,\ [\textcolor{charliteral}{'a'},\ \textcolor{charliteral}{'b'},\ \textcolor{charliteral}{'c'}]);}
+\DoxyCodeLine{\textcolor{comment}{//\ Failed\ assertion\ "{}Even\ items\ in\ array"{}\ for\ item\ with\ value\ array.}}
+
+\end{DoxyCode}
+
+
+The method can be called repeatedly to add multiple constraints. It can be intermixed with calls to {\ttfamily transform()} and {\ttfamily cast\+To()}.\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1303}{}\doxysubsection{\texorpdfstring{Transformation\+: transform()}{Transformation: transform()}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1303}
+Successfully validated data can be modified using a custom function\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ conversion\ to\ uppercase:}}
+\DoxyCodeLine{Expect::string()-\/>transform(fn(\textcolor{keywordtype}{string}\ \$s)\ =>\ strtoupper(\$s));}
+
+\end{DoxyCode}
+
+
+The method can be called repeatedly to add multiple transformations. It can be intermixed with calls to {\ttfamily assert()} and {\ttfamily cast\+To()}. The operations will be executed in the order in which they are declared\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Expect::type(\textcolor{stringliteral}{'string|int'})}
+\DoxyCodeLine{\ \ \ \ -\/>castTo(\textcolor{stringliteral}{'string'})}
+\DoxyCodeLine{\ \ \ \ -\/>assert(\textcolor{stringliteral}{'ctype\_lower'},\ \textcolor{stringliteral}{'All\ characters\ must\ be\ lowercased'})}
+\DoxyCodeLine{\ \ \ \ -\/>transform(fn(\textcolor{keywordtype}{string}\ \$s)\ =>\ strtoupper(\$s));\ \textcolor{comment}{//\ conversion\ to\ uppercase}}
+
+\end{DoxyCode}
+
+
+The {\ttfamily transform()} method can both transform and validate the value simultaneously. This is often simpler and less redundant than chaining {\ttfamily transform()} and {\ttfamily assert()}. For this purpose, the function receives a \href{https://api.nette.org/schema/master/Nette/Schema/Context.html}{\texttt{ Nette\textbackslash{}\+Schema\textbackslash{}\+Context}} object with an {\ttfamily add\+Error()} method, which can be used to add information about validation issues\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Expect::string()}
+\DoxyCodeLine{\ \ \ \ -\/>transform(\textcolor{keyword}{function}\ (\textcolor{keywordtype}{string}\ \$s,\ \mbox{\hyperlink{namespace_nette}{Nette}}\(\backslash\)Schema\(\backslash\)Context\ \$context)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!ctype\_lower(\$s))\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \$context-\/>addError(\textcolor{stringliteral}{'All\ characters\ must\ be\ lowercased'},\ \textcolor{stringliteral}{'my.case.error'});}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ strtoupper(\$s);}
+\DoxyCodeLine{\ \ \ \ \});}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1304}{}\doxysubsection{\texorpdfstring{Casting\+: cast\+To()}{Casting: castTo()}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1304}
+Successfully validated data can be cast\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Expect::scalar()-\/>castTo(\textcolor{stringliteral}{'string'});}
+
+\end{DoxyCode}
+
+
+In addition to native PHP types, you can also cast to classes. It distinguishes whether it is a simple class without a constructor or a class with a constructor. If the class has no constructor, an instance of it is created and all elements of the structure are written to its properties\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{class\ }Info}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \textcolor{keywordtype}{bool}\ \$processRefund;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \textcolor{keywordtype}{int}\ \$refundAmount;}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{Expect::structure([}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'processRefund'}\ =>\ Expect::bool(),}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'refundAmount'}\ =>\ Expect::int(),}
+\DoxyCodeLine{])-\/>castTo(Info::class);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ creates\ '\$obj\ =\ new\ Info'\ and\ writes\ to\ \$obj-\/>processRefund\ and\ \$obj-\/>refundAmount}}
+
+\end{DoxyCode}
+
+
+If the class has a constructor, the elements of the structure are passed as named parameters to the constructor (requires PHP 8)\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{class\ }Info}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_testing_1_1_concerns_a17ea103c75f2b56cb4ebd89dbf59d2d6}{\_\_construct}}(}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keywordtype}{bool}\ \$processRefund,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keywordtype}{int}\ \$refundAmount,}
+\DoxyCodeLine{\ \ \ \ )\ \{}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ creates\ \$obj\ =\ new\ Info(processRefund:\ ...,\ refundAmount:\ ...)}}
+
+\end{DoxyCode}
+
+
+Casting combined with a scalar parameter creates an object and passes the value as the sole parameter to the constructor\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Expect::string()-\/>castTo(DateTime::class);}
+\DoxyCodeLine{\textcolor{comment}{//\ creates\ new\ DateTime(...)}}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1305}{}\doxysubsection{\texorpdfstring{Normalization\+: before()}{Normalization: before()}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1305}
+Prior to the validation itself, the data can be normalized using the method {\ttfamily before()}. As an example, let\textquotesingle{}s have an element that must be an array of strings (eg `\mbox{[}\textquotesingle{}a', \textquotesingle{}b\textquotesingle{}, \textquotesingle{}c\textquotesingle{}\mbox{]}{\ttfamily ), but receives input in the form of a string}a b c\`{}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$explode\ =\ fn(\$v)\ =>\ explode(\textcolor{charliteral}{'\ '},\ \$v);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$schema\ =\ Expect::arrayOf(\textcolor{stringliteral}{'string'})}
+\DoxyCodeLine{\ \ \ \ -\/>before(\$explode);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$normalized\ =\ \$processor-\/>process(\$schema,\ \textcolor{stringliteral}{'a\ b\ c'});}
+\DoxyCodeLine{\textcolor{comment}{//\ OK,\ returns\ ['a',\ 'b',\ 'c']}}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2nette_2schema_2readme_autotoc_md1306}{}\doxysubsection{\texorpdfstring{Mapping to Objects\+: from()}{Mapping to Objects: from()}}\label{md_vendor_2nette_2schema_2readme_autotoc_md1306}
+You can generate structure schema from the class. Example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{class\ }Config}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}};}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \$password;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \$admin\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$schema\ =\ Expect::from(\textcolor{keyword}{new}\ Config);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ \textcolor{stringliteral}{'jeff'},}
+\DoxyCodeLine{];}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$normalized\ =\ \$processor-\/>process(\$schema,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\textcolor{comment}{//\ \$normalized\ instanceof\ Config}}
+\DoxyCodeLine{\textcolor{comment}{//\ \$normalized\ =\ \{'name'\ =>\ 'jeff',\ 'password'\ =>\ null,\ 'admin'\ =>\ false\}}}
+
+\end{DoxyCode}
+
+
+If you are using PHP 7.\+4 or higher, you can use native types\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{class\ }Config}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}};}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ ?\textcolor{keywordtype}{string}\ \$password;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \textcolor{keywordtype}{bool}\ \$admin\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$schema\ =\ Expect::from(\textcolor{keyword}{new}\ Config);}
+
+\end{DoxyCode}
+
+
+Anonymous classes are also supported\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::from(\textcolor{keyword}{new}\ \textcolor{keyword}{class}\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}};}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ ?\textcolor{keywordtype}{string}\ \$password;}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \textcolor{keywordtype}{bool}\ \$admin\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\});}
+
+\end{DoxyCode}
+
+
+Because the information obtained from the class definition may not be sufficient, you can add a custom schema for the elements with the second parameter\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$schema\ =\ Expect::from(\textcolor{keyword}{new}\ Config,\ [}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ Expect::string()-\/>pattern(\textcolor{stringliteral}{'\(\backslash\)w:.*'}),}
+\DoxyCodeLine{]);}
+
+\end{DoxyCode}
+ 

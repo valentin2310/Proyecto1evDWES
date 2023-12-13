@@ -1,0 +1,291 @@
+\doxysection{Database\+Manager.\+php}
+\hypertarget{_database_manager_8php_source}{}\label{_database_manager_8php_source}\index{vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php@{vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php}}
+\mbox{\hyperlink{_database_manager_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_database}{Illuminate\(\backslash\)Database}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00005}00005\ use\ Doctrine\(\backslash\)DBAL\(\backslash\)Types\(\backslash\)Type;}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00006}00006\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_connectors_1_1_connection_factory}{Illuminate\(\backslash\)Database\(\backslash\)Connectors\(\backslash\)ConnectionFactory}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_events_1_1_connection_established}{Illuminate\(\backslash\)Database\(\backslash\)Events\(\backslash\)ConnectionEstablished}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_arr}{Illuminate\(\backslash\)Support\(\backslash\)Arr}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_configuration_url_parser}{Illuminate\(\backslash\)Support\(\backslash\)ConfigurationUrlParser}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_str}{Illuminate\(\backslash\)Support\(\backslash\)Str}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00011}00011\ use\ Illuminate\(\backslash\)Support\(\backslash\)Traits\(\backslash\)Macroable;}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00012}00012\ use\ InvalidArgumentException;}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00013}00013\ use\ PDO;}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00014}00014\ use\ RuntimeException;}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00019}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager}{00019}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager}{DatabaseManager}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_illuminate_1_1_database_1_1_connection_resolver_interface}{ConnectionResolverInterface}}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00020}00020\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00021}00021\ \ \ \ \ use\ Macroable\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00022}00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_ac565bd6a9d062c73a0a0db7afe0ffea9}{\_\_call}}\ as\ macroCall;}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00023}00023\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00030}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_adfb117f244076aa9bc269269f7e57403}{00030}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_adfb117f244076aa9bc269269f7e57403}{\$app}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00037}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a099b374dc664ee043fffcd6ea05e3e70}{00037}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a099b374dc664ee043fffcd6ea05e3e70}{\$factory}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00044}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a8d01870fbfcf9232c0e94c50a7142331}{00044}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a8d01870fbfcf9232c0e94c50a7142331}{\$connections}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00051}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a78dd0f5a8f983099dc6499a2d7cdf7aa}{00051}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a78dd0f5a8f983099dc6499a2d7cdf7aa}{\$extensions}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00058}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a52e65291172ac09a0cff7937e2401a8a}{00058}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a52e65291172ac09a0cff7937e2401a8a}{\$reconnector}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00065}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a785d3bb723b2e8c461beac98d2c74584}{00065}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a785d3bb723b2e8c461beac98d2c74584}{\$doctrineTypes}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00074}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a590822b9dd763de161aa68e5e8fc93dc}{00074}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a590822b9dd763de161aa68e5e8fc93dc}{\_\_construct}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_adfb117f244076aa9bc269269f7e57403}{\$app}},\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_connectors_1_1_connection_factory}{ConnectionFactory}}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a099b374dc664ee043fffcd6ea05e3e70}{\$factory}})}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00075}00075\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \$this-\/>app\ =\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_adfb117f244076aa9bc269269f7e57403}{\$app}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \$this-\/>factory\ =\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a099b374dc664ee043fffcd6ea05e3e70}{\$factory}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \$this-\/>reconnector\ =\ \textcolor{keyword}{function}\ (\$connection)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a35dc3fd67a5e9830c9b4846bdf00da14}{reconnect}}(\$connection-\/>getNameWithReadWriteType());}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00082}00082\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00090}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a2a1f1d20567e9fb08ea59603165c5b30}{00090}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a2a1f1d20567e9fb08ea59603165c5b30}{connection}}(\$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00091}00091\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ [\$database,\ \$type]\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aae41bf65bb4d336ab113bd7053023315}{parseConnectionName}}(\$name);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \$name\ =\ \$name\ ?:\ \$database;}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ haven't\ created\ this\ connection,\ we'll\ create\ it\ based\ on\ the\ config}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ provided\ in\ the\ application.\ Once\ we've\ created\ the\ connections\ we\ will}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ set\ the\ "{}fetch\ mode"{}\ for\ PDO\ which\ determines\ the\ query\ return\ types.}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ isset(\$this-\/>connections[\$name]))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>connections[\$name]\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a2d0fb98e85f8e1f616603a7b5ae11b38}{configure}}(}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aef751ebae37bd416027b46c84538ea5a}{makeConnection}}(\$database),\ \$type}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>app-\/>bound(\textcolor{stringliteral}{'events'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>app[\textcolor{stringliteral}{'events'}]-\/>dispatch(}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_events_1_1_connection_established}{ConnectionEstablished}}(\$this-\/>connections[\$name])}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>connections[\$name];}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00112}00112\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00120}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aae41bf65bb4d336ab113bd7053023315}{00120}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aae41bf65bb4d336ab113bd7053023315}{parseConnectionName}}(\$name)}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00121}00121\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \$name\ =\ \$name\ ?:\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a84283e33d5ebf54a78e25184f6b23aa0}{getDefaultConnection}}();}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Str::endsWith(\$name,\ [\textcolor{stringliteral}{'::read'},\ \textcolor{stringliteral}{'::write'}])}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ explode(\textcolor{stringliteral}{'::'},\ \$name,\ 2)\ :\ [\$name,\ \textcolor{keyword}{null}];}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00134}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aef751ebae37bd416027b46c84538ea5a}{00134}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aef751ebae37bd416027b46c84538ea5a}{makeConnection}}(\$name)}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00135}00135\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a839b92075f7b9c814ffc13efb5c4a1f8}{configuration}}(\$name);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First\ we\ will\ check\ by\ the\ connection\ name\ to\ see\ if\ an\ extension\ has\ been}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ registered\ specifically\ for\ that\ connection.\ If\ it\ has\ we\ will\ call\ the}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Closure\ and\ pass\ it\ the\ config\ allowing\ it\ to\ resolve\ the\ connection.}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>extensions[\$name]))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ call\_user\_func(\$this-\/>extensions[\$name],\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}},\ \$name);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Next\ we\ will\ check\ to\ see\ if\ an\ extension\ has\ been\ registered\ for\ a\ driver}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ will\ call\ the\ Closure\ if\ so,\ which\ allows\ us\ to\ have\ a\ more\ generic}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ resolver\ for\ the\ drivers\ themselves\ which\ applies\ to\ all\ connections.}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>extensions[\$driver\ =\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'driver'}]]))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ call\_user\_func(\$this-\/>extensions[\$driver],\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}},\ \$name);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>factory-\/>make(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}},\ \$name);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00153}00153\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00163}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a839b92075f7b9c814ffc13efb5c4a1f8}{00163}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a839b92075f7b9c814ffc13efb5c4a1f8}{configuration}}(\$name)}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00164}00164\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \$name\ =\ \$name\ ?:\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a84283e33d5ebf54a78e25184f6b23aa0}{getDefaultConnection}}();}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ To\ get\ the\ database\ connection\ configuration,\ we\ will\ just\ pull\ each\ of\ the}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ connection\ configurations\ and\ get\ the\ configurations\ for\ the\ given\ name.}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ configuration\ doesn't\ exist,\ we'll\ throw\ an\ exception\ and\ bail.}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a8d01870fbfcf9232c0e94c50a7142331}{\$connections}}\ =\ \$this-\/>app[\textcolor{stringliteral}{'config'}][\textcolor{stringliteral}{'database.connections'}];}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}\ =\ Arr::get(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a8d01870fbfcf9232c0e94c50a7142331}{\$connections}},\ \$name)))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidArgumentException(\textcolor{stringliteral}{"{}Database\ connection\ [\{\$name\}]\ not\ configured."{}});}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_configuration_url_parser}{ConfigurationUrlParser}})}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>parseConfiguration(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}});}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00178}00178\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00187}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a2d0fb98e85f8e1f616603a7b5ae11b38}{00187}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a2d0fb98e85f8e1f616603a7b5ae11b38}{configure}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection}{Connection}}\ \$connection,\ \$type)}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00188}00188\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \$connection\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a1d0e3aaf1a4121270c73d6bd9bf8bffe}{setPdoForType}}(\$connection,\ \$type)-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection_a1e2a999a9f9a9b61cdc9edfc85deb49f}{setReadWriteType}}(\$type);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First\ we'll\ set\ the\ fetch\ mode\ and\ a\ few\ other\ dependencies\ of\ the\ database}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ connection.\ This\ method\ basically\ just\ configures\ and\ prepares\ it\ to\ get}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ used\ by\ the\ application.\ Once\ we're\ finished\ we'll\ return\ it\ back\ out.}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>app-\/>bound(\textcolor{stringliteral}{'events'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \$connection-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection_a4b9f7d9f845e655d0589dbb5376bed5a}{setEventDispatcher}}(\$this-\/>app[\textcolor{stringliteral}{'events'}]);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>app-\/>bound(\textcolor{stringliteral}{'db.transactions'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \$connection-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection_a1932d3036dc5bd242f8f7d5ba2c07285}{setTransactionManager}}(\$this-\/>app[\textcolor{stringliteral}{'db.transactions'}]);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Here\ we'll\ set\ a\ reconnector\ callback.\ This\ reconnector\ can\ be\ any\ callable}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ so\ we\ will\ set\ a\ Closure\ to\ reconnect\ from\ this\ manager\ with\ the\ name\ of}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ connection,\ which\ will\ allow\ us\ to\ reconnect\ from\ the\ connections.}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \$connection-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection_a0cb6999b25712de7192ab594001843bc}{setReconnector}}(\$this-\/>reconnector);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a0b4329c3f350e662fd00d761aefd64f1}{registerConfiguredDoctrineTypes}}(\$connection);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$connection;}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00210}00210\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00219}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a1d0e3aaf1a4121270c73d6bd9bf8bffe}{00219}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a1d0e3aaf1a4121270c73d6bd9bf8bffe}{setPdoForType}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection}{Connection}}\ \$connection,\ \$type\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00220}00220\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$type\ ===\ \textcolor{stringliteral}{'read'})\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \$connection-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection_aafe9ccc8334eff61c1211a7aba46d93b}{setPdo}}(\$connection-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection_a5ac1cf5358913d5df5f0e1be9765e577}{getReadPdo}}());}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$type\ ===\ \textcolor{stringliteral}{'write'})\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \$connection-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection_a80356ef580225cab06c78757ce0f2b05}{setReadPdo}}(\$connection-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection_a6e7560ad95a7986be67f7528c80e7f1a}{getPdo}}());}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$connection;}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00228}00228\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00236}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a0b4329c3f350e662fd00d761aefd64f1}{00236}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a0b4329c3f350e662fd00d761aefd64f1}{registerConfiguredDoctrineTypes}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection}{Connection}}\ \$connection):\ void}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00237}00237\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>app[\textcolor{stringliteral}{'config'}]-\/>\textcolor{keyword}{get}(\textcolor{stringliteral}{'database.dbal.types'},\ [])\ as\ \$name\ =>\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}})\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a82a26c702d5628393839d195fa95d3a6}{registerDoctrineType}}(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}},\ \$name,\ \$name);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>doctrineTypes\ as\ \$name\ =>\ [\$type,\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}])\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \$connection-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection_a17562ca1bc319e9427f395022ec55df7}{registerDoctrineType}}(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}},\ \$name,\ \$type);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00245}00245\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00258}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a82a26c702d5628393839d195fa95d3a6}{00258}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a82a26c702d5628393839d195fa95d3a6}{registerDoctrineType}}(\textcolor{keywordtype}{string}\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}},\ \textcolor{keywordtype}{string}\ \$name,\ \textcolor{keywordtype}{string}\ \$type):\ void}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00259}00259\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ class\_exists(\textcolor{stringliteral}{'Doctrine\(\backslash\)DBAL\(\backslash\)Connection'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Registering\ a\ custom\ Doctrine\ type\ requires\ Doctrine\ DBAL\ (doctrine/dbal).'}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ Type::hasType(\$name))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ Type::addType(\$name,\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}});}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \$this-\/>doctrineTypes[\$name]\ =\ [\$type,\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}];}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00271}00271\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00279}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aef68a11168e6df0bf320c2b5c0b40efa}{00279}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aef68a11168e6df0bf320c2b5c0b40efa}{purge}}(\$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00280}00280\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \$name\ =\ \$name\ ?:\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a84283e33d5ebf54a78e25184f6b23aa0}{getDefaultConnection}}();}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a8d3a878d514dda4241a8cf0ef8a9f2ee}{disconnect}}(\$name);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00285}00285\ \ \ \ \ \ \ \ \ unset(\$this-\/>connections[\$name]);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00286}00286\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00287}00287\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00294}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a8d3a878d514dda4241a8cf0ef8a9f2ee}{00294}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a8d3a878d514dda4241a8cf0ef8a9f2ee}{disconnect}}(\$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00295}00295\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>connections[\$name\ =\ \$name\ ?:\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a84283e33d5ebf54a78e25184f6b23aa0}{getDefaultConnection}}()]))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>connections[\$name]-\/>disconnect();}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00299}00299\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00307}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a35dc3fd67a5e9830c9b4846bdf00da14}{00307}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a35dc3fd67a5e9830c9b4846bdf00da14}{reconnect}}(\$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00308}00308\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a8d3a878d514dda4241a8cf0ef8a9f2ee}{disconnect}}(\$name\ =\ \$name\ ?:\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a84283e33d5ebf54a78e25184f6b23aa0}{getDefaultConnection}}());}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ isset(\$this-\/>connections[\$name]))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a2a1f1d20567e9fb08ea59603165c5b30}{connection}}(\$name);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00313}00313\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00314}00314\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a9472c30a86e0cb114129c2b7c65793ac}{refreshPdoConnections}}(\$name);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00316}00316\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00325}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a792192504f8bafd7d9151426af18639a}{00325}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a792192504f8bafd7d9151426af18639a}{usingConnection}}(\$name,\ callable\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00326}00326\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00327}00327\ \ \ \ \ \ \ \ \ \$previousName\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a84283e33d5ebf54a78e25184f6b23aa0}{getDefaultConnection}}();}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00328}00328\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a82009ad20d9934a903b7ea41ef2d3e54}{setDefaultConnection}}(\$name);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$callback(),\ \textcolor{keyword}{function}\ ()\ use\ (\$previousName)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a82009ad20d9934a903b7ea41ef2d3e54}{setDefaultConnection}}(\$previousName);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00334}00334\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00342}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a9472c30a86e0cb114129c2b7c65793ac}{00342}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a9472c30a86e0cb114129c2b7c65793ac}{refreshPdoConnections}}(\$name)}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00343}00343\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00344}00344\ \ \ \ \ \ \ \ \ [\$database,\ \$type]\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aae41bf65bb4d336ab113bd7053023315}{parseConnectionName}}(\$name);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00345}00345\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \$fresh\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a2d0fb98e85f8e1f616603a7b5ae11b38}{configure}}(}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aef751ebae37bd416027b46c84538ea5a}{makeConnection}}(\$database),\ \$type}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00350}00350\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>connections[\$name]}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>setPdo(\$fresh-\/>getRawPdo())}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>setReadPdo(\$fresh-\/>getRawReadPdo());}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00353}00353\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00360}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a84283e33d5ebf54a78e25184f6b23aa0}{00360}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a84283e33d5ebf54a78e25184f6b23aa0}{getDefaultConnection}}()}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00361}00361\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>app[\textcolor{stringliteral}{'config'}][\textcolor{stringliteral}{'database.default'}];}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00363}00363\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00371}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a82009ad20d9934a903b7ea41ef2d3e54}{00371}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a82009ad20d9934a903b7ea41ef2d3e54}{setDefaultConnection}}(\$name)}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00372}00372\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \$this-\/>app[\textcolor{stringliteral}{'config'}][\textcolor{stringliteral}{'database.default'}]\ =\ \$name;}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00374}00374\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00375}00375\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00381}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aeee78138a56633943659ae379a5c80fe}{00381}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aeee78138a56633943659ae379a5c80fe}{supportedDrivers}}()}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00382}00382\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00383}00383\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\textcolor{stringliteral}{'mysql'},\ \textcolor{stringliteral}{'pgsql'},\ \textcolor{stringliteral}{'sqlite'},\ \textcolor{stringliteral}{'sqlsrv'}];}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00384}00384\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00385}00385\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00391}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a673619ec49883067a6a7c7abd90ed116}{00391}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a673619ec49883067a6a7c7abd90ed116}{availableDrivers}}()}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00392}00392\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_intersect(}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aeee78138a56633943659ae379a5c80fe}{supportedDrivers}}(),}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ str\_replace(\textcolor{stringliteral}{'dblib'},\ \textcolor{stringliteral}{'sqlsrv'},\ PDO::getAvailableDrivers())}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00396}00396\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00397}00397\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00406}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a1859c9b95bb7b7fbf57205b5ffd82a81}{00406}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a1859c9b95bb7b7fbf57205b5ffd82a81}{extend}}(\$name,\ callable\ \$resolver)}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00407}00407\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \$this-\/>extensions[\$name]\ =\ \$resolver;}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00409}00409\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00410}00410\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00417}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a7f8dd5dd71b239973cb7842007d9bdeb}{00417}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a7f8dd5dd71b239973cb7842007d9bdeb}{forgetExtension}}(\$name)}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00418}00418\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00419}00419\ \ \ \ \ \ \ \ \ unset(\$this-\/>extensions[\$name]);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00420}00420\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00421}00421\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00427}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aa078d9e28131579ede55b9f2a133269a}{00427}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_aa078d9e28131579ede55b9f2a133269a}{getConnections}}()}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00428}00428\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00429}00429\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a8d01870fbfcf9232c0e94c50a7142331}{\$this-\/>connections}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00430}00430\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00431}00431\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00438}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a0cb6999b25712de7192ab594001843bc}{00438}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a0cb6999b25712de7192ab594001843bc}{setReconnector}}(callable\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a52e65291172ac09a0cff7937e2401a8a}{\$reconnector}})}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00439}00439\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00440}00440\ \ \ \ \ \ \ \ \ \$this-\/>reconnector\ =\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a52e65291172ac09a0cff7937e2401a8a}{\$reconnector}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00441}00441\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00442}00442\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00449}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a02ea9cdd85caf487b749b41a2f4f3d02}{00449}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a02ea9cdd85caf487b749b41a2f4f3d02}{setApplication}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_adfb117f244076aa9bc269269f7e57403}{\$app}})}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00450}00450\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \$this-\/>app\ =\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_adfb117f244076aa9bc269269f7e57403}{\$app}};}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00454}00454\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00455}00455\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00463}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_ac565bd6a9d062c73a0a0db7afe0ffea9}{00463}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_ac565bd6a9d062c73a0a0db7afe0ffea9}{\_\_call}}(\$method,\ \$parameters)}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00464}00464\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (static::hasMacro(\$method))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>macroCall(\$method,\ \$parameters);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00467}00467\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00468}00468\ }
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_database_manager_a2a1f1d20567e9fb08ea59603165c5b30}{connection}}()-\/>\$method(...\$parameters);}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00470}00470\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_manager_8php_source_l00471}00471\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,120 @@
+\doxysection{Return\+Type\+Pass.\+php}
+\hypertarget{_return_type_pass_8php_source}{}\label{_return_type_pass_8php_source}\index{vendor/psy/psysh/src/CodeCleaner/ReturnTypePass.php@{vendor/psy/psysh/src/CodeCleaner/ReturnTypePass.php}}
+\mbox{\hyperlink{_return_type_pass_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ Psy\ Shell.}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ 2012-\/2023\ Justin\ Hileman}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_psy_1_1_code_cleaner}{Psy\(\backslash\)CodeCleaner}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00014}00014\ use\ \mbox{\hyperlink{namespace_php_parser_1_1_node}{PhpParser\(\backslash\)Node}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_expr_1_1_closure}{PhpParser\(\backslash\)Node\(\backslash\)Expr\(\backslash\)Closure}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_expr_1_1_const_fetch}{PhpParser\(\backslash\)Node\(\backslash\)Expr\(\backslash\)ConstFetch}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_identifier}{PhpParser\(\backslash\)Node\(\backslash\)Identifier}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_nullable_type}{PhpParser\(\backslash\)Node\(\backslash\)NullableType}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_function__}{PhpParser\(\backslash\)Node\(\backslash\)Stmt\(\backslash\)Function\_}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_return__}{PhpParser\(\backslash\)Node\(\backslash\)Stmt\(\backslash\)Return\_}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_union_type}{PhpParser\(\backslash\)Node\(\backslash\)UnionType}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_fatal_error_exception}{Psy\(\backslash\)Exception\(\backslash\)FatalErrorException}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00027}\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass}{00027}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass}{ReturnTypePass}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_code_cleaner_pass}{CodeCleanerPass}}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00028}00028\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00029}\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_af9b451d04eb24044a2d4112be10de570}{00029}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_af9b451d04eb24044a2d4112be10de570}{MESSAGE}}\ =\ \textcolor{stringliteral}{'A\ function\ with\ return\ type\ must\ return\ a\ value'};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00030}\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_aef5db87805007b47a32af9a8615d80d6}{00030}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_aef5db87805007b47a32af9a8615d80d6}{NULLABLE\_MESSAGE}}\ =\ \textcolor{stringliteral}{'A\ function\ with\ return\ type\ must\ return\ a\ value\ (did\ you\ mean\ "{}return\ null;"{}\ instead\ of\ "{}return;"{}?)'};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00031}\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_a6e7716c2d7950d9bcf69b4ccec6a9792}{00031}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_a6e7716c2d7950d9bcf69b4ccec6a9792}{VOID\_MESSAGE}}\ =\ \textcolor{stringliteral}{'A\ void\ function\ must\ not\ return\ a\ value'};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00032}\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_ada6e2ddbc64954d6312d7b96fccba4d7}{00032}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_ada6e2ddbc64954d6312d7b96fccba4d7}{VOID\_NULL\_MESSAGE}}\ =\ \textcolor{stringliteral}{'A\ void\ function\ must\ not\ return\ a\ value\ (did\ you\ mean\ "{}return;"{}\ instead\ of\ "{}return\ null;"{}?)'};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00033}\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_a36aec3a4debf24f529ee1e3def6d7e8a}{00033}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_a36aec3a4debf24f529ee1e3def6d7e8a}{NULLABLE\_VOID\_MESSAGE}}\ =\ \textcolor{stringliteral}{'Void\ type\ cannot\ be\ nullable'};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00035}00035\ \ \ \ \ \textcolor{keyword}{private}\ \$atLeastPhp71;}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{private}\ \$returnTypeStack\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00038}\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_a095c5d389db211932136b53f25f39685}{00038}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_a095c5d389db211932136b53f25f39685}{\_\_construct}}()}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00039}00039\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \$this-\/>atLeastPhp71\ =\ \(\backslash\)version\_compare(\(\backslash\)PHP\_VERSION,\ \textcolor{stringliteral}{'7.1'},\ \textcolor{stringliteral}{'>='});}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00041}00041\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00048}\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_a72d9ab2b97095f3bf1c97eb453a386d1}{00048}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_a72d9ab2b97095f3bf1c97eb453a386d1}{enterNode}}(\mbox{\hyperlink{interface_php_parser_1_1_node}{Node}}\ \$node)}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00049}00049\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>atLeastPhp71)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};\ \textcolor{comment}{//\ @codeCoverageIgnore}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>isFunctionNode(\$node))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>returnTypeStack[]\ =\ \$node-\/>returnType;}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!empty(\$this-\/>returnTypeStack)\ \&\&\ \$node\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_return__}{Return\_}})\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \$expectedType\ =\ \(\backslash\)end(\$this-\/>returnTypeStack);}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$expectedType\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \$msg\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>typeName(\$expectedType)\ ===\ \textcolor{stringliteral}{'void'})\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Void\ functions}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$expectedType\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_nullable_type}{NullableType}})\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$msg\ =\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_a36aec3a4debf24f529ee1e3def6d7e8a}{self::NULLABLE\_VOID\_MESSAGE}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$node-\/>expr\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_expr_1_1_const_fetch}{ConstFetch}}\ \&\&\ \(\backslash\)strtolower(\$node-\/>expr-\/>name)\ ===\ \textcolor{stringliteral}{'null'})\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$msg\ =\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_ada6e2ddbc64954d6312d7b96fccba4d7}{self::VOID\_NULL\_MESSAGE}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$node-\/>expr\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$msg\ =\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_a6e7716c2d7950d9bcf69b4ccec6a9792}{self::VOID\_MESSAGE}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Everything\ else}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node-\/>expr\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$msg\ =\ \$expectedType\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_nullable_type}{NullableType}}\ ?\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_aef5db87805007b47a32af9a8615d80d6}{self::NULLABLE\_MESSAGE}}\ :\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_af9b451d04eb24044a2d4112be10de570}{self::MESSAGE}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$msg\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_fatal_error_exception}{FatalErrorException}}(\$msg,\ 0,\ \(\backslash\)E\_ERROR,\ \textcolor{keyword}{null},\ \$node-\/>\mbox{\hyperlink{interface_php_parser_1_1_node_aef9c32f6066788a101028a1d4150f8cb}{getLine}}());}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00088}00088\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00095}\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_a560dafbb8615947e1fbfa5565bbb832c}{00095}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_return_type_pass_a560dafbb8615947e1fbfa5565bbb832c}{leaveNode}}(\mbox{\hyperlink{interface_php_parser_1_1_node}{Node}}\ \$node)}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00096}00096\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>atLeastPhp71)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};\ \textcolor{comment}{//\ @codeCoverageIgnore}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!empty(\$this-\/>returnTypeStack)\ \&\&\ \$this-\/>isFunctionNode(\$node))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)array\_pop(\$this-\/>returnTypeStack);}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00104}00104\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00106}00106\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ isFunctionNode(\mbox{\hyperlink{interface_php_parser_1_1_node}{Node}}\ \$node):\ bool}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00107}00107\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$node\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_function__}{Function\_}}\ ||\ \$node\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_expr_1_1_closure}{Closure}};}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00109}00109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00111}00111\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ typeName(\mbox{\hyperlink{interface_php_parser_1_1_node}{Node}}\ \$node):\ string}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00112}00112\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_union_type}{UnionType}})\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ return\ \(\backslash\)implode(\textcolor{charliteral}{'|'},\ \(\backslash\)array\_map([\$this,\ \textcolor{stringliteral}{'typeName'}],\ \$node-\/>types));}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node\ instanceof\ NullableType)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ return\ \(\backslash\)strtolower(\$node-\/>type-\/>name);}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node\ instanceof\ Identifier)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ return\ \(\backslash\)strtolower(\$node-\/>name);}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'Unable\ to\ find\ type\ name'});}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_type_pass_8php_source_l00127}00127\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,1130 @@
+\doxysection{Mailable.\+php}
+\hypertarget{_mail_2_mailable_8php_source}{}\label{_mail_2_mailable_8php_source}\index{vendor/laravel/framework/src/Illuminate/Mail/Mailable.php@{vendor/laravel/framework/src/Illuminate/Mail/Mailable.php}}
+\mbox{\hyperlink{_mail_2_mailable_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_mail}{Illuminate\(\backslash\)Mail}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00005}00005\ use\ \mbox{\hyperlink{class_illuminate_1_1_config_1_1_repository}{Illuminate\(\backslash\)Config\(\backslash\)Repository}}\ as\ ConfigRepository;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00006}00006\ use\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container}{Illuminate\(\backslash\)Container\(\backslash\)Container}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00007}00007\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_filesystem_1_1_factory}{Illuminate\(\backslash\)Contracts\(\backslash\)Filesystem\(\backslash\)Factory}}\ as\ FilesystemFactory;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00008}00008\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_mail_1_1_attachable}{Illuminate\(\backslash\)Contracts\(\backslash\)Mail\(\backslash\)Attachable}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00009}00009\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_mail_1_1_factory}{Illuminate\(\backslash\)Contracts\(\backslash\)Mail\(\backslash\)Factory}}\ as\ MailFactory;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00010}00010\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_mail_1_1_mailable}{Illuminate\(\backslash\)Contracts\(\backslash\)Mail\(\backslash\)Mailable}}\ as\ MailableContract;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00011}00011\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_factory}{Illuminate\(\backslash\)Contracts\(\backslash\)Queue\(\backslash\)Factory}}\ as\ Queue;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00012}00012\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_htmlable}{Illuminate\(\backslash\)Contracts\(\backslash\)Support\(\backslash\)Htmlable}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00013}00013\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_renderable}{Illuminate\(\backslash\)Contracts\(\backslash\)Support\(\backslash\)Renderable}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00014}00014\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_translation_1_1_has_locale_preference}{Illuminate\(\backslash\)Contracts\(\backslash\)Translation\(\backslash\)HasLocalePreference}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_collection}{Illuminate\(\backslash\)Support\(\backslash\)Collection}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_html_string}{Illuminate\(\backslash\)Support\(\backslash\)HtmlString}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_str}{Illuminate\(\backslash\)Support\(\backslash\)Str}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00018}00018\ use\ Illuminate\(\backslash\)Support\(\backslash\)Traits\(\backslash\)Conditionable;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00019}00019\ use\ Illuminate\(\backslash\)Support\(\backslash\)Traits\(\backslash\)ForwardsCalls;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00020}00020\ use\ Illuminate\(\backslash\)Support\(\backslash\)Traits\(\backslash\)Localizable;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00021}00021\ use\ Illuminate\(\backslash\)Support\(\backslash\)Traits\(\backslash\)Macroable;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_illuminate_1_1_testing_1_1_constraints_1_1_see_in_order}{Illuminate\(\backslash\)Testing\(\backslash\)Constraints\(\backslash\)SeeInOrder}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert}{PHPUnit\(\backslash\)Framework\(\backslash\)Assert}}\ as\ PHPUnit;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00024}00024\ use\ ReflectionClass;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00025}00025\ use\ ReflectionProperty;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00026}00026\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_header_1_1_metadata_header}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Header\(\backslash\)MetadataHeader}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00027}00027\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_header_1_1_tag_header}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Header\(\backslash\)TagHeader}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00028}00028\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mime_1_1_address}{Symfony\(\backslash\)Component\(\backslash\)Mime\(\backslash\)Address}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00030}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable}{00030}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable}{Mailable}}\ \textcolor{keyword}{implements}\ MailableContract,\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_renderable}{Renderable}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00031}00031\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00032}00032\ \ \ \ \ use\ Conditionable,\ ForwardsCalls,\ Localizable,\ Macroable\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00033}00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ac565bd6a9d062c73a0a0db7afe0ffea9}{\_\_call}}\ as\ macroCall;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00034}00034\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00041}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a3b392f5a691b803e728f1fb42b35f6e1}{00041}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a3b392f5a691b803e728f1fb42b35f6e1}{\$locale}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00048}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a0bb7e2b3d541598cc9c9e3b11bee859c}{00048}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a0bb7e2b3d541598cc9c9e3b11bee859c}{\$from}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00055}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ac19f839b525d6d99d063fe56bf2a6d3b}{00055}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ac19f839b525d6d99d063fe56bf2a6d3b}{\$to}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00062}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a9b0d06c40e3b730d537b8e1ab12ce238}{00062}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a9b0d06c40e3b730d537b8e1ab12ce238}{\$cc}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00069}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a5e11ecd89692e5b6bfa3702c7894e23d}{00069}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a5e11ecd89692e5b6bfa3702c7894e23d}{\$bcc}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00076}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a8200eb1585f0db75516d8688ab523c06}{00076}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a8200eb1585f0db75516d8688ab523c06}{\$replyTo}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00083}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_afea90503726cd5ad2eb80baf0b6d217d}{00083}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_afea90503726cd5ad2eb80baf0b6d217d}{\$subject}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00090}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_af1addd6607e1f6c844c5870507e860c0}{00090}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_af1addd6607e1f6c844c5870507e860c0}{\$markdown}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00097}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a6f96e7fc92441776c9d1cd3386663b40}{00097}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a6f96e7fc92441776c9d1cd3386663b40}{\$html}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00104}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_acccf2eac8663e0cebe8101e90fbab089}{00104}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_acccf2eac8663e0cebe8101e90fbab089}{\$view}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00111}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a96a0d709a218c61d6d26dfa26ff42110}{00111}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a96a0d709a218c61d6d26dfa26ff42110}{\$textView}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00118}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a60c2a5121c31ea2fadb076f70b4d6d7b}{00118}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a60c2a5121c31ea2fadb076f70b4d6d7b}{\$viewData}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00125}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aa2f80297e973639eba0f2f8619fe783b}{00125}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aa2f80297e973639eba0f2f8619fe783b}{\$attachments}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00132}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_af301e696ea3b17ba8c84afdf1f19380b}{00132}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_af301e696ea3b17ba8c84afdf1f19380b}{\$rawAttachments}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00139}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad48a67459643b04cc8ef3b74890fa24a}{00139}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad48a67459643b04cc8ef3b74890fa24a}{\$diskAttachments}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00146}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a475a6a63b85186663d34151bcbd21590}{00146}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a475a6a63b85186663d34151bcbd21590}{\$tags}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00153}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ae7fc3682b173ad9d4b1892bdc04d18d9}{00153}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ae7fc3682b173ad9d4b1892bdc04d18d9}{\$metadata}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00160}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a151f6e603ac02a25364ad54bee36ab2a}{00160}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a151f6e603ac02a25364ad54bee36ab2a}{\$callbacks}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00167}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a1ae541f7fe1c5e21cb4535f88ec9e9dc}{00167}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a1ae541f7fe1c5e21cb4535f88ec9e9dc}{\$theme}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00174}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a510f86466a19c6f0cb20ff94c2fe47fd}{00174}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a510f86466a19c6f0cb20ff94c2fe47fd}{\$mailer}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00181}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a0abe355c3fca8e22ccdf88820f1178bb}{00181}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a0abe355c3fca8e22ccdf88820f1178bb}{\$assertionableRenderStrings}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00188}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ae823f58fa8f03f2b2f6380ca591c1917}{00188}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ae823f58fa8f03f2b2f6380ca591c1917}{\$viewDataCallback}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00196}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a111677e234af5c5e80f8b52cf4c12eba}{00196}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a111677e234af5c5e80f8b52cf4c12eba}{send}}(\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a510f86466a19c6f0cb20ff94c2fe47fd}{\$mailer}})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00197}00197\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>withLocale(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ae418186f7b3344acd1295798a2b46960}{locale}},\ \textcolor{keyword}{function}\ ()\ use\ (\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a510f86466a19c6f0cb20ff94c2fe47fd}{\$mailer}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a670361bd4092b996f4554978558bd3cb}{prepareMailableForDelivery}}();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a510f86466a19c6f0cb20ff94c2fe47fd}{\$mailer}}\ =\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a510f86466a19c6f0cb20ff94c2fe47fd}{\$mailer}}\ instanceof\ MailFactory}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a510f86466a19c6f0cb20ff94c2fe47fd}{\$mailer}}-\/>mailer(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a2c6689967849957013ddef308e400940}{mailer}})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a510f86466a19c6f0cb20ff94c2fe47fd}{\$mailer}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a510f86466a19c6f0cb20ff94c2fe47fd}{\$mailer}}-\/>send(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a0c747aac05fb2b4fa764beeaa26e7e62}{buildView}}(),\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_afb80be35cb7b7c094413fc33f95936b5}{buildViewData}}(),\ \textcolor{keyword}{function}\ (\$message)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aac714c0ab71659fafac609c5252efe90}{buildFrom}}(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>buildRecipients(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>buildSubject(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>buildTags(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>buildMetadata(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>runCallbacks(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>buildAttachments(\$message);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00215}00215\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00223}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a94d90c3304868885dfd8c2ef4974a8c5}{00223}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a94d90c3304868885dfd8c2ef4974a8c5}{queue}}(Queue\ \$queue)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00224}00224\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>delay))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad34011bbed9c696937fff1a64319cbc9}{later}}(\$this-\/>delay,\ \$queue);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \$connection\ =\ property\_exists(\$this,\ \textcolor{stringliteral}{'connection'})\ ?\ \$this-\/>connection\ :\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \$queueName\ =\ property\_exists(\$this,\ \textcolor{stringliteral}{'queue'})\ ?\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a94d90c3304868885dfd8c2ef4974a8c5}{queue}}\ :\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$queue-\/>connection(\$connection)-\/>pushOn(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \$queueName\ ?:\ \textcolor{keyword}{null},\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a5af0ea312b74c32c3ec4fb85ee12995c}{newQueuedJob}}()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00236}00236\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00245}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad34011bbed9c696937fff1a64319cbc9}{00245}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad34011bbed9c696937fff1a64319cbc9}{later}}(\$delay,\ Queue\ \$queue)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00246}00246\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \$connection\ =\ property\_exists(\$this,\ \textcolor{stringliteral}{'connection'})\ ?\ \$this-\/>connection\ :\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \$queueName\ =\ property\_exists(\$this,\ \textcolor{stringliteral}{'queue'})\ ?\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a94d90c3304868885dfd8c2ef4974a8c5}{queue}}\ :\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$queue-\/>connection(\$connection)-\/>laterOn(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \$queueName\ ?:\ \textcolor{keyword}{null},\ \$delay,\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a5af0ea312b74c32c3ec4fb85ee12995c}{newQueuedJob}}()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00254}00254\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00261}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a5af0ea312b74c32c3ec4fb85ee12995c}{00261}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a5af0ea312b74c32c3ec4fb85ee12995c}{newQueuedJob}}()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00262}00262\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Container::getInstance()-\/>make(SendQueuedMailable::class,\ [\textcolor{stringliteral}{'mailable'}\ =>\ \$this])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>through(array\_merge(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ method\_exists(\$this,\ \textcolor{stringliteral}{'middleware'})\ ?\ \$this-\/>middleware()\ :\ [],}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>middleware\ ??\ []}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00268}00268\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00277}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_afde88292c44dc59faf017738dae6dffb}{00277}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_afde88292c44dc59faf017738dae6dffb}{render}}()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00278}00278\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>withLocale(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ae418186f7b3344acd1295798a2b46960}{locale}},\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a670361bd4092b996f4554978558bd3cb}{prepareMailableForDelivery}}();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Container::getInstance()-\/>make(\textcolor{stringliteral}{'mailer'})-\/>render(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a0c747aac05fb2b4fa764beeaa26e7e62}{buildView}}(),\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_afb80be35cb7b7c094413fc33f95936b5}{buildViewData}}()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00285}00285\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00286}00286\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00287}00287\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00295}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a0c747aac05fb2b4fa764beeaa26e7e62}{00295}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a0c747aac05fb2b4fa764beeaa26e7e62}{buildView}}()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00296}00296\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a6bb1870d57f33ca360ca4892b1200ac4}{html}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_filter([}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'html'}\ =>\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_html_string}{HtmlString}}(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a6bb1870d57f33ca360ca4892b1200ac4}{html}}),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00300}00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'text'}\ =>\ \$this-\/>textView\ ??\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00302}00302\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00304}00304\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a052b441e2eb81cd4274126226ce477fa}{markdown}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00305}00305\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a25cdb7e06735fa83a5a8876e7d42fea8}{buildMarkdownView}}();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00306}00306\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00307}00307\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a9c6d0eaab07b5874e3a3f0af99fd9b9b}{view}},\ \$this-\/>textView))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_acccf2eac8663e0cebe8101e90fbab089}{\$this-\/>view}},\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a96a0d709a218c61d6d26dfa26ff42110}{\$this-\/>textView}}];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \}\ elseif\ (isset(\$this-\/>textView))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\textcolor{stringliteral}{'text'}\ =>\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a96a0d709a218c61d6d26dfa26ff42110}{\$this-\/>textView}}];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_acccf2eac8663e0cebe8101e90fbab089}{\$this-\/>view}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00315}00315\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00316}00316\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00324}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a25cdb7e06735fa83a5a8876e7d42fea8}{00324}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a25cdb7e06735fa83a5a8876e7d42fea8}{buildMarkdownView}}()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00325}00325\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_afb80be35cb7b7c094413fc33f95936b5}{buildViewData}}();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'html'}\ =>\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a7fdfe98867bde34429361be39d472550}{buildMarkdownHtml}}(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'text'}\ =>\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad149a91a8ea02ed37b1e1de940268043}{buildMarkdownText}}(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00332}00332\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00333}00333\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00341}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_afb80be35cb7b7c094413fc33f95936b5}{00341}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_afb80be35cb7b7c094413fc33f95936b5}{buildViewData}}()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00342}00342\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a60c2a5121c31ea2fadb076f70b4d6d7b}{\$this-\/>viewData}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00344}00344\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (static::\$viewDataCallback)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ array\_merge(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ call\_user\_func(static::\$viewDataCallback,\ \$this));}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00348}00348\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ ((\textcolor{keyword}{new}\ ReflectionClass(\$this))-\/>getProperties(ReflectionProperty::IS\_PUBLIC)\ as\ \$property)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$property-\/>getDeclaringClass()-\/>getName()\ !==\ self::class)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\$property-\/>getName()]\ =\ \$property-\/>getValue(\$this);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00353}00353\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00356}00356\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00357}00357\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00364}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a7fdfe98867bde34429361be39d472550}{00364}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a7fdfe98867bde34429361be39d472550}{buildMarkdownHtml}}(\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a60c2a5121c31ea2fadb076f70b4d6d7b}{\$viewData}})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00365}00365\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fn\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})\ =>\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ab0e566acc107b59e4ba211c1354a90b8}{markdownRenderer}}()-\/>render(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a052b441e2eb81cd4274126226ce477fa}{markdown}},}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ array\_merge(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a60c2a5121c31ea2fadb076f70b4d6d7b}{\$viewData}}),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00370}00370\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00371}00371\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00378}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad149a91a8ea02ed37b1e1de940268043}{00378}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad149a91a8ea02ed37b1e1de940268043}{buildMarkdownText}}(\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a60c2a5121c31ea2fadb076f70b4d6d7b}{\$viewData}})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00379}00379\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00380}00380\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})\ use\ (\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a60c2a5121c31ea2fadb076f70b4d6d7b}{\$viewData}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'message'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ array\_merge(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ [}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'message'}\ =>\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_text_message}{TextMessage}}(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'message'}]),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00385}00385\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00386}00386\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>textView\ ??\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ab0e566acc107b59e4ba211c1354a90b8}{markdownRenderer}}()-\/>renderText(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a052b441e2eb81cd4274126226ce477fa}{markdown}},}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_merge(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a60c2a5121c31ea2fadb076f70b4d6d7b}{\$viewData}})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00392}00392\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00393}00393\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00399}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ab0e566acc107b59e4ba211c1354a90b8}{00399}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ab0e566acc107b59e4ba211c1354a90b8}{markdownRenderer}}()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00400}00400\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(Container::getInstance()-\/>make(Markdown::class),\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_af1addd6607e1f6c844c5870507e860c0}{\$markdown}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_af1addd6607e1f6c844c5870507e860c0}{\$markdown}}-\/>theme(\$this-\/>theme\ ?:\ Container::getInstance()-\/>get(ConfigRepository::class)-\/>get(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'mail.markdown.theme'},\ \textcolor{stringliteral}{'default'})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00405}00405\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00406}00406\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00407}00407\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00414}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aac714c0ab71659fafac609c5252efe90}{00414}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aac714c0ab71659fafac609c5252efe90}{buildFrom}}(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00415}00415\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00416}00416\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ empty(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a3d54db4ec1c0e4961870bcee62d24d9e}{from}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>from(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a3d54db4ec1c0e4961870bcee62d24d9e}{from}}[0][\textcolor{stringliteral}{'address'}],\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a3d54db4ec1c0e4961870bcee62d24d9e}{from}}[0][\textcolor{stringliteral}{'name'}]);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00418}00418\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00419}00419\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00420}00420\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00421}00421\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00422}00422\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00429}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a5a60fed5b028a2ede6c7fcea182af71a}{00429}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a5a60fed5b028a2ede6c7fcea182af71a}{buildRecipients}}(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00430}00430\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ ([\textcolor{stringliteral}{'to'},\ \textcolor{stringliteral}{'cc'},\ \textcolor{stringliteral}{'bcc'},\ \textcolor{stringliteral}{'replyTo'}]\ as\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>\{\$type\}\ as\ \$recipient)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>\{\$type\}(\$recipient[\textcolor{stringliteral}{'address'}],\ \$recipient[\textcolor{stringliteral}{'name'}]);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00438}00438\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00439}00439\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00446}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aef96bfb224615fddca91c7e3320bfb07}{00446}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aef96bfb224615fddca91c7e3320bfb07}{buildSubject}}(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00447}00447\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00448}00448\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>subject)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>subject(\$this-\/>subject);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>subject(Str::title(Str::snake(class\_basename(\$this),\ \textcolor{charliteral}{'\ '})));}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00452}00452\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00453}00453\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00455}00455\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00456}00456\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00463}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aebc9eb5a2f8388083d3e8e316d11d53b}{00463}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aebc9eb5a2f8388083d3e8e316d11d53b}{buildAttachments}}(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00464}00464\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>attachments\ as\ \$attachment)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>attach(\$attachment[\textcolor{stringliteral}{'file'}],\ \$attachment[\textcolor{stringliteral}{'options'}]);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00467}00467\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00468}00468\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>rawAttachments\ as\ \$attachment)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00470}00470\ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>attachData(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$attachment[\textcolor{stringliteral}{'data'}],\ \$attachment[\textcolor{stringliteral}{'name'}],\ \$attachment[\textcolor{stringliteral}{'options'}]}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00473}00473\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00474}00474\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \$this-\/>buildDiskAttachments(\$message);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00476}00476\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00478}00478\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00479}00479\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00486}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a70f6c379b37d1aa8d5f37abeff31d95d}{00486}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a70f6c379b37d1aa8d5f37abeff31d95d}{buildDiskAttachments}}(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00487}00487\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>diskAttachments\ as\ \$attachment)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \ \ \ \ \$storage\ =\ Container::getInstance()-\/>make(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00490}00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FilesystemFactory::class}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00491}00491\ \ \ \ \ \ \ \ \ \ \ \ \ )-\/>disk(\$attachment[\textcolor{stringliteral}{'disk'}]);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00492}00492\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00493}00493\ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>attachData(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$storage-\/>get(\$attachment[\textcolor{stringliteral}{'path'}]),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00495}00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$attachment[\textcolor{stringliteral}{'name'}]\ ??\ basename(\$attachment[\textcolor{stringliteral}{'path'}]),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_merge([\textcolor{stringliteral}{'mime'}\ =>\ \$storage-\/>mimeType(\$attachment[\textcolor{stringliteral}{'path'}])],\ \$attachment[\textcolor{stringliteral}{'options'}])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00497}00497\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00498}00498\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00499}00499\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00500}00500\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00507}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_af41bba01769d90bf28e15f06bbd698ba}{00507}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_af41bba01769d90bf28e15f06bbd698ba}{buildTags}}(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00508}00508\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00509}00509\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>tags)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>tags\ as\ \$tag)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>getHeaders()-\/>add(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_header_1_1_tag_header}{TagHeader}}(\$tag));}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00514}00514\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00516}00516\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00517}00517\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00524}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ab70eec31d4a07843feaca34c57b5d91d}{00524}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ab70eec31d4a07843feaca34c57b5d91d}{buildMetadata}}(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00525}00525\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>metadata)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00527}00527\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>metadata\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00528}00528\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>getHeaders()-\/>add(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_header_1_1_metadata_header}{MetadataHeader}}(\$key,\ \$value));}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00530}00530\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00531}00531\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00533}00533\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00534}00534\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00541}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a0413e77886f17d45a5981cc1274a9942}{00541}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a0413e77886f17d45a5981cc1274a9942}{runCallbacks}}(\$message)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00542}00542\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00543}00543\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>callbacks\ as\ \$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \ \ \ \$callback(\$message-\/>getSymfonyMessage());}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00546}00546\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00547}00547\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00548}00548\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00549}00549\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00556}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ae418186f7b3344acd1295798a2b46960}{00556}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ae418186f7b3344acd1295798a2b46960}{locale}}(\$locale)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00557}00557\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00558}00558\ \ \ \ \ \ \ \ \ \$this-\/>locale\ =\ \$locale;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00559}00559\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00560}00560\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00561}00561\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00571}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ac2f52ee3361c281e803b50397bcb040a}{00571}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ac2f52ee3361c281e803b50397bcb040a}{priority}}(\$level\ =\ 3)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00572}00572\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00573}00573\ \ \ \ \ \ \ \ \ \$this-\/>callbacks[]\ =\ \textcolor{keyword}{function}\ (\$message)\ use\ (\$level)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00574}00574\ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>priority(\$level);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00575}00575\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00576}00576\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00578}00578\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00579}00579\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00587}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a3d54db4ec1c0e4961870bcee62d24d9e}{00587}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a3d54db4ec1c0e4961870bcee62d24d9e}{from}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00588}00588\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00589}00589\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>setAddress(\$address,\ \$name,\ \textcolor{stringliteral}{'from'});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00590}00590\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00591}00591\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00599}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a2b0b71f9b772951a6d28aa0ff73fad4a}{00599}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a2b0b71f9b772951a6d28aa0ff73fad4a}{hasFrom}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00600}00600\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00601}00601\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>hasRecipient(\$address,\ \$name,\ \textcolor{stringliteral}{'from'});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00602}00602\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00603}00603\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00611}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a7c12ec82bceac9560b36d5e2cc87d363}{00611}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a7c12ec82bceac9560b36d5e2cc87d363}{to}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00612}00612\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00613}00613\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>locale\ \&\&\ \$address\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_translation_1_1_has_locale_preference}{HasLocalePreference}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00614}00614\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>locale(\$address-\/>preferredLocale());}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00615}00615\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00616}00616\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00617}00617\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>setAddress(\$address,\ \$name,\ \textcolor{stringliteral}{'to'});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00618}00618\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00619}00619\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00627}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a58da518d13b1efc967f9dbf32e7e29e7}{00627}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a58da518d13b1efc967f9dbf32e7e29e7}{hasTo}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00628}00628\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00629}00629\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>hasRecipient(\$address,\ \$name,\ \textcolor{stringliteral}{'to'});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00630}00630\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00631}00631\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00639}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ab5402373ba5eba9d4d1004a592d8814f}{00639}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ab5402373ba5eba9d4d1004a592d8814f}{cc}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00640}00640\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00641}00641\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>setAddress(\$address,\ \$name,\ \textcolor{stringliteral}{'cc'});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00642}00642\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00643}00643\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00651}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a0f944c48e3954e8a889487a6cd45414d}{00651}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a0f944c48e3954e8a889487a6cd45414d}{hasCc}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00652}00652\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00653}00653\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>hasRecipient(\$address,\ \$name,\ \textcolor{stringliteral}{'cc'});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00654}00654\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00655}00655\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00663}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ade4501f9d8b0c8f1f79d72eaacdd1554}{00663}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ade4501f9d8b0c8f1f79d72eaacdd1554}{bcc}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00664}00664\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00665}00665\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>setAddress(\$address,\ \$name,\ \textcolor{stringliteral}{'bcc'});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00666}00666\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00667}00667\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00675}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a5485f05da10142948efc9f7a3a10e1d5}{00675}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a5485f05da10142948efc9f7a3a10e1d5}{hasBcc}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00676}00676\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00677}00677\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>hasRecipient(\$address,\ \$name,\ \textcolor{stringliteral}{'bcc'});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00678}00678\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00679}00679\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00687}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a85cdc59a9f1707fdb3421e04aa48df1f}{00687}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a85cdc59a9f1707fdb3421e04aa48df1f}{replyTo}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00688}00688\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00689}00689\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>setAddress(\$address,\ \$name,\ \textcolor{stringliteral}{'replyTo'});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00690}00690\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00691}00691\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00699}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a2c8e9d9d0a023d42a465619d8c93cff6}{00699}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a2c8e9d9d0a023d42a465619d8c93cff6}{hasReplyTo}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00700}00700\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00701}00701\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>hasRecipient(\$address,\ \$name,\ \textcolor{stringliteral}{'replyTo'});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00702}00702\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00703}00703\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00714}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ac77f96bfcb51f3201dc82ef9d6dce3a8}{00714}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ac77f96bfcb51f3201dc82ef9d6dce3a8}{setAddress}}(\$address,\ \$name\ =\ \textcolor{keyword}{null},\ \$property\ =\ \textcolor{stringliteral}{'to'})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00715}00715\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00716}00716\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$address))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00717}00717\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00718}00718\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00719}00719\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00720}00720\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>addressesToArray(\$address,\ \$name)\ as\ \$recipient)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00721}00721\ \ \ \ \ \ \ \ \ \ \ \ \ \$recipient\ =\ \$this-\/>normalizeRecipient(\$recipient);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00722}00722\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00723}00723\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\{\$property\}[]\ =\ [}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00724}00724\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ \$recipient-\/>name\ ??\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00725}00725\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'address'}\ =>\ \$recipient-\/>email,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00726}00726\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00727}00727\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00728}00728\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00729}00729\ \ \ \ \ \ \ \ \ \$this-\/>\{\$property\}\ =\ collect(\$this-\/>\{\$property\})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00730}00730\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>reverse()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00731}00731\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>unique(\textcolor{stringliteral}{'address'})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00732}00732\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>reverse()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00733}00733\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>values()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00734}00734\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>all();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00735}00735\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00736}00736\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00737}00737\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00738}00738\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00746}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a83001dab08a4c107775d6208f7c17f76}{00746}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a83001dab08a4c107775d6208f7c17f76}{addressesToArray}}(\$address,\ \$name)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00747}00747\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00748}00748\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_array(\$address)\ \&\&\ !\ \$address\ instanceof\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_collection}{Collection}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00749}00749\ \ \ \ \ \ \ \ \ \ \ \ \ \$address\ =\ is\_string(\$name)\ ?\ [[\textcolor{stringliteral}{'name'}\ =>\ \$name,\ \textcolor{stringliteral}{'email'}\ =>\ \$address]]\ :\ [\$address];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00750}00750\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00751}00751\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00752}00752\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$address;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00753}00753\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00754}00754\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00761}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aa0c2ef5ab23dd8c39a59b17135eeabc9}{00761}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aa0c2ef5ab23dd8c39a59b17135eeabc9}{normalizeRecipient}}(\$recipient)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00762}00762\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00763}00763\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$recipient))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00764}00764\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (array\_values(\$recipient)\ ===\ \$recipient)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00765}00765\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{object})\ array\_map(\textcolor{keyword}{function}\ (\$email)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00766}00766\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ compact(\textcolor{stringliteral}{'email'});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00767}00767\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},\ \$recipient);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00768}00768\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00769}00769\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00770}00770\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{object})\ \$recipient;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00771}00771\ \ \ \ \ \ \ \ \ \}\ elseif\ (is\_string(\$recipient))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00772}00772\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{object})\ [\textcolor{stringliteral}{'email'}\ =>\ \$recipient];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00773}00773\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$recipient\ instanceof\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailables_1_1_address}{Address}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00774}00774\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{object})\ [\textcolor{stringliteral}{'email'}\ =>\ \$recipient-\/>getAddress(),\ \textcolor{stringliteral}{'name'}\ =>\ \$recipient-\/>getName()];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00775}00775\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$recipient\ instanceof\ Mailables\(\backslash\)\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailables_1_1_address}{Address}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00776}00776\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{object})\ [\textcolor{stringliteral}{'email'}\ =>\ \$recipient-\/>address,\ \textcolor{stringliteral}{'name'}\ =>\ \$recipient-\/>name];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00777}00777\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00778}00778\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00779}00779\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$recipient;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00780}00780\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00781}00781\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00790}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a281caf567ae7c565d425fc98efbb2760}{00790}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a281caf567ae7c565d425fc98efbb2760}{hasRecipient}}(\$address,\ \$name\ =\ \textcolor{keyword}{null},\ \$property\ =\ \textcolor{stringliteral}{'to'})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00791}00791\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00792}00792\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$address))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00793}00793\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00794}00794\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00795}00795\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00796}00796\ \ \ \ \ \ \ \ \ \$expected\ =\ \$this-\/>normalizeRecipient(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00797}00797\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>addressesToArray(\$address,\ \$name)[0]}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00798}00798\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00799}00799\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00800}00800\ \ \ \ \ \ \ \ \ \$expected\ =\ [}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00801}00801\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ \$expected-\/>name\ ??\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00802}00802\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'address'}\ =>\ \$expected-\/>email,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00803}00803\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00804}00804\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00805}00805\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>hasEnvelopeRecipient(\$expected[\textcolor{stringliteral}{'address'}],\ \$expected[\textcolor{stringliteral}{'name'}],\ \$property))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00806}00806\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00807}00807\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00808}00808\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00809}00809\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$this-\/>\{\$property\})-\/>contains(\textcolor{keyword}{function}\ (\$actual)\ use\ (\$expected)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00810}00810\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ isset(\$expected[\textcolor{stringliteral}{'name'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00811}00811\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$actual[\textcolor{stringliteral}{'address'}]\ ==\ \$expected[\textcolor{stringliteral}{'address'}];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00812}00812\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00813}00813\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00814}00814\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$actual\ ==\ \$expected;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00815}00815\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00816}00816\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00817}00817\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00826}00826\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ hasEnvelopeRecipient(\$address,\ \$name,\ \$property)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00827}00827\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00828}00828\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ method\_exists(\$this,\ \textcolor{stringliteral}{'envelope'})\ \&\&\ match\ (\$property)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00829}00829\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'from'}\ =>\ \$this-\/>envelope()-\/>isFrom(\$address,\ \$name),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00830}00830\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'to'}\ =>\ \$this-\/>envelope()-\/>hasTo(\$address,\ \$name),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00831}00831\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'cc'}\ =>\ \$this-\/>envelope()-\/>hasCc(\$address,\ \$name),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00832}00832\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'bcc'}\ =>\ \$this-\/>envelope()-\/>hasBcc(\$address,\ \$name),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00833}00833\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'replyTo'}\ =>\ \$this-\/>envelope()-\/>hasReplyTo(\$address,\ \$name),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00834}00834\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00835}00835\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00836}00836\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00843}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aaa61b3aaa6cc4c90e26686e4bf41587a}{00843}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aaa61b3aaa6cc4c90e26686e4bf41587a}{subject}}(\$subject)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00844}00844\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00845}00845\ \ \ \ \ \ \ \ \ \$this-\/>subject\ =\ \$subject;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00846}00846\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00847}00847\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00848}00848\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00849}00849\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00856}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a5db516faa10b79c73b327046e586d516}{00856}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a5db516faa10b79c73b327046e586d516}{hasSubject}}(\$subject)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00857}00857\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00858}00858\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>subject\ ===\ \$subject\ ||}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00859}00859\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (method\_exists(\$this,\ \textcolor{stringliteral}{'envelope'})\ \&\&\ \$this-\/>envelope()-\/>hasSubject(\$subject));}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00860}00860\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00861}00861\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00869}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a052b441e2eb81cd4274126226ce477fa}{00869}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a052b441e2eb81cd4274126226ce477fa}{markdown}}(\$view,\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00870}00870\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00871}00871\ \ \ \ \ \ \ \ \ \$this-\/>markdown\ =\ \$view;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00872}00872\ \ \ \ \ \ \ \ \ \$this-\/>viewData\ =\ array\_merge(\$this-\/>viewData,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00873}00873\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00874}00874\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00875}00875\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00876}00876\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00884}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a9c6d0eaab07b5874e3a3f0af99fd9b9b}{00884}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a9c6d0eaab07b5874e3a3f0af99fd9b9b}{view}}(\$view,\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00885}00885\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00886}00886\ \ \ \ \ \ \ \ \ \$this-\/>view\ =\ \$view;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00887}00887\ \ \ \ \ \ \ \ \ \$this-\/>viewData\ =\ array\_merge(\$this-\/>viewData,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00888}00888\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00889}00889\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00890}00890\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00891}00891\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00898}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a6bb1870d57f33ca360ca4892b1200ac4}{00898}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a6bb1870d57f33ca360ca4892b1200ac4}{html}}(\$html)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00899}00899\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00900}00900\ \ \ \ \ \ \ \ \ \$this-\/>html\ =\ \$html;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00901}00901\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00902}00902\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00903}00903\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00904}00904\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00912}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aa193130dc3d8f4179c3020ddd8ca135a}{00912}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aa193130dc3d8f4179c3020ddd8ca135a}{text}}(\$textView,\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00913}00913\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00914}00914\ \ \ \ \ \ \ \ \ \$this-\/>textView\ =\ \$textView;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00915}00915\ \ \ \ \ \ \ \ \ \$this-\/>viewData\ =\ array\_merge(\$this-\/>viewData,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00916}00916\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00917}00917\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00918}00918\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00919}00919\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00927}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a17b7d86a55dc9070c9d743e3ae3147a5}{00927}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a17b7d86a55dc9070c9d743e3ae3147a5}{with}}(\$key,\ \$value\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00928}00928\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00929}00929\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$key))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00930}00930\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>viewData\ =\ array\_merge(\$this-\/>viewData,\ \$key);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00931}00931\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00932}00932\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>viewData[\$key]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00933}00933\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00934}00934\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00935}00935\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00936}00936\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00937}00937\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00945}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a527a54f9bd895f13502eef80cd7f38cd}{00945}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a527a54f9bd895f13502eef80cd7f38cd}{attach}}(\$file,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00946}00946\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00947}00947\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$file\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_mail_1_1_attachable}{Attachable}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00948}00948\ \ \ \ \ \ \ \ \ \ \ \ \ \$file\ =\ \$file-\/>toMailAttachment();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00949}00949\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00950}00950\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00951}00951\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$file\ instanceof\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_attachment}{Attachment}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00952}00952\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$file-\/>attachTo(\$this,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00953}00953\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00954}00954\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00955}00955\ \ \ \ \ \ \ \ \ \$this-\/>attachments\ =\ collect(\$this-\/>attachments)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00956}00956\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>push(compact(\textcolor{stringliteral}{'file'},\ \textcolor{stringliteral}{'options'}))}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00957}00957\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>unique(\textcolor{stringliteral}{'file'})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00958}00958\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>all();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00959}00959\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00960}00960\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00961}00961\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00962}00962\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00969}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aca4a2bbe728d317855011d3338f0710d}{00969}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aca4a2bbe728d317855011d3338f0710d}{attachMany}}(\$files)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00970}00970\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00971}00971\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$files\ as\ \$file\ =>\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00972}00972\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_int(\$file))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00973}00973\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>attach(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00974}00974\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00975}00975\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>attach(\$file,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00976}00976\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00977}00977\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00978}00978\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00979}00979\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00980}00980\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00981}00981\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00989}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ae0539aea0b2cd3c98291ec386998354a}{00989}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ae0539aea0b2cd3c98291ec386998354a}{hasAttachment}}(\$file,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00990}00990\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00991}00991\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$file\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_mail_1_1_attachable}{Attachable}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00992}00992\ \ \ \ \ \ \ \ \ \ \ \ \ \$file\ =\ \$file-\/>toMailAttachment();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00993}00993\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00994}00994\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00995}00995\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$file\ instanceof\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_attachment}{Attachment}}\ \&\&\ \$this-\/>hasEnvelopeAttachment(\$file,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00996}00996\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00997}00997\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00998}00998\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l00999}00999\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$file\ instanceof\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_attachment}{Attachment}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01000}01000\ \ \ \ \ \ \ \ \ \ \ \ \ \$parts\ =\ \$file-\/>attachWith(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01001}01001\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fn\ (\$path)\ =>\ [\$path,\ [}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01002}01002\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'as'}\ =>\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'as'}]\ ??\ \$file-\/>as,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01003}01003\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'mime'}\ =>\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'mime'}]\ ??\ \$file-\/>mime,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01004}01004\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ]],}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01005}01005\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fn\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})\ =>\ \$this-\/>hasAttachedData(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}(),\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'as'}]\ ??\ \$file-\/>as,\ [\textcolor{stringliteral}{'mime'}\ =>\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'mime'}]\ ??\ \$file-\/>mime])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01006}01006\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01007}01007\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01008}01008\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$parts\ ===\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01009}01009\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01010}01010\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01011}01011\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01012}01012\ \ \ \ \ \ \ \ \ \ \ \ \ [\$file,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}]\ =\ \$parts\ ===\ \textcolor{keyword}{false}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01013}01013\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ [\textcolor{keyword}{null},\ []]}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01014}01014\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$parts;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01015}01015\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01016}01016\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01017}01017\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$this-\/>attachments)-\/>contains(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01018}01018\ \ \ \ \ \ \ \ \ \ \ \ \ fn\ (\$attachment)\ =>\ \$attachment[\textcolor{stringliteral}{'file'}]\ ===\ \$file\ \&\&\ array\_filter(\$attachment[\textcolor{stringliteral}{'options'}])\ ===\ array\_filter(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01019}01019\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01020}01020\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01021}01021\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01029}01029\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ hasEnvelopeAttachment(\$attachment,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01030}01030\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01031}01031\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ method\_exists(\$this,\ \textcolor{stringliteral}{'envelope'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01032}01032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01033}01033\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01034}01034\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01035}01035\ \ \ \ \ \ \ \ \ \$attachments\ =\ \$this-\/>attachments();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01036}01036\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01037}01037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Collection::make(is\_object(\$attachments)\ ?\ [\$attachments]\ :\ \$attachments)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01038}01038\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>map(fn\ (\$attached)\ =>\ \$attached\ instanceof\ Attachable\ ?\ \$attached-\/>toMailAttachment()\ :\ \$attached)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01039}01039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>contains(fn\ (\$attached)\ =>\ \$attached-\/>isEquivalent(\$attachment,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}));}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01040}01040\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01041}01041\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01050}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a9b3bf836c378af8981beeb5ae1983147}{01050}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a9b3bf836c378af8981beeb5ae1983147}{attachFromStorage}}(\$path,\ \$name\ =\ \textcolor{keyword}{null},\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01051}01051\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01052}01052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>attachFromStorageDisk(\textcolor{keyword}{null},\ \$path,\ \$name,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01053}01053\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01054}01054\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01064}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aee0776fddfdedfa123b51efaeafba95d}{01064}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aee0776fddfdedfa123b51efaeafba95d}{attachFromStorageDisk}}(\$disk,\ \$path,\ \$name\ =\ \textcolor{keyword}{null},\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01065}01065\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01066}01066\ \ \ \ \ \ \ \ \ \$this-\/>diskAttachments\ =\ collect(\$this-\/>diskAttachments)-\/>push([}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01067}01067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'disk'}\ =>\ \$disk,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01068}01068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'path'}\ =>\ \$path,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01069}01069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ \$name\ ??\ basename(\$path),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01070}01070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'options'}\ =>\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01071}01071\ \ \ \ \ \ \ \ \ ])-\/>unique(\textcolor{keyword}{function}\ (\$file)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01072}01072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$file[\textcolor{stringliteral}{'name'}].\$file[\textcolor{stringliteral}{'disk'}].\$file[\textcolor{stringliteral}{'path'}];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01073}01073\ \ \ \ \ \ \ \ \ \})-\/>all();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01074}01074\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01075}01075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01076}01076\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01077}01077\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01086}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ab181b021c29534944d4a3494138b6a18}{01086}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ab181b021c29534944d4a3494138b6a18}{hasAttachmentFromStorage}}(\$path,\ \$name\ =\ \textcolor{keyword}{null},\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01087}01087\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01088}01088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>hasAttachmentFromStorageDisk(\textcolor{keyword}{null},\ \$path,\ \$name,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01089}01089\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01090}01090\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01100}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a895868fdabecb6f0faa3d8c1b0b0d7d4}{01100}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a895868fdabecb6f0faa3d8c1b0b0d7d4}{hasAttachmentFromStorageDisk}}(\$disk,\ \$path,\ \$name\ =\ \textcolor{keyword}{null},\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01101}01101\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01102}01102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$this-\/>diskAttachments)-\/>contains(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01103}01103\ \ \ \ \ \ \ \ \ \ \ \ \ fn\ (\$attachment)\ =>\ \$attachment[\textcolor{stringliteral}{'disk'}]\ ===\ \$disk}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01104}01104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ \$attachment[\textcolor{stringliteral}{'path'}]\ ===\ \$path}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01105}01105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ \$attachment[\textcolor{stringliteral}{'name'}]\ ===\ (\$name\ ??\ basename(\$path))}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01106}01106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ \$attachment[\textcolor{stringliteral}{'options'}]\ ===\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01107}01107\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01108}01108\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01109}01109\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01118}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a14a1192623bea52269d5099989f90cc5}{01118}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a14a1192623bea52269d5099989f90cc5}{attachData}}(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$name,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01119}01119\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01120}01120\ \ \ \ \ \ \ \ \ \$this-\/>rawAttachments\ =\ collect(\$this-\/>rawAttachments)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01121}01121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>push(compact(\textcolor{stringliteral}{'data'},\ \textcolor{stringliteral}{'name'},\ \textcolor{stringliteral}{'options'}))}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01122}01122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>unique(\textcolor{keyword}{function}\ (\$file)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01123}01123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$file[\textcolor{stringliteral}{'name'}].\$file[\textcolor{stringliteral}{'data'}];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01124}01124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \})-\/>all();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01125}01125\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01126}01126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01127}01127\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01128}01128\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01137}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a8c730a5ea7d7f467f27d4a9498796c29}{01137}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a8c730a5ea7d7f467f27d4a9498796c29}{hasAttachedData}}(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$name,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01138}01138\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01139}01139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$this-\/>rawAttachments)-\/>contains(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01140}01140\ \ \ \ \ \ \ \ \ \ \ \ \ fn\ (\$attachment)\ =>\ \$attachment[\textcolor{stringliteral}{'data'}]\ ===\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01141}01141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ \$attachment[\textcolor{stringliteral}{'name'}]\ ===\ \$name}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01142}01142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ array\_filter(\$attachment[\textcolor{stringliteral}{'options'}])\ ===\ array\_filter(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01143}01143\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01144}01144\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01145}01145\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01152}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a9b636f8639e4c9e7bc4963a274d7a4ae}{01152}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a9b636f8639e4c9e7bc4963a274d7a4ae}{tag}}(\$value)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01153}01153\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01154}01154\ \ \ \ \ \ \ \ \ array\_push(\$this-\/>tags,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01155}01155\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01156}01156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01157}01157\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01158}01158\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01165}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad8e516a80f9c01f85c32410363fe0f63}{01165}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad8e516a80f9c01f85c32410363fe0f63}{hasTag}}(\$value)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01166}01166\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01167}01167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ in\_array(\$value,\ \$this-\/>tags)\ ||}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01168}01168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (method\_exists(\$this,\ \textcolor{stringliteral}{'envelope'})\ \&\&\ in\_array(\$value,\ \$this-\/>envelope()-\/>tags));}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01169}01169\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01170}01170\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01178}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ae61a9717c369feab2dbf91370fd86862}{01178}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ae61a9717c369feab2dbf91370fd86862}{metadata}}(\$key,\ \$value)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01179}01179\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01180}01180\ \ \ \ \ \ \ \ \ \$this-\/>metadata[\$key]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01181}01181\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01182}01182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01183}01183\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01184}01184\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01192}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a2bb89e5548d7c13ea94a28904d1d8ce5}{01192}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a2bb89e5548d7c13ea94a28904d1d8ce5}{hasMetadata}}(\$key,\ \$value)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01193}01193\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01194}01194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (isset(\$this-\/>metadata[\$key])\ \&\&\ \$this-\/>metadata[\$key]\ ===\ \$value)\ ||}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01195}01195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (method\_exists(\$this,\ \textcolor{stringliteral}{'envelope'})\ \&\&\ \$this-\/>envelope()-\/>hasMetadata(\$key,\ \$value));}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01196}01196\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01197}01197\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01205}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_acc8e92bee25a1e16b63825d59d3430b8}{01205}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_acc8e92bee25a1e16b63825d59d3430b8}{assertFrom}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01206}01206\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01207}01207\ \ \ \ \ \ \ \ \ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01208}01208\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01209}01209\ \ \ \ \ \ \ \ \ \$recipient\ =\ \$this-\/>formatAssertionRecipient(\$address,\ \$name);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01210}01210\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01211}01211\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a965043a39c8c43a9c984eb8521c52923}{PHPUnit::assertTrue}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01212}01212\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasFrom(\$address,\ \$name),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01213}01213\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Email\ was\ not\ from\ expected\ address\ [\{\$recipient\}]."{}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01214}01214\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01215}01215\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01216}01216\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01217}01217\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01218}01218\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01226}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a7cbda0c7a2413c281ca80789785a0ab6}{01226}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a7cbda0c7a2413c281ca80789785a0ab6}{assertTo}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01227}01227\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01228}01228\ \ \ \ \ \ \ \ \ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01229}01229\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01230}01230\ \ \ \ \ \ \ \ \ \$recipient\ =\ \$this-\/>formatAssertionRecipient(\$address,\ \$name);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01231}01231\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01232}01232\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a965043a39c8c43a9c984eb8521c52923}{PHPUnit::assertTrue}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01233}01233\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasTo(\$address,\ \$name),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01234}01234\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Did\ not\ see\ expected\ recipient\ [\{\$recipient\}]\ in\ email\ recipients."{}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01235}01235\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01236}01236\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01237}01237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01238}01238\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01239}01239\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01247}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a07cbbe8353bcfa9d9b9c64e025116b8b}{01247}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a07cbbe8353bcfa9d9b9c64e025116b8b}{assertHasTo}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01248}01248\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01249}01249\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>assertTo(\$address,\ \$name);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01250}01250\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01251}01251\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01259}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad3dd1e688cb42d5164af1eb5c84f022e}{01259}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad3dd1e688cb42d5164af1eb5c84f022e}{assertHasCc}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01260}01260\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01261}01261\ \ \ \ \ \ \ \ \ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01262}01262\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01263}01263\ \ \ \ \ \ \ \ \ \$recipient\ =\ \$this-\/>formatAssertionRecipient(\$address,\ \$name);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01264}01264\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01265}01265\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a965043a39c8c43a9c984eb8521c52923}{PHPUnit::assertTrue}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01266}01266\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasCc(\$address,\ \$name),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01267}01267\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Did\ not\ see\ expected\ recipient\ [\{\$recipient\}]\ in\ email\ recipients."{}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01268}01268\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01269}01269\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01270}01270\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01271}01271\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01272}01272\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01280}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aeffca6821303526bfaba2e4503e946ef}{01280}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aeffca6821303526bfaba2e4503e946ef}{assertHasBcc}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01281}01281\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01282}01282\ \ \ \ \ \ \ \ \ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01283}01283\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01284}01284\ \ \ \ \ \ \ \ \ \$recipient\ =\ \$this-\/>formatAssertionRecipient(\$address,\ \$name);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01285}01285\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01286}01286\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a965043a39c8c43a9c984eb8521c52923}{PHPUnit::assertTrue}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01287}01287\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasBcc(\$address,\ \$name),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01288}01288\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Did\ not\ see\ expected\ recipient\ [\{\$recipient\}]\ in\ email\ recipients."{}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01289}01289\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01290}01290\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01291}01291\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01292}01292\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01293}01293\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01301}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad3039fcfe4ffcfd9743d115dd99ea9ad}{01301}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad3039fcfe4ffcfd9743d115dd99ea9ad}{assertHasReplyTo}}(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01302}01302\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01303}01303\ \ \ \ \ \ \ \ \ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01304}01304\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01305}01305\ \ \ \ \ \ \ \ \ \$replyTo\ =\ \$this-\/>formatAssertionRecipient(\$address,\ \$name);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01306}01306\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01307}01307\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a965043a39c8c43a9c984eb8521c52923}{PHPUnit::assertTrue}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01308}01308\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasReplyTo(\$address,\ \$name),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01309}01309\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Did\ not\ see\ expected\ address\ [\{\$replyTo\}]\ as\ email\ 'reply\ to'\ recipient."{}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01310}01310\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01311}01311\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01312}01312\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01313}01313\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01314}01314\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01322}01322\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ formatAssertionRecipient(\$address,\ \$name\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01323}01323\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01324}01324\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_string(\$address))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01325}01325\ \ \ \ \ \ \ \ \ \ \ \ \ \$address\ =\ json\_encode(\$address);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01326}01326\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01327}01327\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01328}01328\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (filled(\$name))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01329}01329\ \ \ \ \ \ \ \ \ \ \ \ \ \$address\ .=\ \textcolor{stringliteral}{'\ ('}.\$name.\textcolor{charliteral}{')'};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01330}01330\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01331}01331\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01332}01332\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$address;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01333}01333\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01334}01334\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01341}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a101249090b04861776999a28697443db}{01341}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a101249090b04861776999a28697443db}{assertHasSubject}}(\$subject)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01342}01342\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01343}01343\ \ \ \ \ \ \ \ \ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01344}01344\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01345}01345\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a965043a39c8c43a9c984eb8521c52923}{PHPUnit::assertTrue}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01346}01346\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasSubject(\$subject),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01347}01347\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Did\ not\ see\ expected\ text\ [\{\$subject\}]\ in\ email\ subject."{}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01348}01348\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01349}01349\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01350}01350\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01351}01351\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01352}01352\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01360}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a97c26d438c205c0b4140d42646aa36ac}{01360}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a97c26d438c205c0b4140d42646aa36ac}{assertSeeInHtml}}(\$string,\ \$escape\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01361}01361\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01362}01362\ \ \ \ \ \ \ \ \ \$string\ =\ \$escape\ ?\ e(\$string)\ :\ \$string;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01363}01363\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01364}01364\ \ \ \ \ \ \ \ \ [\$html,\ \$text]\ =\ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01365}01365\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01366}01366\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a340acaf1255e21429685dade1496b9bc}{PHPUnit::assertStringContainsString}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01367}01367\ \ \ \ \ \ \ \ \ \ \ \ \ \$string,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01368}01368\ \ \ \ \ \ \ \ \ \ \ \ \ \$html,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01369}01369\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Did\ not\ see\ expected\ text\ [\{\$string\}]\ within\ email\ body."{}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01370}01370\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01371}01371\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01372}01372\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01373}01373\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01374}01374\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01382}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad12a0b7a4a63c6762eb53dfab501dfac}{01382}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ad12a0b7a4a63c6762eb53dfab501dfac}{assertDontSeeInHtml}}(\$string,\ \$escape\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01383}01383\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01384}01384\ \ \ \ \ \ \ \ \ \$string\ =\ \$escape\ ?\ e(\$string)\ :\ \$string;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01385}01385\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01386}01386\ \ \ \ \ \ \ \ \ [\$html,\ \$text]\ =\ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01387}01387\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01388}01388\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a84c919b220b7d7e3ad9c00b1130f22ca}{PHPUnit::assertStringNotContainsString}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01389}01389\ \ \ \ \ \ \ \ \ \ \ \ \ \$string,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01390}01390\ \ \ \ \ \ \ \ \ \ \ \ \ \$html,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01391}01391\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Saw\ unexpected\ text\ [\{\$string\}]\ within\ email\ body."{}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01392}01392\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01393}01393\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01394}01394\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01395}01395\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01396}01396\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01404}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a4f4e0e3979f4f2064f04d1a4ec855bae}{01404}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a4f4e0e3979f4f2064f04d1a4ec855bae}{assertSeeInOrderInHtml}}(\$strings,\ \$escape\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01405}01405\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01406}01406\ \ \ \ \ \ \ \ \ \$strings\ =\ \$escape\ ?\ array\_map(\textcolor{charliteral}{'e'},\ \$strings)\ :\ \$strings;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01407}01407\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01408}01408\ \ \ \ \ \ \ \ \ [\$html,\ \$text]\ =\ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01409}01409\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01410}01410\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_aa6f6a8f1474e2c8381d50438e814972b}{PHPUnit::assertThat}}(\$strings,\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_testing_1_1_constraints_1_1_see_in_order}{SeeInOrder}}(\$html));}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01411}01411\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01412}01412\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01413}01413\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01414}01414\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01421}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a73387272e4c4f5a2c33b67bcc0e1b33a}{01421}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a73387272e4c4f5a2c33b67bcc0e1b33a}{assertSeeInText}}(\$string)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01422}01422\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01423}01423\ \ \ \ \ \ \ \ \ [\$html,\ \$text]\ =\ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01424}01424\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01425}01425\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a340acaf1255e21429685dade1496b9bc}{PHPUnit::assertStringContainsString}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01426}01426\ \ \ \ \ \ \ \ \ \ \ \ \ \$string,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01427}01427\ \ \ \ \ \ \ \ \ \ \ \ \ \$text,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01428}01428\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Did\ not\ see\ expected\ text\ [\{\$string\}]\ within\ text\ email\ body."{}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01429}01429\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01430}01430\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01431}01431\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01432}01432\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01433}01433\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01440}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a7148bac434b7710c5f60af3acf86cdde}{01440}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a7148bac434b7710c5f60af3acf86cdde}{assertDontSeeInText}}(\$string)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01441}01441\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01442}01442\ \ \ \ \ \ \ \ \ [\$html,\ \$text]\ =\ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01443}01443\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01444}01444\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a84c919b220b7d7e3ad9c00b1130f22ca}{PHPUnit::assertStringNotContainsString}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01445}01445\ \ \ \ \ \ \ \ \ \ \ \ \ \$string,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01446}01446\ \ \ \ \ \ \ \ \ \ \ \ \ \$text,}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01447}01447\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Saw\ unexpected\ text\ [\{\$string\}]\ within\ text\ email\ body."{}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01448}01448\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01449}01449\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01450}01450\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01451}01451\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01452}01452\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01459}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a929fe759ddb4df66e95ee9cdfca34f39}{01459}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a929fe759ddb4df66e95ee9cdfca34f39}{assertSeeInOrderInText}}(\$strings)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01460}01460\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01461}01461\ \ \ \ \ \ \ \ \ [\$html,\ \$text]\ =\ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01462}01462\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01463}01463\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_aa6f6a8f1474e2c8381d50438e814972b}{PHPUnit::assertThat}}(\$strings,\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_testing_1_1_constraints_1_1_see_in_order}{SeeInOrder}}(\$text));}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01464}01464\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01465}01465\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01466}01466\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01467}01467\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01475}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aba2ecb2ec72b2d62c599e588980c1c96}{01475}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_aba2ecb2ec72b2d62c599e588980c1c96}{assertHasAttachment}}(\$file,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01476}01476\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01477}01477\ \ \ \ \ \ \ \ \ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01478}01478\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01479}01479\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a965043a39c8c43a9c984eb8521c52923}{PHPUnit::assertTrue}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01480}01480\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasAttachment(\$file,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01481}01481\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Did\ not\ find\ the\ expected\ attachment.'}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01482}01482\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01483}01483\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01484}01484\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01485}01485\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01486}01486\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01495}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a1eebe25d4205afa4e5c611a285da9f74}{01495}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a1eebe25d4205afa4e5c611a285da9f74}{assertHasAttachedData}}(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$name,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01496}01496\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01497}01497\ \ \ \ \ \ \ \ \ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01498}01498\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01499}01499\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a965043a39c8c43a9c984eb8521c52923}{PHPUnit::assertTrue}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01500}01500\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasAttachedData(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$name,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01501}01501\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Did\ not\ find\ the\ expected\ attachment.'}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01502}01502\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01503}01503\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01504}01504\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01505}01505\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01506}01506\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01515}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a00e8e02a34f208391fe6864353eefa1e}{01515}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a00e8e02a34f208391fe6864353eefa1e}{assertHasAttachmentFromStorage}}(\$path,\ \$name\ =\ \textcolor{keyword}{null},\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01516}01516\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01517}01517\ \ \ \ \ \ \ \ \ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01518}01518\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01519}01519\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a965043a39c8c43a9c984eb8521c52923}{PHPUnit::assertTrue}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01520}01520\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasAttachmentFromStorage(\$path,\ \$name,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01521}01521\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Did\ not\ find\ the\ expected\ attachment.'}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01522}01522\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01523}01523\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01524}01524\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01525}01525\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01526}01526\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01536}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_abc87aad9bed52412f782998914b2caf8}{01536}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_abc87aad9bed52412f782998914b2caf8}{assertHasAttachmentFromStorageDisk}}(\$disk,\ \$path,\ \$name\ =\ \textcolor{keyword}{null},\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01537}01537\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01538}01538\ \ \ \ \ \ \ \ \ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01539}01539\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01540}01540\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a965043a39c8c43a9c984eb8521c52923}{PHPUnit::assertTrue}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01541}01541\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasAttachmentFromStorageDisk(\$disk,\ \$path,\ \$name,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01542}01542\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Did\ not\ find\ the\ expected\ attachment.'}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01543}01543\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01544}01544\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01545}01545\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01546}01546\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01547}01547\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01554}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a3d10bed7b2b8e451d22e5dafa8e98e94}{01554}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a3d10bed7b2b8e451d22e5dafa8e98e94}{assertHasTag}}(\$tag)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01555}01555\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01556}01556\ \ \ \ \ \ \ \ \ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01557}01557\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01558}01558\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a965043a39c8c43a9c984eb8521c52923}{PHPUnit::assertTrue}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01559}01559\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasTag(\$tag),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01560}01560\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Did\ not\ see\ expected\ tag\ [\{\$tag\}]\ in\ email\ tags."{}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01561}01561\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01562}01562\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01563}01563\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01564}01564\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01565}01565\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01573}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a1fcf3e81e74257e2e752550dc8a6e5a8}{01573}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a1fcf3e81e74257e2e752550dc8a6e5a8}{assertHasMetadata}}(\$key,\ \$value)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01574}01574\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01575}01575\ \ \ \ \ \ \ \ \ \$this-\/>renderForAssertions();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01576}01576\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01577}01577\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_assert_a965043a39c8c43a9c984eb8521c52923}{PHPUnit::assertTrue}}(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01578}01578\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasMetadata(\$key,\ \$value),}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01579}01579\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Did\ not\ see\ expected\ key\ [\{\$key\}]\ and\ value\ [\{\$value\}]\ in\ email\ metadata."{}}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01580}01580\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01581}01581\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01582}01582\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01583}01583\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01584}01584\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01592}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a2e483e92978ec91007c62bfbe929d306}{01592}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a2e483e92978ec91007c62bfbe929d306}{renderForAssertions}}()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01593}01593\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01594}01594\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>assertionableRenderStrings)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01595}01595\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>assertionableRenderStrings;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01596}01596\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01597}01597\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01598}01598\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>assertionableRenderStrings\ =\ \$this-\/>withLocale(\$this-\/>locale,\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01599}01599\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>prepareMailableForDelivery();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01600}01600\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01601}01601\ \ \ \ \ \ \ \ \ \ \ \ \ \$html\ =\ Container::getInstance()-\/>make(\textcolor{stringliteral}{'mailer'})-\/>render(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01602}01602\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$view\ =\ \$this-\/>buildView(),\ \$this-\/>buildViewData()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01603}01603\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01604}01604\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01605}01605\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$view)\ \&\&\ isset(\$view[1]))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01606}01606\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$text\ =\ \$view[1];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01607}01607\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01608}01608\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01609}01609\ \ \ \ \ \ \ \ \ \ \ \ \ \$text\ ??=\ \$view[\textcolor{stringliteral}{'text'}]\ ??\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01610}01610\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01611}01611\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ empty(\$text)\ \&\&\ !\ \$text\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_htmlable}{Htmlable}})\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01612}01612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$text\ =\ Container::getInstance()-\/>make(\textcolor{stringliteral}{'mailer'})-\/>render(}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01613}01613\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$text,\ \$this-\/>buildViewData()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01614}01614\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01615}01615\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01616}01616\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01617}01617\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [(string)\ \$html,\ (\textcolor{keywordtype}{string})\ \$text];}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01618}01618\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01619}01619\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01620}01620\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01626}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a670361bd4092b996f4554978558bd3cb}{01626}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a670361bd4092b996f4554978558bd3cb}{prepareMailableForDelivery}}()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01627}01627\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01628}01628\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (method\_exists(\$this,\ \textcolor{stringliteral}{'build'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01629}01629\ \ \ \ \ \ \ \ \ \ \ \ \ Container::getInstance()-\/>call([\$this,\ \textcolor{stringliteral}{'build'}]);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01630}01630\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01631}01631\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01632}01632\ \ \ \ \ \ \ \ \ \$this-\/>ensureHeadersAreHydrated();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01633}01633\ \ \ \ \ \ \ \ \ \$this-\/>ensureEnvelopeIsHydrated();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01634}01634\ \ \ \ \ \ \ \ \ \$this-\/>ensureContentIsHydrated();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01635}01635\ \ \ \ \ \ \ \ \ \$this-\/>ensureAttachmentsAreHydrated();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01636}01636\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01637}01637\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01643}01643\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ ensureHeadersAreHydrated()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01644}01644\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01645}01645\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ method\_exists(\$this,\ \textcolor{stringliteral}{'headers'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01646}01646\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01647}01647\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01648}01648\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01649}01649\ \ \ \ \ \ \ \ \ \$headers\ =\ \$this-\/>headers();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01650}01650\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01651}01651\ \ \ \ \ \ \ \ \ \$this-\/>withSymfonyMessage(\textcolor{keyword}{function}\ (\$message)\ use\ (\$headers)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01652}01652\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$headers-\/>messageId)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01653}01653\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>getHeaders()-\/>addIdHeader(\textcolor{stringliteral}{'Message-\/Id'},\ \$headers-\/>messageId);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01654}01654\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01655}01655\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01656}01656\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_ab7b0934f179386acaa4ad69fb6e3c8e6}{if}}\ (count(\$headers-\/>references)\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01657}01657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>getHeaders()-\/>addTextHeader(\textcolor{stringliteral}{'References'},\ \$headers-\/>referencesString());}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01658}01658\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01659}01659\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01660}01660\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8html_8php_a60d7df1792291b4917a23f3a7f7a633e}{foreach}}\ (\$headers-\/>text\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01661}01661\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message-\/>getHeaders()-\/>addTextHeader(\$key,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01662}01662\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01663}01663\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01664}01664\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01665}01665\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01671}01671\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ ensureEnvelopeIsHydrated()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01672}01672\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01673}01673\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ method\_exists(\$this,\ \textcolor{stringliteral}{'envelope'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01674}01674\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01675}01675\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01676}01676\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01677}01677\ \ \ \ \ \ \ \ \ \$envelope\ =\ \$this-\/>envelope();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01678}01678\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01679}01679\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$envelope-\/>from))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01680}01680\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a4e3d0d4b626e0ee57b533d53e6025d11}{from}}(\$envelope-\/>from-\/>address,\ \$envelope-\/>from-\/>name);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01681}01681\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01682}01682\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01683}01683\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ ([\textcolor{stringliteral}{'to'},\ \textcolor{stringliteral}{'cc'},\ \textcolor{stringliteral}{'bcc'},\ \textcolor{stringliteral}{'replyTo'}]\ as\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01684}01684\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$envelope-\/>\{\$type\}\ as\ \$address)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01685}01685\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\{\$type\}(\$address-\/>address,\ \$address-\/>name);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01686}01686\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01687}01687\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01688}01688\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01689}01689\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$envelope-\/>subject)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01690}01690\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>subject(\$envelope-\/>subject);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01691}01691\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01692}01692\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01693}01693\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$envelope-\/>tags\ as\ \$tag)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01694}01694\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>tag(\$tag);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01695}01695\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01696}01696\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01697}01697\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$envelope-\/>metadata\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01698}01698\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>metadata(\$key,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01699}01699\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01700}01700\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01701}01701\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$envelope-\/>using\ as\ \$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01702}01702\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>withSymfonyMessage(\$callback);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01703}01703\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01704}01704\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01705}01705\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01711}01711\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ ensureContentIsHydrated()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01712}01712\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01713}01713\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ method\_exists(\$this,\ \textcolor{stringliteral}{'content'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01714}01714\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01715}01715\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01716}01716\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01717}01717\ \ \ \ \ \ \ \ \ \$content\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_http_a9b80bb36f89498eac4f43bf08461240d}{content}}();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01718}01718\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01719}01719\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$content-\/>view)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01720}01720\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>view(\$content-\/>view);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01721}01721\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01722}01722\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01723}01723\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$content-\/>html)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01724}01724\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>view(\$content-\/>html);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01725}01725\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01726}01726\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01727}01727\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$content-\/>text)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01728}01728\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_laravel_1_1_prompts_a57d04de642ca46c7ea0208bc750de5e9}{text}}(\$content-\/>text);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01729}01729\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01730}01730\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01731}01731\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$content-\/>markdown)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01732}01732\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>markdown(\$content-\/>markdown);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01733}01733\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01734}01734\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01735}01735\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$content-\/>htmlString)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01736}01736\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>html(\$content-\/>htmlString);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01737}01737\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01738}01738\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01739}01739\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$content-\/>with\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01740}01740\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>with(\$key,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01741}01741\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01742}01742\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01743}01743\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01749}01749\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ ensureAttachmentsAreHydrated()}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01750}01750\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01751}01751\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ method\_exists(\$this,\ \textcolor{stringliteral}{'attachments'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01752}01752\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01753}01753\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01754}01754\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01755}01755\ \ \ \ \ \ \ \ \ \$attachments\ =\ \$this-\/>attachments();}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01756}01756\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01757}01757\ \ \ \ \ \ \ \ \ Collection::make(is\_object(\$attachments)\ ?\ [\$attachments]\ :\ \$attachments)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01758}01758\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a250aed01ee1641984f4a8f96be76f927}{each}}(\mbox{\hyperlink{rector-migrate_8php_affc7ca71e2c30ccc9604c2697809c870}{function}}\ (\$attachment)\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01759}01759\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a527a54f9bd895f13502eef80cd7f38cd}{attach}}(\$attachment);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01760}01760\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01761}01761\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01762}01762\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01769}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a2c6689967849957013ddef308e400940}{01769}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_a2c6689967849957013ddef308e400940}{mailer}}(\$mailer)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01770}01770\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01771}01771\ \ \ \ \ \ \ \ \ \$this-\/>mailer\ =\ \$mailer;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01772}01772\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01773}01773\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01774}01774\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01775}01775\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01782}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_abe5d1138ff63c7959ecc533a4693d536}{01782}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_abe5d1138ff63c7959ecc533a4693d536}{withSymfonyMessage}}(\$callback)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01783}01783\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01784}01784\ \ \ \ \ \ \ \ \ \$this-\/>callbacks[]\ =\ \$callback;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01785}01785\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01786}01786\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01787}01787\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01788}01788\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01795}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ac3824a5b3074ab930d7aef8beca4b6d2}{01795}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ac3824a5b3074ab930d7aef8beca4b6d2}{buildViewDataUsing}}(callable\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01796}01796\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01797}01797\ \ \ \ \ \ \ \ \ static::\$viewDataCallback\ =\ \$callback;}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01798}01798\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01799}01799\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01809}\mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ac565bd6a9d062c73a0a0db7afe0ffea9}{01809}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_mail_1_1_mailable_ac565bd6a9d062c73a0a0db7afe0ffea9}{\_\_call}}(\$method,\ \$parameters)}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01810}01810\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01811}01811\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (static::hasMacro(\$method))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01812}01812\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>macroCall(\$method,\ \$parameters);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01813}01813\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01814}01814\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01815}01815\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\$method,\ \textcolor{stringliteral}{'with'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01816}01816\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>with(Str::camel(substr(\$method,\ 4)),\ \$parameters[0]);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01817}01817\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01818}01818\ }
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01819}01819\ \ \ \ \ \ \ \ \ static::throwBadMethodCallException(\$method);}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01820}01820\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mail_2_mailable_8php_source_l01821}01821\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,311 @@
+\doxysection{Code\+Unit\+Finding\+Visitor.\+php}
+\hypertarget{_code_unit_finding_visitor_8php_source}{}\label{_code_unit_finding_visitor_8php_source}\index{vendor/phpunit/php-\/code-\/coverage/src/StaticAnalysis/CodeUnitFindingVisitor.php@{vendor/phpunit/php-\/code-\/coverage/src/StaticAnalysis/CodeUnitFindingVisitor.php}}
+\mbox{\hyperlink{_code_unit_finding_visitor_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ phpunit/php-\/code-\/coverage.}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)StaticAnalysis}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00012}00012\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ implode;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ rtrim;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ trim;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00016}00016\ use\ \mbox{\hyperlink{namespace_php_parser_1_1_node}{PhpParser\(\backslash\)Node}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_complex_type}{PhpParser\(\backslash\)Node\(\backslash\)ComplexType}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_identifier}{PhpParser\(\backslash\)Node\(\backslash\)Identifier}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_intersection_type}{PhpParser\(\backslash\)Node\(\backslash\)IntersectionType}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00020}00020\ use\ \mbox{\hyperlink{namespace_php_parser_1_1_node_1_1_name}{PhpParser\(\backslash\)Node\(\backslash\)Name}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_nullable_type}{PhpParser\(\backslash\)Node\(\backslash\)NullableType}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_class__}{PhpParser\(\backslash\)Node\(\backslash\)Stmt\(\backslash\)Class\_}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_class_method}{PhpParser\(\backslash\)Node\(\backslash\)Stmt\(\backslash\)ClassMethod}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00024}00024\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_enum__}{PhpParser\(\backslash\)Node\(\backslash\)Stmt\(\backslash\)Enum\_}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00025}00025\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_function__}{PhpParser\(\backslash\)Node\(\backslash\)Stmt\(\backslash\)Function\_}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00026}00026\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_interface__}{PhpParser\(\backslash\)Node\(\backslash\)Stmt\(\backslash\)Interface\_}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00027}00027\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_trait__}{PhpParser\(\backslash\)Node\(\backslash\)Stmt\(\backslash\)Trait\_}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00028}00028\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_union_type}{PhpParser\(\backslash\)Node\(\backslash\)UnionType}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00029}00029\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_traverser}{PhpParser\(\backslash\)NodeTraverser}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00030}00030\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_visitor_abstract}{PhpParser\(\backslash\)NodeVisitorAbstract}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00031}00031\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_complexity_1_1_cyclomatic_complexity_calculating_visitor}{SebastianBergmann\(\backslash\)Complexity\(\backslash\)CyclomaticComplexityCalculatingVisitor}};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00070}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor}{00070}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor}{CodeUnitFindingVisitor}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_php_parser_1_1_node_visitor_abstract}{NodeVisitorAbstract}}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00071}00071\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00075}00075\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$classes\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00080}00080\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$traits\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00085}00085\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$functions\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00087}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor_a72d9ab2b97095f3bf1c97eb453a386d1}{00087}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor_a72d9ab2b97095f3bf1c97eb453a386d1}{enterNode}}(\mbox{\hyperlink{interface_php_parser_1_1_node}{Node}}\ \$node):\ void}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00088}00088\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_class__}{Class\_}})\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node-\/>isAnonymous())\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>processClass(\$node);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_trait__}{Trait\_}})\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>processTrait(\$node);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$node\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_class_method}{ClassMethod}}\ \&\&\ !\$node\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_function__}{Function\_}})\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_class_method}{ClassMethod}})\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \$parentNode\ =\ \$node-\/>\mbox{\hyperlink{interface_php_parser_1_1_node_a8326238c49c45406cddb3625e0dadf67}{getAttribute}}(\textcolor{stringliteral}{'parent'});}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$parentNode\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_class__}{Class\_}}\ \&\&\ \$parentNode-\/>\mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_class___a1e7b2580aa378d9676b1212e012a177f}{isAnonymous}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>processMethod(\$node);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \$this-\/>processFunction(\$node);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00118}00118\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00123}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor_a0d4621fbde6e250d9475bb858b877c5e}{00123}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor_a0d4621fbde6e250d9475bb858b877c5e}{classes}}():\ array}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00124}00124\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>classes;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00131}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor_a7c4ffaba1f26678ced320c5787c3d590}{00131}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor_a7c4ffaba1f26678ced320c5787c3d590}{traits}}():\ array}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00132}00132\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>traits;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00134}00134\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00139}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor_a080c9835b216730f385f2d426b560af2}{00139}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor_a080c9835b216730f385f2d426b560af2}{functions}}():\ array}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00140}00140\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>functions;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00142}00142\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00144}00144\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ cyclomaticComplexity(\mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_class_method}{ClassMethod}}|\mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_function__}{Function\_}}\ \$node):\ int}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00145}00145\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \$nodes\ =\ \$node-\/>\mbox{\hyperlink{class_php_parser_1_1_node_1_1_stmt_1_1_function___a50ff17b7495cc1618bb06708d881e680}{getStmts}}();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$nodes\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \$traverser\ =\ \textcolor{keyword}{new}\ NodeTraverser;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \$cyclomaticComplexityCalculatingVisitor\ =\ \textcolor{keyword}{new}\ CyclomaticComplexityCalculatingVisitor;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \$traverser-\/>addVisitor(\$cyclomaticComplexityCalculatingVisitor);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ @noinspection\ UnusedFunctionResultInspection\ */}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \$traverser-\/>traverse(\$nodes);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$cyclomaticComplexityCalculatingVisitor-\/>cyclomaticComplexity();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00162}00162\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00164}00164\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ signature(ClassMethod|Function\_\ \$node):\ string}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00165}00165\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \$signature\ \ =\ (\$node-\/>returnsByRef()\ ?\ \textcolor{charliteral}{'\&'}\ :\ \textcolor{stringliteral}{''})\ .\ \$node-\/>name-\/>toString()\ .\ \textcolor{charliteral}{'('};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \$parameters\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$node-\/>getParams()\ as\ \$parameter)\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ assert(isset(\$parameter-\/>var-\/>name));}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \$parameterAsString\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$parameter-\/>type\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$parameterAsString\ =\ \$this-\/>type(\$parameter-\/>type)\ .\ \textcolor{charliteral}{'\ '};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \$parameterAsString\ .=\ \textcolor{charliteral}{'\$'}\ .\ \$parameter-\/>var-\/>name;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ @todo\ Handle\ default\ values\ */}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \$parameters[]\ =\ \$parameterAsString;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \$signature\ .=\ implode(\textcolor{stringliteral}{',\ '},\ \$parameters)\ .\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \$returnType\ =\ \$node-\/>getReturnType();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$returnType\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \$signature\ .=\ \textcolor{stringliteral}{':\ '}\ .\ \$this-\/>type(\$returnType);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$signature;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00194}00194\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00196}00196\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ type(Identifier|Name|ComplexType\ \$type):\ string}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00197}00197\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$type\ instanceof\ NullableType)\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'?'}\ .\ \$type-\/>type;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$type\ instanceof\ UnionType)\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>unionTypeAsString(\$type);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00205}00205\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$type\ instanceof\ IntersectionType)\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>intersectionTypeAsString(\$type);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$type-\/>toString();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00211}00211\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00213}00213\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ visibility(ClassMethod\ \$node):\ string}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00214}00214\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node-\/>isPrivate())\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'private'};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node-\/>isProtected())\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'protected'};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'public'};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00224}00224\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00226}00226\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ processClass(Class\_\ \$node):\ void}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00227}00227\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}}\ \ \ \ \ \ \ \ \ \ \ =\ \$node-\/>name-\/>toString();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \$namespacedName\ =\ \$node-\/>namespacedName-\/>toString();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor_a0d4621fbde6e250d9475bb858b877c5e}{classes}}[\$namespacedName]\ =\ [}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ \ \ \ \ \ \ \ \ \ \ =>\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}},}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'namespacedName'}\ =>\ \$namespacedName,}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'namespace'}\ \ \ \ \ \ =>\ \$this-\/>\textcolor{keyword}{namespace}(\$namespacedName,\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}}),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'startLine'}\ \ \ \ \ \ =>\ \$node-\/>getStartLine(),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'endLine'}\ \ \ \ \ \ \ \ =>\ \$node-\/>getEndLine(),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'methods'}\ \ \ \ \ \ \ \ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00239}00239\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00241}00241\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ processTrait(Trait\_\ \$node):\ void}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00242}00242\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}}\ \ \ \ \ \ \ \ \ \ \ =\ \$node-\/>name-\/>toString();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \$namespacedName\ =\ \$node-\/>namespacedName-\/>toString();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor_a7c4ffaba1f26678ced320c5787c3d590}{traits}}[\$namespacedName]\ =\ [}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ \ \ \ \ \ \ \ \ \ \ =>\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}},}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'namespacedName'}\ =>\ \$namespacedName,}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'namespace'}\ \ \ \ \ \ =>\ \$this-\/>\textcolor{keyword}{namespace}(\$namespacedName,\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}}),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'startLine'}\ \ \ \ \ \ =>\ \$node-\/>getStartLine(),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'endLine'}\ \ \ \ \ \ \ \ =>\ \$node-\/>getEndLine(),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'methods'}\ \ \ \ \ \ \ \ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00254}00254\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00256}00256\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ processMethod(ClassMethod\ \$node):\ void}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00257}00257\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \$parentNode\ =\ \$node-\/>getAttribute(\textcolor{stringliteral}{'parent'});}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$parentNode\ instanceof\ Interface\_)\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}}(\$parentNode\ instanceof\ Class\_\ ||\ \$parentNode\ instanceof\ Trait\_\ ||\ \$parentNode\ instanceof\ Enum\_);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}}(isset(\$parentNode-\/>name));}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}}(isset(\$parentNode-\/>namespacedName));}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}}(\$parentNode-\/>namespacedName\ instanceof\ Name);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \$parentName\ \ \ \ \ \ \ \ \ \ \ =\ \$parentNode-\/>name-\/>toString();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \$parentNamespacedName\ =\ \$parentNode-\/>namespacedName-\/>toString();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$parentNode\ instanceof\ Class\_)\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \$storage\ =\ \&\$this-\/>classes;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \$storage\ =\ \&\$this-\/>traits;}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$storage[\$parentNamespacedName]))\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \$storage[\$parentNamespacedName]\ =\ [}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ \ \ \ \ \ \ \ \ \ \ =>\ \$parentName,}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'namespacedName'}\ =>\ \$parentNamespacedName,}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'namespace'}\ \ \ \ \ \ =>\ \$this-\/>\textcolor{keyword}{namespace}(\$parentNamespacedName,\ \$parentName),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'startLine'}\ \ \ \ \ \ =>\ \$parentNode-\/>getStartLine(),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'endLine'}\ \ \ \ \ \ \ \ =>\ \$parentNode-\/>getEndLine(),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'methods'}\ \ \ \ \ \ \ \ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \$storage[\$parentNamespacedName][\textcolor{stringliteral}{'methods'}][\$node-\/>name-\/>toString()]\ =\ [}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'methodName'}\ =>\ \$node-\/>name-\/>toString(),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'signature'}\ \ =>\ \$this-\/>signature(\$node),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'visibility'}\ =>\ \$this-\/>visibility(\$node),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'startLine'}\ \ =>\ \$node-\/>getStartLine(),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'endLine'}\ \ \ \ =>\ \$node-\/>getEndLine(),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'ccn'}\ \ \ \ \ \ \ \ =>\ \$this-\/>cyclomaticComplexity(\$node),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00297}00297\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00298}00298\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00299}00299\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ processFunction(Function\_\ \$node):\ void}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00300}00300\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00301}00301\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}}(isset(\$node-\/>name));}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00302}00302\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}}(isset(\$node-\/>namespacedName));}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00303}00303\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}}(\$node-\/>namespacedName\ instanceof\ Name);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00305}00305\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}}\ \ \ \ \ \ \ \ \ \ \ =\ \$node-\/>name-\/>toString();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00306}00306\ \ \ \ \ \ \ \ \ \$namespacedName\ =\ \$node-\/>namespacedName-\/>toString();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00307}00307\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor_a080c9835b216730f385f2d426b560af2}{functions}}[\$namespacedName]\ =\ [}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ \ \ \ \ \ \ \ \ \ \ =>\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}},}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'namespacedName'}\ =>\ \$namespacedName,}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'namespace'}\ \ \ \ \ \ =>\ \$this-\/>\textcolor{keyword}{namespace}(\$namespacedName,\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}}),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'signature'}\ \ \ \ \ \ =>\ \$this-\/>signature(\$node),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'startLine'}\ \ \ \ \ \ =>\ \$node-\/>getStartLine(),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'endLine'}\ \ \ \ \ \ \ \ =>\ \$node-\/>getEndLine(),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'ccn'}\ \ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>cyclomaticComplexity(\$node),}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00317}00317\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00319}\mbox{\hyperlink{namespace_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_code_unit_finding_visitor_1_1string}{00319}}\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ \textcolor{keyword}{namespace}(\textcolor{keywordtype}{string}\ \$namespacedName,\ \textcolor{keywordtype}{string}\ \$name):\ string}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00320}00320\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ trim(rtrim(\$namespacedName,\ \$name),\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'});}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00322}00322\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00324}00324\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ unionTypeAsString(\mbox{\hyperlink{class_php_parser_1_1_node_1_1_union_type}{UnionType}}\ \$node):\ string}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00325}00325\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \$types\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$node-\/>types\ as\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$type\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_intersection_type}{IntersectionType}})\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$types[]\ =\ \textcolor{charliteral}{'('}\ .\ \$this-\/>intersectionTypeAsString(\$type)\ .\ \textcolor{charliteral}{')'};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00331}00331\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00334}00334\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \$types[]\ =\ \$this-\/>typeAsString(\$type);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ implode(\textcolor{charliteral}{'|'},\ \$types);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00339}00339\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00341}00341\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ intersectionTypeAsString(IntersectionType\ \$node):\ string}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00342}00342\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \$types\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00344}00344\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$node-\/>types\ as\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \ \ \$types[]\ =\ \$this-\/>typeAsString(\$type);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00348}00348\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ implode(\textcolor{charliteral}{'\&'},\ \$types);}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00350}00350\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00351}00351\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00352}00352\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ typeAsString(Identifier|Name\ \$node):\ string}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00353}00353\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node\ instanceof\ Name)\ \{}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$node-\/>toCodeString();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00356}00356\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00357}00357\ }
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$node-\/>toString();}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00359}00359\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_code_unit_finding_visitor_8php_source_l00360}00360\ \}}
+
+\end{DoxyCode}

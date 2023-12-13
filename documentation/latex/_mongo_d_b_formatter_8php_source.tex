@@ -1,0 +1,127 @@
+\doxysection{Mongo\+DBFormatter.\+php}
+\hypertarget{_mongo_d_b_formatter_8php_source}{}\label{_mongo_d_b_formatter_8php_source}\index{vendor/monolog/monolog/src/Monolog/Formatter/MongoDBFormatter.php@{vendor/monolog/monolog/src/Monolog/Formatter/MongoDBFormatter.php}}
+\mbox{\hyperlink{_mongo_d_b_formatter_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Monolog\ package.}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Jordi\ Boggiano\ <j.boggiano@seld.be>}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_monolog_1_1_formatter}{Monolog\(\backslash\)Formatter}};}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00014}00014\ use\ MongoDB\(\backslash\)BSON\(\backslash\)Type;}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00015}00015\ use\ MongoDB\(\backslash\)BSON\(\backslash\)UTCDateTime;}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_monolog_1_1_utils}{Monolog\(\backslash\)Utils}};}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_monolog_1_1_log_record}{Monolog\(\backslash\)LogRecord}};}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00024}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter}{00024}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter}{MongoDBFormatter}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{FormatterInterface}}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00025}00025\ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00026}00026\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$exceptionTraceAsString;}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00027}00027\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$maxNestingLevel;}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$isLegacyMongoExt;}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00034}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a995727c46a099e5c36b6f23dcce58c83}{00034}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a995727c46a099e5c36b6f23dcce58c83}{\_\_construct}}(\textcolor{keywordtype}{int}\ \$maxNestingLevel\ =\ 3,\ \textcolor{keywordtype}{bool}\ \$exceptionTraceAsString\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00035}00035\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00036}00036\ \ \ \ \ \ \ \ \ \$this-\/>maxNestingLevel\ =\ max(\$maxNestingLevel,\ 0);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00037}00037\ \ \ \ \ \ \ \ \ \$this-\/>exceptionTraceAsString\ =\ \$exceptionTraceAsString;}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \$this-\/>isLegacyMongoExt\ =\ extension\_loaded(\textcolor{stringliteral}{'mongodb'})\ \&\&\ version\_compare((\textcolor{keywordtype}{string})\ phpversion(\textcolor{stringliteral}{'mongodb'}),\ \textcolor{stringliteral}{'1.1.9'},\ \textcolor{stringliteral}{'<='});}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00040}00040\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00047}00047\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface_ab6d88f2cce9dadb57de1322da02c0a15}{format}}(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record):\ array}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00048}00048\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \$res\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a6c501c3a8ef94b473fb545168088fdac}{formatArray}}(\$record-\/>\mbox{\hyperlink{class_monolog_1_1_log_record_a658defb34762c8f40085aec87e16ba1a}{toArray}}());}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$res;}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00053}00053\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00060}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a11f3cde7544eac9e23b0517d513a362b}{00060}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a11f3cde7544eac9e23b0517d513a362b}{formatBatch}}(array\ \$records):\ array}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00061}00061\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \$formatted\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$records\ as\ \$key\ =>\ \$record)\ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \$formatted[\$key]\ =\ \$this-\/>\mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface_ab6d88f2cce9dadb57de1322da02c0a15}{format}}(\$record);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$formatted;}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00068}00068\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00074}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a6c501c3a8ef94b473fb545168088fdac}{00074}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a6c501c3a8ef94b473fb545168088fdac}{formatArray}}(array\ \$array,\ \textcolor{keywordtype}{int}\ \$nestingLevel\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00075}00075\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>maxNestingLevel\ >\ 0\ \&\&\ \$nestingLevel\ >\ \$this-\/>maxNestingLevel)\ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'[...]'};}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$array\ as\ \$name\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ instanceof\ \(\backslash\)DateTimeInterface)\ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$array[\$name]\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a7d4d38da770760aaa85c497dd6ccacb6}{formatDate}}(\$value,\ \$nestingLevel\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$value\ instanceof\ \(\backslash\)Throwable)\ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$array[\$name]\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a6d00fe4257525d1aac507e395e43fd12}{formatException}}(\$value,\ \$nestingLevel\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (is\_array(\$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$array[\$name]\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a6c501c3a8ef94b473fb545168088fdac}{formatArray}}(\$value,\ \$nestingLevel\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (is\_object(\$value)\ \&\&\ !\$value\ instanceof\ Type)\ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$array[\$name]\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a49827a2cb402d33decb3da2f86f0202d}{formatObject}}(\$value,\ \$nestingLevel\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$array;}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00093}00093\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00099}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a49827a2cb402d33decb3da2f86f0202d}{00099}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a49827a2cb402d33decb3da2f86f0202d}{formatObject}}(\$value,\ \textcolor{keywordtype}{int}\ \$nestingLevel)}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00100}00100\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \$objectVars\ =\ get\_object\_vars(\$value);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \$objectVars[\textcolor{stringliteral}{'class'}]\ =\ \mbox{\hyperlink{class_monolog_1_1_utils_ab18b88929d1e210e006940c48af10743}{Utils::getClass}}(\$value);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a6c501c3a8ef94b473fb545168088fdac}{formatArray}}(\$objectVars,\ \$nestingLevel);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00105}00105\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00110}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a6d00fe4257525d1aac507e395e43fd12}{00110}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a6d00fe4257525d1aac507e395e43fd12}{formatException}}(\(\backslash\)Throwable\ \$exception,\ \textcolor{keywordtype}{int}\ \$nestingLevel)}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00111}00111\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \$formattedException\ =\ [}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'class'}\ =>\ \mbox{\hyperlink{class_monolog_1_1_utils_ab18b88929d1e210e006940c48af10743}{Utils::getClass}}(\$exception),}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'message'}\ =>\ \$exception-\/>getMessage(),}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'code'}\ =>\ (int)\ \$exception-\/>getCode(),}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'file'}\ =>\ \$exception-\/>getFile()\ .\ \textcolor{charliteral}{':'}\ .\ \$exception-\/>getLine(),}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>exceptionTraceAsString\ ===\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \$formattedException[\textcolor{stringliteral}{'trace'}]\ =\ \$exception-\/>getTraceAsString();}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \$formattedException[\textcolor{stringliteral}{'trace'}]\ =\ \$exception-\/>getTrace();}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a6c501c3a8ef94b473fb545168088fdac}{formatArray}}(\$formattedException,\ \$nestingLevel);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00128}\mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a7d4d38da770760aaa85c497dd6ccacb6}{00128}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_mongo_d_b_formatter_a7d4d38da770760aaa85c497dd6ccacb6}{formatDate}}(\(\backslash\)DateTimeInterface\ \$value,\ \textcolor{keywordtype}{int}\ \$nestingLevel):\ UTCDateTime}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00129}00129\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>isLegacyMongoExt)\ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>legacyGetMongoDbDateTime(\$value);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>getMongoDbDateTime(\$value);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00135}00135\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00137}00137\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getMongoDbDateTime(\(\backslash\)DateTimeInterface\ \$value):\ UTCDateTime}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00138}00138\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ UTCDateTime((\textcolor{keywordtype}{int})\ floor(((\textcolor{keywordtype}{float})\ \$value-\/>format(\textcolor{stringliteral}{'U.u'}))\ *\ 1000));}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00140}00140\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00149}00149\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ legacyGetMongoDbDateTime(\(\backslash\)DateTimeInterface\ \$value):\ UTCDateTime}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00150}00150\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \$milliseconds\ =\ floor(((\textcolor{keywordtype}{float})\ \$value-\/>format(\textcolor{stringliteral}{'U.u'}))\ *\ 1000);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \$milliseconds\ =\ (PHP\_INT\_SIZE\ ==\ 8)\ \textcolor{comment}{//64-\/bit\ OS?}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ (\textcolor{keywordtype}{int})\ \$milliseconds}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ :\ (string)\ \$milliseconds;}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ UTCDateTime(\$milliseconds);}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00158}00158\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_mongo_d_b_formatter_8php_source_l00159}00159\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,74 @@
+\chapter{Mailer Component}
+\hypertarget{md_vendor_2symfony_2mailer_2_r_e_a_d_m_e}{}\label{md_vendor_2symfony_2mailer_2_r_e_a_d_m_e}\index{Mailer Component@{Mailer Component}}
+The Mailer component helps sending emails.\hypertarget{md_vendor_2symfony_2mailer_2_r_e_a_d_m_e_autotoc_md2280}{}\doxysection{\texorpdfstring{Getting Started}{Getting Started}}\label{md_vendor_2symfony_2mailer_2_r_e_a_d_m_e_autotoc_md2280}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$\ composer\ require\ symfony/mailer}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_mailer_1_1_transport}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Transport}};}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_mailer}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Mailer}};}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mime_1_1_email}{Symfony\(\backslash\)Component\(\backslash\)Mime\(\backslash\)Email}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$transport\ =\ Transport::fromDsn(\textcolor{stringliteral}{'smtp://localhost'});}
+\DoxyCodeLine{\$mailer\ =\ \textcolor{keyword}{new}\ Mailer(\$transport);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$email\ =\ (\textcolor{keyword}{new}\ Email())}
+\DoxyCodeLine{\ \ \ \ -\/>\mbox{\hyperlink{namespace_illuminate_1_1_foundation_1_1_testing_1_1_concerns_a4e3d0d4b626e0ee57b533d53e6025d11}{from}}(\textcolor{stringliteral}{'hello@example.com'})}
+\DoxyCodeLine{\ \ \ \ -\/>to(\textcolor{stringliteral}{'you@example.com'})}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//-\/>cc('cc@example.com')}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//-\/>bcc('bcc@example.com')}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//-\/>replyTo('fabien@example.com')}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//-\/>priority(Email::PRIORITY\_HIGH)}}
+\DoxyCodeLine{\ \ \ \ -\/>subject(\textcolor{stringliteral}{'Time\ for\ Symfony\ Mailer!'})}
+\DoxyCodeLine{\ \ \ \ -\/>text(\textcolor{stringliteral}{'Sending\ emails\ is\ fun\ again!'})}
+\DoxyCodeLine{\ \ \ \ -\/>html(\textcolor{stringliteral}{'<p>See\ Twig\ integration\ for\ better\ HTML\ integration!</p>'});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$mailer-\/>send(\$email);}
+
+\end{DoxyCode}
+
+
+To enable the Twig integration of the Mailer, require {\ttfamily symfony/twig-\/bridge} and set up the {\ttfamily Body\+Renderer}\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ Symfony\(\backslash\)Bridge\(\backslash\)Twig\(\backslash\)Mime\(\backslash\)BodyRenderer;}
+\DoxyCodeLine{use\ Symfony\(\backslash\)Bridge\(\backslash\)Twig\(\backslash\)Mime\(\backslash\)TemplatedEmail;}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher}{Symfony\(\backslash\)Component\(\backslash\)EventDispatcher\(\backslash\)EventDispatcher}};}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_listener_1_1_message_listener}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)EventListener\(\backslash\)MessageListener}};}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_mailer}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Mailer}};}
+\DoxyCodeLine{use\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_mailer_1_1_transport}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Transport}};}
+\DoxyCodeLine{use\ Twig\(\backslash\)Environment\ as\ TwigEnvironment;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$twig\ =\ \textcolor{keyword}{new}\ TwigEnvironment(...);}
+\DoxyCodeLine{\$messageListener\ =\ \textcolor{keyword}{new}\ MessageListener(\textcolor{keyword}{null},\ \textcolor{keyword}{new}\ BodyRenderer(\$twig));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$eventDispatcher\ =\ \textcolor{keyword}{new}\ EventDispatcher();}
+\DoxyCodeLine{\$eventDispatcher-\/>addSubscriber(\$messageListener);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$transport\ =\ Transport::fromDsn(\textcolor{stringliteral}{'smtp://localhost'},\ \$eventDispatcher);}
+\DoxyCodeLine{\$mailer\ =\ \textcolor{keyword}{new}\ Mailer(\$transport,\ \textcolor{keyword}{null},\ \$eventDispatcher);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$email\ =\ (\textcolor{keyword}{new}\ TemplatedEmail())}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ ...}}
+\DoxyCodeLine{\ \ \ \ -\/>htmlTemplate(\textcolor{stringliteral}{'emails/signup.html.twig'})}
+\DoxyCodeLine{\ \ \ \ -\/>context([}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{'expiration\_date'}\ =>\ \textcolor{keyword}{new}\ \(\backslash\)DateTime(\textcolor{stringliteral}{'+7\ days'}),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{'username'}\ =>\ \textcolor{stringliteral}{'foo'},}
+\DoxyCodeLine{\ \ \ \ ])}
+\DoxyCodeLine{;}
+\DoxyCodeLine{\$mailer-\/>send(\$email);}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2symfony_2mailer_2_r_e_a_d_m_e_autotoc_md2281}{}\doxysection{\texorpdfstring{Resources}{Resources}}\label{md_vendor_2symfony_2mailer_2_r_e_a_d_m_e_autotoc_md2281}
+
+\begin{DoxyItemize}
+\item \href{https://symfony.com/doc/current/mailer.html}{\texttt{ Documentation}}
+\item \href{https://symfony.com/doc/current/contributing/index.html}{\texttt{ Contributing}}
+\item \href{https://github.com/symfony/symfony/issues}{\texttt{ Report issues}} and \href{https://github.com/symfony/symfony/pulls}{\texttt{ send Pull Requests}} in the \href{https://github.com/symfony/symfony}{\texttt{ main Symfony repository}} 
+\end{DoxyItemize}

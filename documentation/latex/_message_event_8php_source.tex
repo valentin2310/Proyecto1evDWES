@@ -1,0 +1,102 @@
+\doxysection{Message\+Event.\+php}
+\hypertarget{_message_event_8php_source}{}\label{_message_event_8php_source}\index{vendor/symfony/mailer/Event/MessageEvent.php@{vendor/symfony/mailer/Event/MessageEvent.php}}
+\mbox{\hyperlink{_message_event_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_mailer_1_1_event}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Event}};}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_envelope}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Envelope}};}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_logic_exception}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Exception\(\backslash\)LogicException}};}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00016}00016\ use\ Symfony\(\backslash\)Component\(\backslash\)Messenger\(\backslash\)Stamp\(\backslash\)StampInterface;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mime_1_1_raw_message}{Symfony\(\backslash\)Component\(\backslash\)Mime\(\backslash\)RawMessage}};}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_symfony_1_1_contracts_1_1_event_dispatcher_1_1_event}{Symfony\(\backslash\)Contracts\(\backslash\)EventDispatcher\(\backslash\)Event}};}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00025}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event}{00025}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event}{MessageEvent}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_symfony_1_1_contracts_1_1_event_dispatcher_1_1_event}{Event}}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00026}00026\ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00027}00027\ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mime_1_1_raw_message}{RawMessage}}\ \$message;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_envelope}{Envelope}}\ \$envelope;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$transport;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$queued;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$rejected\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00034}00034\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$stamps\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00036}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a2a3900c5e17937b4298707a7c960dd6e}{00036}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a2a3900c5e17937b4298707a7c960dd6e}{\_\_construct}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_mime_1_1_raw_message}{RawMessage}}\ \$message,\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_envelope}{Envelope}}\ \$envelope,\ \textcolor{keywordtype}{string}\ \$transport,\ \textcolor{keywordtype}{bool}\ \$queued\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00037}00037\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00038}00038\ \ \ \ \ \ \ \ \ \$this-\/>message\ =\ \$message;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \$this-\/>envelope\ =\ \$envelope;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \$this-\/>transport\ =\ \$transport;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \$this-\/>queued\ =\ \$queued;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00042}00042\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00044}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a0b0e611236742aac18ba1936d03ba89a}{00044}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a0b0e611236742aac18ba1936d03ba89a}{getMessage}}():\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mime_1_1_raw_message}{RawMessage}}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00045}00045\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>message;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00047}00047\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00049}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a756d551d341cd1bf2e0397a30926a70f}{00049}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a756d551d341cd1bf2e0397a30926a70f}{setMessage}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_mime_1_1_raw_message}{RawMessage}}\ \$message):\ void}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00050}00050\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \$this-\/>message\ =\ \$message;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00052}00052\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00054}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a16d85a51fe5b156ff2ddfd3b2c2dfc8f}{00054}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a16d85a51fe5b156ff2ddfd3b2c2dfc8f}{getEnvelope}}():\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_envelope}{Envelope}}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00055}00055\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>envelope;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00057}00057\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00059}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_ace6f5dac395d56ad1ab38edd55ebfaf6}{00059}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_ace6f5dac395d56ad1ab38edd55ebfaf6}{setEnvelope}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_envelope}{Envelope}}\ \$envelope):\ void}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00060}00060\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \$this-\/>envelope\ =\ \$envelope;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00064}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a62db13394d9416f4cfc864858cca433b}{00064}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a62db13394d9416f4cfc864858cca433b}{getTransport}}():\ string}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00065}00065\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>transport;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00067}00067\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00069}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a8a52580fff34dbd7c5a775a9858b911c}{00069}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a8a52580fff34dbd7c5a775a9858b911c}{isQueued}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00070}00070\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>queued;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00072}00072\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00074}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a33754c5e6c71afac728ad55cb5775253}{00074}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a33754c5e6c71afac728ad55cb5775253}{isRejected}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00075}00075\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>rejected;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00077}00077\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00079}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a9fb916f1fc57a568452c45c128e1db90}{00079}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a9fb916f1fc57a568452c45c128e1db90}{reject}}():\ void}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00080}00080\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \$this-\/>rejected\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_contracts_1_1_event_dispatcher_1_1_event_adc3f4b7596e176069cd179814c05c66d}{stopPropagation}}();}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00085}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a80f4c2f9e9de4f4485b0c55ed4b21f31}{00085}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_a80f4c2f9e9de4f4485b0c55ed4b21f31}{addStamp}}(StampInterface\ \$stamp):\ void}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00086}00086\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>queued)\ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_logic_exception}{LogicException}}(sprintf(\textcolor{stringliteral}{'Cannot\ call\ "{}\%s()"{}\ on\ a\ message\ that\ is\ not\ meant\ to\ be\ queued.'},\ \_\_METHOD\_\_));}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \$this-\/>stamps[]\ =\ \$stamp;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00092}00092\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00097}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_addb7640a9a4bdf566357b9f5ee1cbfba}{00097}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_event_1_1_message_event_addb7640a9a4bdf566357b9f5ee1cbfba}{getStamps}}():\ array}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00098}00098\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>queued)\ \{}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_logic_exception}{LogicException}}(sprintf(\textcolor{stringliteral}{'Cannot\ call\ "{}\%s()"{}\ on\ a\ message\ that\ is\ not\ meant\ to\ be\ queued.'},\ \_\_METHOD\_\_));}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>stamps;}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00104}00104\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_message_event_8php_source_l00105}00105\ \}}
+
+\end{DoxyCode}

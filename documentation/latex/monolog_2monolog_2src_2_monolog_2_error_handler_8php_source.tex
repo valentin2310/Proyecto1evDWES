@@ -1,0 +1,239 @@
+\doxysection{Error\+Handler.\+php}
+\hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source}{}\label{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source}\index{vendor/monolog/monolog/src/Monolog/ErrorHandler.php@{vendor/monolog/monolog/src/Monolog/ErrorHandler.php}}
+\mbox{\hyperlink{monolog_2monolog_2src_2_monolog_2_error_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Monolog\ package.}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Jordi\ Boggiano\ <j.boggiano@seld.be>}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }Monolog;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00014}00014\ use\ Closure;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00015}00015\ use\ \mbox{\hyperlink{interface_psr_1_1_log_1_1_logger_interface}{Psr\(\backslash\)Log\(\backslash\)LoggerInterface}};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_psr_1_1_log_1_1_log_level}{Psr\(\backslash\)Log\(\backslash\)LogLevel}};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00027}\mbox{\hyperlink{class_monolog_1_1_error_handler}{00027}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_monolog_1_1_error_handler}{ErrorHandler}}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00028}00028\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{private}\ Closure|\textcolor{keyword}{null}\ \$previousExceptionHandler\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$uncaughtExceptionLevelMap\ =\ [];}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00035}00035\ \ \ \ \ \textcolor{keyword}{private}\ Closure|\textcolor{keywordtype}{bool}|\textcolor{keyword}{null}\ \$previousErrorHandler\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00038}00038\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$errorLevelMap\ =\ [];}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00040}00040\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$handleOnlyReportedErrors\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00042}00042\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$hasFatalErrorHandler\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00044}00044\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$fatalLevel\ =\ LogLevel::ALERT;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}|\textcolor{keyword}{null}\ \$reservedMemory\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00049}00049\ \ \ \ \ \textcolor{keyword}{private}\ array|\textcolor{keyword}{null}\ \$lastFatalData\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00051}00051\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ FATAL\_ERRORS\ =\ [E\_ERROR,\ E\_PARSE,\ E\_CORE\_ERROR,\ E\_COMPILE\_ERROR,\ E\_USER\_ERROR];}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00053}\mbox{\hyperlink{class_monolog_1_1_error_handler_a6b66e0869eedb0726aa01202326099a8}{00053}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_error_handler_a6b66e0869eedb0726aa01202326099a8}{\_\_construct}}(}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ LoggerInterface\ \$logger}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00055}00055\ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00056}00056\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00068}\mbox{\hyperlink{class_monolog_1_1_error_handler_a58357fcba408092c4c8005dbb2417db6}{00068}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \textcolor{keyword}{register}(LoggerInterface\ \$logger,\ \$errorLevelMap\ =\ [],\ \$exceptionLevelMap\ =\ [],\ \$fatalLevel\ =\ \textcolor{keyword}{null}):\ self}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00069}00069\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \$handler\ =\ \textcolor{keyword}{new}\ \textcolor{keyword}{static}(\$logger);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$errorLevelMap\ !==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>registerErrorHandler(\$errorLevelMap);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$exceptionLevelMap\ !==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>registerExceptionHandler(\$exceptionLevelMap);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$fatalLevel\ !==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>registerFatalHandler(\$fatalLevel);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$handler;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00089}\mbox{\hyperlink{class_monolog_1_1_error_handler_af5fca5f39ccecba75ca04fc485a6b408}{00089}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_error_handler_af5fca5f39ccecba75ca04fc485a6b408}{registerExceptionHandler}}(array\ \$levelMap\ =\ [],\ \textcolor{keywordtype}{bool}\ \$callPrevious\ =\ \textcolor{keyword}{true}):\ self}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00090}00090\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \$prev\ =\ set\_exception\_handler(\textcolor{keyword}{function}\ (\(\backslash\)Throwable\ \$e):\ \textcolor{keywordtype}{void}\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>handleException(\$e);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \$this-\/>uncaughtExceptionLevelMap\ =\ \$levelMap;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>defaultExceptionLevelMap()\ as\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}\ =>\ \$level)\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>uncaughtExceptionLevelMap[\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}]))\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>uncaughtExceptionLevelMap[\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}]\ =\ \$level;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$callPrevious\ \&\&\ \textcolor{keyword}{null}\ !==\ \$prev)\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>previousExceptionHandler\ =\ \$prev(...);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00105}00105\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00111}\mbox{\hyperlink{class_monolog_1_1_error_handler_ab1b793ffd22aed039930dc284c3475b0}{00111}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_error_handler_ab1b793ffd22aed039930dc284c3475b0}{registerErrorHandler}}(array\ \$levelMap\ =\ [],\ \textcolor{keywordtype}{bool}\ \$callPrevious\ =\ \textcolor{keyword}{true},\ \textcolor{keywordtype}{int}\ \$errorTypes\ =\ -\/1,\ \textcolor{keywordtype}{bool}\ \$handleOnlyReportedErrors\ =\ \textcolor{keyword}{true}):\ self}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00112}00112\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \$prev\ =\ set\_error\_handler(\$this-\/>handleError(...),\ \$errorTypes);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \$this-\/>errorLevelMap\ =\ array\_replace(\$this-\/>defaultErrorLevelMap(),\ \$levelMap);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$callPrevious)\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>previousErrorHandler\ =\ \$prev\ !==\ \textcolor{keyword}{null}\ ?\ \$prev(...)\ :\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>previousErrorHandler\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \$this-\/>handleOnlyReportedErrors\ =\ \$handleOnlyReportedErrors;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00124}00124\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00131}\mbox{\hyperlink{class_monolog_1_1_error_handler_a19f4f33bd087d6aad82b4eb53571e46d}{00131}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_error_handler_a19f4f33bd087d6aad82b4eb53571e46d}{registerFatalHandler}}(\$level\ =\ \textcolor{keyword}{null},\ \textcolor{keywordtype}{int}\ \$reservedMemorySize\ =\ 20):\ self}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00132}00132\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ register\_shutdown\_function(\$this-\/>handleFatalError(...));}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \$this-\/>reservedMemory\ =\ str\_repeat(\textcolor{charliteral}{'\ '},\ 1024\ *\ \$reservedMemorySize);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \$this-\/>fatalLevel\ =\ \textcolor{keyword}{null}\ ===\ \$level\ ?\ LogLevel::ALERT\ :\ \$level;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \$this-\/>hasFatalErrorHandler\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00140}00140\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00145}\mbox{\hyperlink{class_monolog_1_1_error_handler_ab1bbcccb700cef1a5ee5a6d2b519b950}{00145}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_error_handler_ab1bbcccb700cef1a5ee5a6d2b519b950}{defaultExceptionLevelMap}}():\ array}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00146}00146\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'ParseError'}\ =>\ LogLevel::CRITICAL,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Throwable'}\ =>\ LogLevel::ERROR,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00151}00151\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00156}\mbox{\hyperlink{class_monolog_1_1_error_handler_a559577b2ffcc6421e8315419d237bde5}{00156}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_error_handler_a559577b2ffcc6421e8315419d237bde5}{defaultErrorLevelMap}}():\ array}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00157}00157\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ E\_ERROR\ \ \ \ \ \ \ \ \ \ \ \ \ =>\ LogLevel::CRITICAL,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ E\_WARNING\ \ \ \ \ \ \ \ \ \ \ =>\ LogLevel::WARNING,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ E\_PARSE\ \ \ \ \ \ \ \ \ \ \ \ \ =>\ LogLevel::ALERT,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ E\_NOTICE\ \ \ \ \ \ \ \ \ \ \ \ =>\ LogLevel::NOTICE,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ E\_CORE\_ERROR\ \ \ \ \ \ \ \ =>\ LogLevel::CRITICAL,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ E\_CORE\_WARNING\ \ \ \ \ \ =>\ LogLevel::WARNING,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ E\_COMPILE\_ERROR\ \ \ \ \ =>\ LogLevel::ALERT,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ E\_COMPILE\_WARNING\ \ \ =>\ LogLevel::WARNING,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ E\_USER\_ERROR\ \ \ \ \ \ \ \ =>\ LogLevel::ERROR,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ E\_USER\_WARNING\ \ \ \ \ \ =>\ LogLevel::WARNING,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ E\_USER\_NOTICE\ \ \ \ \ \ \ =>\ LogLevel::NOTICE,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ E\_STRICT\ \ \ \ \ \ \ \ \ \ \ \ =>\ LogLevel::NOTICE,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ E\_RECOVERABLE\_ERROR\ =>\ LogLevel::ERROR,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ E\_DEPRECATED\ \ \ \ \ \ \ \ =>\ LogLevel::NOTICE,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ E\_USER\_DEPRECATED\ \ \ =>\ LogLevel::NOTICE,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00175}00175\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00177}00177\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ handleException(\(\backslash\)Throwable\ \$e):\ never}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00178}00178\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \$level\ =\ LogLevel::ERROR;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>uncaughtExceptionLevelMap\ as\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}\ =>\ \$candidate)\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$e\ instanceof\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}})\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$level\ =\ \$candidate;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \$this-\/>logger-\/>log(}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \$level,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ sprintf(\textcolor{stringliteral}{'Uncaught\ Exception\ \%s:\ "{}\%s"{}\ at\ \%s\ line\ \%s'},\ Utils::getClass(\$e),\ \$e-\/>getMessage(),\ \$e-\/>getFile(),\ \$e-\/>getLine()),}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'exception'}\ =>\ \$e]}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$this-\/>previousExceptionHandler)\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ (\$this-\/>previousExceptionHandler)(\$e);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!headers\_sent()\ \&\&\ in\_array(strtolower((\textcolor{keywordtype}{string})\ ini\_get(\textcolor{stringliteral}{'display\_errors'})),\ [\textcolor{charliteral}{'0'},\ \textcolor{stringliteral}{''},\ \textcolor{stringliteral}{'false'},\ \textcolor{stringliteral}{'off'},\ \textcolor{stringliteral}{'none'},\ \textcolor{stringliteral}{'no'}],\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ http\_response\_code(500);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ exit(255);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00202}00202\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00204}00204\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ handleError(\textcolor{keywordtype}{int}\ \$code,\ \textcolor{keywordtype}{string}\ \$message,\ \textcolor{keywordtype}{string}\ \$file\ =\ \textcolor{stringliteral}{''},\ \textcolor{keywordtype}{int}\ \$line\ =\ 0):\ bool}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00205}00205\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>handleOnlyReportedErrors\ \&\&\ 0\ ===\ (error\_reporting()\ \&\ \$code))\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ fatal\ error\ codes\ are\ ignored\ if\ a\ fatal\ error\ handler\ is\ present\ as\ well\ to\ avoid\ duplicate\ log\ entries}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>hasFatalErrorHandler\ ||\ !in\_array(\$code,\ self::FATAL\_ERRORS,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \$level\ =\ \$this-\/>errorLevelMap[\$code]\ ??\ LogLevel::CRITICAL;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>logger-\/>log(\$level,\ self::codeToString(\$code).\textcolor{stringliteral}{':\ '}.\$message,\ [\textcolor{stringliteral}{'code'}\ =>\ \$code,\ \textcolor{stringliteral}{'message'}\ =>\ \$message,\ \textcolor{stringliteral}{'file'}\ =>\ \$file,\ \textcolor{stringliteral}{'line'}\ =>\ \$line]);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \$trace\ =\ debug\_backtrace(DEBUG\_BACKTRACE\_IGNORE\_ARGS);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ array\_shift(\$trace);\ \textcolor{comment}{//\ Exclude\ handleError\ from\ trace}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>lastFatalData\ =\ [\textcolor{stringliteral}{'type'}\ =>\ \$code,\ \textcolor{stringliteral}{'message'}\ =>\ \$message,\ \textcolor{stringliteral}{'file'}\ =>\ \$file,\ \textcolor{stringliteral}{'line'}\ =>\ \$line,\ \textcolor{stringliteral}{'trace'}\ =>\ \$trace];}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>previousErrorHandler\ ===\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>previousErrorHandler\ instanceof\ Closure)\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{bool})\ (\$this-\/>previousErrorHandler)(\$code,\ \$message,\ \$file,\ \$line);}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00228}00228\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00233}\mbox{\hyperlink{class_monolog_1_1_error_handler_ab1df674eee1fcbda8ba8ea263f7ae513}{00233}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_error_handler_ab1df674eee1fcbda8ba8ea263f7ae513}{handleFatalError}}():\ void}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00234}00234\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \$this-\/>reservedMemory\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$this-\/>lastFatalData))\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \$lastError\ =\ \$this-\/>lastFatalData;}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \$lastError\ =\ error\_get\_last();}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$lastError)\ \&\&\ in\_array(\$lastError[\textcolor{stringliteral}{'type'}],\ self::FATAL\_ERRORS,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \$trace\ =\ \$lastError[\textcolor{stringliteral}{'trace'}]\ ??\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>logger-\/>log(}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>fatalLevel,}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Fatal\ Error\ ('}.self::codeToString(\$lastError[\textcolor{stringliteral}{'type'}]).\textcolor{stringliteral}{'):\ '}.\$lastError[\textcolor{stringliteral}{'message'}],}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'code'}\ =>\ \$lastError[\textcolor{stringliteral}{'type'}],\ \textcolor{stringliteral}{'message'}\ =>\ \$lastError[\textcolor{stringliteral}{'message'}],\ \textcolor{stringliteral}{'file'}\ =>\ \$lastError[\textcolor{stringliteral}{'file'}],\ \textcolor{stringliteral}{'line'}\ =>\ \$lastError[\textcolor{stringliteral}{'line'}],\ \textcolor{stringliteral}{'trace'}\ =>\ \$trace]}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00249}00249\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>logger\ instanceof\ \mbox{\hyperlink{class_monolog_1_1_logger}{Logger}})\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>logger-\/>getHandlers()\ as\ \$handler)\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>close();}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00256}00256\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00258}00258\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ codeToString(\textcolor{keywordtype}{int}\ \$code):\ string}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00259}00259\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ match\ (\$code)\ \{}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ E\_ERROR\ =>\ \textcolor{stringliteral}{'E\_ERROR'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ E\_WARNING\ =>\ \textcolor{stringliteral}{'E\_WARNING'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ E\_PARSE\ =>\ \textcolor{stringliteral}{'E\_PARSE'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ E\_NOTICE\ =>\ \textcolor{stringliteral}{'E\_NOTICE'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ E\_CORE\_ERROR\ =>\ \textcolor{stringliteral}{'E\_CORE\_ERROR'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ E\_CORE\_WARNING\ =>\ \textcolor{stringliteral}{'E\_CORE\_WARNING'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ E\_COMPILE\_ERROR\ =>\ \textcolor{stringliteral}{'E\_COMPILE\_ERROR'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ E\_COMPILE\_WARNING\ =>\ \textcolor{stringliteral}{'E\_COMPILE\_WARNING'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ E\_USER\_ERROR\ =>\ \textcolor{stringliteral}{'E\_USER\_ERROR'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ E\_USER\_WARNING\ =>\ \textcolor{stringliteral}{'E\_USER\_WARNING'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ E\_USER\_NOTICE\ =>\ \textcolor{stringliteral}{'E\_USER\_NOTICE'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ E\_STRICT\ =>\ \textcolor{stringliteral}{'E\_STRICT'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ E\_RECOVERABLE\_ERROR\ =>\ \textcolor{stringliteral}{'E\_RECOVERABLE\_ERROR'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ E\_DEPRECATED\ =>\ \textcolor{stringliteral}{'E\_DEPRECATED'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ E\_USER\_DEPRECATED\ =>\ \textcolor{stringliteral}{'E\_USER\_DEPRECATED'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}\ =>\ \textcolor{stringliteral}{'Unknown\ PHP\ error'},}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00278}00278\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{monolog_2monolog_2src_2_monolog_2_error_handler_8php_source_l00279}00279\ \}}
+
+\end{DoxyCode}

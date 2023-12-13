@@ -1,0 +1,246 @@
+\doxysection{Database\+Queue.\+php}
+\hypertarget{_database_queue_8php_source}{}\label{_database_queue_8php_source}\index{vendor/laravel/framework/src/Illuminate/Queue/DatabaseQueue.php@{vendor/laravel/framework/src/Illuminate/Queue/DatabaseQueue.php}}
+\mbox{\hyperlink{_database_queue_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_queue}{Illuminate\(\backslash\)Queue}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00005}00005\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_clearable_queue}{Illuminate\(\backslash\)Contracts\(\backslash\)Queue\(\backslash\)ClearableQueue}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00006}00006\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_queue}{Illuminate\(\backslash\)Contracts\(\backslash\)Queue\(\backslash\)Queue}}\ as\ QueueContract;}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection}{Illuminate\(\backslash\)Database\(\backslash\)Connection}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_jobs_1_1_database_job}{Illuminate\(\backslash\)Queue\(\backslash\)Jobs\(\backslash\)DatabaseJob}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_jobs_1_1_database_job_record}{Illuminate\(\backslash\)Queue\(\backslash\)Jobs\(\backslash\)DatabaseJobRecord}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_carbon}{Illuminate\(\backslash\)Support\(\backslash\)Carbon}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_str}{Illuminate\(\backslash\)Support\(\backslash\)Str}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00012}00012\ use\ PDO;}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00014}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue}{00014}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue}{DatabaseQueue}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue}{Queue}}\ implements\ QueueContract,\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_clearable_queue}{ClearableQueue}}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00015}00015\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00021}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a7691c0162d89de0b6ba47edcd8ba8878}{00021}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a7691c0162d89de0b6ba47edcd8ba8878}{\$database}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00028}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_ae8876a14058f368335baccf35af4a22b}{00028}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_ae8876a14058f368335baccf35af4a22b}{\$table}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00035}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a9df479534ecf05fd7575c6275d381687}{00035}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a9df479534ecf05fd7575c6275d381687}{\$default}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00042}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_abe8354824b50ba889ddf2b5e629d7245}{00042}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_abe8354824b50ba889ddf2b5e629d7245}{\$retryAfter}}\ =\ 60;}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00054}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a815aa6da84009c2e5119e306bcdecea0}{00054}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a815aa6da84009c2e5119e306bcdecea0}{\_\_construct}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_connection}{Connection}}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a7691c0162d89de0b6ba47edcd8ba8878}{\$database}},}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_ae8876a14058f368335baccf35af4a22b}{\$table}},}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a9df479534ecf05fd7575c6275d381687}{\$default}}\ =\ \textcolor{stringliteral}{'default'},}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_abe8354824b50ba889ddf2b5e629d7245}{\$retryAfter}}\ =\ 60,}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_a76884421064260c51b508e92b6d254d8}{\$dispatchAfterCommit}}\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00059}00059\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \$this-\/>table\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_ae8876a14058f368335baccf35af4a22b}{\$table}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \$this-\/>\textcolor{keywordflow}{default}\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a9df479534ecf05fd7575c6275d381687}{\$default}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \$this-\/>database\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a7691c0162d89de0b6ba47edcd8ba8878}{\$database}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \$this-\/>retryAfter\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_abe8354824b50ba889ddf2b5e629d7245}{\$retryAfter}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \$this-\/>dispatchAfterCommit\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_a76884421064260c51b508e92b6d254d8}{\$dispatchAfterCommit}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00065}00065\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00073}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a7726053078fe9b29e4b8a36262e2a1c2}{00073}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a7726053078fe9b29e4b8a36262e2a1c2}{size}}(\$queue\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00074}00074\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>database-\/>table(\$this-\/>table)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>where(\textcolor{stringliteral}{'queue'},\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1def6924b6f6288613a0c963e9127e6d}{getQueue}}(\$queue))}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>count();}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00078}00078\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00088}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a5d8fdd3d7354c5fe45e9bd16bc723565}{00088}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a5d8fdd3d7354c5fe45e9bd16bc723565}{push}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \textcolor{stringliteral}{''},\ \$queue\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00089}00089\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_ad2e0055462414a48d3d2b407f8b4727a}{enqueueUsing}}(}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_aebdcac72586efce60bb4dd7eea819399}{createPayload}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1def6924b6f6288613a0c963e9127e6d}{getQueue}}(\$queue),\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}),}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \$queue,}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{function}\ (\$payload,\ \$queue)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a8d726f67a5be5f50bd977f8855202a07}{pushToDatabase}}(\$queue,\ \$payload);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00099}00099\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00109}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_aa6df37cb0b7653bd171a6a41b3a2d962}{00109}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_aa6df37cb0b7653bd171a6a41b3a2d962}{pushRaw}}(\$payload,\ \$queue\ =\ \textcolor{keyword}{null},\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00110}00110\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a8d726f67a5be5f50bd977f8855202a07}{pushToDatabase}}(\$queue,\ \$payload);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00112}00112\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00123}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a6254b056e09b51aab77c2a6a8e10e560}{00123}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a6254b056e09b51aab77c2a6a8e10e560}{later}}(\$delay,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \textcolor{stringliteral}{''},\ \$queue\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00124}00124\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_ad2e0055462414a48d3d2b407f8b4727a}{enqueueUsing}}(}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_aebdcac72586efce60bb4dd7eea819399}{createPayload}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1def6924b6f6288613a0c963e9127e6d}{getQueue}}(\$queue),\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}),}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \$queue,}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \$delay,}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{function}\ (\$payload,\ \$queue,\ \$delay)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a8d726f67a5be5f50bd977f8855202a07}{pushToDatabase}}(\$queue,\ \$payload,\ \$delay);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00134}00134\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00144}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_af45a7769b164dc48f1e939df5097a99d}{00144}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_af45a7769b164dc48f1e939df5097a99d}{bulk}}(\$jobs,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \textcolor{stringliteral}{''},\ \$queue\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00145}00145\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \$queue\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1def6924b6f6288613a0c963e9127e6d}{getQueue}}(\$queue);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \$now\ =\ \$this-\/>availableAt();}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>database-\/>table(\$this-\/>table)-\/>insert(collect((array)\ \$jobs)-\/>map(}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{function}\ (\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})\ use\ (\$queue,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$now)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_ae4757ceee6023c3b084a179083926409}{buildDatabaseRecord}}(}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$queue,}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_aebdcac72586efce60bb4dd7eea819399}{createPayload}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1def6924b6f6288613a0c963e9127e6d}{getQueue}}(\$queue),\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}),}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ isset(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>delay)\ ?\ \$this-\/>availableAt(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>delay)\ :\ \$now,}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ )-\/>all());}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00159}00159\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00169}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_ae6c9e4f452bedcdbbbe72f4cb9f974a5}{00169}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_ae6c9e4f452bedcdbbbe72f4cb9f974a5}{release}}(\$queue,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$delay)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00170}00170\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a8d726f67a5be5f50bd977f8855202a07}{pushToDatabase}}(\$queue,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>payload,\ \$delay,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>attempts);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00172}00172\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00183}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a8d726f67a5be5f50bd977f8855202a07}{00183}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a8d726f67a5be5f50bd977f8855202a07}{pushToDatabase}}(\$queue,\ \$payload,\ \$delay\ =\ 0,\ \$attempts\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00184}00184\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>database-\/>table(\$this-\/>table)-\/>insertGetId(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_ae4757ceee6023c3b084a179083926409}{buildDatabaseRecord}}(}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1def6924b6f6288613a0c963e9127e6d}{getQueue}}(\$queue),\ \$payload,\ \$this-\/>availableAt(\$delay),\ \$attempts}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00188}00188\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00199}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_ae4757ceee6023c3b084a179083926409}{00199}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_ae4757ceee6023c3b084a179083926409}{buildDatabaseRecord}}(\$queue,\ \$payload,\ \$availableAt,\ \$attempts\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00200}00200\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'queue'}\ =>\ \$queue,}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'attempts'}\ =>\ \$attempts,}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'reserved\_at'}\ =>\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'available\_at'}\ =>\ \$availableAt,}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'created\_at'}\ =>\ \$this-\/>currentTime(),}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'payload'}\ =>\ \$payload,}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00209}00209\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00219}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_afc9c07aeca2efd28a0968de45ea1d023}{00219}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_afc9c07aeca2efd28a0968de45ea1d023}{pop}}(\$queue\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00220}00220\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \$queue\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1def6924b6f6288613a0c963e9127e6d}{getQueue}}(\$queue);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>database-\/>transaction(\textcolor{keyword}{function}\ ()\ use\ (\$queue)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a9e15bc1f1be1aa3a2c9dc5860a3060f6}{getNextAvailableJob}}(\$queue))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a26c78be8584ecb3b6487b6732c13d930}{marshalJob}}(\$queue,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}});}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00228}00228\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00236}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a9e15bc1f1be1aa3a2c9dc5860a3060f6}{00236}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a9e15bc1f1be1aa3a2c9dc5860a3060f6}{getNextAvailableJob}}(\$queue)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00237}00237\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}\ =\ \$this-\/>database-\/>table(\$this-\/>table)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>lock(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_af13ac39c445e6a72f52d7dc65bbd6844}{getLockForPopping}}())}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>where(\textcolor{stringliteral}{'queue'},\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1def6924b6f6288613a0c963e9127e6d}{getQueue}}(\$queue))}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>where(\textcolor{keyword}{function}\ (\$query)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a141b78d2eb3b754b49da1c590c5947c4}{isAvailable}}(\$query);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a815e98e9923c4f4e57761d8e15ee9e91}{isReservedButExpired}}(\$query);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \})}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>orderBy(\textcolor{stringliteral}{'id'},\ \textcolor{stringliteral}{'asc'})}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>first();}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}\ ?\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_jobs_1_1_database_job_record}{DatabaseJobRecord}}((\textcolor{keywordtype}{object})\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})\ :\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00249}00249\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00256}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_af13ac39c445e6a72f52d7dc65bbd6844}{00256}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_af13ac39c445e6a72f52d7dc65bbd6844}{getLockForPopping}}()}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00257}00257\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \$databaseEngine\ =\ \$this-\/>database-\/>getPdo()-\/>getAttribute(PDO::ATTR\_DRIVER\_NAME);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \$databaseVersion\ =\ \$this-\/>database-\/>getConfig(\textcolor{stringliteral}{'version'})\ ??\ \$this-\/>database-\/>getPdo()-\/>getAttribute(PDO::ATTR\_SERVER\_VERSION);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Str::of(\$databaseVersion)-\/>contains(\textcolor{stringliteral}{'MariaDB'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \$databaseEngine\ =\ \textcolor{stringliteral}{'mariadb'};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \$databaseVersion\ =\ Str::before(Str::after(\$databaseVersion,\ \textcolor{stringliteral}{'5.5.5-\/'}),\ \textcolor{charliteral}{'-\/'});}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \}\ elseif\ (Str::of(\$databaseVersion)-\/>contains([\textcolor{stringliteral}{'vitess'},\ \textcolor{stringliteral}{'PlanetScale'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \$databaseEngine\ =\ \textcolor{stringliteral}{'vitess'};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \$databaseVersion\ =\ Str::before(\$databaseVersion,\ \textcolor{charliteral}{'-\/'});}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\$databaseEngine\ ===\ \textcolor{stringliteral}{'mysql'}\ \&\&\ version\_compare(\$databaseVersion,\ \textcolor{stringliteral}{'8.0.1'},\ \textcolor{stringliteral}{'>='}))\ ||}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ (\$databaseEngine\ ===\ \textcolor{stringliteral}{'mariadb'}\ \&\&\ version\_compare(\$databaseVersion,\ \textcolor{stringliteral}{'10.6.0'},\ \textcolor{stringliteral}{'>='}))\ ||}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ (\$databaseEngine\ ===\ \textcolor{stringliteral}{'pgsql'}\ \&\&\ version\_compare(\$databaseVersion,\ \textcolor{stringliteral}{'9.5'},\ \textcolor{stringliteral}{'>='})))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'FOR\ UPDATE\ SKIP\ LOCKED'};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$databaseEngine\ ===\ \textcolor{stringliteral}{'sqlsrv'})\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'with(rowlock,updlock,readpast)'};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00278}00278\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00280}00280\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00288}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a141b78d2eb3b754b49da1c590c5947c4}{00288}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a141b78d2eb3b754b49da1c590c5947c4}{isAvailable}}(\$query)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00289}00289\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00290}00290\ \ \ \ \ \ \ \ \ \$query-\/>where(\textcolor{keyword}{function}\ (\$query)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>whereNull(\textcolor{stringliteral}{'reserved\_at'})}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>where(\textcolor{stringliteral}{'available\_at'},\ \textcolor{stringliteral}{'<='},\ \$this-\/>currentTime());}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00294}00294\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00302}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a815e98e9923c4f4e57761d8e15ee9e91}{00302}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a815e98e9923c4f4e57761d8e15ee9e91}{isReservedButExpired}}(\$query)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00303}00303\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00304}00304\ \ \ \ \ \ \ \ \ \$expiration\ =\ Carbon::now()-\/>subSeconds(\$this-\/>retryAfter)-\/>getTimestamp();}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00306}00306\ \ \ \ \ \ \ \ \ \$query-\/>orWhere(\textcolor{keyword}{function}\ (\$query)\ use\ (\$expiration)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \$query-\/>where(\textcolor{stringliteral}{'reserved\_at'},\ \textcolor{stringliteral}{'<='},\ \$expiration);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00309}00309\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00318}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a26c78be8584ecb3b6487b6732c13d930}{00318}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a26c78be8584ecb3b6487b6732c13d930}{marshalJob}}(\$queue,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00319}00319\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a4ae25eca3c8c3a6d0470b20bc1f73b9b}{markJobAsReserved}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}});}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00321}00321\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_jobs_1_1_database_job}{DatabaseJob}}(}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>container,\ \$this,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$this-\/>connectionName,\ \$queue}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00325}00325\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00326}00326\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00333}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a4ae25eca3c8c3a6d0470b20bc1f73b9b}{00333}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a4ae25eca3c8c3a6d0470b20bc1f73b9b}{markJobAsReserved}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00334}00334\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \$this-\/>database-\/>table(\$this-\/>table)-\/>where(\textcolor{stringliteral}{'id'},\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>id)-\/>update([}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'reserved\_at'}\ =>\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>touch(),}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'attempts'}\ =>\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>increment(),}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00340}00340\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00341}00341\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00342}00342\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00352}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a03719201a457fb6e0999089d9ceefaf1}{00352}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a03719201a457fb6e0999089d9ceefaf1}{deleteReserved}}(\$queue,\ \$id)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00353}00353\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \$this-\/>database-\/>transaction(\textcolor{keyword}{function}\ ()\ use\ (\$id)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>database-\/>table(\$this-\/>table)-\/>lockForUpdate()-\/>find(\$id))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>database-\/>table(\$this-\/>table)-\/>where(\textcolor{stringliteral}{'id'},\ \$id)-\/>delete();}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00359}00359\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00360}00360\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00369}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_ac998915ee8fedb6327f154e69d43a5a0}{00369}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_ac998915ee8fedb6327f154e69d43a5a0}{deleteAndRelease}}(\$queue,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$delay)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00370}00370\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00371}00371\ \ \ \ \ \ \ \ \ \$this-\/>database-\/>transaction(\textcolor{keyword}{function}\ ()\ use\ (\$queue,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$delay)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>database-\/>table(\$this-\/>table)-\/>lockForUpdate()-\/>find(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>getJobId()))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>database-\/>table(\$this-\/>table)-\/>where(\textcolor{stringliteral}{'id'},\ \$job-\/>getJobId())-\/>delete();}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00374}00374\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00375}00375\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00376}00376\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>release(\$queue,\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>getJobRecord(),\ \$delay);}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00377}00377\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00378}00378\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00379}00379\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00386}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1694ac4653e98c1c7367c90e78edc1b9}{00386}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1694ac4653e98c1c7367c90e78edc1b9}{clear}}(\$queue)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00387}00387\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>database-\/>table(\$this-\/>table)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>where(\textcolor{stringliteral}{'queue'},\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1def6924b6f6288613a0c963e9127e6d}{getQueue}}(\$queue))}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>delete();}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00391}00391\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00399}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1def6924b6f6288613a0c963e9127e6d}{00399}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a1def6924b6f6288613a0c963e9127e6d}{getQueue}}(\$queue)}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00400}00400\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$queue\ ?:\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a9df479534ecf05fd7575c6275d381687}{\$this-\/>default}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00402}00402\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00403}00403\ }
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00409}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a728138a9219e8751278542c3a8c5e3a9}{00409}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a728138a9219e8751278542c3a8c5e3a9}{getDatabase}}()}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00410}00410\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00411}00411\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_database_queue_a7691c0162d89de0b6ba47edcd8ba8878}{\$this-\/>database}};}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00412}00412\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_queue_8php_source_l00413}00413\ \}}
+
+\end{DoxyCode}

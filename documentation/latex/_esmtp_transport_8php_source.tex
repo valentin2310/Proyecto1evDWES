@@ -1,0 +1,219 @@
+\doxysection{Esmtp\+Transport.\+php}
+\hypertarget{_esmtp_transport_8php_source}{}\label{_esmtp_transport_8php_source}\index{vendor/symfony/mailer/Transport/Smtp/EsmtpTransport.php@{vendor/symfony/mailer/Transport/Smtp/EsmtpTransport.php}}
+\mbox{\hyperlink{_esmtp_transport_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Transport\(\backslash\)Smtp}};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00014}00014\ use\ \mbox{\hyperlink{interface_psr_1_1_event_dispatcher_1_1_event_dispatcher_interface}{Psr\(\backslash\)EventDispatcher\(\backslash\)EventDispatcherInterface}};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00015}00015\ use\ \mbox{\hyperlink{interface_psr_1_1_log_1_1_logger_interface}{Psr\(\backslash\)Log\(\backslash\)LoggerInterface}};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_transport_exception}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Exception\(\backslash\)TransportException}};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00017}00017\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_transport_exception_interface}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Exception\(\backslash\)TransportExceptionInterface}};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00018}00018\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_auth_1_1_authenticator_interface}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Transport\(\backslash\)Smtp\(\backslash\)Auth\(\backslash\)AuthenticatorInterface}};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_stream_1_1_abstract_stream}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Transport\(\backslash\)Smtp\(\backslash\)Stream\(\backslash\)AbstractStream}};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_stream_1_1_socket_stream}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Transport\(\backslash\)Smtp\(\backslash\)Stream\(\backslash\)SocketStream}};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00028}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport}{00028}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport}{EsmtpTransport}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_smtp_transport}{SmtpTransport}}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00029}00029\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$authenticators\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$username\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$password\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00033}00033\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$capabilities;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00035}00035\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_smtp_transport_ab671c16ca6dc7e4bc5400ff29cb67bd9}{\_\_construct}}(\textcolor{keywordtype}{string}\ \$host\ =\ \textcolor{stringliteral}{'localhost'},\ \textcolor{keywordtype}{int}\ \$port\ =\ 0,\ \textcolor{keywordtype}{bool}\ \$tls\ =\ \textcolor{keyword}{null},\ \mbox{\hyperlink{interface_psr_1_1_event_dispatcher_1_1_event_dispatcher_interface}{EventDispatcherInterface}}\ \$dispatcher\ =\ \textcolor{keyword}{null},\ \mbox{\hyperlink{interface_psr_1_1_log_1_1_logger_interface}{LoggerInterface}}\ \$logger\ =\ \textcolor{keyword}{null},\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_stream_1_1_abstract_stream}{AbstractStream}}\ \$stream\ =\ \textcolor{keyword}{null},\ array\ \$authenticators\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00036}00036\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00037}00037\ \ \ \ \ \ \ \ \ parent::\_\_construct(\$stream,\ \$dispatcher,\ \$logger);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$authenticators)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ fallback\ to\ default\ authenticators}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ order\ is\ important\ here\ (roughly\ most\ secure\ and\ popular\ first)}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \$authenticators\ =\ [}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Auth\(\backslash\)CramMd5Authenticator(),}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Auth\(\backslash\)LoginAuthenticator(),}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Auth\(\backslash\)PlainAuthenticator(),}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Auth\(\backslash\)XOAuth2Authenticator(),}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_afcafc6dfe9b9389e188b1bacae910891}{setAuthenticators}}(\$authenticators);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \$stream\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_smtp_transport_a3e5834ff3daeecd091712270886a16fb}{getStream}}();}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$tls)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (465\ ===\ \$port)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$tls\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$tls\ =\ \(\backslash\)defined(\textcolor{stringliteral}{'OPENSSL\_VERSION\_NUMBER'})\ \&\&\ 0\ ===\ \$port\ \&\&\ \textcolor{stringliteral}{'localhost'}\ !==\ \$host;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$tls)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \$stream-\/>disableTls();}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (0\ ===\ \$port)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \$port\ =\ \$tls\ ?\ 465\ :\ 25;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \$stream-\/>setHost(\$host);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \$stream-\/>setPort(\$port);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00075}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a6fcb92ccc9c50d72d73b6bb2908db9bc}{00075}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a6fcb92ccc9c50d72d73b6bb2908db9bc}{setUsername}}(\textcolor{keywordtype}{string}\ \$username):\ static}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00076}00076\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \$this-\/>username\ =\ \$username;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00080}00080\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00082}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a81b37a3c9d639574e394f80c1138c75e}{00082}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a81b37a3c9d639574e394f80c1138c75e}{getUsername}}():\ string}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00083}00083\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>username;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00085}00085\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00090}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_ac7a794498cb16cf60b9911d29b2b070e}{00090}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_ac7a794498cb16cf60b9911d29b2b070e}{setPassword}}(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$password):\ static}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00091}00091\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \$this-\/>password\ =\ \$password;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00095}00095\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00097}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a04e0957baeb7acde9c0c86556da2d43f}{00097}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a04e0957baeb7acde9c0c86556da2d43f}{getPassword}}():\ string}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00098}00098\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>password;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00100}00100\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00102}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_afcafc6dfe9b9389e188b1bacae910891}{00102}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_afcafc6dfe9b9389e188b1bacae910891}{setAuthenticators}}(array\ \$authenticators):\ void}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00103}00103\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \$this-\/>authenticators\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$authenticators\ as\ \$authenticator)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a42370dd3f5043bdd86b9ed97e542bfea}{addAuthenticator}}(\$authenticator);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00108}00108\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00110}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a42370dd3f5043bdd86b9ed97e542bfea}{00110}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a42370dd3f5043bdd86b9ed97e542bfea}{addAuthenticator}}(\mbox{\hyperlink{interface_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_auth_1_1_authenticator_interface}{AuthenticatorInterface}}\ \$authenticator):\ void}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00111}00111\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \$this-\/>authenticators[]\ =\ \$authenticator;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00113}00113\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00115}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a5dceca60df9682b46543382fe520ba4f}{00115}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a5dceca60df9682b46543382fe520ba4f}{executeCommand}}(\textcolor{keywordtype}{string}\ \$command,\ array\ \$codes):\ string}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00116}00116\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [250]\ ===\ \$codes\ \&\&\ str\_starts\_with(\$command,\ \textcolor{stringliteral}{'HELO\ '})\ ?\ \$this-\/>doEhloCommand()\ :\ parent::executeCommand(\$command,\ \$codes);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00118}00118\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00120}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_aef6a344a8de433b50039668ea77ed506}{00120}}\ \ \ \ \ \textcolor{keyword}{final}\ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_aef6a344a8de433b50039668ea77ed506}{getCapabilities}}():\ array}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00121}00121\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>capabilities;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00123}00123\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00125}00125\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ doEhloCommand():\ string}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00126}00126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a5dceca60df9682b46543382fe520ba4f}{executeCommand}}(sprintf(\textcolor{stringliteral}{"{}EHLO\ \%s\(\backslash\)r\(\backslash\)n"{}},\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_smtp_transport_a1627a9f04f0c176a5581eaa08d01cf88}{getLocalDomain}}()),\ [250]);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{interface_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_transport_exception_interface}{TransportExceptionInterface}}\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parent::executeCommand(sprintf(\textcolor{stringliteral}{"{}HELO\ \%s\(\backslash\)r\(\backslash\)n"{}},\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_smtp_transport_a1627a9f04f0c176a5581eaa08d01cf88}{getLocalDomain}}()),\ [250]);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{interface_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_transport_exception_interface}{TransportExceptionInterface}}\ \$ex)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$ex-\/>getCode())\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$ex;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \$this-\/>capabilities\ =\ \$this-\/>parseCapabilities(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \$stream\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_smtp_transport_a3e5834ff3daeecd091712270886a16fb}{getStream}}();}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ WARNING:\ !\$stream-\/>isTLS()\ is\ right,\ 100\%\ sure\ :)}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ you\ think\ that\ the\ !\ should\ be\ removed,\ read\ the\ code\ again}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ if\ doing\ so\ "{}fixes"{}\ your\ issue\ then\ it\ probably\ means\ your\ SMTP\ server\ behaves\ incorrectly\ or\ is\ wrongly\ configured}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$stream-\/>isTLS()\ \&\&\ \(\backslash\)defined(\textcolor{stringliteral}{'OPENSSL\_VERSION\_NUMBER'})\ \&\&\ \(\backslash\)array\_key\_exists(\textcolor{stringliteral}{'STARTTLS'},\ \$this-\/>capabilities))\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a5dceca60df9682b46543382fe520ba4f}{executeCommand}}(\textcolor{stringliteral}{"{}STARTTLS\(\backslash\)r\(\backslash\)n"{}},\ [220]);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$stream-\/>startTLS())\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ TransportException(\textcolor{stringliteral}{'Unable\ to\ connect\ with\ STARTTLS.'});}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a5dceca60df9682b46543382fe520ba4f}{executeCommand}}(sprintf(\textcolor{stringliteral}{"{}EHLO\ \%s\(\backslash\)r\(\backslash\)n"{}},\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_smtp_transport_a1627a9f04f0c176a5581eaa08d01cf88}{getLocalDomain}}()),\ [250]);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>capabilities\ =\ \$this-\/>parseCapabilities(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)array\_key\_exists(\textcolor{stringliteral}{'AUTH'},\ \$this-\/>capabilities))\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>handleAuth(\$this-\/>capabilities[\textcolor{stringliteral}{'AUTH'}]);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00164}00164\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00166}00166\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ parseCapabilities(\textcolor{keywordtype}{string}\ \$ehloResponse):\ array}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00167}00167\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \$capabilities\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \$lines\ =\ explode(\textcolor{stringliteral}{"{}\(\backslash\)r\(\backslash\)n"{}},\ trim(\$ehloResponse));}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ array\_shift(\$lines);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$lines\ as\ \$line)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (preg\_match(\textcolor{stringliteral}{'/\string^[0-\/9]\{3\}[\ -\/]([A-\/Z0-\/9-\/]+)((?:[\ =].*)?)\$/Di'},\ \$line,\ \$matches))\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ strtoupper(ltrim(\$matches[2],\ \textcolor{stringliteral}{'\ ='}));}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$capabilities[strtoupper(\$matches[1])]\ =\ \$value\ ?\ explode(\textcolor{charliteral}{'\ '},\ \$value)\ :\ [];}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$capabilities;}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00179}00179\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00181}00181\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ handleAuth(array\ \$modes):\ void}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00182}00182\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>username)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \$code\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \$authNames\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \$errors\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \$modes\ =\ array\_map(\textcolor{stringliteral}{'strtolower'},\ \$modes);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>authenticators\ as\ \$authenticator)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)in\_array(strtolower(\$authenticator-\/>getAuthKeyword()),\ \$modes,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \$code\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \$authNames[]\ =\ \$authenticator-\/>getAuthKeyword();}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$authenticator-\/>authenticate(\$this);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (TransportExceptionInterface\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$code\ =\ \$e-\/>getCode();}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_smtp_1_1_esmtp_transport_a5dceca60df9682b46543382fe520ba4f}{executeCommand}}(\textcolor{stringliteral}{"{}RSET\(\backslash\)r\(\backslash\)n"{}},\ [250]);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (TransportExceptionInterface)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ignore\ this\ exception\ as\ it\ probably\ means\ that\ the\ server\ error\ was\ final}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ keep\ the\ error\ message,\ but\ tries\ the\ other\ authenticators}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$errors[\$authenticator-\/>getAuthKeyword()]\ =\ \$e-\/>getMessage();}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$authNames)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ TransportException(sprintf(\textcolor{stringliteral}{'Failed\ to\ find\ an\ authenticator\ supported\ by\ the\ SMTP\ server,\ which\ currently\ supports:\ "{}\%s"{}.'},\ implode(\textcolor{stringliteral}{'"{},\ "{}'},\ \$modes)),\ \$code\ ?:\ 504);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \$message\ =\ sprintf(\textcolor{stringliteral}{'Failed\ to\ authenticate\ on\ SMTP\ server\ with\ username\ "{}\%s"{}\ using\ the\ following\ authenticators:\ "{}\%s"{}.'},\ \$this-\/>username,\ implode(\textcolor{stringliteral}{'"{},\ "{}'},\ \$authNames));}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$errors\ as\ \$name\ =>\ \$error)\ \{}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ .=\ sprintf(\textcolor{stringliteral}{'\ Authenticator\ "{}\%s"{}\ returned\ "{}\%s"{}.'},\ \$name,\ \$error);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ TransportException(\$message,\ \$code\ ?:\ 535);}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00226}00226\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_esmtp_transport_8php_source_l00227}00227\ \}}
+
+\end{DoxyCode}

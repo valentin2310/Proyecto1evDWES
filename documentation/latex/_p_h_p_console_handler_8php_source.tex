@@ -1,0 +1,216 @@
+\doxysection{PHPConsole\+Handler.\+php}
+\hypertarget{_p_h_p_console_handler_8php_source}{}\label{_p_h_p_console_handler_8php_source}\index{vendor/monolog/monolog/src/Monolog/Handler/PHPConsoleHandler.php@{vendor/monolog/monolog/src/Monolog/Handler/PHPConsoleHandler.php}}
+\mbox{\hyperlink{_p_h_p_console_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Monolog\ package.}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Jordi\ Boggiano\ <j.boggiano@seld.be>}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_monolog_1_1_handler}{Monolog\(\backslash\)Handler}};}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_line_formatter}{Monolog\(\backslash\)Formatter\(\backslash\)LineFormatter}};}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00015}00015\ use\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{Monolog\(\backslash\)Formatter\(\backslash\)FormatterInterface}};}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00016}00016\ use\ Monolog\(\backslash\)Level;}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_monolog_1_1_utils}{Monolog\(\backslash\)Utils}};}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00018}00018\ use\ PhpConsole\(\backslash\)Connector;}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00019}00019\ use\ PhpConsole\(\backslash\)Handler\ as\ VendorPhpConsoleHandler;}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00020}00020\ use\ PhpConsole\(\backslash\)Helper;}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_monolog_1_1_log_record}{Monolog\(\backslash\)LogRecord}};}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00022}00022\ use\ PhpConsole\(\backslash\)Storage;}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00089}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler}{00089}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler}{PHPConsoleHandler}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_processing_handler}{AbstractProcessingHandler}}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00090}00090\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00094}00094\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$options\ =\ [}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'enabled'}\ =>\ \textcolor{keyword}{true},\ \textcolor{comment}{//\ bool\ Is\ PHP\ Console\ server\ enabled}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'classesPartialsTraceIgnore'}\ =>\ [\textcolor{stringliteral}{'Monolog\(\backslash\)\(\backslash\)'}],\ \textcolor{comment}{//\ array\ Hide\ calls\ of\ classes\ started\ with...}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'debugTagsKeysInContext'}\ =>\ [0,\ \textcolor{stringliteral}{'tag'}],\ \textcolor{comment}{//\ bool\ Is\ PHP\ Console\ server\ enabled}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'useOwnErrorsHandler'}\ =>\ \textcolor{keyword}{false},\ \textcolor{comment}{//\ bool\ Enable\ errors\ handling}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'useOwnExceptionsHandler'}\ =>\ \textcolor{keyword}{false},\ \textcolor{comment}{//\ bool\ Enable\ exceptions\ handling}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'sourcesBasePath'}\ =>\ \textcolor{keyword}{null},\ \textcolor{comment}{//\ string\ Base\ path\ of\ all\ project\ sources\ to\ strip\ in\ errors\ source\ paths}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'registerHelper'}\ =>\ \textcolor{keyword}{true},\ \textcolor{comment}{//\ bool\ Register\ PhpConsole\(\backslash\)Helper\ that\ allows\ short\ debug\ calls\ like\ PC::debug(\$var,\ 'ta.g.s')}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'serverEncoding'}\ =>\ \textcolor{keyword}{null},\ \textcolor{comment}{//\ string|null\ Server\ internal\ encoding}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'headersLimit'}\ =>\ \textcolor{keyword}{null},\ \textcolor{comment}{//\ int|null\ Set\ headers\ size\ limit\ for\ your\ web-\/server}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'password'}\ =>\ \textcolor{keyword}{null},\ \textcolor{comment}{//\ string|null\ Protect\ PHP\ Console\ connection\ by\ password}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'enableSslOnlyMode'}\ =>\ \textcolor{keyword}{false},\ \textcolor{comment}{//\ bool\ Force\ connection\ by\ SSL\ for\ clients\ with\ PHP\ Console\ installed}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'ipMasks'}\ =>\ [],\ \textcolor{comment}{//\ array\ Set\ IP\ masks\ of\ clients\ that\ will\ be\ allowed\ to\ connect\ to\ PHP\ Console:\ array('192.168.*.*',\ '127.0.0.1')}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'enableEvalListener'}\ =>\ \textcolor{keyword}{false},\ \textcolor{comment}{//\ bool\ Enable\ eval\ request\ to\ be\ handled\ by\ eval\ dispatcher(if\ enabled,\ 'password'\ option\ is\ also\ required)}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'dumperDetectCallbacks'}\ =>\ \textcolor{keyword}{false},\ \textcolor{comment}{//\ bool\ Convert\ callback\ items\ in\ dumper\ vars\ to\ (callback\ SomeClass::someMethod)\ strings}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'dumperLevelLimit'}\ =>\ 5,\ \textcolor{comment}{//\ int\ Maximum\ dumped\ vars\ array\ or\ object\ nested\ dump\ level}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'dumperItemsCountLimit'}\ =>\ 100,\ \textcolor{comment}{//\ int\ Maximum\ dumped\ var\ same\ level\ array\ items\ or\ object\ properties\ number}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'dumperItemSizeLimit'}\ =>\ 5000,\ \textcolor{comment}{//\ int\ Maximum\ length\ of\ any\ string\ or\ dumped\ array\ item}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'dumperDumpSizeLimit'}\ =>\ 500000,\ \textcolor{comment}{//\ int\ Maximum\ approximate\ size\ of\ dumped\ vars\ result\ formatted\ in\ JSON}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'detectDumpTraceAndSource'}\ =>\ \textcolor{keyword}{false},\ \textcolor{comment}{//\ bool\ Autodetect\ and\ append\ trace\ data\ to\ debug}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'dataStorage'}\ =>\ \textcolor{keyword}{null},\ \textcolor{comment}{//\ \(\backslash\)PhpConsole\(\backslash\)Storage|null\ Fixes\ problem\ with\ custom\ \$\_SESSION\ handler(see\ http://goo.gl/Ne8juJ)}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00115}00115\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00117}00117\ \ \ \ \ \textcolor{keyword}{private}\ Connector\ \$connector;}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00125}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler_ad5dd1d8d89c3f4986c5fdd0fda0b6942}{00125}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler_ad5dd1d8d89c3f4986c5fdd0fda0b6942}{\_\_construct}}(array\ \$options\ =\ [],\ ?Connector\ \$connector\ =\ \textcolor{keyword}{null},\ \textcolor{keywordtype}{int}|\textcolor{keywordtype}{string}|Level\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}}\ =\ Level::Debug,\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}}\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00126}00126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!class\_exists(\textcolor{stringliteral}{'PhpConsole\(\backslash\)Connector'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{'PHP\ Console\ library\ not\ found.\ See\ https://github.com/barbushin/php-\/console\#installation'});}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ parent::\_\_construct(\mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}},\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}});}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \$this-\/>options\ =\ \$this-\/>initOptions(\$options);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \$this-\/>connector\ =\ \$this-\/>initConnector(\$connector);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00133}00133\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00142}00142\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ initOptions(array\ \$options):\ array}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00143}00143\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \$wrongOptions\ =\ array\_diff(array\_keys(\$options),\ array\_keys(\$this-\/>options));}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)count(\$wrongOptions)\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{'Unknown\ options:\ '}\ .\ implode(\textcolor{stringliteral}{',\ '},\ \$wrongOptions));}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_replace(\$this-\/>options,\ \$options);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00150}00150\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00152}00152\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ initConnector(?Connector\ \$connector\ =\ \textcolor{keyword}{null}):\ Connector}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00153}00153\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$connector)\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>options[\textcolor{stringliteral}{'dataStorage'}]\ instanceof\ Storage)\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Connector::setPostponeStorage(\$this-\/>options[\textcolor{stringliteral}{'dataStorage'}]);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \$connector\ =\ Connector::getInstance();}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>options[\textcolor{stringliteral}{'registerHelper'}]\ \&\&\ !Helper::isRegistered())\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ Helper::register();}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>options[\textcolor{stringliteral}{'enabled'}]\ \&\&\ \$connector-\/>isActiveClient())\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>options[\textcolor{stringliteral}{'useOwnErrorsHandler'}]\ ||\ \$this-\/>options[\textcolor{stringliteral}{'useOwnExceptionsHandler'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$handler\ =\ VendorPhpConsoleHandler::getInstance();}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>setHandleErrors(\$this-\/>options[\textcolor{stringliteral}{'useOwnErrorsHandler'}]);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>setHandleExceptions(\$this-\/>options[\textcolor{stringliteral}{'useOwnExceptionsHandler'}]);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>start();}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$this-\/>options[\textcolor{stringliteral}{'sourcesBasePath'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connector-\/>setSourcesBasePath(\$this-\/>options[\textcolor{stringliteral}{'sourcesBasePath'}]);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$this-\/>options[\textcolor{stringliteral}{'serverEncoding'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connector-\/>setServerEncoding(\$this-\/>options[\textcolor{stringliteral}{'serverEncoding'}]);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$this-\/>options[\textcolor{stringliteral}{'password'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connector-\/>setPassword(\$this-\/>options[\textcolor{stringliteral}{'password'}]);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>options[\textcolor{stringliteral}{'enableSslOnlyMode'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connector-\/>enableSslOnlyMode();}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)count(\$this-\/>options[\textcolor{stringliteral}{'ipMasks'}])\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connector-\/>setAllowedIpMasks(\$this-\/>options[\textcolor{stringliteral}{'ipMasks'}]);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$this-\/>options[\textcolor{stringliteral}{'headersLimit'}]\ \&\&\ \$this-\/>options[\textcolor{stringliteral}{'headersLimit'}]\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connector-\/>setHeadersLimit(\$this-\/>options[\textcolor{stringliteral}{'headersLimit'}]);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>options[\textcolor{stringliteral}{'detectDumpTraceAndSource'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connector-\/>getDebugDispatcher()-\/>detectTraceAndSource\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \$dumper\ =\ \$connector-\/>getDumper();}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \$dumper-\/>levelLimit\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_console_1_1_concerns_ae1559345410441589126591dd2a216e3}{options}}[\textcolor{stringliteral}{'dumperLevelLimit'}];}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \$dumper-\/>itemsCountLimit\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_console_1_1_concerns_ae1559345410441589126591dd2a216e3}{options}}[\textcolor{stringliteral}{'dumperItemsCountLimit'}];}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \$dumper-\/>itemSizeLimit\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_console_1_1_concerns_ae1559345410441589126591dd2a216e3}{options}}[\textcolor{stringliteral}{'dumperItemSizeLimit'}];}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \$dumper-\/>dumpSizeLimit\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_console_1_1_concerns_ae1559345410441589126591dd2a216e3}{options}}[\textcolor{stringliteral}{'dumperDumpSizeLimit'}];}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \$dumper-\/>detectCallbacks\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_console_1_1_concerns_ae1559345410441589126591dd2a216e3}{options}}[\textcolor{stringliteral}{'dumperDetectCallbacks'}];}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>options[\textcolor{stringliteral}{'enableEvalListener'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connector-\/>startEvalRequestsListener();}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$connector;}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00205}00205\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00207}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler_a8559271d6a6c009d51a62dda78fd937c}{00207}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler_a8559271d6a6c009d51a62dda78fd937c}{getConnector}}():\ Connector}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00208}00208\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>connector;}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00210}00210\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00215}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler_a1a49b8dded6e91a52e2fd07195d334da}{00215}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler_a1a49b8dded6e91a52e2fd07195d334da}{getOptions}}():\ array}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00216}00216\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>options;}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00218}00218\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00220}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler_acb13379d9d704c21ec1e43b40700d064}{00220}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler_acb13379d9d704c21ec1e43b40700d064}{handle}}(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record):\ bool}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00221}00221\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>options[\textcolor{stringliteral}{'enabled'}]\ \&\&\ \$this-\/>connector-\/>isActiveClient())\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parent::handle(\$record);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$this-\/>bubble}};}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00227}00227\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00232}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler_a4d821b93cc01881ce31ed79d678a8800}{00232}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler_a4d821b93cc01881ce31ed79d678a8800}{write}}(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record):\ void}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00233}00233\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$record-\/>level-\/>isLowerThan(Level::Notice))\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>handleDebugRecord(\$record);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \}\ elseif\ (isset(\$record-\/>context[\textcolor{stringliteral}{'exception'}])\ \&\&\ \$record-\/>context[\textcolor{stringliteral}{'exception'}]\ instanceof\ \(\backslash\)Throwable)\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>handleExceptionRecord(\$record);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>handleErrorRecord(\$record);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00241}00241\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00243}00243\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ handleDebugRecord(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record):\ void}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00244}00244\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ [\$tags,\ \$filteredContext]\ =\ \$this-\/>getRecordTags(\$record);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \$message\ =\ \$record-\/>message;}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)count(\$filteredContext)\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ .=\ \textcolor{charliteral}{'\ '}\ .\ \mbox{\hyperlink{class_monolog_1_1_utils_ad10eeb69895cb168d8f9ef89d9b2edbc}{Utils::jsonEncode}}(\$this-\/>connector-\/>getDumper()-\/>dump(array\_filter(\$filteredContext)),\ \textcolor{keyword}{null},\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \$this-\/>connector-\/>getDebugDispatcher()-\/>dispatchDebug(\$message,\ \$tags,\ \$this-\/>options[\textcolor{stringliteral}{'classesPartialsTraceIgnore'}]);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00251}00251\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00253}00253\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ handleExceptionRecord(LogRecord\ \$record):\ void}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00254}00254\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \$this-\/>connector-\/>getErrorsDispatcher()-\/>dispatchException(\$record-\/>context[\textcolor{stringliteral}{'exception'}]);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00256}00256\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00258}00258\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ handleErrorRecord(LogRecord\ \$record):\ void}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00259}00259\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \$context\ =\ \$record-\/>context;}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \$this-\/>connector-\/>getErrorsDispatcher()-\/>dispatchError(}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \$context[\textcolor{stringliteral}{'code'}]\ ??\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \$context[\textcolor{stringliteral}{'message'}]\ ??\ \$record-\/>message,}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \$context[\textcolor{stringliteral}{'file'}]\ ??\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \$context[\textcolor{stringliteral}{'line'}]\ ??\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'classesPartialsTraceIgnore'}]}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00269}00269\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00270}00270\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00274}00274\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getRecordTags(LogRecord\ \$record):\ array}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00275}00275\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \$tags\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \$filteredContext\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$record-\/>context\ !==\ [])\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \$filteredContext\ =\ \$record-\/>context;}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>options[\textcolor{stringliteral}{'debugTagsKeysInContext'}]\ as\ \$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$filteredContext[\$key]))\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$tags\ =\ \$filteredContext[\$key];}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$key\ ===\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_shift(\$filteredContext);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$filteredContext[\$key]);}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\$tags\ ??\ \$record-\/>level-\/>toPsrLogLevel(),\ \$filteredContext];}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00294}00294\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00299}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler_a0bd80b04e1992562f7eacea2097d3d9d}{00299}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_p_h_p_console_handler_a0bd80b04e1992562f7eacea2097d3d9d}{getDefaultFormatter}}():\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{FormatterInterface}}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00300}00300\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00301}00301\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_line_formatter}{LineFormatter}}(\textcolor{stringliteral}{'\%message\%'});}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00302}00302\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_p_h_p_console_handler_8php_source_l00303}00303\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,110 @@
+\doxysection{Slack\+Webhook\+Handler.\+php}
+\hypertarget{_slack_webhook_handler_8php_source}{}\label{_slack_webhook_handler_8php_source}\index{vendor/monolog/monolog/src/Monolog/Handler/SlackWebhookHandler.php@{vendor/monolog/monolog/src/Monolog/Handler/SlackWebhookHandler.php}}
+\mbox{\hyperlink{_slack_webhook_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Monolog\ package.}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Jordi\ Boggiano\ <j.boggiano@seld.be>}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_monolog_1_1_handler}{Monolog\(\backslash\)Handler}};}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00014}00014\ use\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{Monolog\(\backslash\)Formatter\(\backslash\)FormatterInterface}};}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00015}00015\ use\ Monolog\(\backslash\)Level;}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_monolog_1_1_utils}{Monolog\(\backslash\)Utils}};}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_1_1_slack_record}{Monolog\(\backslash\)Handler\(\backslash\)Slack\(\backslash\)SlackRecord}};}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_monolog_1_1_log_record}{Monolog\(\backslash\)LogRecord}};}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00026}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler}{00026}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler}{SlackWebhookHandler}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_processing_handler}{AbstractProcessingHandler}}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00027}00027\ \{}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$webhookUrl;}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_1_1_slack_record}{SlackRecord}}\ \$slackRecord;}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00050}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler_af25b125770b0ffdb73a20d02d07682ba}{00050}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler_af25b125770b0ffdb73a20d02d07682ba}{\_\_construct}}(}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \$webhookUrl,}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ ?\textcolor{keywordtype}{string}\ \$channel\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ ?\textcolor{keywordtype}{string}\ \$username\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$useAttachment\ =\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ ?\textcolor{keywordtype}{string}\ \$iconEmoji\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$useShortAttachment\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$includeContextAndExtra\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}}\ =\ Level::Critical,}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}}\ =\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ array\ \$excludeFields\ =\ []}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00061}00061\ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!extension\_loaded(\textcolor{stringliteral}{'curl'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_missing_extension_exception}{MissingExtensionException}}(\textcolor{stringliteral}{'The\ curl\ extension\ is\ needed\ to\ use\ the\ SlackWebhookHandler'});}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ parent::\_\_construct(\mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}},\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}});}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \$this-\/>webhookUrl\ =\ \$webhookUrl;}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \$this-\/>slackRecord\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_1_1_slack_record}{SlackRecord}}(}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \$channel,}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \$username,}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \$useAttachment,}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \$iconEmoji,}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \$useShortAttachment,}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \$includeContextAndExtra,}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \$excludeFields}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00079}00079\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00081}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler_a2e1602a17dc749ea8690b9ecc0d923d4}{00081}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler_a2e1602a17dc749ea8690b9ecc0d923d4}{getSlackRecord}}():\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_1_1_slack_record}{SlackRecord}}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00082}00082\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>slackRecord;}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00084}00084\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00086}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler_ab4e3c1539cc1a10688ffda0a912856f0}{00086}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler_ab4e3c1539cc1a10688ffda0a912856f0}{getWebhookUrl}}():\ string}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00087}00087\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>webhookUrl;}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00089}00089\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00094}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler_a4d821b93cc01881ce31ed79d678a8800}{00094}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler_a4d821b93cc01881ce31ed79d678a8800}{write}}(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record):\ void}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00095}00095\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \$postData\ =\ \$this-\/>slackRecord-\/>getSlackData(\$record);}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \$postString\ =\ \mbox{\hyperlink{class_monolog_1_1_utils_ad10eeb69895cb168d8f9ef89d9b2edbc}{Utils::jsonEncode}}(\$postData);}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \$ch\ =\ curl\_init();}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ CURLOPT\_URL\ =>\ \$this-\/>webhookUrl,}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ CURLOPT\_POST\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ CURLOPT\_RETURNTRANSFER\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ CURLOPT\_HTTPHEADER\ =>\ [\textcolor{stringliteral}{'Content-\/type:\ application/json'}],}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ CURLOPT\_POSTFIELDS\ =>\ \$postString,}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (defined(\textcolor{stringliteral}{'CURLOPT\_SAFE\_UPLOAD'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[CURLOPT\_SAFE\_UPLOAD]\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ curl\_setopt\_array(\$ch,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ Curl\(\backslash\)Util::execute(\$ch);}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00114}00114\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00116}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler_a87804f2347dd817752ef1faa1f0dea05}{00116}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler_a87804f2347dd817752ef1faa1f0dea05}{setFormatter}}(\mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{FormatterInterface}}\ \$formatter):\ \mbox{\hyperlink{interface_monolog_1_1_handler_1_1_handler_interface}{HandlerInterface}}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00117}00117\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ parent::setFormatter(\$formatter);}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \$this-\/>slackRecord-\/>setFormatter(\$formatter);}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00122}00122\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00124}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler_aad3a8e83c90770a1f71a75bb51e782d8}{00124}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_slack_webhook_handler_aad3a8e83c90770a1f71a75bb51e782d8}{getFormatter}}():\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{FormatterInterface}}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00125}00125\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \$formatter\ =\ parent::getFormatter();}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \$this-\/>slackRecord-\/>setFormatter(\$formatter);}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$formatter;}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00130}00130\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_slack_webhook_handler_8php_source_l00131}00131\ \}}
+
+\end{DoxyCode}

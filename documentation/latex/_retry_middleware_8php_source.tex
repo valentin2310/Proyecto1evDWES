@@ -1,0 +1,89 @@
+\doxysection{Retry\+Middleware.\+php}
+\hypertarget{_retry_middleware_8php_source}{}\label{_retry_middleware_8php_source}\index{vendor/guzzlehttp/guzzle/src/RetryMiddleware.php@{vendor/guzzlehttp/guzzle/src/RetryMiddleware.php}}
+\mbox{\hyperlink{_retry_middleware_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_guzzle_http}{GuzzleHttp}};}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00005}00005\ use\ \mbox{\hyperlink{namespace_guzzle_http_1_1_promise}{GuzzleHttp\(\backslash\)Promise}}\ as\ \mbox{\hyperlink{namespace_guzzle_http_1_1_promise}{P}};}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00006}00006\ use\ \mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface}{GuzzleHttp\(\backslash\)Promise\(\backslash\)PromiseInterface}};}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00007}00007\ use\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{Psr\(\backslash\)Http\(\backslash\)Message\(\backslash\)RequestInterface}};}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00008}00008\ use\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_response_interface}{Psr\(\backslash\)Http\(\backslash\)Message\(\backslash\)ResponseInterface}};}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00016}\mbox{\hyperlink{class_guzzle_http_1_1_retry_middleware}{00016}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_guzzle_http_1_1_retry_middleware}{RetryMiddleware}}}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00017}00017\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{private}\ \$nextHandler;}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00026}00026\ \ \ \ \ \textcolor{keyword}{private}\ \$decider;}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}\ \$delay;}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00043}\mbox{\hyperlink{class_guzzle_http_1_1_retry_middleware_a0a27767cfccc4db63b1109b9b5212d98}{00043}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_retry_middleware_a0a27767cfccc4db63b1109b9b5212d98}{\_\_construct}}(callable\ \$decider,\ callable\ \$nextHandler,\ callable\ \$delay\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00044}00044\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \$this-\/>decider\ =\ \$decider;}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \$this-\/>nextHandler\ =\ \$nextHandler;}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \$this-\/>delay\ =\ \$delay\ ?:\ \_\_CLASS\_\_.\textcolor{stringliteral}{'::exponentialDelay'};}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00048}00048\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00055}\mbox{\hyperlink{class_guzzle_http_1_1_retry_middleware_ae092dfda3c7598c9d3dfb77e948c0380}{00055}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_retry_middleware_ae092dfda3c7598c9d3dfb77e948c0380}{exponentialDelay}}(\textcolor{keywordtype}{int}\ \$retries):\ int}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00056}00056\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{int})\ 2\ **\ (\$retries\ -\/\ 1)\ *\ 1000;}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00058}00058\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00060}\mbox{\hyperlink{class_guzzle_http_1_1_retry_middleware_a8b41a62c59d4d0d86e7525197f2904f5}{00060}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_retry_middleware_a8b41a62c59d4d0d86e7525197f2904f5}{\_\_invoke}}(\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{RequestInterface}}\ \$request,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}):\ \mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface}{PromiseInterface}}}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00061}00061\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'retries'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'retries'}]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \$fn\ =\ \$this-\/>nextHandler;}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$fn(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>\mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface_a4feb652e6c84c7767347fb21cf496c73}{then}}(}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>onFulfilled(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}),}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>onRejected(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00073}00073\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00078}00078\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ onFulfilled(\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{RequestInterface}}\ \$request,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}):\ callable}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00079}00079\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{function}\ (\$value)\ use\ (\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(\$this-\/>decider)(}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'retries'}],}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$request,}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value,}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ null}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ ))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>doRetry(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ \$value);}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00092}00092\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00097}00097\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ onRejected(RequestInterface\ \$req,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}):\ callable}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00098}00098\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{function}\ (\$reason)\ use\ (\$req,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(\$this-\/>decider)(}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'retries'}],}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$req,}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$reason}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ ))\ \{}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ P\(\backslash\)Create::rejectionFor(\$reason);}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>doRetry(\$req,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00111}00111\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00113}00113\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ doRetry(RequestInterface\ \$request,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ ResponseInterface\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \textcolor{keyword}{null}):\ PromiseInterface}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00114}00114\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'delay'}]\ =\ (\$this-\/>delay)(++\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'retries'}],\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}},\ \$request);}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this(\$request,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00118}00118\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_retry_middleware_8php_source_l00119}00119\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['sebastian_20global_20state_0',['Changes in sebastian/global-state',['../md_vendor_2sebastian_2global-state_2_change_log.html',1,'']]],
+  ['sebastianbergmann_20environment_1',['Changes in sebastianbergmann/environment',['../md_vendor_2sebastian_2environment_2_change_log.html',1,'']]],
+  ['security_2',['SECURITY',['../md_vendor_2ramsey_2collection_2_s_e_c_u_r_i_t_y.html',1,'']]],
+  ['security_20policy_3',['security policy',['../md_vendor_2filp_2whoops_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2object-reflector_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2recursion-context_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2mockery_2mockery_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2phpunit_2php-code-coverage_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2phpunit_2php-file-iterator_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2phpunit_2php-invoker_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2phpunit_2php-text-template_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2phpunit_2php-timer_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2phpunit_2phpunit_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2type_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2cli-parser_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2code-unit-reverse-lookup_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2code-unit_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2comparator_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2complexity_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2diff_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2environment_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2exporter_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2version_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2global-state_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2lines-of-code_2_s_e_c_u_r_i_t_y.html',1,'Security Policy'],['../md_vendor_2sebastian_2object-enumerator_2_s_e_c_u_r_i_t_y.html',1,'Security Policy']]],
+  ['send_20php_20errors_20to_20flare_4',['Send PHP errors to Flare',['../md_vendor_2spatie_2flare-client-php_2_r_e_a_d_m_e.html',1,'']]],
+  ['serializable_20closure_5',['Serializable Closure',['../md_vendor_2laravel_2serializable-closure_2_r_e_a_d_m_e.html',1,'']]],
+  ['service_20contracts_6',['Symfony Service Contracts',['../md_vendor_2symfony_2service-contracts_2_r_e_a_d_m_e.html',1,'']]],
+  ['simple_20cache_20psr_7',['PHP FIG Simple Cache PSR',['../md_vendor_2psr_2simple-cache_2_r_e_a_d_m_e.html',1,'']]],
+  ['state_8',['Changes in sebastian/global-state',['../md_vendor_2sebastian_2global-state_2_change_log.html',1,'']]],
+  ['string_20component_9',['String Component',['../md_vendor_2symfony_2string_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20deprecation_20contracts_10',['Symfony Deprecation Contracts',['../md_vendor_2symfony_2deprecation-contracts_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20eventdispatcher_20contracts_11',['Symfony EventDispatcher Contracts',['../md_vendor_2symfony_2event-dispatcher-contracts_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20httpfoundation_12',['CORS for PHP (using the Symfony HttpFoundation)',['../md_vendor_2fruitcake_2php-cors_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20polyfill_20ctype_13',['Symfony Polyfill / Ctype',['../md_vendor_2symfony_2polyfill-ctype_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20polyfill_20intl_3a_20grapheme_14',['Symfony Polyfill / Intl: Grapheme',['../md_vendor_2symfony_2polyfill-intl-grapheme_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20polyfill_20intl_3a_20idn_15',['Symfony Polyfill / Intl: Idn',['../md_vendor_2symfony_2polyfill-intl-idn_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20polyfill_20intl_3a_20normalizer_16',['Symfony Polyfill / Intl: Normalizer',['../md_vendor_2symfony_2polyfill-intl-normalizer_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20polyfill_20mbstring_17',['Symfony Polyfill / Mbstring',['../md_vendor_2symfony_2polyfill-mbstring_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20polyfill_20php72_18',['Symfony Polyfill / Php72',['../md_vendor_2symfony_2polyfill-php72_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20polyfill_20php80_19',['Symfony Polyfill / Php80',['../md_vendor_2symfony_2polyfill-php80_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20polyfill_20php83_20',['Symfony Polyfill / Php83',['../md_vendor_2symfony_2polyfill-php83_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20polyfill_20uuid_21',['Symfony Polyfill / Uuid',['../md_vendor_2symfony_2polyfill-uuid_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20service_20contracts_22',['Symfony Service Contracts',['../md_vendor_2symfony_2service-contracts_2_r_e_a_d_m_e.html',1,'']]],
+  ['symfony_20translation_20contracts_23',['Symfony Translation Contracts',['../md_vendor_2symfony_2translation-contracts_2_r_e_a_d_m_e.html',1,'']]]
+];

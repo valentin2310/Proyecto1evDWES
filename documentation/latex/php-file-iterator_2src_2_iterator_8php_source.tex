@@ -1,0 +1,102 @@
+\doxysection{Iterator.\+php}
+\hypertarget{php-file-iterator_2src_2_iterator_8php_source}{}\label{php-file-iterator_2src_2_iterator_8php_source}\index{vendor/phpunit/php-\/file-\/iterator/src/Iterator.php@{vendor/phpunit/php-\/file-\/iterator/src/Iterator.php}}
+\mbox{\hyperlink{php-file-iterator_2src_2_iterator_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ phpunit/php-\/file-\/iterator.}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_sebastian_bergmann_1_1_file_iterator}{SebastianBergmann\(\backslash\)FileIterator}};}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00012}00012\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}};}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ preg\_match;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ realpath;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ str\_ends\_with;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00016}00016\ use\ \textcolor{keyword}{function}\ str\_replace;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00017}00017\ use\ \textcolor{keyword}{function}\ str\_starts\_with;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00018}00018\ use\ AppendIterator;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00019}00019\ use\ FilterIterator;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00020}00020\ use\ SplFileInfo;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00027}\mbox{\hyperlink{class_sebastian_bergmann_1_1_file_iterator_1_1_iterator}{00027}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_sebastian_bergmann_1_1_file_iterator_1_1_iterator}{Iterator}}\ \textcolor{keyword}{extends}\ FilterIterator}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00028}00028\ \{}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00029}\mbox{\hyperlink{class_sebastian_bergmann_1_1_file_iterator_1_1_iterator_a2a00ef970c682ccf10b5376d22fa5c8a}{00029}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_file_iterator_1_1_iterator_a2a00ef970c682ccf10b5376d22fa5c8a}{PREFIX}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00030}\mbox{\hyperlink{class_sebastian_bergmann_1_1_file_iterator_1_1_iterator_a4c9304aab4e45943e021a2d495b546b4}{00030}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_file_iterator_1_1_iterator_a4c9304aab4e45943e021a2d495b546b4}{SUFFIX}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}|\textcolor{keyword}{false}\ \$basePath;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$suffixes;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00041}00041\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$prefixes;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00047}\mbox{\hyperlink{class_sebastian_bergmann_1_1_file_iterator_1_1_iterator_a31af510f87b6ed6ee736cf61513aff22}{00047}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_file_iterator_1_1_iterator_a31af510f87b6ed6ee736cf61513aff22}{\_\_construct}}(\textcolor{keywordtype}{string}\ \$basePath,\ \(\backslash\)\mbox{\hyperlink{class_sebastian_bergmann_1_1_file_iterator_1_1_iterator}{Iterator}}\ \$iterator,\ array\ \$suffixes\ =\ [],\ array\ \$prefixes\ =\ [])}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00048}00048\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \$this-\/>basePath\ =\ realpath(\$basePath);}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \$this-\/>prefixes\ =\ \$prefixes;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \$this-\/>suffixes\ =\ \$suffixes;}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ parent::\_\_construct(\$iterator);}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00054}00054\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00056}\mbox{\hyperlink{class_sebastian_bergmann_1_1_file_iterator_1_1_iterator_acb64affba32059c09533892d9ded224a}{00056}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_file_iterator_1_1_iterator_acb64affba32059c09533892d9ded224a}{accept}}():\ bool}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00057}00057\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_a2c4c58e377f6c66ca38c8ea97666fc5e}{\$current}}\ =\ \$this-\/>getInnerIterator()-\/>current();}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ assert(\mbox{\hyperlink{update__mime__types_8php_a2c4c58e377f6c66ca38c8ea97666fc5e}{\$current}}\ instanceof\ SplFileInfo);}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \$filename\ =\ \mbox{\hyperlink{update__mime__types_8php_a2c4c58e377f6c66ca38c8ea97666fc5e}{\$current}}-\/>getFilename();}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \$realPath\ =\ \mbox{\hyperlink{update__mime__types_8php_a2c4c58e377f6c66ca38c8ea97666fc5e}{\$current}}-\/>getRealPath();}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$realPath\ ===\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @codeCoverageIgnoreStart}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @codeCoverageIgnoreEnd}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>acceptPath(\$realPath)\ \&\&}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>acceptPrefix(\$filename)\ \&\&}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>acceptSuffix(\$filename);}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00074}00074\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00076}00076\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ acceptPath(\textcolor{keywordtype}{string}\ \$path):\ bool}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00077}00077\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Filter\ files\ in\ hidden\ directories\ by\ checking\ path\ that\ is\ relative\ to\ the\ base\ path.}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (preg\_match(\textcolor{stringliteral}{'=/\(\backslash\).[\string^/]*/='},\ str\_replace((\textcolor{keywordtype}{string})\ \$this-\/>basePath,\ \textcolor{stringliteral}{''},\ \$path)))\ \{}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00084}00084\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00086}00086\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ acceptPrefix(\textcolor{keywordtype}{string}\ \$filename):\ bool}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00087}00087\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>acceptSubString(\$filename,\ \$this-\/>prefixes,\ self::PREFIX);}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00089}00089\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00091}00091\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ acceptSuffix(\textcolor{keywordtype}{string}\ \$filename):\ bool}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00092}00092\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>acceptSubString(\$filename,\ \$this-\/>suffixes,\ self::SUFFIX);}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00094}00094\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00099}00099\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ acceptSubString(\textcolor{keywordtype}{string}\ \$filename,\ array\ \$subStrings,\ \textcolor{keywordtype}{int}\ \$type):\ bool}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00100}00100\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$subStrings))\ \{}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$subStrings\ as\ \$string)\ \{}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\$type\ ===\ self::PREFIX\ \&\&\ str\_starts\_with(\$filename,\ \$string))\ ||}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\$type\ ===\ self::SUFFIX\ \&\&\ str\_ends\_with(\$filename,\ \$string)))\ \{}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00113}00113\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-file-iterator_2src_2_iterator_8php_source_l00114}00114\ \}}
+
+\end{DoxyCode}

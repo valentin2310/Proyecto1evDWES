@@ -1,0 +1,925 @@
+\doxysection{Builder.\+php}
+\hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source}{}\label{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source}\index{vendor/phpunit/phpunit/src/TextUI/Configuration/Cli/Builder.php@{vendor/phpunit/phpunit/src/TextUI/Configuration/Cli/Builder.php}}
+\mbox{\hyperlink{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ PHPUnit.}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00010}\mbox{\hyperlink{namespace_p_h_p_unit_1_1_text_u_i_1_1_cli_arguments}{00010}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_p_h_p_unit_1_1_text_u_i_1_1_cli_arguments}{PHPUnit\(\backslash\)TextUI\(\backslash\)CliArguments}};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00012}00012\ use\ \textcolor{keyword}{function}\ array\_map;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ basename;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ explode;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ getcwd;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00016}00016\ use\ \textcolor{keyword}{function}\ is\_file;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00017}00017\ use\ \textcolor{keyword}{function}\ is\_numeric;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00018}00018\ use\ \textcolor{keyword}{function}\ sprintf;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_test_suite_sorter}{PHPUnit\(\backslash\)Runner\(\backslash\)TestSuiteSorter}};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00020}00020\ use\ \mbox{\hyperlink{interface_sebastian_bergmann_1_1_cli_parser_1_1_exception}{SebastianBergmann\(\backslash\)CliParser\(\backslash\)Exception}}\ as\ CliParserException;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_cli_parser_1_1_parser}{SebastianBergmann\(\backslash\)CliParser\(\backslash\)Parser}}\ as\ CliParser;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00026}\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_cli_arguments_1_1_builder}{00026}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_cli_arguments_1_1_builder}{Builder}}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00027}00027\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ LONG\_OPTIONS\ =\ [}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00029}00029\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'atleast-\/version='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'bootstrap='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'cache-\/result'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'do-\/not-\/cache-\/result'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'cache-\/directory='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'cache-\/result-\/file='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'check-\/version'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00036}00036\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'colors=='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'columns='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00038}00038\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'configuration='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'coverage-\/cache='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'warm-\/coverage-\/cache'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'coverage-\/filter='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'coverage-\/clover='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'coverage-\/cobertura='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'coverage-\/crap4j='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'coverage-\/html='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'coverage-\/php='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'coverage-\/text=='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'coverage-\/xml='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'path-\/coverage'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'disallow-\/test-\/output'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'display-\/incomplete'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'display-\/skipped'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'display-\/deprecations'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'display-\/errors'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'display-\/notices'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'display-\/warnings'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'default-\/time-\/limit='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'enforce-\/time-\/limit'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'exclude-\/group='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'filter='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'generate-\/baseline='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'use-\/baseline='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'ignore-\/baseline'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'generate-\/configuration'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'globals-\/backup'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'group='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'covers='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'uses='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'help'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'resolve-\/dependencies'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'ignore-\/dependencies'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'include-\/path='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'list-\/groups'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'list-\/suites'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'list-\/tests'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'list-\/tests-\/xml='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'log-\/junit='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'log-\/teamcity='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'migrate-\/configuration'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'no-\/configuration'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'no-\/coverage'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'no-\/logging'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'no-\/extensions'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'no-\/output'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'no-\/progress'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'no-\/results'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'order-\/by='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'process-\/isolation'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'dont-\/report-\/useless-\/tests'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'random-\/order'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'random-\/order-\/seed='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'reverse-\/order'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'reverse-\/list'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'static-\/backup'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'stderr'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'fail-\/on-\/deprecation'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'fail-\/on-\/empty-\/test-\/suite'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'fail-\/on-\/incomplete'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'fail-\/on-\/notice'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'fail-\/on-\/risky'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'fail-\/on-\/skipped'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'fail-\/on-\/warning'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'stop-\/on-\/defect'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'stop-\/on-\/deprecation'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'stop-\/on-\/error'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'stop-\/on-\/failure'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'stop-\/on-\/incomplete'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'stop-\/on-\/notice'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'stop-\/on-\/risky'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'stop-\/on-\/skipped'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'stop-\/on-\/warning'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'strict-\/coverage'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'disable-\/coverage-\/ignore'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'strict-\/global-\/state'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'teamcity'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'testdox'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'testdox-\/html='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'testdox-\/text='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'test-\/suffix='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'testsuite='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'exclude-\/testsuite='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'log-\/events-\/text='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'log-\/events-\/verbose-\/text='},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'version'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00125}00125\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00126}00126\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ SHORT\_OPTIONS\ =\ \textcolor{stringliteral}{'d:c:h'};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00131}\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_cli_arguments_1_1_builder_a9c736326a68352d4d7dc33e2f555216c}{00131}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_cli_arguments_1_1_builder_a9c736326a68352d4d7dc33e2f555216c}{fromParameters}}(array\ \$parameters):\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_cli_arguments_1_1_configuration}{Configuration}}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00132}00132\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ (\textcolor{keyword}{new}\ CliParser)-\/>parse(}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$parameters,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self::SHORT\_OPTIONS,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self::LONG\_OPTIONS,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (CliParserException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_cli_arguments_1_1_exception}{Exception}}(}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$e-\/>getMessage(),}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$e-\/>getCode(),}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$e,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \$atLeastVersion\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \$backupGlobals\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \$backupStaticProperties\ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \$beStrictAboutChangesToGlobalState\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \$bootstrap\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \$cacheDirectory\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \$cacheResult\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \$cacheResultFile\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \$checkVersion\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \$colors\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \$columns\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \$configuration\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \$coverageCacheDirectory\ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \$warmCoverageCache\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \$coverageFilter\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \$coverageClover\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \$coverageCobertura\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \$coverageCrap4J\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \$coverageHtml\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \$coveragePhp\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \$coverageText\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \$coverageTextShowUncoveredFiles\ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \$coverageTextShowOnlySummary\ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \$coverageXml\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \$pathCoverage\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \$defaultTimeLimit\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \$disableCodeCoverageIgnore\ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \$disallowTestOutput\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \$displayIncomplete\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \$displaySkipped\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \$displayDeprecations\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \$displayErrors\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \$displayNotices\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \$displayWarnings\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \$enforceTimeLimit\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \$excludeGroups\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \$executionOrder\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \$executionOrderDefects\ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \$failOnDeprecation\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \$failOnEmptyTestSuite\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \$failOnIncomplete\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \$failOnNotice\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \$failOnRisky\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \$failOnSkipped\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \$failOnWarning\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \$stopOnDefect\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \$stopOnDeprecation\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \$stopOnError\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \$stopOnFailure\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \$stopOnIncomplete\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \$stopOnNotice\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \$stopOnRisky\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \$stopOnSkipped\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \$stopOnWarning\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \$filter\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \$generateBaseline\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \$useBaseline\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \$ignoreBaseline\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \$generateConfiguration\ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \$migrateConfiguration\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \$groups\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \$testsCovering\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \$testsUsing\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \$help\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \$includePath\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \$iniSettings\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ [];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \$junitLogfile\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \$listGroups\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \$listSuites\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \$listTests\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \$listTestsXml\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \$noCoverage\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \$noExtensions\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \$noOutput\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \$noProgress\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \$noResults\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \$noLogging\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \$processIsolation\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \$randomOrderSeed\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \$reportUselessTests\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \$resolveDependencies\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \$reverseList\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \$stderr\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \$strictCoverage\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \$teamcityLogfile\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \$testdoxHtmlFile\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \$testdoxTextFile\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \$testSuffixes\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \$testSuite\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \$excludeTestSuite\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \$useDefaultConfiguration\ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \$version\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \$logEventsText\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \$logEventsVerboseText\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \$printerTeamCity\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \$printerTestDox\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[0]\ as\ \$option)\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$option[0])\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/colors'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$colors\ =\ \$option[1]\ ?:\ \(\backslash\)\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_a04f9b419c55dfed29e86a49094316c18}{PHPUnit\(\backslash\)TextUI\(\backslash\)Configuration\(\backslash\)Configuration::COLOR\_AUTO}};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/bootstrap'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$bootstrap\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/cache-\/directory'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheDirectory\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/cache-\/result'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheResult\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/do-\/not-\/cache-\/result'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheResult\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00270}00270\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/cache-\/result-\/file'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheResultFile\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/columns'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_numeric(\$option[1]))\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$columns\ =\ (int)\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$option[1]\ ===\ \textcolor{stringliteral}{'max'})\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$columns\ =\ \textcolor{stringliteral}{'max'};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'c'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/configuration'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$configuration\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00290}00290\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/coverage-\/cache'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCacheDirectory\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/warm-\/coverage-\/cache'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$warmCoverageCache\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00298}00298\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/coverage-\/clover'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00302}00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageClover\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00304}00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00306}00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/coverage-\/cobertura'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCobertura\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00308}00308\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/coverage-\/crap4j'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCrap4J\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00315}00315\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/coverage-\/html'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtml\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00320}00320\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/coverage-\/php'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coveragePhp\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/coverage-\/text'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00327}00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$option[1]\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$option[1]\ =\ \textcolor{stringliteral}{'php://stdout'};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageText\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageTextShowUncoveredFiles\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageTextShowOnlySummary\ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00334}00334\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00336}00336\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/coverage-\/xml'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageXml\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00340}00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/path-\/coverage'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$pathCoverage\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00344}00344\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'d'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$tmp\ =\ explode(\textcolor{charliteral}{'='},\ \$option[1]);}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$tmp[0]))\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$tmp[1]))\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$iniSettings[\$tmp[0]]\ =\ \$tmp[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$iniSettings[\$tmp[0]]\ =\ \textcolor{charliteral}{'1'};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00357}00357\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00359}00359\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'h'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/help'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$help\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00363}00363\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/filter'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$filter\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00370}00370\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/testsuite'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testSuite\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00374}00374\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00375}00375\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00376}00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/exclude-\/testsuite'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00377}00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$excludeTestSuite\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00378}00378\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00380}00380\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/generate-\/baseline'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$generateBaseline\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00383}00383\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (basename(\$generateBaseline)\ ===\ \$generateBaseline)\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00385}00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$generateBaseline\ =\ getcwd()\ .\ DIRECTORY\_SEPARATOR\ .\ \$generateBaseline;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/use-\/baseline'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$useBaseline\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_file(\$useBaseline)\ \&\&\ basename(\$useBaseline)\ ===\ \$useBaseline)\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$useBaseline\ =\ getcwd()\ .\ DIRECTORY\_SEPARATOR\ .\ \$useBaseline;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00396}00396\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/ignore-\/baseline'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00400}00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$ignoreBaseline\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00401}00401\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00403}00403\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/generate-\/configuration'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$generateConfiguration\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00406}00406\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00408}00408\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/migrate-\/configuration'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$migrateConfiguration\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00411}00411\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00413}00413\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/group'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00415}00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$groups\ =\ explode(\textcolor{charliteral}{','},\ \$option[1]);}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/exclude-\/group'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$excludeGroups\ =\ explode(\textcolor{charliteral}{','},\ \$option[1]);}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00421}00421\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00423}00423\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/covers'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testsCovering\ =\ array\_map(\textcolor{stringliteral}{'strtolower'},\ explode(\textcolor{charliteral}{','},\ \$option[1]));}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00426}00426\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00428}00428\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/uses'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testsUsing\ =\ array\_map(\textcolor{stringliteral}{'strtolower'},\ explode(\textcolor{charliteral}{','},\ \$option[1]));}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00431}00431\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00433}00433\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/test-\/suffix'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testSuffixes\ =\ explode(\textcolor{charliteral}{','},\ \$option[1]);}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00438}00438\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/include-\/path'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$includePath\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00443}00443\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/list-\/groups'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00445}00445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$listGroups\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00446}00446\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00447}00447\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00448}00448\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/list-\/suites'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$listSuites\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00451}00451\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00452}00452\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00453}00453\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/list-\/tests'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$listTests\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00456}00456\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00458}00458\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/list-\/tests-\/xml'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$listTestsXml\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00461}00461\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00463}00463\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/log-\/junit'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$junitLogfile\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00466}00466\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00467}00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00468}00468\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/log-\/teamcity'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00470}00470\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$teamcityLogfile\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00471}00471\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00473}00473\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00474}00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/order-\/by'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (explode(\textcolor{charliteral}{','},\ \$option[1])\ as\ \$order)\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$order)\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'default'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrder\ \ \ \ \ \ \ \ =\ TestSuiteSorter::ORDER\_DEFAULT;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrderDefects\ =\ TestSuiteSorter::ORDER\_DEFAULT;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$resolveDependencies\ \ \ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00481}00481\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00482}00482\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00483}00483\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'defects'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrderDefects\ =\ TestSuiteSorter::ORDER\_DEFECTS\_FIRST;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00486}00486\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00487}00487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00488}00488\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'depends'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00490}00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$resolveDependencies\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00491}00491\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00492}00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00493}00493\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'duration'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00495}00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrder\ =\ TestSuiteSorter::ORDER\_DURATION;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00496}00496\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00497}00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00498}00498\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'no-\/depends'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$resolveDependencies\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00501}00501\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'random'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrder\ =\ TestSuiteSorter::ORDER\_RANDOMIZED;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00506}00506\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00507}00507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00508}00508\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00509}00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'reverse'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrder\ =\ TestSuiteSorter::ORDER\_REVERSED;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00511}00511\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00513}00513\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'size'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrder\ =\ TestSuiteSorter::ORDER\_SIZE;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00516}00516\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00518}00518\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_cli_arguments_1_1_exception}{Exception}}(}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sprintf(}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'unrecognized\ -\/-\/order-\/by\ option:\ \%s'},}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$order,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00524}00524\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00525}00525\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00527}00527\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00528}00528\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00530}00530\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/process-\/isolation'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$processIsolation\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00533}00533\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00535}00535\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/stderr'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00537}00537\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stderr\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00538}00538\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00539}00539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00540}00540\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/deprecation'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnDeprecation\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00543}00543\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00545}00545\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/empty-\/test-\/suite'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00547}00547\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnEmptyTestSuite\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00548}00548\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00550}00550\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00551}00551\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/incomplete'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00552}00552\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnIncomplete\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00553}00553\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00554}00554\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00555}00555\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00556}00556\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/notice'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00557}00557\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnNotice\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00558}00558\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00559}00559\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00560}00560\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/risky'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00562}00562\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnRisky\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00563}00563\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00565}00565\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00566}00566\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/skipped'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00567}00567\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnSkipped\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00568}00568\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00570}00570\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00571}00571\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/warning'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00572}00572\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnWarning\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00573}00573\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00574}00574\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00575}00575\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00576}00576\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/defect'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnDefect\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00578}00578\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00579}00579\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00580}00580\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/deprecation'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00582}00582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnDeprecation\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00583}00583\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00585}00585\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00586}00586\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/error'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00587}00587\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnError\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00588}00588\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00589}00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00590}00590\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00591}00591\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/failure'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00592}00592\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnFailure\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00593}00593\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00594}00594\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00595}00595\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/incomplete'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00597}00597\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnIncomplete\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00598}00598\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00599}00599\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00600}00600\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00601}00601\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/notice'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnNotice\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00603}00603\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00604}00604\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00605}00605\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00606}00606\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/risky'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00607}00607\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnRisky\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00608}00608\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00610}00610\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/skipped'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00612}00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnSkipped\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00613}00613\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00614}00614\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00615}00615\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00616}00616\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/warning'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00617}00617\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnWarning\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00618}00618\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00619}00619\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00620}00620\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/teamcity'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$printerTeamCity\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00623}00623\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00625}00625\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00626}00626\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/testdox'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00627}00627\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$printerTestDox\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00628}00628\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00629}00629\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00630}00630\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00631}00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/testdox-\/html'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00632}00632\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testdoxHtmlFile\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00633}00633\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00634}00634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00635}00635\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/testdox-\/text'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testdoxTextFile\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00638}00638\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00639}00639\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00640}00640\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00641}00641\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/no-\/configuration'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00642}00642\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$useDefaultConfiguration\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00643}00643\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00644}00644\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00645}00645\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00646}00646\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/no-\/extensions'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00647}00647\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$noExtensions\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00648}00648\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00649}00649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00650}00650\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00651}00651\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/no-\/coverage'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00652}00652\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$noCoverage\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00653}00653\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00654}00654\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00655}00655\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00656}00656\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/no-\/logging'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00657}00657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$noLogging\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00658}00658\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00659}00659\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00660}00660\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00661}00661\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/no-\/output'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00662}00662\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$noOutput\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00663}00663\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00664}00664\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00665}00665\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00666}00666\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/no-\/progress'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00667}00667\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$noProgress\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00668}00668\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00669}00669\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00670}00670\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00671}00671\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/no-\/results'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00672}00672\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$noResults\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00673}00673\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00674}00674\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00675}00675\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00676}00676\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/globals-\/backup'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00677}00677\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$backupGlobals\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00678}00678\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00679}00679\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00680}00680\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00681}00681\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/static-\/backup'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00682}00682\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$backupStaticProperties\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00683}00683\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00684}00684\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00685}00685\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00686}00686\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/atleast-\/version'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00687}00687\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$atLeastVersion\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00688}00688\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00689}00689\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00690}00690\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00691}00691\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/version'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00692}00692\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$version\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00693}00693\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00694}00694\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00695}00695\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00696}00696\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/dont-\/report-\/useless-\/tests'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00697}00697\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$reportUselessTests\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00698}00698\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00699}00699\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00700}00700\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00701}00701\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/strict-\/coverage'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00702}00702\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$strictCoverage\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00703}00703\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00704}00704\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00705}00705\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00706}00706\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/disable-\/coverage-\/ignore'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00707}00707\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$disableCodeCoverageIgnore\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00708}00708\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00709}00709\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00710}00710\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00711}00711\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/strict-\/global-\/state'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00712}00712\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$beStrictAboutChangesToGlobalState\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00713}00713\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00714}00714\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00715}00715\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00716}00716\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/disallow-\/test-\/output'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00717}00717\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$disallowTestOutput\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00718}00718\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00719}00719\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00720}00720\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00721}00721\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/display-\/incomplete'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00722}00722\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$displayIncomplete\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00723}00723\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00724}00724\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00725}00725\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00726}00726\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/display-\/skipped'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00727}00727\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$displaySkipped\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00728}00728\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00729}00729\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00730}00730\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00731}00731\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/display-\/deprecations'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00732}00732\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDeprecations\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00733}00733\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00734}00734\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00735}00735\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00736}00736\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/display-\/errors'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00737}00737\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$displayErrors\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00738}00738\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00739}00739\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00740}00740\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00741}00741\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/display-\/notices'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00742}00742\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$displayNotices\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00743}00743\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00744}00744\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00745}00745\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00746}00746\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/display-\/warnings'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00747}00747\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$displayWarnings\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00748}00748\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00749}00749\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00750}00750\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00751}00751\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/default-\/time-\/limit'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00752}00752\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$defaultTimeLimit\ =\ (int)\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00753}00753\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00754}00754\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00755}00755\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00756}00756\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/enforce-\/time-\/limit'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00757}00757\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$enforceTimeLimit\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00758}00758\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00759}00759\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00760}00760\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00761}00761\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/reverse-\/list'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00762}00762\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$reverseList\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00763}00763\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00764}00764\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00765}00765\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00766}00766\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/check-\/version'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00767}00767\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$checkVersion\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00768}00768\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00769}00769\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00770}00770\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00771}00771\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/coverage-\/filter'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00772}00772\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$coverageFilter\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00773}00773\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageFilter\ =\ [];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00774}00774\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00775}00775\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00776}00776\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageFilter[]\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00777}00777\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00778}00778\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00779}00779\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00780}00780\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/random-\/order'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00781}00781\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrder\ =\ TestSuiteSorter::ORDER\_RANDOMIZED;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00782}00782\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00783}00783\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00784}00784\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00785}00785\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/random-\/order-\/seed'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00786}00786\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$randomOrderSeed\ =\ (int)\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00787}00787\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00788}00788\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00789}00789\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00790}00790\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/resolve-\/dependencies'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00791}00791\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$resolveDependencies\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00792}00792\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00793}00793\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00794}00794\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00795}00795\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/ignore-\/dependencies'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00796}00796\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$resolveDependencies\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00797}00797\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00798}00798\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00799}00799\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00800}00800\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/reverse-\/order'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00801}00801\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrder\ =\ TestSuiteSorter::ORDER\_REVERSED;}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00802}00802\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00803}00803\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00804}00804\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00805}00805\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/log-\/events-\/text'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00806}00806\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$logEventsText\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00807}00807\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00808}00808\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00809}00809\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00810}00810\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'-\/-\/log-\/events-\/verbose-\/text'}:}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00811}00811\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$logEventsVerboseText\ =\ \$option[1];}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00812}00812\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00813}00813\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00814}00814\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00815}00815\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00816}00816\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00817}00817\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$iniSettings))\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00818}00818\ \ \ \ \ \ \ \ \ \ \ \ \ \$iniSettings\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00819}00819\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00820}00820\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00821}00821\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$coverageFilter))\ \{}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00822}00822\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageFilter\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00823}00823\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00824}00824\ }
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00825}00825\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_cli_arguments_1_1_configuration}{Configuration}}(}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00826}00826\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[1],}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00827}00827\ \ \ \ \ \ \ \ \ \ \ \ \ \$atLeastVersion,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00828}00828\ \ \ \ \ \ \ \ \ \ \ \ \ \$backupGlobals,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00829}00829\ \ \ \ \ \ \ \ \ \ \ \ \ \$backupStaticProperties,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00830}00830\ \ \ \ \ \ \ \ \ \ \ \ \ \$beStrictAboutChangesToGlobalState,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00831}00831\ \ \ \ \ \ \ \ \ \ \ \ \ \$bootstrap,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00832}00832\ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheDirectory,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00833}00833\ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheResult,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00834}00834\ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheResultFile,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00835}00835\ \ \ \ \ \ \ \ \ \ \ \ \ \$checkVersion,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00836}00836\ \ \ \ \ \ \ \ \ \ \ \ \ \$colors,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00837}00837\ \ \ \ \ \ \ \ \ \ \ \ \ \$columns,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00838}00838\ \ \ \ \ \ \ \ \ \ \ \ \ \$configuration,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00839}00839\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageClover,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00840}00840\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCobertura,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00841}00841\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCrap4J,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00842}00842\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtml,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00843}00843\ \ \ \ \ \ \ \ \ \ \ \ \ \$coveragePhp,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00844}00844\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageText,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00845}00845\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageTextShowUncoveredFiles,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00846}00846\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageTextShowOnlySummary,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00847}00847\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageXml,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00848}00848\ \ \ \ \ \ \ \ \ \ \ \ \ \$pathCoverage,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00849}00849\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCacheDirectory,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00850}00850\ \ \ \ \ \ \ \ \ \ \ \ \ \$warmCoverageCache,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00851}00851\ \ \ \ \ \ \ \ \ \ \ \ \ \$defaultTimeLimit,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00852}00852\ \ \ \ \ \ \ \ \ \ \ \ \ \$disableCodeCoverageIgnore,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00853}00853\ \ \ \ \ \ \ \ \ \ \ \ \ \$disallowTestOutput,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00854}00854\ \ \ \ \ \ \ \ \ \ \ \ \ \$enforceTimeLimit,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00855}00855\ \ \ \ \ \ \ \ \ \ \ \ \ \$excludeGroups,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00856}00856\ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrder,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00857}00857\ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrderDefects,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00858}00858\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnDeprecation,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00859}00859\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnEmptyTestSuite,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00860}00860\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnIncomplete,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00861}00861\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnNotice,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00862}00862\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnRisky,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00863}00863\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnSkipped,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00864}00864\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnWarning,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00865}00865\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnDefect,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00866}00866\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnDeprecation,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00867}00867\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnError,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00868}00868\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnFailure,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00869}00869\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnIncomplete,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00870}00870\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnNotice,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00871}00871\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnRisky,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00872}00872\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnSkipped,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00873}00873\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnWarning,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00874}00874\ \ \ \ \ \ \ \ \ \ \ \ \ \$filter,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00875}00875\ \ \ \ \ \ \ \ \ \ \ \ \ \$generateBaseline,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00876}00876\ \ \ \ \ \ \ \ \ \ \ \ \ \$useBaseline,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00877}00877\ \ \ \ \ \ \ \ \ \ \ \ \ \$ignoreBaseline,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00878}00878\ \ \ \ \ \ \ \ \ \ \ \ \ \$generateConfiguration,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00879}00879\ \ \ \ \ \ \ \ \ \ \ \ \ \$migrateConfiguration,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00880}00880\ \ \ \ \ \ \ \ \ \ \ \ \ \$groups,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00881}00881\ \ \ \ \ \ \ \ \ \ \ \ \ \$testsCovering,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00882}00882\ \ \ \ \ \ \ \ \ \ \ \ \ \$testsUsing,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00883}00883\ \ \ \ \ \ \ \ \ \ \ \ \ \$help,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00884}00884\ \ \ \ \ \ \ \ \ \ \ \ \ \$includePath,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00885}00885\ \ \ \ \ \ \ \ \ \ \ \ \ \$iniSettings,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00886}00886\ \ \ \ \ \ \ \ \ \ \ \ \ \$junitLogfile,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00887}00887\ \ \ \ \ \ \ \ \ \ \ \ \ \$listGroups,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00888}00888\ \ \ \ \ \ \ \ \ \ \ \ \ \$listSuites,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00889}00889\ \ \ \ \ \ \ \ \ \ \ \ \ \$listTests,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00890}00890\ \ \ \ \ \ \ \ \ \ \ \ \ \$listTestsXml,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00891}00891\ \ \ \ \ \ \ \ \ \ \ \ \ \$noCoverage,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00892}00892\ \ \ \ \ \ \ \ \ \ \ \ \ \$noExtensions,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00893}00893\ \ \ \ \ \ \ \ \ \ \ \ \ \$noOutput,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00894}00894\ \ \ \ \ \ \ \ \ \ \ \ \ \$noProgress,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00895}00895\ \ \ \ \ \ \ \ \ \ \ \ \ \$noResults,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00896}00896\ \ \ \ \ \ \ \ \ \ \ \ \ \$noLogging,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00897}00897\ \ \ \ \ \ \ \ \ \ \ \ \ \$processIsolation,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00898}00898\ \ \ \ \ \ \ \ \ \ \ \ \ \$randomOrderSeed,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00899}00899\ \ \ \ \ \ \ \ \ \ \ \ \ \$reportUselessTests,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00900}00900\ \ \ \ \ \ \ \ \ \ \ \ \ \$resolveDependencies,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00901}00901\ \ \ \ \ \ \ \ \ \ \ \ \ \$reverseList,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00902}00902\ \ \ \ \ \ \ \ \ \ \ \ \ \$stderr,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00903}00903\ \ \ \ \ \ \ \ \ \ \ \ \ \$strictCoverage,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00904}00904\ \ \ \ \ \ \ \ \ \ \ \ \ \$teamcityLogfile,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00905}00905\ \ \ \ \ \ \ \ \ \ \ \ \ \$testdoxHtmlFile,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00906}00906\ \ \ \ \ \ \ \ \ \ \ \ \ \$testdoxTextFile,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00907}00907\ \ \ \ \ \ \ \ \ \ \ \ \ \$testSuffixes,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00908}00908\ \ \ \ \ \ \ \ \ \ \ \ \ \$testSuite,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00909}00909\ \ \ \ \ \ \ \ \ \ \ \ \ \$excludeTestSuite,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00910}00910\ \ \ \ \ \ \ \ \ \ \ \ \ \$useDefaultConfiguration,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00911}00911\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayIncomplete,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00912}00912\ \ \ \ \ \ \ \ \ \ \ \ \ \$displaySkipped,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00913}00913\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDeprecations,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00914}00914\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayErrors,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00915}00915\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayNotices,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00916}00916\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayWarnings,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00917}00917\ \ \ \ \ \ \ \ \ \ \ \ \ \$version,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00918}00918\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageFilter,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00919}00919\ \ \ \ \ \ \ \ \ \ \ \ \ \$logEventsText,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00920}00920\ \ \ \ \ \ \ \ \ \ \ \ \ \$logEventsVerboseText,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00921}00921\ \ \ \ \ \ \ \ \ \ \ \ \ \$printerTeamCity,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00922}00922\ \ \ \ \ \ \ \ \ \ \ \ \ \$printerTestDox,}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00923}00923\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00924}00924\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{phpunit_2phpunit_2src_2_text_u_i_2_configuration_2_cli_2_builder_8php_source_l00925}00925\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,426 @@
+\doxysection{Repository.\+php}
+\hypertarget{_cache_2_repository_8php_source}{}\label{_cache_2_repository_8php_source}\index{vendor/laravel/framework/src/Illuminate/Cache/Repository.php@{vendor/laravel/framework/src/Illuminate/Cache/Repository.php}}
+\mbox{\hyperlink{_cache_2_repository_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_cache}{Illuminate\(\backslash\)Cache}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00005}00005\ use\ ArrayAccess;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00006}00006\ use\ BadMethodCallException;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00007}00007\ use\ Closure;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00008}00008\ use\ DateTimeInterface;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_events_1_1_cache_hit}{Illuminate\(\backslash\)Cache\(\backslash\)Events\(\backslash\)CacheHit}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_events_1_1_cache_missed}{Illuminate\(\backslash\)Cache\(\backslash\)Events\(\backslash\)CacheMissed}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_events_1_1_key_forgotten}{Illuminate\(\backslash\)Cache\(\backslash\)Events\(\backslash\)KeyForgotten}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00012}00012\ use\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_events_1_1_key_written}{Illuminate\(\backslash\)Cache\(\backslash\)Events\(\backslash\)KeyWritten}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00013}00013\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_cache_1_1_repository}{Illuminate\(\backslash\)Contracts\(\backslash\)Cache\(\backslash\)Repository}}\ as\ CacheContract;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00014}00014\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_cache_1_1_store}{Illuminate\(\backslash\)Contracts\(\backslash\)Cache\(\backslash\)Store}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00015}00015\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_events_1_1_dispatcher}{Illuminate\(\backslash\)Contracts\(\backslash\)Events\(\backslash\)Dispatcher}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_carbon}{Illuminate\(\backslash\)Support\(\backslash\)Carbon}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00017}00017\ use\ Illuminate\(\backslash\)Support\(\backslash\)InteractsWithTime;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00018}00018\ use\ Illuminate\(\backslash\)Support\(\backslash\)Traits\(\backslash\)Macroable;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00023}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository}{00023}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository}{Repository}}\ \textcolor{keyword}{implements}\ ArrayAccess,\ CacheContract}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00024}00024\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00025}00025\ \ \ \ \ use\ InteractsWithTime;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00026}00026\ \ \ \ \ use\ Macroable\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00027}00027\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ac565bd6a9d062c73a0a0db7afe0ffea9}{\_\_call}}\ as\ macroCall;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00028}00028\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00035}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a827b42f70d98e1bf51ff54dbbe771421}{00035}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a827b42f70d98e1bf51ff54dbbe771421}{\$store}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00042}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a1bcec9bbd34255927faaf155bf3a940a}{00042}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a1bcec9bbd34255927faaf155bf3a940a}{\$events}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00049}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9df479534ecf05fd7575c6275d381687}{00049}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9df479534ecf05fd7575c6275d381687}{\$default}}\ =\ 3600;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00057}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af1e47cf9ecd476fca0cb8e691b45bd2c}{00057}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af1e47cf9ecd476fca0cb8e691b45bd2c}{\_\_construct}}(\mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_cache_1_1_store}{Store}}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a827b42f70d98e1bf51ff54dbbe771421}{\$store}})}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00058}00058\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \$this-\/>store\ =\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a827b42f70d98e1bf51ff54dbbe771421}{\$store}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00060}00060\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00068}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a8b23dbb48f0c3c94725695191d06981a}{00068}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a8b23dbb48f0c3c94725695191d06981a}{has}}(\$key):\ bool}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00069}00069\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\ is\_null(\$this-\/>\textcolor{keyword}{get}(\$key));}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00071}00071\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00079}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a3e65f6ad413b9830d1eb5e9c911e1910}{00079}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a3e65f6ad413b9830d1eb5e9c911e1910}{missing}}(\$key)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00080}00080\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a8b23dbb48f0c3c94725695191d06981a}{has}}(\$key);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00082}00082\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00093}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a499d39d1876a05b20e1ca8e8a1c2b466}{00093}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{get}(\$key,\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9df479534ecf05fd7575c6275d381687}{\$default}}\ =\ \textcolor{keyword}{null}):\ mixed}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00094}00094\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$key))\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a239d442996d14299e7c497b8cf5ba081}{many}}(\$key);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \$value\ =\ \$this-\/>store-\/>get(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_abb95537423bc69469696f814455ae222}{itemKey}}(\$key));}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ could\ not\ find\ the\ cache\ value,\ we\ will\ fire\ the\ missed\ event\ and\ get}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ default\ value\ for\ this\ cache\ value.\ This\ default\ could\ be\ a\ callback}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ so\ we\ will\ execute\ the\ value\ function\ which\ will\ resolve\ it\ if\ needed.}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af2ed0944d8bd90b71f9e64ddaac0a399}{event}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_events_1_1_cache_missed}{CacheMissed}}(\$key));}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ value(\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9df479534ecf05fd7575c6275d381687}{\$default}});}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af2ed0944d8bd90b71f9e64ddaac0a399}{event}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_events_1_1_cache_hit}{CacheHit}}(\$key,\ \$value));}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00113}00113\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00123}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a239d442996d14299e7c497b8cf5ba081}{00123}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a239d442996d14299e7c497b8cf5ba081}{many}}(array\ \$keys)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00124}00124\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \$values\ =\ \$this-\/>store-\/>many(collect(\$keys)-\/>map(\textcolor{keyword}{function}\ (\$value,\ \$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_string(\$key)\ ?\ \$key\ :\ \$value;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \})-\/>values()-\/>all());}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$values)-\/>map(\textcolor{keyword}{function}\ (\$value,\ \$key)\ use\ (\$keys)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af060dfc4e8fd7bd3602289b734afbba6}{handleManyResult}}(\$keys,\ \$key,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \})-\/>all();}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00132}00132\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00139}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9f113f21f478daebfafe7f573b23dce3}{00139}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9f113f21f478daebfafe7f573b23dce3}{getMultiple}}(\$keys,\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9df479534ecf05fd7575c6275d381687}{\$default}}\ =\ \textcolor{keyword}{null}):\ iterable}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00140}00140\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \$defaults\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$keys\ as\ \$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \$defaults[\$key]\ =\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9df479534ecf05fd7575c6275d381687}{\$default}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a239d442996d14299e7c497b8cf5ba081}{many}}(\$defaults);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00148}00148\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00158}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af060dfc4e8fd7bd3602289b734afbba6}{00158}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af060dfc4e8fd7bd3602289b734afbba6}{handleManyResult}}(\$keys,\ \$key,\ \$value)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00159}00159\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ could\ not\ find\ the\ cache\ value,\ we\ will\ fire\ the\ missed\ event\ and\ get}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ default\ value\ for\ this\ cache\ value.\ This\ default\ could\ be\ a\ callback}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ so\ we\ will\ execute\ the\ value\ function\ which\ will\ resolve\ it\ if\ needed.}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af2ed0944d8bd90b71f9e64ddaac0a399}{event}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_events_1_1_cache_missed}{CacheMissed}}(\$key));}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (isset(\$keys[\$key])\ \&\&\ !\ array\_is\_list(\$keys))\ ?\ value(\$keys[\$key])\ :\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ found\ a\ valid\ value\ we\ will\ fire\ the\ "{}hit"{}\ event\ and\ return\ the\ value}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ back\ from\ this\ function.\ The\ "{}hit"{}\ event\ gives\ developers\ an\ opportunity}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ listen\ for\ every\ possible\ cache\ "{}hit"{}\ throughout\ this\ applications.}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af2ed0944d8bd90b71f9e64ddaac0a399}{event}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_events_1_1_cache_hit}{CacheHit}}(\$key,\ \$value));}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00175}00175\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00186}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af221134cb856ca918de73feebbe36d9c}{00186}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af221134cb856ca918de73feebbe36d9c}{pull}}(\$key,\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9df479534ecf05fd7575c6275d381687}{\$default}}\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00187}00187\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this-\/>\textcolor{keyword}{get}(\$key,\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9df479534ecf05fd7575c6275d381687}{\$default}}),\ \textcolor{keyword}{function}\ ()\ use\ (\$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a56aaa13f3fc2cac361f2c6545644b341}{forget}}(\$key);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00191}00191\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00201}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af9c6b46c35dafa78890e4b24a9a724c2}{00201}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af9c6b46c35dafa78890e4b24a9a724c2}{put}}(\$key,\ \$value,\ \$ttl\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00202}00202\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$key))\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a7978ed1e6bb8436a128d34bd549da045}{putMany}}(\$key,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$ttl\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9e878bc609488e3718911915829f29a2}{forever}}(\$key,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \$seconds\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_acaad132ffd8d9afb43512a5fbba1883f}{getSeconds}}(\$ttl);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$seconds\ <=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a56aaa13f3fc2cac361f2c6545644b341}{forget}}(\$key);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \$result\ =\ \$this-\/>store-\/>put(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_abb95537423bc69469696f814455ae222}{itemKey}}(\$key),\ \$value,\ \$seconds);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$result)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af2ed0944d8bd90b71f9e64ddaac0a399}{event}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_events_1_1_key_written}{KeyWritten}}(\$key,\ \$value,\ \$seconds));}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$result;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00224}00224\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00231}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ae972783bbd380976dc0cb87fc985d84e}{00231}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{set}(\$key,\ \$value,\ \$ttl\ =\ \textcolor{keyword}{null}):\ bool}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00232}00232\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af9c6b46c35dafa78890e4b24a9a724c2}{put}}(\$key,\ \$value,\ \$ttl);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00234}00234\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00243}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a7978ed1e6bb8436a128d34bd549da045}{00243}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a7978ed1e6bb8436a128d34bd549da045}{putMany}}(array\ \$values,\ \$ttl\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00244}00244\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$ttl\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a83741ce71439034690a583d654688905}{putManyForever}}(\$values);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \$seconds\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_acaad132ffd8d9afb43512a5fbba1883f}{getSeconds}}(\$ttl);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$seconds\ <=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a5950974b7aa126f3c1864539b722cbbd}{deleteMultiple}}(array\_keys(\$values));}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \$result\ =\ \$this-\/>store-\/>putMany(\$values,\ \$seconds);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$result)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$values\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af2ed0944d8bd90b71f9e64ddaac0a399}{event}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_events_1_1_key_written}{KeyWritten}}(\$key,\ \$value,\ \$seconds));}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$result;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00264}00264\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00272}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a83741ce71439034690a583d654688905}{00272}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a83741ce71439034690a583d654688905}{putManyForever}}(array\ \$values)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00273}00273\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \$result\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$values\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9e878bc609488e3718911915829f29a2}{forever}}(\$key,\ \$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$result\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$result;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00283}00283\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00290}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a0cddff25fce3972ec25ced86f1715780}{00290}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a0cddff25fce3972ec25ced86f1715780}{setMultiple}}(\$values,\ \$ttl\ =\ \textcolor{keyword}{null}):\ bool}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00291}00291\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a7978ed1e6bb8436a128d34bd549da045}{putMany}}(is\_array(\$values)\ ?\ \$values\ :\ iterator\_to\_array(\$values),\ \$ttl);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00293}00293\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00294}00294\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00303}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a2c817fcc6844f9cf289d662da1c39e63}{00303}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a2c817fcc6844f9cf289d662da1c39e63}{add}}(\$key,\ \$value,\ \$ttl\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00304}00304\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00305}00305\ \ \ \ \ \ \ \ \ \$seconds\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00306}00306\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$ttl\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ \$seconds\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_acaad132ffd8d9afb43512a5fbba1883f}{getSeconds}}(\$ttl);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$seconds\ <=\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ store\ has\ an\ "{}add"{}\ method\ we\ will\ call\ the\ method\ on\ the\ store\ so\ it}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ has\ a\ chance\ to\ override\ this\ logic.\ Some\ drivers\ better\ support\ the\ way}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ operation\ should\ work\ with\ a\ total\ "{}atomic"{}\ implementation\ of\ it.}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (method\_exists(\$this-\/>store,\ \textcolor{stringliteral}{'add'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>store-\/>add(}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_abb95537423bc69469696f814455ae222}{itemKey}}(\$key),\ \$value,\ \$seconds}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ value\ did\ not\ exist\ in\ the\ cache,\ we\ will\ put\ the\ value\ in\ the\ cache}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00325}00325\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ so\ it\ exists\ for\ subsequent\ requests.\ Then,\ we\ will\ return\ true\ so\ it\ is}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ easy\ to\ know\ if\ the\ value\ gets\ added.\ Otherwise,\ we\ will\ return\ false.}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00327}00327\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$this-\/>\textcolor{keyword}{get}(\$key)))\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af9c6b46c35dafa78890e4b24a9a724c2}{put}}(\$key,\ \$value,\ \$seconds);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00332}00332\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00333}00333\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00341}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ae988f454c3a6f948704f0b3c1bd494f8}{00341}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ae988f454c3a6f948704f0b3c1bd494f8}{increment}}(\$key,\ \$value\ =\ 1)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00342}00342\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>store-\/>increment(\$key,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00344}00344\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00345}00345\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00353}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a91b4776ce9b64b515af83f82cb5ba1b8}{00353}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a91b4776ce9b64b515af83f82cb5ba1b8}{decrement}}(\$key,\ \$value\ =\ 1)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00354}00354\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>store-\/>decrement(\$key,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00356}00356\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00357}00357\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00365}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9e878bc609488e3718911915829f29a2}{00365}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9e878bc609488e3718911915829f29a2}{forever}}(\$key,\ \$value)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00366}00366\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \$result\ =\ \$this-\/>store-\/>forever(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_abb95537423bc69469696f814455ae222}{itemKey}}(\$key),\ \$value);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$result)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00370}00370\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af2ed0944d8bd90b71f9e64ddaac0a399}{event}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_events_1_1_key_written}{KeyWritten}}(\$key,\ \$value));}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00371}00371\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00372}00372\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$result;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00374}00374\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00375}00375\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00386}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a8f991855347f69fa6ff25e66d9a9b04f}{00386}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a8f991855347f69fa6ff25e66d9a9b04f}{remember}}(\$key,\ \$ttl,\ Closure\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00387}00387\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \$value\ =\ \$this-\/>\textcolor{keyword}{get}(\$key);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ item\ exists\ in\ the\ cache\ we\ will\ just\ return\ this\ immediately\ and\ if}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ not\ we\ will\ execute\ the\ given\ Closure\ and\ cache\ the\ result\ of\ that\ for\ a}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ given\ number\ of\ seconds\ so\ it's\ available\ for\ all\ subsequent\ requests.}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00396}00396\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \$value\ =\ \$callback();}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00399}00399\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af9c6b46c35dafa78890e4b24a9a724c2}{put}}(\$key,\ \$value,\ value(\$ttl,\ \$value));}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00402}00402\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00403}00403\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00413}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a63cf87dc7fa41b404c2db8dc68f24888}{00413}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a63cf87dc7fa41b404c2db8dc68f24888}{sear}}(\$key,\ Closure\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00414}00414\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00415}00415\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ac3a49505d6548f2e0b9b97294044fe49}{rememberForever}}(\$key,\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00416}00416\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00417}00417\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00427}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ac3a49505d6548f2e0b9b97294044fe49}{00427}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ac3a49505d6548f2e0b9b97294044fe49}{rememberForever}}(\$key,\ Closure\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00428}00428\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00429}00429\ \ \ \ \ \ \ \ \ \$value\ =\ \$this-\/>\textcolor{keyword}{get}(\$key);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00430}00430\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ item\ exists\ in\ the\ cache\ we\ will\ just\ return\ this\ immediately}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ if\ not\ we\ will\ execute\ the\ given\ Closure\ and\ cache\ the\ result}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ of\ that\ forever\ so\ it\ is\ available\ for\ all\ subsequent\ requests.}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00437}00437\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9e878bc609488e3718911915829f29a2}{forever}}(\$key,\ \$value\ =\ \$callback());}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00439}00439\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00440}00440\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00441}00441\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00442}00442\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00449}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a56aaa13f3fc2cac361f2c6545644b341}{00449}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a56aaa13f3fc2cac361f2c6545644b341}{forget}}(\$key)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00450}00450\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\$this-\/>store-\/>forget(\$this-\/>itemKey(\$key)),\ \mbox{\hyperlink{rector-migrate_8php_affc7ca71e2c30ccc9604c2697809c870}{function}}\ (\$result)\ use\ (\$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00452}00452\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$result)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af2ed0944d8bd90b71f9e64ddaac0a399}{event}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_events_1_1_key_forgotten}{KeyForgotten}}(\$key));}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00456}00456\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00457}00457\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00463}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_aa74a2edd6f3cbb5c5353f7faa97b6d70}{00463}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{delete}(\$key):\ bool}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00464}00464\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a56aaa13f3fc2cac361f2c6545644b341}{forget}}(\$key);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00466}00466\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00473}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a5950974b7aa126f3c1864539b722cbbd}{00473}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a5950974b7aa126f3c1864539b722cbbd}{deleteMultiple}}(\$keys):\ bool}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00474}00474\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \$result\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00476}00476\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$keys\ as\ \$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a56aaa13f3fc2cac361f2c6545644b341}{forget}}(\$key))\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$result\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00482}00482\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00483}00483\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$result;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00484}00484\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00485}00485\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00491}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_aa821bec12eaa7e0f649397c9675ff505}{00491}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_aa821bec12eaa7e0f649397c9675ff505}{clear}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00492}00492\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00493}00493\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>store-\/>flush();}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00494}00494\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00495}00495\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00504}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a5c93f390501a110af5ee104099e65261}{00504}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a5c93f390501a110af5ee104099e65261}{tags}}(\$names)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00505}00505\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00506}00506\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ab0bc59e5ce9ba978118d33ffde07e730}{supportsTags}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00507}00507\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ BadMethodCallException(\textcolor{stringliteral}{'This\ cache\ store\ does\ not\ support\ tagging.'});}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00508}00508\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \$cache\ =\ \$this-\/>store-\/>tags(is\_array(\$names)\ ?\ \$names\ :\ func\_get\_args());}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00511}00511\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$this-\/>events))\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \$cache-\/>setEventDispatcher(\$this-\/>events);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00515}00515\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$cache-\/>setDefaultCacheTime(\$this-\/>\textcolor{keywordflow}{default});}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00517}00517\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00518}00518\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00525}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_abb95537423bc69469696f814455ae222}{00525}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_abb95537423bc69469696f814455ae222}{itemKey}}(\$key)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00526}00526\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00527}00527\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$key;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00528}00528\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00529}00529\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00536}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_acaad132ffd8d9afb43512a5fbba1883f}{00536}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_acaad132ffd8d9afb43512a5fbba1883f}{getSeconds}}(\$ttl)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00537}00537\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00538}00538\ \ \ \ \ \ \ \ \ \$duration\ =\ \$this-\/>parseDateInterval(\$ttl);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00539}00539\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$duration\ instanceof\ DateTimeInterface)\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \$duration\ =\ Carbon::now()-\/>diffInRealSeconds(\$duration,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00543}00543\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00544}00544\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{int})\ (\$duration\ >\ 0\ ?\ \$duration\ :\ 0);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00545}00545\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00546}00546\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00552}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ab0bc59e5ce9ba978118d33ffde07e730}{00552}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ab0bc59e5ce9ba978118d33ffde07e730}{supportsTags}}()}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00553}00553\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00554}00554\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ method\_exists(\$this-\/>store,\ \textcolor{stringliteral}{'tags'});}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00555}00555\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00556}00556\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00562}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af3c708fbd76ea91fd7cc1c0957582aad}{00562}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af3c708fbd76ea91fd7cc1c0957582aad}{getDefaultCacheTime}}()}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00563}00563\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a9df479534ecf05fd7575c6275d381687}{\$this-\/>default}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00565}00565\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00566}00566\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00573}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a192ab9620f87f4f5eb57092c921a3a44}{00573}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a192ab9620f87f4f5eb57092c921a3a44}{setDefaultCacheTime}}(\$seconds)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00574}00574\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00575}00575\ \ \ \ \ \ \ \ \ \$this-\/>\textcolor{keywordflow}{default}\ =\ \$seconds;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00576}00576\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00578}00578\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00579}00579\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00585}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a523d1f40bae28997db97fd9ac767fdf6}{00585}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a523d1f40bae28997db97fd9ac767fdf6}{getStore}}()}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00586}00586\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00587}00587\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a827b42f70d98e1bf51ff54dbbe771421}{\$this-\/>store}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00588}00588\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00589}00589\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00596}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a17761306cedffe5e69d5546acd4f09fc}{00596}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a17761306cedffe5e69d5546acd4f09fc}{setStore}}(\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a827b42f70d98e1bf51ff54dbbe771421}{\$store}})}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00597}00597\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00598}00598\ \ \ \ \ \ \ \ \ \$this-\/>store\ =\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a827b42f70d98e1bf51ff54dbbe771421}{\$store}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00599}00599\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00600}00600\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00601}00601\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00602}00602\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00609}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af2ed0944d8bd90b71f9e64ddaac0a399}{00609}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af2ed0944d8bd90b71f9e64ddaac0a399}{event}}(\$event)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00610}00610\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \$this-\/>events?-\/>dispatch(\$event);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00612}00612\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00613}00613\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00619}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a1038704d0a304d447214b6a700e7607f}{00619}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a1038704d0a304d447214b6a700e7607f}{getEventDispatcher}}()}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00620}00620\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a1bcec9bbd34255927faaf155bf3a940a}{\$this-\/>events}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00622}00622\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00623}00623\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00630}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a4b9f7d9f845e655d0589dbb5376bed5a}{00630}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a4b9f7d9f845e655d0589dbb5376bed5a}{setEventDispatcher}}(\mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_events_1_1_dispatcher}{Dispatcher}}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a1bcec9bbd34255927faaf155bf3a940a}{\$events}})}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00631}00631\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00632}00632\ \ \ \ \ \ \ \ \ \$this-\/>events\ =\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a1bcec9bbd34255927faaf155bf3a940a}{\$events}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00633}00633\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00634}00634\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00641}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a72b9545b16ea105298bb0d2109bd2fbe}{00641}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a72b9545b16ea105298bb0d2109bd2fbe}{offsetExists}}(\$key):\ bool}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00642}00642\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00643}00643\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a8b23dbb48f0c3c94725695191d06981a}{has}}(\$key);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00644}00644\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00645}00645\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00652}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a6e8e2b3128ee9bd6be930cb296c02ac7}{00652}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a6e8e2b3128ee9bd6be930cb296c02ac7}{offsetGet}}(\$key):\ mixed}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00653}00653\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00654}00654\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\textcolor{keyword}{get}(\$key);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00655}00655\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00656}00656\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00664}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a3199adfa66a63d34fb355f3ccf39bf0a}{00664}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a3199adfa66a63d34fb355f3ccf39bf0a}{offsetSet}}(\$key,\ \$value):\ void}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00665}00665\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00666}00666\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_af9c6b46c35dafa78890e4b24a9a724c2}{put}}(\$key,\ \$value,\ \$this-\/>\textcolor{keywordflow}{default});}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00667}00667\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00668}00668\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00675}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a1d11d3dade07ef846d01a397abfaf0d9}{00675}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a1d11d3dade07ef846d01a397abfaf0d9}{offsetUnset}}(\$key):\ void}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00676}00676\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00677}00677\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a56aaa13f3fc2cac361f2c6545644b341}{forget}}(\$key);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00678}00678\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00679}00679\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00687}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ac565bd6a9d062c73a0a0db7afe0ffea9}{00687}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ac565bd6a9d062c73a0a0db7afe0ffea9}{\_\_call}}(\$method,\ \$parameters)}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00688}00688\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00689}00689\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (static::hasMacro(\$method))\ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00690}00690\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>macroCall(\$method,\ \$parameters);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00691}00691\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00692}00692\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00693}00693\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>store-\/>\$method(...\$parameters);}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00694}00694\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00695}00695\ }
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00701}\mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ad0cb87b388bc74d63dc884accdca8713}{00701}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_ad0cb87b388bc74d63dc884accdca8713}{\_\_clone}}()}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00702}00702\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00703}00703\ \ \ \ \ \ \ \ \ \$this-\/>store\ =\ clone\ \mbox{\hyperlink{class_illuminate_1_1_cache_1_1_repository_a827b42f70d98e1bf51ff54dbbe771421}{\$this-\/>store}};}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00704}00704\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_cache_2_repository_8php_source_l00705}00705\ \}}
+
+\end{DoxyCode}

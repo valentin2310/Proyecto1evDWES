@@ -1,0 +1,197 @@
+\doxysection{Entry\+Parser.\+php}
+\hypertarget{_entry_parser_8php_source}{}\label{_entry_parser_8php_source}\index{vendor/vlucas/phpdotenv/src/Parser/EntryParser.php@{vendor/vlucas/phpdotenv/src/Parser/EntryParser.php}}
+\mbox{\hyperlink{_entry_parser_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00003}00003\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_dotenv_1_1_parser}{Dotenv\(\backslash\)Parser}};}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_dotenv_1_1_util_1_1_regex}{Dotenv\(\backslash\)Util\(\backslash\)Regex}};}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_dotenv_1_1_util_1_1_str}{Dotenv\(\backslash\)Util\(\backslash\)Str}};}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_graham_campbell_1_1_result_type_1_1_error}{GrahamCampbell\(\backslash\)ResultType\(\backslash\)Error}};}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_graham_campbell_1_1_result_type_1_1_result}{GrahamCampbell\(\backslash\)ResultType\(\backslash\)Result}};}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_graham_campbell_1_1_result_type_1_1_success}{GrahamCampbell\(\backslash\)ResultType\(\backslash\)Success}};}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00013}\mbox{\hyperlink{class_dotenv_1_1_parser_1_1_entry_parser}{00013}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_dotenv_1_1_parser_1_1_entry_parser}{EntryParser}}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00014}00014\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00015}00015\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ INITIAL\_STATE\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00016}00016\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ UNQUOTED\_STATE\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00017}00017\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ SINGLE\_QUOTED\_STATE\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00018}00018\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ DOUBLE\_QUOTED\_STATE\ =\ 3;}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00019}00019\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ ESCAPE\_SEQUENCE\_STATE\ =\ 4;}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ WHITESPACE\_STATE\ =\ 5;}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ COMMENT\_STATE\ =\ 6;}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ REJECT\_STATES\ =\ [self::SINGLE\_QUOTED\_STATE,\ self::DOUBLE\_QUOTED\_STATE,\ self::ESCAPE\_SEQUENCE\_STATE];}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ \_\_construct()}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00032}00032\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00033}00033\ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00034}00034\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ parse(\textcolor{keywordtype}{string}\ \$entry)}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00047}00047\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::splitStringIntoParts(\$entry)-\/>flatMap(\textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (array\ \$parts)\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ [\$name,\ \$value]\ =\ \$parts;}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::parseName(\$name)-\/>flatMap(\textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (\textcolor{keywordtype}{string}\ \$name)\ use\ (\$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$parsedValue\ =\ \$value\ ===\ \textcolor{keyword}{null}\ ?\ Success::create(\textcolor{keyword}{null})\ :\ self::parseValue(\$value);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$parsedValue-\/>map(\textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (?\mbox{\hyperlink{class_dotenv_1_1_parser_1_1_value}{Value}}\ \$value)\ use\ (\$name)\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_dotenv_1_1_parser_1_1_entry}{Entry}}(\$name,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00060}00060\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00069}00069\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ splitStringIntoParts(\textcolor{keywordtype}{string}\ \$line)}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00070}00070\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \$result\ =\ Str::pos(\$line,\ \textcolor{charliteral}{'='})-\/>map(\textcolor{keyword}{static}\ \textcolor{keyword}{function}\ ()\ use\ (\$line)\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ return\ \(\backslash\)array\_map(\textcolor{stringliteral}{'trim'},\ \(\backslash\)explode(\textcolor{charliteral}{'='},\ \$line,\ 2));}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \})-\/>getOrElse([\$line,\ \textcolor{keyword}{null}]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$result[0]\ ===\ \textcolor{stringliteral}{''})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_graham_campbell_1_1_result_type_1_1_error_a95592398c063f14f4ec180d392b60c48}{Error::create}}(self::getErrorMessage(\textcolor{stringliteral}{'an\ unexpected\ equals'},\ \$line));}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create(\$result);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00095}00095\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ parseName(\textcolor{keywordtype}{string}\ \$name)}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00096}00096\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Str::len(\$name)\ >\ 8\ \&\&\ Str::substr(\$name,\ 0,\ 6)\ ===\ \textcolor{stringliteral}{'export'}\ \&\&\ \(\backslash\)ctype\_space(Str::substr(\$name,\ 6,\ 1)))\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \$name\ =\ \(\backslash\)ltrim(Str::substr(\$name,\ 6));}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (self::isQuotedName(\$name))\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \$name\ =\ Str::substr(\$name,\ 1,\ -\/1);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!self::isValidName(\$name))\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_graham_campbell_1_1_result_type_1_1_error_a95592398c063f14f4ec180d392b60c48}{Error::create}}(self::getErrorMessage(\textcolor{stringliteral}{'an\ invalid\ name'},\ \$name));}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create(\$name);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00112}00112\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00121}00121\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ isQuotedName(\textcolor{keywordtype}{string}\ \$name)}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00122}00122\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Str::len(\$name)\ <\ 3)\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \$first\ =\ Str::substr(\$name,\ 0,\ 1);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{exception_8html_8php_acf48db609a946d13953d8060363fd1d3}{\$last}}\ =\ Str::substr(\$name,\ -\/1,\ 1);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\$first\ ===\ \textcolor{charliteral}{'"{}'}\ \&\&\ \mbox{\hyperlink{exception_8html_8php_acf48db609a946d13953d8060363fd1d3}{\$last}}\ ===\ \textcolor{charliteral}{'"{}'})\ ||\ (\$first\ ===\ \textcolor{charliteral}{'\(\backslash\)''}\ \&\&\ \mbox{\hyperlink{exception_8html_8php_acf48db609a946d13953d8060363fd1d3}{\$last}}\ ===\ \textcolor{charliteral}{'\(\backslash\)''});}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00131}00131\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00140}00140\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ isValidName(\textcolor{keywordtype}{string}\ \$name)}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00141}00141\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Regex::matches(\textcolor{stringliteral}{'\string~(*UTF8)\(\backslash\)A[\(\backslash\)p\{Ll\}\(\backslash\)p\{Lu\}\(\backslash\)p\{M\}\(\backslash\)p\{N\}\_.]+\(\backslash\)z\string~'},\ \$name)-\/>success()-\/>getOrElse(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00143}00143\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00157}00157\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ parseValue(\textcolor{keywordtype}{string}\ \$value)}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00158}00158\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)trim(\$value)\ ===\ \textcolor{stringliteral}{''})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create(\mbox{\hyperlink{class_dotenv_1_1_parser_1_1_value_a33162ac2a50b79b85a3d4a92be8f8289}{Value::blank}}());}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ return\ \(\backslash\)array\_reduce(\(\backslash\)iterator\_to\_array(\mbox{\hyperlink{class_dotenv_1_1_parser_1_1_lexer_a0567ec259bdbeaf1be0522e6d98f9732}{Lexer::lex}}(\$value)),\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_graham_campbell_1_1_result_type_1_1_result}{Result}}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \textcolor{keywordtype}{string}\ \$token)\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}-\/>flatMap(\textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})\ use\ (\$token)\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::processToken(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[1],\ \$token)-\/>map(\textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (array\ \$val)\ use\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[0]-\/>append(\$val[0],\ \$val[1]),\ \$val[2]];}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \},\ Success::create([\mbox{\hyperlink{class_dotenv_1_1_parser_1_1_value_a33162ac2a50b79b85a3d4a92be8f8289}{Value::blank}}(),\ self::INITIAL\_STATE]))-\/>flatMap(\textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (array\ \$result)\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\$result[1],\ self::REJECT\_STATES,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_graham_campbell_1_1_result_type_1_1_error_a95592398c063f14f4ec180d392b60c48}{Error::create}}(\textcolor{stringliteral}{'a\ missing\ closing\ quote'});}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create(\$result[0]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \})-\/>mapError(\textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (\textcolor{keywordtype}{string}\ \$err)\ use\ (\$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::getErrorMessage(\$err,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00182}00182\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00192}00192\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ processToken(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{update__mime__types_8php_ae82306c4f2d17d8dd5c7d8d916b33bed}{\$state}},\ \textcolor{keywordtype}{string}\ \$token)}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00193}00193\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{update__mime__types_8php_ae82306c4f2d17d8dd5c7d8d916b33bed}{\$state}})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ self::INITIAL\_STATE:}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$token\ ===\ \textcolor{charliteral}{'\(\backslash\)''})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\textcolor{stringliteral}{''},\ \textcolor{keyword}{false},\ self::SINGLE\_QUOTED\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$token\ ===\ \textcolor{charliteral}{'"{}'})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\textcolor{stringliteral}{''},\ \textcolor{keyword}{false},\ self::DOUBLE\_QUOTED\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$token\ ===\ \textcolor{charliteral}{'\#'})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\textcolor{stringliteral}{''},\ \textcolor{keyword}{false},\ self::COMMENT\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$token\ ===\ \textcolor{charliteral}{'\$'})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\$token,\ \textcolor{keyword}{true},\ self::UNQUOTED\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\$token,\ \textcolor{keyword}{false},\ self::UNQUOTED\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ self::UNQUOTED\_STATE:}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$token\ ===\ \textcolor{charliteral}{'\#'})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\textcolor{stringliteral}{''},\ \textcolor{keyword}{false},\ self::COMMENT\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\(\backslash\)ctype\_space(\$token))\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\textcolor{stringliteral}{''},\ \textcolor{keyword}{false},\ self::WHITESPACE\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$token\ ===\ \textcolor{charliteral}{'\$'})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\$token,\ \textcolor{keyword}{true},\ self::UNQUOTED\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\$token,\ \textcolor{keyword}{false},\ self::UNQUOTED\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ self::SINGLE\_QUOTED\_STATE:}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$token\ ===\ \textcolor{charliteral}{'\(\backslash\)''})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\textcolor{stringliteral}{''},\ \textcolor{keyword}{false},\ self::WHITESPACE\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\$token,\ \textcolor{keyword}{false},\ self::SINGLE\_QUOTED\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ self::DOUBLE\_QUOTED\_STATE:}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$token\ ===\ \textcolor{charliteral}{'"{}'})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\textcolor{stringliteral}{''},\ \textcolor{keyword}{false},\ self::WHITESPACE\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$token\ ===\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\textcolor{stringliteral}{''},\ \textcolor{keyword}{false},\ self::ESCAPE\_SEQUENCE\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$token\ ===\ \textcolor{charliteral}{'\$'})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\$token,\ \textcolor{keyword}{true},\ self::DOUBLE\_QUOTED\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\$token,\ \textcolor{keyword}{false},\ self::DOUBLE\_QUOTED\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ self::ESCAPE\_SEQUENCE\_STATE:}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$token\ ===\ \textcolor{charliteral}{'"{}'}\ ||\ \$token\ ===\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\$token,\ \textcolor{keyword}{false},\ self::DOUBLE\_QUOTED\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$token\ ===\ \textcolor{charliteral}{'\$'})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\$token,\ \textcolor{keyword}{false},\ self::DOUBLE\_QUOTED\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$first\ =\ Str::substr(\$token,\ 0,\ 1);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)in\_array(\$first,\ [\textcolor{charliteral}{'f'},\ \textcolor{charliteral}{'n'},\ \textcolor{charliteral}{'r'},\ \textcolor{charliteral}{'t'},\ \textcolor{charliteral}{'v'}],\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\(\backslash\)stripcslashes(\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}.\$first).Str::substr(\$token,\ 1),\ \textcolor{keyword}{false},\ self::DOUBLE\_QUOTED\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_graham_campbell_1_1_result_type_1_1_error_a95592398c063f14f4ec180d392b60c48}{Error::create}}(\textcolor{stringliteral}{'an\ unexpected\ escape\ sequence'});}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ self::WHITESPACE\_STATE:}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$token\ ===\ \textcolor{charliteral}{'\#'})\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\textcolor{stringliteral}{''},\ \textcolor{keyword}{false},\ self::COMMENT\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (!\(\backslash\)ctype\_space(\$token))\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_graham_campbell_1_1_result_type_1_1_error_a95592398c063f14f4ec180d392b60c48}{Error::create}}(\textcolor{stringliteral}{'unexpected\ whitespace'});}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\textcolor{stringliteral}{''},\ \textcolor{keyword}{false},\ self::WHITESPACE\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ self::COMMENT\_STATE:}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Success::create([\textcolor{stringliteral}{''},\ \textcolor{keyword}{false},\ self::COMMENT\_STATE]);}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)Error(\textcolor{stringliteral}{'Parser\ entered\ invalid\ state.'});}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00282}00282\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00292}00292\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ getErrorMessage(\textcolor{keywordtype}{string}\ \$cause,\ \textcolor{keywordtype}{string}\ \$subject)}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00293}00293\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ return\ \(\backslash\)sprintf(}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Encountered\ \%s\ at\ [\%s].'},}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \$cause,}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)strtok(\$subject,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}})}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00299}00299\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_entry_parser_8php_source_l00300}00300\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,496 @@
+\doxysection{Lexer.\+php}
+\hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source}{}\label{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source}\index{vendor/nikic/php-\/parser/lib/PhpParser/Lexer.php@{vendor/nikic/php-\/parser/lib/PhpParser/Lexer.php}}
+\mbox{\hyperlink{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_php_parser}{PhpParser}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00005}00005\ use\ \mbox{\hyperlink{class_php_parser_1_1_parser_1_1_tokens}{PhpParser\(\backslash\)Parser\(\backslash\)Tokens}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00007}\mbox{\hyperlink{class_php_parser_1_1_lexer}{00007}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_php_parser_1_1_lexer}{Lexer}}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00008}00008\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00009}\mbox{\hyperlink{class_php_parser_1_1_lexer_a7949acdaecc70b9f035c12a7069db132}{00009}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_a7949acdaecc70b9f035c12a7069db132}{\$code}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00010}\mbox{\hyperlink{class_php_parser_1_1_lexer_a72ead29e4317fbc4335fd3ba764e8b59}{00010}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00011}\mbox{\hyperlink{class_php_parser_1_1_lexer_a5de51f0c80b3bb3b39a57b23f6b9ea9f}{00011}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_a5de51f0c80b3bb3b39a57b23f6b9ea9f}{\$pos}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00012}\mbox{\hyperlink{class_php_parser_1_1_lexer_a52f469b0182d9abac2d0f20548680c9c}{00012}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_a52f469b0182d9abac2d0f20548680c9c}{\$line}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00013}\mbox{\hyperlink{class_php_parser_1_1_lexer_a6cfadcd69d77fb8bded90b5de852710f}{00013}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_a6cfadcd69d77fb8bded90b5de852710f}{\$filePos}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00014}\mbox{\hyperlink{class_php_parser_1_1_lexer_a73aba9c7972142ccd4045576e7715ec7}{00014}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_a73aba9c7972142ccd4045576e7715ec7}{\$prevCloseTagHasNewline}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00016}\mbox{\hyperlink{class_php_parser_1_1_lexer_ac268457fe29add64a1b2ea609c8b7393}{00016}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_ac268457fe29add64a1b2ea609c8b7393}{\$tokenMap}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00017}\mbox{\hyperlink{class_php_parser_1_1_lexer_ad43f53661b5171fe263fe5d22c9b3b90}{00017}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_ad43f53661b5171fe263fe5d22c9b3b90}{\$dropTokens}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00018}\mbox{\hyperlink{class_php_parser_1_1_lexer_a57e50d99d2e8a2fa22c81afb7e7c4cc8}{00018}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_a57e50d99d2e8a2fa22c81afb7e7c4cc8}{\$identifierTokens}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00020}00020\ \ \ \ \ \textcolor{keyword}{private}\ \$attributeStartLineUsed;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{private}\ \$attributeEndLineUsed;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{private}\ \$attributeStartTokenPosUsed;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{private}\ \$attributeEndTokenPosUsed;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00024}00024\ \ \ \ \ \textcolor{keyword}{private}\ \$attributeStartFilePosUsed;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00025}00025\ \ \ \ \ \textcolor{keyword}{private}\ \$attributeEndFilePosUsed;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00026}00026\ \ \ \ \ \textcolor{keyword}{private}\ \$attributeCommentsUsed;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00037}\mbox{\hyperlink{class_php_parser_1_1_lexer_a3f8a60e8e1644d4f26da4ca9330794dd}{00037}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_a3f8a60e8e1644d4f26da4ca9330794dd}{\_\_construct}}(array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00038}00038\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ Map\ from\ internal\ tokens\ to\ PhpParser\ tokens.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \$this-\/>defineCompatibilityTokens();}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \$this-\/>tokenMap\ =\ \$this-\/>createTokenMap();}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \$this-\/>identifierTokens\ =\ \$this-\/>createIdentifierTokenMap();}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ map\ of\ tokens\ to\ drop\ while\ lexing\ (the\ map\ is\ only\ used\ for\ isset\ lookup,}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ that's\ why\ the\ value\ is\ simply\ set\ to\ 1;\ the\ value\ is\ never\ actually\ used.)}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \$this-\/>dropTokens\ =\ array\_fill\_keys(}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ [\(\backslash\)T\_WHITESPACE,\ \(\backslash\)T\_OPEN\_TAG,\ \(\backslash\)T\_COMMENT,\ \(\backslash\)T\_DOC\_COMMENT,\ \(\backslash\)T\_BAD\_CHARACTER],\ 1}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \$defaultAttributes\ =\ [\textcolor{stringliteral}{'comments'},\ \textcolor{stringliteral}{'startLine'},\ \textcolor{stringliteral}{'endLine'}];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \$usedAttributes\ =\ array\_fill\_keys(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'usedAttributes'}]\ ??\ \$defaultAttributes,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ individual\ boolean\ properties\ to\ make\ these\ checks\ faster.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \$this-\/>attributeStartLineUsed\ =\ isset(\$usedAttributes[\textcolor{stringliteral}{'startLine'}]);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \$this-\/>attributeEndLineUsed\ =\ isset(\$usedAttributes[\textcolor{stringliteral}{'endLine'}]);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \$this-\/>attributeStartTokenPosUsed\ =\ isset(\$usedAttributes[\textcolor{stringliteral}{'startTokenPos'}]);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \$this-\/>attributeEndTokenPosUsed\ =\ isset(\$usedAttributes[\textcolor{stringliteral}{'endTokenPos'}]);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \$this-\/>attributeStartFilePosUsed\ =\ isset(\$usedAttributes[\textcolor{stringliteral}{'startFilePos'}]);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \$this-\/>attributeEndFilePosUsed\ =\ isset(\$usedAttributes[\textcolor{stringliteral}{'endFilePos'}]);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \$this-\/>attributeCommentsUsed\ =\ isset(\$usedAttributes[\textcolor{stringliteral}{'comments'}]);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00060}00060\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00072}\mbox{\hyperlink{class_php_parser_1_1_lexer_aa7f1b933ad5b72b8a6aa3939c08ff67e}{00072}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_aa7f1b933ad5b72b8a6aa3939c08ff67e}{startLexing}}(\textcolor{keywordtype}{string}\ \$code,\ \mbox{\hyperlink{interface_php_parser_1_1_error_handler}{ErrorHandler}}\ \$errorHandler\ =\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$errorHandler)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \$errorHandler\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_php_parser_1_1_error_handler_1_1_throwing}{ErrorHandler\(\backslash\)Throwing}}();}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \$this-\/>code\ =\ \$code;\ \textcolor{comment}{//\ keep\ the\ code\ around\ for\ \_\_halt\_compiler()\ handling}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \$this-\/>pos\ \ =\ -\/1;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \$this-\/>line\ =\ \ 1;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \$this-\/>filePos\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ inline\ HTML\ occurs\ without\ preceding\ code,\ treat\ it\ as\ if\ it\ had\ a\ leading\ newline.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ ensures\ proper\ composability,\ because\ having\ a\ newline\ is\ the\ "{}safe"{}\ assumption.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \$this-\/>prevCloseTagHasNewline\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \$scream\ =\ ini\_set(\textcolor{stringliteral}{'xdebug.scream'},\ \textcolor{charliteral}{'0'});}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \$this-\/>tokens\ =\ @token\_get\_all(\$code);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \$this-\/>postprocessTokens(\$errorHandler);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{false}\ !==\ \$scream)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ ini\_set(\textcolor{stringliteral}{'xdebug.scream'},\ \$scream);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00094}00094\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00096}00096\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ handleInvalidCharacterRange(\$start,\ \$end,\ \$line,\ \mbox{\hyperlink{interface_php_parser_1_1_error_handler}{ErrorHandler}}\ \$errorHandler)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ \$start;\ \$i\ <\ \$end;\ \$i++)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \$chr\ =\ \$this-\/>code[\$i];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$chr\ ===\ \textcolor{stringliteral}{"{}\(\backslash\)0"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ PHP\ cuts\ error\ message\ after\ null\ byte,\ so\ need\ special\ case}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$errorMsg\ =\ \textcolor{stringliteral}{'Unexpected\ null\ byte'};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$errorMsg\ =\ sprintf(}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Unexpected\ character\ "{}\%s"{}\ (ASCII\ \%d)'},\ \$chr,\ ord(\$chr)}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[]\ =\ [\(\backslash\)T\_BAD\_CHARACTER,\ \$chr,\ \$line];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \$errorHandler-\/>\mbox{\hyperlink{interface_php_parser_1_1_error_handler_aed718281073b3e90cbb3a2000f73b029}{handleError}}(\textcolor{keyword}{new}\ Error(\$errorMsg,\ [}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'startLine'}\ =>\ \$line,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'endLine'}\ =>\ \$line,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'startFilePos'}\ =>\ \$i,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'endFilePos'}\ =>\ \$i,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ ]));}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00118}00118\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00125}00125\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ isUnterminatedComment(\$token)\ :\ bool\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_2app_8php_acad40810860c7e1d97832f57dbe2d202}{return}}\ (\$token[0]\ ===\ \(\backslash\)T\_COMMENT\ ||\ \$token[0]\ ===\ \(\backslash\)T\_DOC\_COMMENT)}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ substr(\$token[1],\ 0,\ 2)\ ===\ \textcolor{stringliteral}{'/*'}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ substr(\$token[1],\ -\/2)\ !==\ \textcolor{stringliteral}{'*/'};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00129}00129\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00131}\mbox{\hyperlink{class_php_parser_1_1_lexer_a1244d1222ea9d02f60bc7c6a7b48578b}{00131}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_a1244d1222ea9d02f60bc7c6a7b48578b}{postprocessTokens}}(\mbox{\hyperlink{interface_php_parser_1_1_error_handler}{ErrorHandler}}\ \$errorHandler)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ PHP's\ error\ handling\ for\ token\_get\_all()\ is\ rather\ bad,\ so\ if\ we\ want\ detailed}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ error\ information\ we\ need\ to\ compute\ it\ ourselves.\ Invalid\ character\ errors\ are}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ detected\ by\ finding\ "{}gaps"{}\ in\ the\ token\ array.\ Unterminated\ comments\ are\ detected}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ by\ checking\ if\ a\ trailing\ comment\ has\ a\ "{}*/"{}\ at\ the\ end.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Additionally,\ we\ perform\ a\ number\ of\ canonicalizations\ here:}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ *\ Use\ the\ PHP\ 8.0\ comment\ format,\ which\ does\ not\ include\ trailing\ whitespace\ anymore.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ *\ Use\ PHP\ 8.0\ T\_NAME\_*\ tokens.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ *\ Use\ PHP\ 8.1\ T\_AMPERSAND\_NOT\_FOLLOWED\_BY\_VAR\_OR\_VARARG\ and}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ T\_AMPERSAND\_FOLLOWED\_BY\_VAR\_OR\_VARARG\ tokens\ used\ to\ disambiguate\ intersection\ types.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \$filePos\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \$line\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \$numTokens\ =\ \(\backslash\)count(\$this-\/>tokens);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 0;\ \$i\ <\ \$numTokens;\ \$i++)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \$token\ =\ \$this-\/>tokens[\$i];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Since\ PHP\ 7.4\ invalid\ characters\ are\ represented\ by\ a\ T\_BAD\_CHARACTER\ token.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ In\ this\ case\ we\ only\ need\ to\ emit\ an\ error.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$token[0]\ ===\ \(\backslash\)T\_BAD\_CHARACTER)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>handleInvalidCharacterRange(\$filePos,\ \$filePos\ +\ 1,\ \$line,\ \$errorHandler);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$token[0]\ ===\ \(\backslash\)T\_COMMENT\ \&\&\ substr(\$token[1],\ 0,\ 2)\ !==\ \textcolor{stringliteral}{'/*'}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ preg\_match(\textcolor{stringliteral}{'/(\(\backslash\)r\(\backslash\)n|\(\backslash\)n|\(\backslash\)r)\$/D'},\ \$token[1],\ \$matches))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$trailingNewline\ =\ \$matches[0];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$token[1]\ =\ substr(\$token[1],\ 0,\ -\/strlen(\$trailingNewline));}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>tokens[\$i]\ =\ \$token;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>tokens[\$i\ +\ 1])\ \&\&\ \$this-\/>tokens[\$i\ +\ 1][0]\ ===\ \(\backslash\)T\_WHITESPACE)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Move\ trailing\ newline\ into\ following\ T\_WHITESPACE\ token,\ if\ it\ already\ exists.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>tokens[\$i\ +\ 1][1]\ =\ \$trailingNewline\ .\ \$this-\/>tokens[\$i\ +\ 1][1];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>tokens[\$i\ +\ 1][2]-\/-\/;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Otherwise,\ we\ need\ to\ create\ a\ new\ T\_WHITESPACE\ token.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_splice(\$this-\/>tokens,\ \$i\ +\ 1,\ 0,\ [}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\(\backslash\)T\_WHITESPACE,\ \$trailingNewline,\ \$line],}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$numTokens++;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emulate\ PHP\ 8\ T\_NAME\_*\ tokens,\ by\ combining\ sequences\ of\ T\_NS\_SEPARATOR\ and\ T\_STRING}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ into\ a\ single\ token.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_array(\$token)}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ (\$token[0]\ ===\ \(\backslash\)T\_NS\_SEPARATOR\ ||\ isset(\$this-\/>identifierTokens[\$token[0]])))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$lastWasSeparator\ =\ \$token[0]\ ===\ \(\backslash\)T\_NS\_SEPARATOR;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$text\ =\ \$token[1];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$j\ =\ \$i\ +\ 1;\ isset(\$this-\/>tokens[\$j]);\ \$j++)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$lastWasSeparator)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>identifierTokens[\$this-\/>tokens[\$j][0]]))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$lastWasSeparator\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>tokens[\$j][0]\ !==\ \(\backslash\)T\_NS\_SEPARATOR)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$lastWasSeparator\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$text\ .=\ \$this-\/>tokens[\$j][1];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$lastWasSeparator)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Trailing\ separator\ is\ not\ part\ of\ the\ name.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$j-\/-\/;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$text\ =\ substr(\$text,\ 0,\ -\/1);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$j\ >\ \$i\ +\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$token[0]\ ===\ \(\backslash\)T\_NS\_SEPARATOR)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$type\ =\ \(\backslash\)T\_NAME\_FULLY\_QUALIFIED;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \textcolor{keywordflow}{if}\ (\$token[0]\ ===\ \(\backslash\)T\_NAMESPACE)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$type\ =\ \(\backslash\)T\_NAME\_RELATIVE;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$type\ =\ \(\backslash\)T\_NAME\_QUALIFIED;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$token\ =\ [\$type,\ \$text,\ \$line];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_splice(\$this-\/>tokens,\ \$i,\ \$j\ -\/\ \$i,\ [\$token]);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$numTokens\ -\/=\ \$j\ -\/\ \$i\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$token\ ===\ \textcolor{charliteral}{'\&'})\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$next\ =\ \$i\ +\ 1;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (isset(\$this-\/>tokens[\$next])\ \&\&\ \$this-\/>tokens[\$next][0]\ ===\ \(\backslash\)T\_WHITESPACE)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$next++;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$followedByVarOrVarArg\ =\ isset(\$this-\/>tokens[\$next])\ \&\&}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\$this-\/>tokens[\$next][0]\ ===\ \(\backslash\)T\_VARIABLE\ ||\ \$this-\/>tokens[\$next][0]\ ===\ \(\backslash\)T\_ELLIPSIS);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>tokens[\$i]\ =\ \$token\ =\ [}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$followedByVarOrVarArg}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \(\backslash\)T\_AMPERSAND\_FOLLOWED\_BY\_VAR\_OR\_VARARG}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \(\backslash\)T\_AMPERSAND\_NOT\_FOLLOWED\_BY\_VAR\_OR\_VARARG,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{charliteral}{'\&'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$line,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \$tokenValue\ =\ \(\backslash\)is\_string(\$token)\ ?\ \$token\ :\ \$token[1];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \$tokenLen\ =\ \(\backslash\)strlen(\$tokenValue);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (substr(\$this-\/>code,\ \$filePos,\ \$tokenLen)\ !==\ \$tokenValue)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Something\ is\ missing,\ must\ be\ an\ invalid\ character}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$nextFilePos\ =\ strpos(\$this-\/>code,\ \$tokenValue,\ \$filePos);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$badCharTokens\ =\ \$this-\/>handleInvalidCharacterRange(}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$filePos,\ \$nextFilePos,\ \$line,\ \$errorHandler);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$filePos\ =\ (int)\ \$nextFilePos;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_splice(\$this-\/>tokens,\ \$i,\ 0,\ \$badCharTokens);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$numTokens\ +=\ \(\backslash\)count(\$badCharTokens);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$i\ +=\ \(\backslash\)count(\$badCharTokens);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \$filePos\ +=\ \$tokenLen;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \$line\ +=\ substr\_count(\$tokenValue,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$filePos\ !==\ \(\backslash\)strlen(\$this-\/>code))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (substr(\$this-\/>code,\ \$filePos,\ 2)\ ===\ \textcolor{stringliteral}{'/*'})\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Unlike\ PHP,\ HHVM\ will\ drop\ unterminated\ comments\ entirely}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$comment\ =\ substr(\$this-\/>code,\ \$filePos);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$errorHandler-\/>\mbox{\hyperlink{interface_php_parser_1_1_error_handler_aed718281073b3e90cbb3a2000f73b029}{handleError}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_php_parser_1_1_error}{Error}}(\textcolor{stringliteral}{'Unterminated\ comment'},\ [}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'startLine'}\ =>\ \$line,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'endLine'}\ =>\ \$line\ +\ substr\_count(\$comment,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}),}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'startFilePos'}\ =>\ \$filePos,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'endFilePos'}\ =>\ \$filePos\ +\ \(\backslash\)strlen(\$comment),}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ]));}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Emulate\ the\ PHP\ behavior}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$isDocComment\ =\ isset(\$comment[3])\ \&\&\ \$comment[3]\ ===\ \textcolor{charliteral}{'*'};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>tokens[]\ =\ [\$isDocComment\ ?\ \(\backslash\)T\_DOC\_COMMENT\ :\ \(\backslash\)T\_COMMENT,\ \$comment,\ \$line];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Invalid\ characters\ at\ the\ end\ of\ the\ input}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$badCharTokens\ =\ \$this-\/>handleInvalidCharacterRange(}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$filePos,\ \(\backslash\)strlen(\$this-\/>code),\ \$line,\ \$errorHandler);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>tokens\ =\ array\_merge(\$this-\/>tokens,\ \$badCharTokens);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$this-\/>tokens)\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ for\ unterminated\ comment}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \$lastToken\ =\ \$this-\/>tokens[count(\$this-\/>tokens)\ -\/\ 1];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>isUnterminatedComment(\$lastToken))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$errorHandler-\/>\mbox{\hyperlink{interface_php_parser_1_1_error_handler_aed718281073b3e90cbb3a2000f73b029}{handleError}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_php_parser_1_1_error}{Error}}(\textcolor{stringliteral}{'Unterminated\ comment'},\ [}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'startLine'}\ =>\ \$line\ -\/\ substr\_count(\$lastToken[1],\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}),}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'endLine'}\ =>\ \$line,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'startFilePos'}\ =>\ \$filePos\ -\/\ \(\backslash\)strlen(\$lastToken[1]),}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'endFilePos'}\ =>\ \$filePos,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ]));}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00282}00282\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00306}\mbox{\hyperlink{class_php_parser_1_1_lexer_a1761f26dc6c72475616f4688c00029fc}{00306}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_a1761f26dc6c72475616f4688c00029fc}{getNextToken}}(\&\$value\ =\ \textcolor{keyword}{null},\ \&\$startAttributes\ =\ \textcolor{keyword}{null},\ \&\$endAttributes\ =\ \textcolor{keyword}{null})\ :\ int\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \$startAttributes\ =\ [];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \$endAttributes\ \ \ =\ [];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (1)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>tokens[++\$this-\/>pos]))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$token\ =\ \$this-\/>tokens[\$this-\/>pos];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ EOF\ token\ with\ ID\ 0}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$token\ =\ \textcolor{stringliteral}{"{}\(\backslash\)0"{}};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>attributeStartLineUsed)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$startAttributes[\textcolor{stringliteral}{'startLine'}]\ =\ \$this-\/>line;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>attributeStartTokenPosUsed)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$startAttributes[\textcolor{stringliteral}{'startTokenPos'}]\ =\ \$this-\/>pos;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>attributeStartFilePosUsed)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$startAttributes[\textcolor{stringliteral}{'startFilePos'}]\ =\ \$this-\/>filePos;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_string(\$token))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \$token;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$token[1]))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ bug\ in\ token\_get\_all}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>filePos\ +=\ 2;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$id\ =\ ord(\textcolor{charliteral}{'"{}'});}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>filePos\ +=\ 1;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$id\ =\ ord(\$token);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (!isset(\$this-\/>dropTokens[\$token[0]]))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \$token[1];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00340}00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$id\ =\ \$this-\/>tokenMap[\$token[0]];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00341}00341\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)T\_CLOSE\_TAG\ ===\ \$token[0])\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>prevCloseTagHasNewline\ =\ \textcolor{keyword}{false}\ !==\ strpos(\$token[1],\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}})}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ \textcolor{keyword}{false}\ !==\ strpos(\$token[1],\ \textcolor{stringliteral}{"{}\(\backslash\)r"{}});}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\(\backslash\)T\_INLINE\_HTML\ ===\ \$token[0])\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$startAttributes[\textcolor{stringliteral}{'hasLeadingNewline'}]\ =\ \$this-\/>prevCloseTagHasNewline;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00347}00347\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>line\ +=\ substr\_count(\$value,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>filePos\ +=\ \(\backslash\)strlen(\$value);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$origLine\ =\ \$this-\/>line;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$origFilePos\ =\ \$this-\/>filePos;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>line\ +=\ substr\_count(\$token[1],\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>filePos\ +=\ \(\backslash\)strlen(\$token[1]);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00355}00355\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)T\_COMMENT\ ===\ \$token[0]\ ||\ \(\backslash\)T\_DOC\_COMMENT\ ===\ \$token[0])\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>attributeCommentsUsed)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$comment\ =\ \(\backslash\)T\_DOC\_COMMENT\ ===\ \$token[0]}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_php_parser_1_1_comment_1_1_doc}{Comment\(\backslash\)Doc}}(\$token[1],}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$origLine,\ \$origFilePos,\ \$this-\/>pos,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>line,\ \$this-\/>filePos\ -\/\ 1,\ \$this-\/>pos)}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_php_parser_1_1_comment}{Comment}}(\$token[1],}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$origLine,\ \$origFilePos,\ \$this-\/>pos,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>line,\ \$this-\/>filePos\ -\/\ 1,\ \$this-\/>pos);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$startAttributes[\textcolor{stringliteral}{'comments'}][]\ =\ \$comment;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00370}00370\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>attributeEndLineUsed)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$endAttributes[\textcolor{stringliteral}{'endLine'}]\ =\ \$this-\/>line;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00374}00374\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>attributeEndTokenPosUsed)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00375}00375\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$endAttributes[\textcolor{stringliteral}{'endTokenPos'}]\ =\ \$this-\/>pos;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00376}00376\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00377}00377\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>attributeEndFilePosUsed)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$endAttributes[\textcolor{stringliteral}{'endFilePos'}]\ =\ \$this-\/>filePos\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00380}00380\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$id;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00383}00383\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00384}00384\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{'Reached\ end\ of\ lexer\ loop'});}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00385}00385\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00386}00386\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00397}\mbox{\hyperlink{class_php_parser_1_1_lexer_acf2f05f60b57bd67020d2259a2cf9982}{00397}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_acf2f05f60b57bd67020d2259a2cf9982}{getTokens}}()\ :\ array\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00398}00398\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_2app_8php_acad40810860c7e1d97832f57dbe2d202}{return}}\ \$this-\/>tokens;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00399}00399\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00406}\mbox{\hyperlink{class_php_parser_1_1_lexer_ac83469b13bec28fe92b00b833344ce57}{00406}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_ac83469b13bec28fe92b00b833344ce57}{handleHaltCompiler}}()\ :\ string\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00407}00407\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ text\ after\ T\_HALT\_COMPILER,\ still\ including\ ();}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \$textAfter\ =\ substr(\$this-\/>code,\ \$this-\/>filePos);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00409}00409\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00410}00410\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ensure\ that\ it\ is\ followed\ by\ ();}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00411}00411\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ this\ simplifies\ the\ situation,\ by\ not\ allowing\ any\ comments}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00412}00412\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ in\ between\ of\ the\ tokens.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00413}00413\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!preg\_match(\textcolor{stringliteral}{'\string~\string^\(\backslash\)s*\(\backslash\)(\(\backslash\)s*\(\backslash\))\(\backslash\)s*(?:;|\(\backslash\)?>\(\backslash\)r?\(\backslash\)n?)\string~'},\ \$textAfter,\ \$matches))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_php_parser_1_1_error}{Error}}(\textcolor{stringliteral}{'\_\_HALT\_COMPILER\ must\ be\ followed\ by\ "{}();"{}'});}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00415}00415\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ prevent\ the\ lexer\ from\ returning\ any\ further\ tokens}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00418}00418\ \ \ \ \ \ \ \ \ \$this-\/>pos\ =\ count(\$this-\/>tokens);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00419}00419\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00420}00420\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ return\ with\ ();\ removed}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00421}00421\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ substr(\$textAfter,\ strlen(\$matches[0]));}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00422}00422\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00423}00423\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00424}00424\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ defineCompatibilityTokens()\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \$compatTokensDefined\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00426}00426\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$compatTokensDefined)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00428}00428\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00429}00429\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \$compatTokens\ =\ [}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ PHP\ 7.4}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_BAD\_CHARACTER'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_FN'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_COALESCE\_EQUAL'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ PHP\ 8.0}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_NAME\_QUALIFIED'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_NAME\_FULLY\_QUALIFIED'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_NAME\_RELATIVE'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_MATCH'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_NULLSAFE\_OBJECT\_OPERATOR'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_ATTRIBUTE'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ PHP\ 8.1}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_ENUM'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_AMPERSAND\_NOT\_FOLLOWED\_BY\_VAR\_OR\_VARARG'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00445}00445\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_AMPERSAND\_FOLLOWED\_BY\_VAR\_OR\_VARARG'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00446}00446\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'T\_READONLY'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00447}00447\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00448}00448\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ PHP-\/Parser\ might\ be\ used\ together\ with\ another\ library\ that\ also\ emulates\ some\ or\ all}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ of\ these\ tokens.\ Perform\ a\ sanity-\/check\ that\ all\ already\ defined\ tokens\ have\ been}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ assigned\ a\ unique\ ID.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00452}00452\ \ \ \ \ \ \ \ \ \$usedTokenIds\ =\ [];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$compatTokens\ as\ \$token)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)\mbox{\hyperlink{namespace_laravel_1_1_serializable_closure_1_1_support_a0b5ee6f176cd47e84b04710f2181e3ff}{defined}}(\$token))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$tokenId\ =\ \(\backslash\)constant(\$token);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$clashingToken\ =\ \$usedTokenIds[\$tokenId]\ ??\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$clashingToken\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)Error(sprintf(}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Token\ \%s\ has\ same\ ID\ as\ token\ \%s,\ '}\ .}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'you\ may\ be\ using\ a\ library\ with\ broken\ token\ emulation'},}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$token,\ \$clashingToken}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$usedTokenIds[\$tokenId]\ =\ \$token;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00468}00468\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Now\ define\ any\ tokens\ that\ have\ not\ yet\ been\ emulated.\ Try\ to\ assign\ IDs\ from\ -\/1}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ downwards,\ but\ skip\ any\ IDs\ that\ may\ already\ be\ in\ use.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00470}00470\ \ \ \ \ \ \ \ \ \$newTokenId\ =\ -\/1;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$compatTokens\ as\ \$token)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)\mbox{\hyperlink{namespace_laravel_1_1_serializable_closure_1_1_support_a0b5ee6f176cd47e84b04710f2181e3ff}{defined}}(\$token))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (isset(\$usedTokenIds[\$newTokenId]))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00474}00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$newTokenId-\/-\/;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)define(\$token,\ \$newTokenId);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$newTokenId-\/-\/;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00480}00480\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ \$compatTokensDefined\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00482}00482\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00483}00483\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00493}\mbox{\hyperlink{class_php_parser_1_1_lexer_aac88a2f15ec4d7418846f116b62db8b1}{00493}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_php_parser_1_1_lexer_aac88a2f15ec4d7418846f116b62db8b1}{createTokenMap}}()\ :\ array\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \$tokenMap\ =\ [];}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00495}00495\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 256\ is\ the\ minimum\ possible\ token\ number,\ as\ everything\ below}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00497}00497\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ it\ is\ an\ ASCII\ value}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00498}00498\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 256;\ \$i\ <\ 1000;\ ++\$i)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)T\_DOUBLE\_COLON\ ===\ \$i)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ T\_DOUBLE\_COLON\ is\ equivalent\ to\ T\_PAAMAYIM\_NEKUDOTAYIM}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00501}00501\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$tokenMap[\$i]\ =\ Tokens::T\_PAAMAYIM\_NEKUDOTAYIM;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif(\(\backslash\)T\_OPEN\_TAG\_WITH\_ECHO\ ===\ \$i)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00503}00503\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ T\_OPEN\_TAG\_WITH\_ECHO\ with\ dropped\ T\_OPEN\_TAG\ results\ in\ T\_ECHO}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$tokenMap[\$i]\ =\ Tokens::T\_ECHO;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif(\(\backslash\)T\_CLOSE\_TAG\ ===\ \$i)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00506}00506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ T\_CLOSE\_TAG\ is\ equivalent\ to\ ';'}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00507}00507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$tokenMap[\$i]\ =\ ord(\textcolor{charliteral}{';'});}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00508}00508\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\textcolor{stringliteral}{'UNKNOWN'}\ !==\ \$name\ =\ token\_name(\$i))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00509}00509\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'T\_HASHBANG'}\ ===\ \$name)\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ HHVM\ uses\ a\ special\ token\ for\ \#!\ hashbang\ lines}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$tokenMap[\$i]\ =\ Tokens::T\_INLINE\_HTML;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (defined(\$name\ =\ Tokens::class\ .\ \textcolor{stringliteral}{'::'}\ .\ \$name))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Other\ tokens\ can\ be\ mapped\ directly}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$tokenMap[\$i]\ =\ constant(\$name);}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00518}00518\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ HHVM\ uses\ a\ special\ token\ for\ numbers\ that\ overflow\ to\ double}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (defined(\textcolor{stringliteral}{'T\_ONUMBER'}))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_ONUMBER]\ =\ Tokens::T\_DNUMBER;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00523}00523\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ HHVM\ also\ has\ a\ separate\ token\ for\ the\ \_\_COMPILER\_HALT\_OFFSET\_\_\ constant}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00524}00524\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (defined(\textcolor{stringliteral}{'T\_COMPILER\_HALT\_OFFSET'}))\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00525}00525\ \ \ \ \ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_COMPILER\_HALT\_OFFSET]\ =\ Tokens::T\_STRING;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00527}00527\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00528}00528\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Assign\ tokens\ for\ which\ we\ define\ compatibility\ constants,\ as\ token\_name()\ does\ not\ know\ them.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_FN]\ =\ Tokens::T\_FN;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00530}00530\ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_COALESCE\_EQUAL]\ =\ Tokens::T\_COALESCE\_EQUAL;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_NAME\_QUALIFIED]\ =\ Tokens::T\_NAME\_QUALIFIED;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_NAME\_FULLY\_QUALIFIED]\ =\ Tokens::T\_NAME\_FULLY\_QUALIFIED;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00533}00533\ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_NAME\_RELATIVE]\ =\ Tokens::T\_NAME\_RELATIVE;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_MATCH]\ =\ Tokens::T\_MATCH;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00535}00535\ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_NULLSAFE\_OBJECT\_OPERATOR]\ =\ Tokens::T\_NULLSAFE\_OBJECT\_OPERATOR;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00536}00536\ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_ATTRIBUTE]\ =\ Tokens::T\_ATTRIBUTE;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00537}00537\ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_AMPERSAND\_NOT\_FOLLOWED\_BY\_VAR\_OR\_VARARG]\ =\ Tokens::T\_AMPERSAND\_NOT\_FOLLOWED\_BY\_VAR\_OR\_VARARG;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00538}00538\ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_AMPERSAND\_FOLLOWED\_BY\_VAR\_OR\_VARARG]\ =\ Tokens::T\_AMPERSAND\_FOLLOWED\_BY\_VAR\_OR\_VARARG;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00539}00539\ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_ENUM]\ =\ Tokens::T\_ENUM;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \$tokenMap[\(\backslash\)T\_READONLY]\ =\ Tokens::T\_READONLY;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00541}00541\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$tokenMap;}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00543}00543\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00544}00544\ }
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00545}00545\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ createIdentifierTokenMap():\ array\ \{}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00546}00546\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Based\ on\ semi\_reserved\ production.}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00547}00547\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_2app_8php_acad40810860c7e1d97832f57dbe2d202}{return}}\ array\_fill\_keys([}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00548}00548\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)T\_STRING,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)T\_STATIC,\ \(\backslash\)T\_ABSTRACT,\ \(\backslash\)T\_FINAL,\ \(\backslash\)T\_PRIVATE,\ \(\backslash\)T\_PROTECTED,\ \(\backslash\)T\_PUBLIC,\ \(\backslash\)T\_READONLY,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00550}00550\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)T\_INCLUDE,\ \(\backslash\)T\_INCLUDE\_ONCE,\ \(\backslash\)T\_EVAL,\ \(\backslash\)T\_REQUIRE,\ \(\backslash\)T\_REQUIRE\_ONCE,\ \(\backslash\)T\_LOGICAL\_OR,\ \(\backslash\)T\_LOGICAL\_XOR,\ \(\backslash\)T\_LOGICAL\_AND,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00551}00551\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)T\_INSTANCEOF,\ \(\backslash\)T\_NEW,\ \(\backslash\)T\_CLONE,\ \(\backslash\)T\_EXIT,\ \(\backslash\)T\_IF,\ \(\backslash\)T\_ELSEIF,\ \(\backslash\)T\_ELSE,\ \(\backslash\)T\_ENDIF,\ \(\backslash\)T\_ECHO,\ \(\backslash\)T\_DO,\ \(\backslash\)T\_WHILE,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00552}00552\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)T\_ENDWHILE,\ \(\backslash\)T\_FOR,\ \(\backslash\)T\_ENDFOR,\ \(\backslash\)T\_FOREACH,\ \(\backslash\)T\_ENDFOREACH,\ \(\backslash\)T\_DECLARE,\ \(\backslash\)T\_ENDDECLARE,\ \(\backslash\)T\_AS,\ \(\backslash\)T\_TRY,\ \(\backslash\)T\_CATCH,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00553}00553\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)T\_FINALLY,\ \(\backslash\)T\_THROW,\ \(\backslash\)T\_USE,\ \(\backslash\)T\_INSTEADOF,\ \(\backslash\)T\_GLOBAL,\ \(\backslash\)T\_VAR,\ \(\backslash\)T\_UNSET,\ \(\backslash\)T\_ISSET,\ \(\backslash\)T\_EMPTY,\ \(\backslash\)T\_CONTINUE,\ \(\backslash\)T\_GOTO,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00554}00554\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)T\_FUNCTION,\ \(\backslash\)T\_CONST,\ \(\backslash\)T\_RETURN,\ \(\backslash\)T\_PRINT,\ \(\backslash\)T\_YIELD,\ \(\backslash\)T\_LIST,\ \(\backslash\)T\_SWITCH,\ \(\backslash\)T\_ENDSWITCH,\ \(\backslash\)T\_CASE,\ \(\backslash\)T\_DEFAULT,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00555}00555\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)T\_BREAK,\ \(\backslash\)T\_ARRAY,\ \(\backslash\)T\_CALLABLE,\ \(\backslash\)T\_EXTENDS,\ \(\backslash\)T\_IMPLEMENTS,\ \(\backslash\)T\_NAMESPACE,\ \(\backslash\)T\_TRAIT,\ \(\backslash\)T\_INTERFACE,\ \(\backslash\)T\_CLASS,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00556}00556\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)T\_CLASS\_C,\ \(\backslash\)T\_TRAIT\_C,\ \(\backslash\)T\_FUNC\_C,\ \(\backslash\)T\_METHOD\_C,\ \(\backslash\)T\_LINE,\ \(\backslash\)T\_FILE,\ \(\backslash\)T\_DIR,\ \(\backslash\)T\_NS\_C,\ \(\backslash\)T\_HALT\_COMPILER,\ \(\backslash\)T\_FN,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00557}00557\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)T\_MATCH,}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00558}00558\ \ \ \ \ \ \ \ \ ],\ \mbox{\hyperlink{namespace_php_parser_a930920b2bc42824a5c03be681830f4b2}{true}});}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00559}00559\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{nikic_2php-parser_2lib_2_php_parser_2_lexer_8php_source_l00560}00560\ \}}
+
+\end{DoxyCode}

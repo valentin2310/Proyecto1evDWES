@@ -1,0 +1,529 @@
+\doxysection{Has\+Relationships.\+php}
+\hypertarget{_has_relationships_8php_source}{}\label{_has_relationships_8php_source}\index{vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasRelationships.php@{vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasRelationships.php}}
+\mbox{\hyperlink{_has_relationships_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Concerns}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00005}00005\ use\ Closure;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00006}00006\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_class_morph_violation_exception}{Illuminate\(\backslash\)Database\(\backslash\)ClassMorphViolationException}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_builder}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Builder}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_collection}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Collection}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Model}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_pending_has_through_relationship}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)PendingHasThroughRelationship}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_belongs_to}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)BelongsTo}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00012}00012\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_belongs_to_many}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)BelongsToMany}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00013}00013\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_has_many}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)HasMany}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_has_many_through}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)HasManyThrough}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_has_one}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)HasOne}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_has_one_through}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)HasOneThrough}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_morph_many}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)MorphMany}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_morph_one}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)MorphOne}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_morph_to}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)MorphTo}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_morph_to_many}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)MorphToMany}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_pivot}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)Pivot}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_relation}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Relations\(\backslash\)Relation}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_arr}{Illuminate\(\backslash\)Support\(\backslash\)Arr}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00024}00024\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_str}{Illuminate\(\backslash\)Support\(\backslash\)Str}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00026}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a15380aea53b8eebd36d23dfa865fa215}{00026}}\ trait\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a15380aea53b8eebd36d23dfa865fa215}{HasRelationships}}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00027}00027\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00033}00033\ \ \ \ \ \textcolor{keyword}{protected}\ \$relations\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00040}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a7b68211fbfc54fbe2efcba07ce47ff0c}{00040}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a7b68211fbfc54fbe2efcba07ce47ff0c}{\$touches}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00047}00047\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \$manyMethods\ =\ [}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'belongsToMany'},\ \textcolor{stringliteral}{'morphToMany'},\ \textcolor{stringliteral}{'morphedByMany'},}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00049}00049\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00056}00056\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{static}\ \$relationResolvers\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00065}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a5dae00372b897532281418069145cae7}{00065}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a5dae00372b897532281418069145cae7}{relationResolver}}(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}},\ \$key)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00066}00066\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$resolver\ =\ static::\$relationResolvers[\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}][\$key]\ ??\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$resolver;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$parent\ =\ get\_parent\_class(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a5dae00372b897532281418069145cae7}{relationResolver}}(\$parent,\ \$key);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00076}00076\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00085}00085\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ resolveRelationUsing(\$name,\ Closure\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00086}00086\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ static::\$relationResolvers\ =\ array\_replace\_recursive(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ static::\$relationResolvers,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ [static::class\ =>\ [\$name\ =>\ \$callback]]}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00091}00091\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00101}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_aa73208931aa5db9bf7983fcaa013a5b3}{00101}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_aa73208931aa5db9bf7983fcaa013a5b3}{hasOne}}(\$related,\ \$foreignKey\ =\ \textcolor{keyword}{null},\ \$localKey\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00102}00102\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \$instance\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab4d90b96cc192ff864ba3691a2aa1a65}{newRelatedInstance}}(\$related);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \$foreignKey\ =\ \$foreignKey\ ?:\ \$this-\/>getForeignKey();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \$localKey\ =\ \$localKey\ ?:\ \$this-\/>getKeyName();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a39997891f624b47daafb38e1b020b3fd}{newHasOne}}(\$instance-\/>newQuery(),\ \$this,\ \$instance-\/>getTable().\textcolor{charliteral}{'.'}.\$foreignKey,\ \$localKey);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00110}00110\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00121}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a39997891f624b47daafb38e1b020b3fd}{00121}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a39997891f624b47daafb38e1b020b3fd}{newHasOne}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_builder}{Builder}}\ \$query,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Model}}\ \$parent,\ \$foreignKey,\ \$localKey)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00122}00122\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_has_one}{HasOne}}(\$query,\ \$parent,\ \$foreignKey,\ \$localKey);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00124}00124\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00137}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a1657585634edbfc4a97273dd9c15c0b0}{00137}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a1657585634edbfc4a97273dd9c15c0b0}{hasOneThrough}}(\$related,\ \$through,\ \$firstKey\ =\ \textcolor{keyword}{null},\ \$secondKey\ =\ \textcolor{keyword}{null},\ \$localKey\ =\ \textcolor{keyword}{null},\ \$secondLocalKey\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00138}00138\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \$through\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a030867a660dfc0fea35a174f771df1c2}{newRelatedThroughInstance}}(\$through);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \$firstKey\ =\ \$firstKey\ ?:\ \$this-\/>getForeignKey();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \$secondKey\ =\ \$secondKey\ ?:\ \$through-\/>getForeignKey();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a30e824be1d5a1d8ad1cb85a3f6cb215e}{newHasOneThrough}}(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab4d90b96cc192ff864ba3691a2aa1a65}{newRelatedInstance}}(\$related)-\/>newQuery(),\ \$this,\ \$through,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \$firstKey,\ \$secondKey,\ \$localKey\ ?:\ \$this-\/>getKeyName(),}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \$secondLocalKey\ ?:\ \$through-\/>getKeyName()}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00150}00150\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00164}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a30e824be1d5a1d8ad1cb85a3f6cb215e}{00164}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a30e824be1d5a1d8ad1cb85a3f6cb215e}{newHasOneThrough}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_builder}{Builder}}\ \$query,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Model}}\ \$farParent,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Model}}\ \$throughParent,\ \$firstKey,\ \$secondKey,\ \$localKey,\ \$secondLocalKey)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00165}00165\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_has_one_through}{HasOneThrough}}(\$query,\ \$farParent,\ \$throughParent,\ \$firstKey,\ \$secondKey,\ \$localKey,\ \$secondLocalKey);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00167}00167\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00179}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a3f8d561fb2941c439fb57cf5bc8f2201}{00179}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a3f8d561fb2941c439fb57cf5bc8f2201}{morphOne}}(\$related,\ \$name,\ \$type\ =\ \textcolor{keyword}{null},\ \$id\ =\ \textcolor{keyword}{null},\ \$localKey\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00180}00180\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \$instance\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab4d90b96cc192ff864ba3691a2aa1a65}{newRelatedInstance}}(\$related);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ [\$type,\ \$id]\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a2c815e02f965fb9f650bf4a8cdc3d649}{getMorphs}}(\$name,\ \$type,\ \$id);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \$table\ =\ \$instance-\/>getTable();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \$localKey\ =\ \$localKey\ ?:\ \$this-\/>getKeyName();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_add1150a1d43b34d1ab0e0b9fa49843b3}{newMorphOne}}(\$instance-\/>newQuery(),\ \$this,\ \$table.\textcolor{charliteral}{'.'}.\$type,\ \$table.\textcolor{charliteral}{'.'}.\$id,\ \$localKey);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00190}00190\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00202}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_add1150a1d43b34d1ab0e0b9fa49843b3}{00202}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_add1150a1d43b34d1ab0e0b9fa49843b3}{newMorphOne}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_builder}{Builder}}\ \$query,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Model}}\ \$parent,\ \$type,\ \$id,\ \$localKey)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00203}00203\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_morph_one}{MorphOne}}(\$query,\ \$parent,\ \$type,\ \$id,\ \$localKey);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00205}00205\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00216}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_afbc158dc54c7305f8a0706cb172ed2a0}{00216}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_afbc158dc54c7305f8a0706cb172ed2a0}{belongsTo}}(\$related,\ \$foreignKey\ =\ \textcolor{keyword}{null},\ \$ownerKey\ =\ \textcolor{keyword}{null},\ \$relation\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00217}00217\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ no\ relation\ name\ was\ given,\ we\ will\ use\ this\ debug\ backtrace\ to\ extract}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ calling\ method's\ name\ and\ use\ that\ as\ the\ relationship\ name\ as\ most}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ of\ the\ time\ this\ will\ be\ what\ we\ desire\ to\ use\ for\ the\ relationships.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$relation))\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \$relation\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a84641008f20bc1163a951121c87a56d6}{guessBelongsToRelation}}();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \$instance\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab4d90b96cc192ff864ba3691a2aa1a65}{newRelatedInstance}}(\$related);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ no\ foreign\ key\ was\ supplied,\ we\ can\ use\ a\ backtrace\ to\ guess\ the\ proper}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ foreign\ key\ name\ by\ using\ the\ name\ of\ the\ relationship\ function,\ which}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ when\ combined\ with\ an\ "{}\_id"{}\ should\ conventionally\ match\ the\ columns.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$foreignKey))\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \$foreignKey\ =\ Str::snake(\$relation).\textcolor{charliteral}{'\_'}.\$instance-\/>getKeyName();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Once\ we\ have\ the\ foreign\ key\ names\ we'll\ just\ create\ a\ new\ Eloquent\ query}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ for\ the\ related\ models\ and\ return\ the\ relationship\ instance\ which\ will}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ actually\ be\ responsible\ for\ retrieving\ and\ hydrating\ every\ relation.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \$ownerKey\ =\ \$ownerKey\ ?:\ \$instance-\/>getKeyName();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00238}00238\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_affa7f503b713842ece6ffc5df0767737}{newBelongsTo}}(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \$instance-\/>newQuery(),\ \$this,\ \$foreignKey,\ \$ownerKey,\ \$relation}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00242}00242\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00254}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_affa7f503b713842ece6ffc5df0767737}{00254}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_affa7f503b713842ece6ffc5df0767737}{newBelongsTo}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_builder}{Builder}}\ \$query,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Model}}\ \$child,\ \$foreignKey,\ \$ownerKey,\ \$relation)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00255}00255\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_belongs_to}{BelongsTo}}(\$query,\ \$child,\ \$foreignKey,\ \$ownerKey,\ \$relation);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00257}00257\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00268}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a4530ce54b8a3c2b7421f800763cff4cc}{00268}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a4530ce54b8a3c2b7421f800763cff4cc}{morphTo}}(\$name\ =\ \textcolor{keyword}{null},\ \$type\ =\ \textcolor{keyword}{null},\ \$id\ =\ \textcolor{keyword}{null},\ \$ownerKey\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00269}00269\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ no\ name\ is\ provided,\ we\ will\ use\ the\ backtrace\ to\ get\ the\ function\ name}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ since\ that\ is\ most\ likely\ the\ name\ of\ the\ polymorphic\ interface.\ We\ can}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ use\ that\ to\ get\ both\ the\ class\ and\ foreign\ key\ that\ will\ be\ utilized.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \$name\ =\ \$name\ ?:\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a84641008f20bc1163a951121c87a56d6}{guessBelongsToRelation}}();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ [\$type,\ \$id]\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a2c815e02f965fb9f650bf4a8cdc3d649}{getMorphs}}(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ Str::snake(\$name),\ \$type,\ \$id}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00278}00278\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ type\ value\ is\ null\ it\ is\ probably\ safe\ to\ assume\ we're\ eager\ loading}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ relationship.\ In\ this\ case\ we'll\ just\ pass\ in\ a\ dummy\ query\ where\ we}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ need\ to\ remove\ any\ eager\ loads\ that\ may\ already\ be\ defined\ on\ a\ model.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_null(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a285c2501c9bc5774e7972d9e08bbc4b7}{getAttributeFromArray}}(\$type))\ ||\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}\ ===\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a406d4614eb28d8896a6886cd1d717256}{morphEagerTo}}(\$name,\ \$type,\ \$id,\ \$ownerKey)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a755a75812dfe0e0b48e1f7764dfa05c3}{morphInstanceTo}}(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}},\ \$name,\ \$type,\ \$id,\ \$ownerKey);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00285}00285\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00296}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a406d4614eb28d8896a6886cd1d717256}{00296}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a406d4614eb28d8896a6886cd1d717256}{morphEagerTo}}(\$name,\ \$type,\ \$id,\ \$ownerKey)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00297}00297\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a1ff42dfedd30b4fc79c0ea36aa667e24}{newMorphTo}}(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>newQuery()-\/>setEagerLoads([]),\ \$this,\ \$id,\ \$ownerKey,\ \$type,\ \$name}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00300}00300\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00301}00301\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00313}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a755a75812dfe0e0b48e1f7764dfa05c3}{00313}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a755a75812dfe0e0b48e1f7764dfa05c3}{morphInstanceTo}}(\$target,\ \$name,\ \$type,\ \$id,\ \$ownerKey)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00314}00314\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \$instance\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab4d90b96cc192ff864ba3691a2aa1a65}{newRelatedInstance}}(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ static::getActualClassNameForMorph(\$target)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a1ff42dfedd30b4fc79c0ea36aa667e24}{newMorphTo}}(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \$instance-\/>newQuery(),\ \$this,\ \$id,\ \$ownerKey\ ??\ \$instance-\/>getKeyName(),\ \$type,\ \$name}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00322}00322\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00335}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a1ff42dfedd30b4fc79c0ea36aa667e24}{00335}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a1ff42dfedd30b4fc79c0ea36aa667e24}{newMorphTo}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_builder}{Builder}}\ \$query,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Model}}\ \$parent,\ \$foreignKey,\ \$ownerKey,\ \$type,\ \$relation)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00336}00336\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_morph_to}{MorphTo}}(\$query,\ \$parent,\ \$foreignKey,\ \$ownerKey,\ \$type,\ \$relation);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00338}00338\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00346}00346\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ getActualClassNameForMorph(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00347}00347\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Arr::get(Relation::morphMap()\ ?:\ [],\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}},\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}});}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00349}00349\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00350}00350\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00356}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a84641008f20bc1163a951121c87a56d6}{00356}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a84641008f20bc1163a951121c87a56d6}{guessBelongsToRelation}}()}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00357}00357\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ [\$one,\ \$two,\ \$caller]\ =\ debug\_backtrace(DEBUG\_BACKTRACE\_IGNORE\_ARGS,\ 3);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00359}00359\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$caller[\textcolor{stringliteral}{'function'}];}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00361}00361\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00362}00362\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00369}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a05bd4da742a19db1fcef02eaceb53295}{00369}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a05bd4da742a19db1fcef02eaceb53295}{through}}(\$relationship)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00370}00370\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00371}00371\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$relationship))\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \$relationship\ =\ \$this-\/>\{\$relationship\}();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00375}00375\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_pending_has_through_relationship}{PendingHasThroughRelationship}}(\$this,\ \$relationship);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00376}00376\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00377}00377\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00386}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a2c5d3f86084785a87fabfa7dddeb1305}{00386}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a2c5d3f86084785a87fabfa7dddeb1305}{hasMany}}(\$related,\ \$foreignKey\ =\ \textcolor{keyword}{null},\ \$localKey\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00387}00387\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \$instance\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab4d90b96cc192ff864ba3691a2aa1a65}{newRelatedInstance}}(\$related);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \$foreignKey\ =\ \$foreignKey\ ?:\ \$this-\/>getForeignKey();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00391}00391\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \$localKey\ =\ \$localKey\ ?:\ \$this-\/>getKeyName();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00393}00393\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a08b195d50b0f6483600cb7f1c7bb45c4}{newHasMany}}(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \$instance-\/>newQuery(),\ \$this,\ \$instance-\/>getTable().\textcolor{charliteral}{'.'}.\$foreignKey,\ \$localKey}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00396}00396\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00397}00397\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00408}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a08b195d50b0f6483600cb7f1c7bb45c4}{00408}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a08b195d50b0f6483600cb7f1c7bb45c4}{newHasMany}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_builder}{Builder}}\ \$query,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Model}}\ \$parent,\ \$foreignKey,\ \$localKey)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00409}00409\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00410}00410\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_has_many}{HasMany}}(\$query,\ \$parent,\ \$foreignKey,\ \$localKey);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00411}00411\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00412}00412\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00424}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a81b58683dbead147082112bb0e542bb0}{00424}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a81b58683dbead147082112bb0e542bb0}{hasManyThrough}}(\$related,\ \$through,\ \$firstKey\ =\ \textcolor{keyword}{null},\ \$secondKey\ =\ \textcolor{keyword}{null},\ \$localKey\ =\ \textcolor{keyword}{null},\ \$secondLocalKey\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00425}00425\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00426}00426\ \ \ \ \ \ \ \ \ \$through\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a030867a660dfc0fea35a174f771df1c2}{newRelatedThroughInstance}}(\$through);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00428}00428\ \ \ \ \ \ \ \ \ \$firstKey\ =\ \$firstKey\ ?:\ \$this-\/>getForeignKey();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00429}00429\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \$secondKey\ =\ \$secondKey\ ?:\ \$through-\/>getForeignKey();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00431}00431\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a7fec70745c9b41c76cd58efdebd19cc1}{newHasManyThrough}}(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab4d90b96cc192ff864ba3691a2aa1a65}{newRelatedInstance}}(\$related)-\/>newQuery(),}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \$this,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \$through,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \$firstKey,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \$secondKey,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \$localKey\ ?:\ \$this-\/>getKeyName(),}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \$secondLocalKey\ ?:\ \$through-\/>getKeyName()}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00440}00440\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00441}00441\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00442}00442\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00455}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a7fec70745c9b41c76cd58efdebd19cc1}{00455}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a7fec70745c9b41c76cd58efdebd19cc1}{newHasManyThrough}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_builder}{Builder}}\ \$query,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Model}}\ \$farParent,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Model}}\ \$throughParent,\ \$firstKey,\ \$secondKey,\ \$localKey,\ \$secondLocalKey)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00456}00456\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_has_many_through}{HasManyThrough}}(\$query,\ \$farParent,\ \$throughParent,\ \$firstKey,\ \$secondKey,\ \$localKey,\ \$secondLocalKey);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00458}00458\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00459}00459\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00470}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a585b5dbd6c023326d011eba1c832cc37}{00470}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a585b5dbd6c023326d011eba1c832cc37}{morphMany}}(\$related,\ \$name,\ \$type\ =\ \textcolor{keyword}{null},\ \$id\ =\ \textcolor{keyword}{null},\ \$localKey\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00471}00471\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \$instance\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab4d90b96cc192ff864ba3691a2aa1a65}{newRelatedInstance}}(\$related);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00473}00473\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00474}00474\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Here\ we\ will\ gather\ up\ the\ morph\ type\ and\ ID\ for\ the\ relationship\ so\ that\ we}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ can\ properly\ query\ the\ intermediate\ table\ of\ a\ relation.\ Finally,\ we\ will}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ get\ the\ table\ and\ create\ the\ relationship\ instances\ for\ the\ developers.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ [\$type,\ \$id]\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a2c815e02f965fb9f650bf4a8cdc3d649}{getMorphs}}(\$name,\ \$type,\ \$id);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00478}00478\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \$table\ =\ \$instance-\/>getTable();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00480}00480\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ \$localKey\ =\ \$localKey\ ?:\ \$this-\/>getKeyName();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00482}00482\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00483}00483\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_af9d4ac8dabea53859d361ff15a207e63}{newMorphMany}}(\$instance-\/>newQuery(),\ \$this,\ \$table.\textcolor{charliteral}{'.'}.\$type,\ \$table.\textcolor{charliteral}{'.'}.\$id,\ \$localKey);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00484}00484\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00485}00485\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00496}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_af9d4ac8dabea53859d361ff15a207e63}{00496}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_af9d4ac8dabea53859d361ff15a207e63}{newMorphMany}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_builder}{Builder}}\ \$query,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Model}}\ \$parent,\ \$type,\ \$id,\ \$localKey)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00497}00497\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00498}00498\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_morph_many}{MorphMany}}(\$query,\ \$parent,\ \$type,\ \$id,\ \$localKey);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00499}00499\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00500}00500\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00513}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a62b7bb7af02724129dbe4a960f895f0e}{00513}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a62b7bb7af02724129dbe4a960f895f0e}{belongsToMany}}(\$related,\ \$table\ =\ \textcolor{keyword}{null},\ \$foreignPivotKey\ =\ \textcolor{keyword}{null},\ \$relatedPivotKey\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$parentKey\ =\ \textcolor{keyword}{null},\ \$relatedKey\ =\ \textcolor{keyword}{null},\ \$relation\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00515}00515\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ no\ relationship\ name\ was\ passed,\ we\ will\ pull\ backtraces\ to\ get\ the}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ name\ of\ the\ calling\ function.\ We\ will\ use\ that\ function\ name\ as\ the}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00518}00518\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ title\ of\ this\ relation\ since\ that\ is\ a\ great\ convention\ to\ apply.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$relation))\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \$relation\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a51092eab10423986fcea7e10bbff6167}{guessBelongsToManyRelation}}();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00522}00522\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00523}00523\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First,\ we'll\ need\ to\ determine\ the\ foreign\ key\ and\ "{}other\ key"{}\ for\ the}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00524}00524\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ relationship.\ Once\ we\ have\ determined\ the\ keys\ we'll\ make\ the\ query}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00525}00525\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ instances\ as\ well\ as\ the\ relationship\ instances\ we\ need\ for\ this.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \$instance\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab4d90b96cc192ff864ba3691a2aa1a65}{newRelatedInstance}}(\$related);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00527}00527\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00528}00528\ \ \ \ \ \ \ \ \ \$foreignPivotKey\ =\ \$foreignPivotKey\ ?:\ \$this-\/>getForeignKey();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00529}00529\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00530}00530\ \ \ \ \ \ \ \ \ \$relatedPivotKey\ =\ \$relatedPivotKey\ ?:\ \$instance-\/>getForeignKey();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00531}00531\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ no\ table\ name\ was\ provided,\ we\ can\ guess\ it\ by\ concatenating\ the\ two}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00533}00533\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ models\ using\ underscores\ in\ alphabetical\ order.\ The\ two\ model\ names}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ are\ transformed\ to\ snake\ case\ from\ their\ default\ CamelCase\ also.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00535}00535\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$table))\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ \$table\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_abf9ed86a43b5e22870f38c08b2b035be}{joiningTable}}(\$related,\ \$instance);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00537}00537\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00538}00538\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00539}00539\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a771003599c3a785ea75ac9b9e4b3ab7a}{newBelongsToMany}}(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \ \ \ \ \$instance-\/>newQuery(),\ \$this,\ \$table,\ \$foreignPivotKey,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \$relatedPivotKey,\ \$parentKey\ ?:\ \$this-\/>getKeyName(),}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ \$relatedKey\ ?:\ \$instance-\/>getKeyName(),\ \$relation}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00543}00543\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00544}00544\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00545}00545\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00559}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a771003599c3a785ea75ac9b9e4b3ab7a}{00559}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a771003599c3a785ea75ac9b9e4b3ab7a}{newBelongsToMany}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_builder}{Builder}}\ \$query,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Model}}\ \$parent,\ \$table,\ \$foreignPivotKey,\ \$relatedPivotKey,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00560}00560\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$parentKey,\ \$relatedKey,\ \$relationName\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00561}00561\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00562}00562\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_belongs_to_many}{BelongsToMany}}(\$query,\ \$parent,\ \$table,\ \$foreignPivotKey,\ \$relatedPivotKey,\ \$parentKey,\ \$relatedKey,\ \$relationName);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00563}00563\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00564}00564\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00579}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_afff5263571e969a89bd22f0ea454165b}{00579}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_afff5263571e969a89bd22f0ea454165b}{morphToMany}}(\$related,\ \$name,\ \$table\ =\ \textcolor{keyword}{null},\ \$foreignPivotKey\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00580}00580\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$relatedPivotKey\ =\ \textcolor{keyword}{null},\ \$parentKey\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$relatedKey\ =\ \textcolor{keyword}{null},\ \$relation\ =\ \textcolor{keyword}{null},\ \$inverse\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00582}00582\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00583}00583\ \ \ \ \ \ \ \ \ \$relation\ =\ \$relation\ ?:\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a51092eab10423986fcea7e10bbff6167}{guessBelongsToManyRelation}}();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00584}00584\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00585}00585\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First,\ we\ will\ need\ to\ determine\ the\ foreign\ key\ and\ "{}other\ key"{}\ for\ the}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00586}00586\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ relationship.\ Once\ we\ have\ determined\ the\ keys\ we\ will\ make\ the\ query}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00587}00587\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ instances,\ as\ well\ as\ the\ relationship\ instances\ we\ need\ for\ these.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00588}00588\ \ \ \ \ \ \ \ \ \$instance\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab4d90b96cc192ff864ba3691a2aa1a65}{newRelatedInstance}}(\$related);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00589}00589\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00590}00590\ \ \ \ \ \ \ \ \ \$foreignPivotKey\ =\ \$foreignPivotKey\ ?:\ \$name.\textcolor{stringliteral}{'\_id'};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00591}00591\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00592}00592\ \ \ \ \ \ \ \ \ \$relatedPivotKey\ =\ \$relatedPivotKey\ ?:\ \$instance-\/>getForeignKey();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00593}00593\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00594}00594\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Now\ we're\ ready\ to\ create\ a\ new\ query\ builder\ for\ the\ related\ model\ and}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00595}00595\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ relationship\ instances\ for\ this\ relation.\ This\ relation\ will\ set}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ appropriate\ query\ constraints\ then\ entirely\ manage\ the\ hydrations.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00597}00597\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$table)\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00598}00598\ \ \ \ \ \ \ \ \ \ \ \ \ \$words\ =\ preg\_split(\textcolor{stringliteral}{'/(\_)/u'},\ \$name,\ -\/1,\ PREG\_SPLIT\_DELIM\_CAPTURE);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00599}00599\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00600}00600\ \ \ \ \ \ \ \ \ \ \ \ \ \$lastWord\ =\ array\_pop(\$words);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00601}00601\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ \ \ \$table\ =\ implode(\textcolor{stringliteral}{''},\ \$words).Str::plural(\$lastWord);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00603}00603\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00604}00604\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00605}00605\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a6ed697aef14b8350e11c42fb468ed45a}{newMorphToMany}}(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00606}00606\ \ \ \ \ \ \ \ \ \ \ \ \ \$instance-\/>newQuery(),\ \$this,\ \$name,\ \$table,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00607}00607\ \ \ \ \ \ \ \ \ \ \ \ \ \$foreignPivotKey,\ \$relatedPivotKey,\ \$parentKey\ ?:\ \$this-\/>getKeyName(),}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00608}00608\ \ \ \ \ \ \ \ \ \ \ \ \ \$relatedKey\ ?:\ \$instance-\/>getKeyName(),\ \$relation,\ \$inverse}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00609}00609\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00610}00610\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00611}00611\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00627}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a6ed697aef14b8350e11c42fb468ed45a}{00627}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a6ed697aef14b8350e11c42fb468ed45a}{newMorphToMany}}(\mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_builder}{Builder}}\ \$query,\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Model}}\ \$parent,\ \$name,\ \$table,\ \$foreignPivotKey,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00628}00628\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$relatedPivotKey,\ \$parentKey,\ \$relatedKey,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00629}00629\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$relationName\ =\ \textcolor{keyword}{null},\ \$inverse\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00630}00630\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00631}00631\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_relations_1_1_morph_to_many}{MorphToMany}}(\$query,\ \$parent,\ \$name,\ \$table,\ \$foreignPivotKey,\ \$relatedPivotKey,\ \$parentKey,\ \$relatedKey,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00632}00632\ \ \ \ \ \ \ \ \ \ \ \ \ \$relationName,\ \$inverse);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00633}00633\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00634}00634\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00648}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab55f6ee54acd3b0728b94ba1da04800b}{00648}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab55f6ee54acd3b0728b94ba1da04800b}{morphedByMany}}(\$related,\ \$name,\ \$table\ =\ \textcolor{keyword}{null},\ \$foreignPivotKey\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00649}00649\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$relatedPivotKey\ =\ \textcolor{keyword}{null},\ \$parentKey\ =\ \textcolor{keyword}{null},\ \$relatedKey\ =\ \textcolor{keyword}{null},\ \$relation\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00650}00650\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00651}00651\ \ \ \ \ \ \ \ \ \$foreignPivotKey\ =\ \$foreignPivotKey\ ?:\ \$this-\/>getForeignKey();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00652}00652\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00653}00653\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ For\ the\ inverse\ of\ the\ polymorphic\ many-\/to-\/many\ relations,\ we\ will\ change}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00654}00654\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ way\ we\ determine\ the\ foreign\ and\ other\ keys,\ as\ it\ is\ the\ opposite}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00655}00655\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ of\ the\ morph-\/to-\/many\ method\ since\ we're\ figuring\ out\ these\ inverses.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00656}00656\ \ \ \ \ \ \ \ \ \$relatedPivotKey\ =\ \$relatedPivotKey\ ?:\ \$name.\textcolor{stringliteral}{'\_id'};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00657}00657\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00658}00658\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_afff5263571e969a89bd22f0ea454165b}{morphToMany}}(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00659}00659\ \ \ \ \ \ \ \ \ \ \ \ \ \$related,\ \$name,\ \$table,\ \$foreignPivotKey,}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00660}00660\ \ \ \ \ \ \ \ \ \ \ \ \ \$relatedPivotKey,\ \$parentKey,\ \$relatedKey,\ \$relation,\ \textcolor{keyword}{true}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00661}00661\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00662}00662\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00663}00663\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00669}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a51092eab10423986fcea7e10bbff6167}{00669}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a51092eab10423986fcea7e10bbff6167}{guessBelongsToManyRelation}}()}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00670}00670\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00671}00671\ \ \ \ \ \ \ \ \ \$caller\ =\ Arr::first(debug\_backtrace(DEBUG\_BACKTRACE\_IGNORE\_ARGS),\ \textcolor{keyword}{function}\ (\$trace)\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00672}00672\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\ in\_array(}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00673}00673\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$trace[\textcolor{stringliteral}{'function'}],}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00674}00674\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_merge(static::\$manyMethods,\ [\textcolor{stringliteral}{'guessBelongsToManyRelation'}])}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00675}00675\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00676}00676\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00677}00677\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00678}00678\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\ is\_null(\$caller)\ ?\ \$caller[\textcolor{stringliteral}{'function'}]\ :\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00679}00679\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00680}00680\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00688}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_abf9ed86a43b5e22870f38c08b2b035be}{00688}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_abf9ed86a43b5e22870f38c08b2b035be}{joiningTable}}(\$related,\ \$instance\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00689}00689\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00690}00690\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ joining\ table\ name,\ by\ convention,\ is\ simply\ the\ snake\ cased\ models}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00691}00691\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ sorted\ alphabetically\ and\ concatenated\ with\ an\ underscore,\ so\ we\ can}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00692}00692\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ just\ sort\ the\ models\ and\ join\ them\ together\ to\ get\ the\ table\ name.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00693}00693\ \ \ \ \ \ \ \ \ \$segments\ =\ [}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00694}00694\ \ \ \ \ \ \ \ \ \ \ \ \ \$instance\ ?\ \$instance-\/>joiningTableSegment()}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00695}00695\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ Str::snake(class\_basename(\$related)),}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00696}00696\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_aefd0147c4c4f2c5691a76d1735cb9f6a}{joiningTableSegment}}(),}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00697}00697\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00698}00698\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00699}00699\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Now\ that\ we\ have\ the\ model\ names\ in\ an\ array\ we\ can\ just\ sort\ them\ and}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00700}00700\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ use\ the\ implode\ function\ to\ join\ them\ together\ with\ an\ underscores,}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00701}00701\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ which\ is\ typically\ used\ by\ convention\ within\ the\ database\ system.}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00702}00702\ \ \ \ \ \ \ \ \ sort(\$segments);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00703}00703\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00704}00704\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ strtolower(implode(\textcolor{charliteral}{'\_'},\ \$segments));}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00705}00705\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00706}00706\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00712}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_aefd0147c4c4f2c5691a76d1735cb9f6a}{00712}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_aefd0147c4c4f2c5691a76d1735cb9f6a}{joiningTableSegment}}()}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00713}00713\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00714}00714\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Str::snake(class\_basename(\$this));}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00715}00715\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00716}00716\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00723}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a7a0af0176b8bb8e6096d4f0589d4ce1e}{00723}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a7a0af0176b8bb8e6096d4f0589d4ce1e}{touches}}(\$relation)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00724}00724\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00725}00725\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ in\_array(\$relation,\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a8537b356486971b1f87f925dac57ddac}{getTouchedRelations}}());}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00726}00726\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00727}00727\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00733}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a3b5c80c7bffb92adf5cff83a27b8a058}{00733}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a3b5c80c7bffb92adf5cff83a27b8a058}{touchOwners}}()}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00734}00734\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00735}00735\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a8537b356486971b1f87f925dac57ddac}{getTouchedRelations}}()\ as\ \$relation)\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00736}00736\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\$relation()-\/>touch();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00737}00737\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00738}00738\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\$relation\ instanceof\ \textcolor{keyword}{self})\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00739}00739\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\$relation-\/>fireModelEvent(\textcolor{stringliteral}{'saved'},\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00740}00740\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00741}00741\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\$relation-\/>touchOwners();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00742}00742\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$this-\/>\$relation\ instanceof\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_collection}{Collection}})\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00743}00743\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\$relation-\/>each-\/>touchOwners();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00744}00744\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00745}00745\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00746}00746\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00747}00747\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00756}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a2c815e02f965fb9f650bf4a8cdc3d649}{00756}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a2c815e02f965fb9f650bf4a8cdc3d649}{getMorphs}}(\$name,\ \$type,\ \$id)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00757}00757\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00758}00758\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\$type\ ?:\ \$name.\textcolor{stringliteral}{'\_type'},\ \$id\ ?:\ \$name.\textcolor{stringliteral}{'\_id'}];}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00759}00759\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00760}00760\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00766}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a5122eab426c3ec21ec1dfd8e165d5438}{00766}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a5122eab426c3ec21ec1dfd8e165d5438}{getMorphClass}}()}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00767}00767\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00768}00768\ \ \ \ \ \ \ \ \ \$morphMap\ =\ Relation::morphMap();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00769}00769\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00770}00770\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ empty(\$morphMap)\ \&\&\ in\_array(static::class,\ \$morphMap))\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00771}00771\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_search(static::class,\ \$morphMap,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00772}00772\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00773}00773\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00774}00774\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (static::class\ ===\ Pivot::class)\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00775}00775\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ static::class;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00776}00776\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00777}00777\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00778}00778\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (Relation::requiresMorphMap())\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00779}00779\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_class_morph_violation_exception}{ClassMorphViolationException}}(\$this);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00780}00780\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00781}00781\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00782}00782\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ static::class;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00783}00783\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00784}00784\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00791}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab4d90b96cc192ff864ba3691a2aa1a65}{00791}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_ab4d90b96cc192ff864ba3691a2aa1a65}{newRelatedInstance}}(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00792}00792\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00793}00793\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\textcolor{keyword}{new}\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}},\ \textcolor{keyword}{function}\ (\$instance)\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00794}00794\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$instance-\/>getConnectionName())\ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00795}00795\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$instance-\/>setConnection(\$this-\/>connection);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00796}00796\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00797}00797\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00798}00798\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00799}00799\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00806}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a030867a660dfc0fea35a174f771df1c2}{00806}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a030867a660dfc0fea35a174f771df1c2}{newRelatedThroughInstance}}(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00807}00807\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00808}00808\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00809}00809\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00810}00810\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00816}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a055db30d0e264bc41e3f27955e523a3d}{00816}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a055db30d0e264bc41e3f27955e523a3d}{getRelations}}()}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00817}00817\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00818}00818\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>relations;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00819}00819\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00820}00820\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00827}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a18d16d70ee1e05044e3e59aad4446974}{00827}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a18d16d70ee1e05044e3e59aad4446974}{getRelation}}(\$relation)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00828}00828\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00829}00829\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>relations[\$relation];}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00830}00830\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00831}00831\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00838}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_affda244705a7f4b3b3f717fc14bb0ab7}{00838}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_affda244705a7f4b3b3f717fc14bb0ab7}{relationLoaded}}(\$key)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00839}00839\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00840}00840\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_key\_exists(\$key,\ \$this-\/>relations);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00841}00841\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00842}00842\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00850}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_afe8cfca2851c5944e695153cd89ef2ba}{00850}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_afe8cfca2851c5944e695153cd89ef2ba}{setRelation}}(\$relation,\ \$value)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00851}00851\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00852}00852\ \ \ \ \ \ \ \ \ \$this-\/>relations[\$relation]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00853}00853\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00854}00854\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00855}00855\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00856}00856\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00863}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a454e94af548045f19eed71ed04fbae10}{00863}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a454e94af548045f19eed71ed04fbae10}{unsetRelation}}(\$relation)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00864}00864\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00865}00865\ \ \ \ \ \ \ \ \ unset(\$this-\/>relations[\$relation]);}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00866}00866\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00867}00867\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00868}00868\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00869}00869\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00876}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a260f46c3f6485d3fcb1a8a3791d48db5}{00876}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a260f46c3f6485d3fcb1a8a3791d48db5}{setRelations}}(array\ \$relations)}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00877}00877\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00878}00878\ \ \ \ \ \ \ \ \ \$this-\/>relations\ =\ \$relations;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00879}00879\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00880}00880\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00881}00881\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00882}00882\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00888}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a2fa21729929389287eaa0cc0532cb41b}{00888}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a2fa21729929389287eaa0cc0532cb41b}{withoutRelations}}()}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00889}00889\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00890}00890\ \ \ \ \ \ \ \ \ \$model\ =\ clone\ \$this;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00891}00891\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00892}00892\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$model-\/>unsetRelations();}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00893}00893\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00894}00894\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00900}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_acbb169f8c20510885c41ae0c2648ee7c}{00900}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_acbb169f8c20510885c41ae0c2648ee7c}{unsetRelations}}()}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00901}00901\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00902}00902\ \ \ \ \ \ \ \ \ \$this-\/>relations\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00903}00903\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00904}00904\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00905}00905\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00906}00906\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00912}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a8537b356486971b1f87f925dac57ddac}{00912}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a8537b356486971b1f87f925dac57ddac}{getTouchedRelations}}()}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00913}00913\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00914}00914\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a7b68211fbfc54fbe2efcba07ce47ff0c}{\$this-\/>touches}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00915}00915\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00916}00916\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00923}\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a5676112145e015e4cef6f9fcf42fab9b}{00923}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a5676112145e015e4cef6f9fcf42fab9b}{setTouchedRelations}}(array\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a7b68211fbfc54fbe2efcba07ce47ff0c}{\$touches}})}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00924}00924\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00925}00925\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a7a0af0176b8bb8e6096d4f0589d4ce1e}{touches}}\ =\ \mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_eloquent_1_1_concerns_a7b68211fbfc54fbe2efcba07ce47ff0c}{\$touches}};}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00926}00926\ }
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00927}00927\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00928}00928\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_has_relationships_8php_source_l00929}00929\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,324 @@
+\doxysection{Socket\+Handler.\+php}
+\hypertarget{_socket_handler_8php_source}{}\label{_socket_handler_8php_source}\index{vendor/monolog/monolog/src/Monolog/Handler/SocketHandler.php@{vendor/monolog/monolog/src/Monolog/Handler/SocketHandler.php}}
+\mbox{\hyperlink{_socket_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Monolog\ package.}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Jordi\ Boggiano\ <j.boggiano@seld.be>}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_monolog_1_1_handler}{Monolog\(\backslash\)Handler}};}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00014}00014\ use\ Monolog\(\backslash\)Level;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_monolog_1_1_log_record}{Monolog\(\backslash\)LogRecord}};}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00023}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler}{00023}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler}{SocketHandler}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_processing_handler}{AbstractProcessingHandler}}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00024}00024\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00025}00025\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$connectionString;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00026}00026\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{float}\ \$connectionTimeout;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{private}\ \$resource;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{float}\ \$timeout;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{float}\ \$writingTimeout;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}|\textcolor{keyword}{null}\ \$lastSentBytes\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}|\textcolor{keyword}{null}\ \$chunkSize;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00033}00033\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$persistent;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00034}00034\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}|\textcolor{keyword}{null}\ \$errno\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00035}00035\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}|\textcolor{keyword}{null}\ \$errstr\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{float}|\textcolor{keyword}{null}\ \$lastWritingAt\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00049}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a2344a6fa32037069202ac3585a227d80}{00049}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a2344a6fa32037069202ac3585a227d80}{\_\_construct}}(}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \$connectionString,}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}}\ =\ Level::Debug,}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}}\ =\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$persistent\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \$timeout\ =\ 0.0,}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ \$writingTimeout\ =\ 10.0,}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ ?\textcolor{keywordtype}{float}\ \$connectionTimeout\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ ?\textcolor{keywordtype}{int}\ \$chunkSize\ =\ \textcolor{keyword}{null}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00058}00058\ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ parent::\_\_construct(\mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}},\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \$this-\/>connectionString\ =\ \$connectionString;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$connectionTimeout\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>validateTimeout(\$connectionTimeout);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \$this-\/>connectionTimeout\ =\ \$connectionTimeout\ ??\ (float)\ ini\_get(\textcolor{stringliteral}{'default\_socket\_timeout'});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \$this-\/>persistent\ =\ \$persistent;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \$this-\/>validateTimeout(\$timeout);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \$this-\/>timeout\ =\ \$timeout;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \$this-\/>validateTimeout(\$writingTimeout);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \$this-\/>writingTimeout\ =\ \$writingTimeout;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \$this-\/>chunkSize\ =\ \$chunkSize;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00073}00073\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00083}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a4d821b93cc01881ce31ed79d678a8800}{00083}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a4d821b93cc01881ce31ed79d678a8800}{write}}(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record):\ void}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00084}00084\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \$this-\/>connectIfNotConnected();}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a8f3d3d8b205b289509fb06d576175bb1}{generateDataStream}}(\$record);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \$this-\/>writeToSocket(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00088}00088\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00093}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_aa69c8bf1f1dcf4e72552efff1fe3e87e}{00093}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_aa69c8bf1f1dcf4e72552efff1fe3e87e}{close}}():\ void}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00094}00094\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a4dd0c77d3fdc85d2a22154a73132c281}{isPersistent}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a643ebddba786a3abc5c87a86aa810dfe}{closeSocket}}();}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00098}00098\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00103}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a643ebddba786a3abc5c87a86aa810dfe}{00103}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a643ebddba786a3abc5c87a86aa810dfe}{closeSocket}}():\ void}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00104}00104\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_resource(\$this-\/>resource))\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$this-\/>resource);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>resource\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00109}00109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00116}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a633780c655536e47c039bbb4e2cf7803}{00116}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a633780c655536e47c039bbb4e2cf7803}{setPersistent}}(\textcolor{keywordtype}{bool}\ \$persistent):\ self}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00117}00117\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \$this-\/>persistent\ =\ \$persistent;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00121}00121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00129}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a7832fb45dd28d2e0d0032088c35bc935}{00129}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a7832fb45dd28d2e0d0032088c35bc935}{setConnectionTimeout}}(\textcolor{keywordtype}{float}\ \$seconds):\ self}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00130}00130\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \$this-\/>validateTimeout(\$seconds);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \$this-\/>connectionTimeout\ =\ \$seconds;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00135}00135\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00143}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_aa63894f336cdb49322706850083454b5}{00143}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_aa63894f336cdb49322706850083454b5}{setTimeout}}(\textcolor{keywordtype}{float}\ \$seconds):\ self}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00144}00144\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \$this-\/>validateTimeout(\$seconds);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \$this-\/>timeout\ =\ \$seconds;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00149}00149\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00157}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_ae727454940522dd7f834daa0b3d569e2}{00157}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_ae727454940522dd7f834daa0b3d569e2}{setWritingTimeout}}(\textcolor{keywordtype}{float}\ \$seconds):\ self}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00158}00158\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \$this-\/>validateTimeout(\$seconds);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \$this-\/>writingTimeout\ =\ \$seconds;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00163}00163\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00170}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a8ee8db95efc3693282fb1cca4726be1a}{00170}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a8ee8db95efc3693282fb1cca4726be1a}{setChunkSize}}(\textcolor{keywordtype}{int}\ \$bytes):\ self}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00171}00171\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \$this-\/>chunkSize\ =\ \$bytes;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00175}00175\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00180}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_af56ef2800042aa1b74489f4653a5a2e7}{00180}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_af56ef2800042aa1b74489f4653a5a2e7}{getConnectionString}}():\ string}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00181}00181\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>connectionString;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00183}00183\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00188}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a4dd0c77d3fdc85d2a22154a73132c281}{00188}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a4dd0c77d3fdc85d2a22154a73132c281}{isPersistent}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00189}00189\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>persistent;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00191}00191\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00196}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a5115029b76d31675aca1d57ad64fb97d}{00196}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a5115029b76d31675aca1d57ad64fb97d}{getConnectionTimeout}}():\ float}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00197}00197\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>connectionTimeout;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00199}00199\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00204}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_abac5019c5daf3a27d739aa3a249fdb31}{00204}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_abac5019c5daf3a27d739aa3a249fdb31}{getTimeout}}():\ float}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00205}00205\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>timeout;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00207}00207\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00212}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a23c663e657f77d9e9aef6aaf9e6cec75}{00212}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a23c663e657f77d9e9aef6aaf9e6cec75}{getWritingTimeout}}():\ float}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00213}00213\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>writingTimeout;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00215}00215\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00220}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a26f9ac1be808f90bd9f267dce510bacc}{00220}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a26f9ac1be808f90bd9f267dce510bacc}{getChunkSize}}():\ ?int}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00221}00221\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>chunkSize;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00223}00223\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00230}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_af160f7fbbf281d018ae3162521b8267d}{00230}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_af160f7fbbf281d018ae3162521b8267d}{isConnected}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00231}00231\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_resource(\$this-\/>resource)}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ !feof(\$this-\/>resource);\ \ \textcolor{comment}{//\ on\ TCP\ -\/\ other\ party\ can\ close\ connection.}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00234}00234\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00241}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a182602fa0f1e2b34f70560889e2d0e15}{00241}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a182602fa0f1e2b34f70560889e2d0e15}{pfsockopen}}()}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00242}00242\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ @\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a182602fa0f1e2b34f70560889e2d0e15}{pfsockopen}}(\$this-\/>connectionString,\ -\/1,\ \$this-\/>errno,\ \$this-\/>errstr,\ \$this-\/>connectionTimeout);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00244}00244\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00251}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a4412f90a431cf197ffcfa65222435b24}{00251}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a4412f90a431cf197ffcfa65222435b24}{fsockopen}}()}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00252}00252\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ @\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a4412f90a431cf197ffcfa65222435b24}{fsockopen}}(\$this-\/>connectionString,\ -\/1,\ \$this-\/>errno,\ \$this-\/>errstr,\ \$this-\/>connectionTimeout);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00254}00254\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00261}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a98b86f0a536c1d29154b1ca39a3c1a3d}{00261}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a98b86f0a536c1d29154b1ca39a3c1a3d}{streamSetTimeout}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00262}00262\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \$seconds\ =\ floor(\$this-\/>timeout);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \$microseconds\ =\ round((\$this-\/>timeout\ -\/\ \$seconds)\ *\ 1e6);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_resource(\$this-\/>resource))\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)LogicException(\textcolor{stringliteral}{'streamSetTimeout\ called\ but\ \$this-\/>resource\ is\ not\ a\ resource'});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ stream\_set\_timeout(\$this-\/>resource,\ (\textcolor{keywordtype}{int})\ \$seconds,\ (\textcolor{keywordtype}{int})\ \$microseconds);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00271}00271\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00280}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a95f4dc807eff9c0a13b77ec7ee750502}{00280}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a95f4dc807eff9c0a13b77ec7ee750502}{streamSetChunkSize}}():\ int|bool}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00281}00281\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_resource(\$this-\/>resource))\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)LogicException(\textcolor{stringliteral}{'streamSetChunkSize\ called\ but\ \$this-\/>resource\ is\ not\ a\ resource'});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00284}00284\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00286}00286\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$this-\/>chunkSize)\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)LogicException(\textcolor{stringliteral}{'streamSetChunkSize\ called\ but\ \$this-\/>chunkSize\ is\ not\ set'});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00288}00288\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00290}00290\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ stream\_set\_chunk\_size(\$this-\/>resource,\ \$this-\/>chunkSize);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00291}00291\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00298}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_aa50e558c4437da601bb5c3c76dc6c01e}{00298}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_aa50e558c4437da601bb5c3c76dc6c01e}{fwrite}}(\textcolor{keywordtype}{string}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}):\ int|bool}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00299}00299\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00300}00300\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_resource(\$this-\/>resource))\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)LogicException(\textcolor{stringliteral}{'fwrite\ called\ but\ \$this-\/>resource\ is\ not\ a\ resource'});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00302}00302\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00304}00304\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ @\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_aa50e558c4437da601bb5c3c76dc6c01e}{fwrite}}(\$this-\/>resource,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00305}00305\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00306}00306\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00312}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a35558df5380ae64115534888170c9338}{00312}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a35558df5380ae64115534888170c9338}{streamGetMetadata}}():\ array|bool}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00313}00313\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_resource(\$this-\/>resource))\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)LogicException(\textcolor{stringliteral}{'streamGetMetadata\ called\ but\ \$this-\/>resource\ is\ not\ a\ resource'});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ stream\_get\_meta\_data(\$this-\/>resource);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00319}00319\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00320}00320\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00321}00321\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ validateTimeout(\textcolor{keywordtype}{float}\ \$value):\ void}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00322}00322\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ <\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{"{}Timeout\ must\ be\ 0\ or\ a\ positive\ float\ (got\ \$value)"{}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00325}00325\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00326}00326\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00328}00328\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ connectIfNotConnected():\ void}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00329}00329\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_af160f7fbbf281d018ae3162521b8267d}{isConnected}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \$this-\/>connect();}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00334}00334\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00336}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a8f3d3d8b205b289509fb06d576175bb1}{00336}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a8f3d3d8b205b289509fb06d576175bb1}{generateDataStream}}(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record):\ string}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00337}00337\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{string})\ \$record-\/>formatted;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00339}00339\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00344}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a8c5a689e9be7d35d0d01d0194637a7d2}{00344}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a8c5a689e9be7d35d0d01d0194637a7d2}{getResource}}()}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00345}00345\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>resource;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00347}00347\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00348}00348\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00349}00349\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ connect():\ void}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00350}00350\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00351}00351\ \ \ \ \ \ \ \ \ \$this-\/>createSocketResource();}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \$this-\/>setSocketTimeout();}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00353}00353\ \ \ \ \ \ \ \ \ \$this-\/>setStreamChunkSize();}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00354}00354\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00355}00355\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00356}00356\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ createSocketResource():\ void}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00357}00357\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a4dd0c77d3fdc85d2a22154a73132c281}{isPersistent}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \ \ \ \$resource\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a182602fa0f1e2b34f70560889e2d0e15}{pfsockopen}}();}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \$resource\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a4412f90a431cf197ffcfa65222435b24}{fsockopen}}();}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_bool(\$resource))\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)UnexpectedValueException(\textcolor{stringliteral}{"{}Failed\ connecting\ to\ \$this-\/>connectionString\ (\$this-\/>errno:\ \$this-\/>errstr)"{}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00365}00365\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \$this-\/>resource\ =\ \$resource;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00367}00367\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00369}00369\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ setSocketTimeout():\ void}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00370}00370\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00371}00371\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a98b86f0a536c1d29154b1ca39a3c1a3d}{streamSetTimeout}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)UnexpectedValueException(\textcolor{stringliteral}{"{}Failed\ setting\ timeout\ with\ stream\_set\_timeout()"{}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00374}00374\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00375}00375\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00376}00376\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ setStreamChunkSize():\ void}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00377}00377\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00378}00378\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$this-\/>chunkSize\ \&\&\ \textcolor{keyword}{false}\ ===\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a95f4dc807eff9c0a13b77ec7ee750502}{streamSetChunkSize}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)UnexpectedValueException(\textcolor{stringliteral}{"{}Failed\ setting\ chunk\ size\ with\ stream\_set\_chunk\_size()"{}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00380}00380\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00381}00381\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00382}00382\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00383}00383\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ writeToSocket(\textcolor{keywordtype}{string}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}):\ void}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00384}00384\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00385}00385\ \ \ \ \ \ \ \ \ \$length\ =\ strlen(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \$sent\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \$this-\/>lastSentBytes\ =\ \$sent;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_af160f7fbbf281d018ae3162521b8267d}{isConnected}}()\ \&\&\ \$sent\ <\ \$length)\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (0\ ==\ \$sent)\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$chunk\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_aa50e558c4437da601bb5c3c76dc6c01e}{fwrite}}(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$chunk\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_aa50e558c4437da601bb5c3c76dc6c01e}{fwrite}}(substr(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$sent));}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$chunk\ ===\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{"{}Could\ not\ write\ to\ socket"{}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00396}00396\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \ \ \$sent\ +=\ \$chunk;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00398}00398\ \ \ \ \ \ \ \ \ \ \ \ \ \$socketInfo\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a35558df5380ae64115534888170c9338}{streamGetMetadata}}();}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$socketInfo)\ \&\&\ (\textcolor{keywordtype}{bool})\ \$socketInfo[\textcolor{stringliteral}{'timed\_out'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00400}00400\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{"{}Write\ timed-\/out"{}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00402}00402\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>writingIsTimedOut(\$sent))\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{"{}Write\ timed-\/out,\ no\ data\ sent\ for\ \`{}\{\$this-\/>writingTimeout\}`\ seconds,\ probably\ we\ got\ disconnected\ (sent\ \$sent\ of\ \$length)"{}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00406}00406\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00407}00407\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_af160f7fbbf281d018ae3162521b8267d}{isConnected}}()\ \&\&\ \$sent\ <\ \$length)\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{"{}End-\/of-\/file\ reached,\ probably\ we\ got\ disconnected\ (sent\ \$sent\ of\ \$length)"{}});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00409}00409\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00410}00410\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00411}00411\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00412}00412\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ writingIsTimedOut(\textcolor{keywordtype}{int}\ \$sent):\ bool}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00413}00413\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00414}00414\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ convert\ to\ ms}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00415}00415\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (0.0\ ==\ \$this-\/>writingTimeout)\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00416}00416\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00419}00419\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$sent\ !==\ \$this-\/>lastSentBytes)\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>lastWritingAt\ =\ microtime(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00421}00421\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>lastSentBytes\ =\ \$sent;}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00422}00422\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00424}00424\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ usleep(100);}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00426}00426\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00428}00428\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((microtime(\textcolor{keyword}{true})\ -\/\ (\textcolor{keywordtype}{float})\ \$this-\/>lastWritingAt)\ >=\ \$this-\/>writingTimeout)\ \{}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_socket_handler_a643ebddba786a3abc5c87a86aa810dfe}{closeSocket}}();}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00430}00430\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00433}00433\ }
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00435}00435\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_socket_handler_8php_source_l00436}00436\ \}}
+
+\end{DoxyCode}

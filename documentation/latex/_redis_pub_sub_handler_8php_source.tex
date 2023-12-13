@@ -1,0 +1,49 @@
+\doxysection{Redis\+Pub\+Sub\+Handler.\+php}
+\hypertarget{_redis_pub_sub_handler_8php_source}{}\label{_redis_pub_sub_handler_8php_source}\index{vendor/monolog/monolog/src/Monolog/Handler/RedisPubSubHandler.php@{vendor/monolog/monolog/src/Monolog/Handler/RedisPubSubHandler.php}}
+\mbox{\hyperlink{_redis_pub_sub_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Monolog\ package.}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Jordi\ Boggiano\ <j.boggiano@seld.be>}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_monolog_1_1_handler}{Monolog\(\backslash\)Handler}};}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_line_formatter}{Monolog\(\backslash\)Formatter\(\backslash\)LineFormatter}};}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00015}00015\ use\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{Monolog\(\backslash\)Formatter\(\backslash\)FormatterInterface}};}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00016}00016\ use\ Monolog\(\backslash\)Level;}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_monolog_1_1_log_record}{Monolog\(\backslash\)LogRecord}};}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00018}00018\ use\ Predis\(\backslash\)Client\ as\ Predis;}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00019}00019\ use\ Redis;}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00032}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_redis_pub_sub_handler}{00032}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_monolog_1_1_handler_1_1_redis_pub_sub_handler}{RedisPubSubHandler}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_processing_handler}{AbstractProcessingHandler}}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00033}00033\ \{}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00035}00035\ \ \ \ \ \textcolor{keyword}{private}\ Predis|Redis\ \$redisClient;}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$channelKey;}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00042}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_redis_pub_sub_handler_a96d8761ddd0ef85e5c35b641c57f81ec}{00042}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_redis_pub_sub_handler_a96d8761ddd0ef85e5c35b641c57f81ec}{\_\_construct}}(Predis|Redis\ \$redis,\ \textcolor{keywordtype}{string}\ \$key,\ \textcolor{keywordtype}{int}|\textcolor{keywordtype}{string}|Level\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}}\ =\ Level::Debug,\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}}\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00043}00043\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \$this-\/>redisClient\ =\ \$redis;}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \$this-\/>channelKey\ =\ \$key;}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ parent::\_\_construct(\mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}},\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}});}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00048}00048\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00053}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_redis_pub_sub_handler_a4d821b93cc01881ce31ed79d678a8800}{00053}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_redis_pub_sub_handler_a4d821b93cc01881ce31ed79d678a8800}{write}}(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record):\ void}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00054}00054\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \$this-\/>redisClient-\/>publish(\$this-\/>channelKey,\ \$record-\/>formatted);}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00056}00056\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00061}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_redis_pub_sub_handler_a0bd80b04e1992562f7eacea2097d3d9d}{00061}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_redis_pub_sub_handler_a0bd80b04e1992562f7eacea2097d3d9d}{getDefaultFormatter}}():\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{FormatterInterface}}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00062}00062\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_line_formatter}{LineFormatter}}();}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00064}00064\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_pub_sub_handler_8php_source_l00065}00065\ \}}
+
+\end{DoxyCode}

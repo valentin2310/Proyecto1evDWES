@@ -1,0 +1,57 @@
+\doxysection{Sqs\+Handler.\+php}
+\hypertarget{_sqs_handler_8php_source}{}\label{_sqs_handler_8php_source}\index{vendor/monolog/monolog/src/Monolog/Handler/SqsHandler.php@{vendor/monolog/monolog/src/Monolog/Handler/SqsHandler.php}}
+\mbox{\hyperlink{_sqs_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Monolog\ package.}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Jordi\ Boggiano\ <j.boggiano@seld.be>}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_monolog_1_1_handler}{Monolog\(\backslash\)Handler}};}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00014}00014\ use\ Aws\(\backslash\)Sqs\(\backslash\)SqsClient;}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00015}00015\ use\ Monolog\(\backslash\)Level;}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_monolog_1_1_utils}{Monolog\(\backslash\)Utils}};}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_monolog_1_1_log_record}{Monolog\(\backslash\)LogRecord}};}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00024}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_sqs_handler}{00024}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_monolog_1_1_handler_1_1_sqs_handler}{SqsHandler}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_processing_handler}{AbstractProcessingHandler}}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00025}00025\ \{}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00027}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_sqs_handler_a61f0ccb3fce8659953ac797a444e22eb}{00027}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_sqs_handler_a61f0ccb3fce8659953ac797a444e22eb}{MAX\_MESSAGE\_SIZE}}\ =\ 262144;}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00029}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_sqs_handler_a942cbf63e7d98e3678c322e678d4f8f1}{00029}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_sqs_handler_a942cbf63e7d98e3678c322e678d4f8f1}{HEAD\_MESSAGE\_SIZE}}\ =\ 102400;}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}\ SqsClient\ \$client;}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$queueUrl;}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00034}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_sqs_handler_a74e44d8dc374f86f327de81a90efc74c}{00034}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_sqs_handler_a74e44d8dc374f86f327de81a90efc74c}{\_\_construct}}(SqsClient\ \$sqsClient,\ \textcolor{keywordtype}{string}\ \$queueUrl,\ \textcolor{keywordtype}{int}|\textcolor{keywordtype}{string}|Level\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}}\ =\ Level::Debug,\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}}\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00035}00035\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00036}00036\ \ \ \ \ \ \ \ \ parent::\_\_construct(\mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}},\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}});}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00038}00038\ \ \ \ \ \ \ \ \ \$this-\/>client\ =\ \$sqsClient;}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \$this-\/>queueUrl\ =\ \$queueUrl;}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00040}00040\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00045}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_sqs_handler_a4d821b93cc01881ce31ed79d678a8800}{00045}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_sqs_handler_a4d821b93cc01881ce31ed79d678a8800}{write}}(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record):\ void}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00046}00046\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$record-\/>formatted)\ ||\ \textcolor{stringliteral}{'string'}\ !==\ gettype(\$record-\/>formatted))\ \{}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'SqsHandler\ accepts\ only\ formatted\ records\ as\ a\ string'}\ .\ \mbox{\hyperlink{class_monolog_1_1_utils_ad04f15214653290447f3c6399cff0cc7}{Utils::getRecordMessageForException}}(\$record));}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \$messageBody\ =\ \$record-\/>formatted;}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strlen(\$messageBody)\ >=\ static::MAX\_MESSAGE\_SIZE)\ \{}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \$messageBody\ =\ \mbox{\hyperlink{class_monolog_1_1_utils_a6c6f203419d3af91290aa221f337988b}{Utils::substr}}(\$messageBody,\ 0,\ static::HEAD\_MESSAGE\_SIZE);}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \$this-\/>client-\/>sendMessage([}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'QueueUrl'}\ =>\ \$this-\/>queueUrl,}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'MessageBody'}\ =>\ \$messageBody,}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00060}00060\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_sqs_handler_8php_source_l00061}00061\ \}}
+
+\end{DoxyCode}

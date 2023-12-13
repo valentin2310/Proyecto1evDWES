@@ -1,0 +1,545 @@
+\chapter{This is the PHP port of Hamcrest Matchers}
+\hypertarget{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e}{}\label{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e}\index{This is the PHP port of Hamcrest Matchers@{This is the PHP port of Hamcrest Matchers}}
+\href{https://travis-ci.org/hamcrest/hamcrest-php}{\texttt{ }}
+
+\doxylink{namespace_hamcrest}{Hamcrest} is a matching library originally written for Java, but subsequently ported to many other languages. hamcrest-\/php is the official PHP port of \doxylink{namespace_hamcrest}{Hamcrest} and essentially follows a literal translation of the original Java API for \doxylink{namespace_hamcrest}{Hamcrest}, with a few Exceptions, mostly down to PHP language barriers\+:
+
+
+\begin{DoxyEnumerate}
+\item {\ttfamily instance\+Of(\$the\+Class)} is actually {\ttfamily an\+Instance\+Of(\$the\+Class)}
+\item `both(contains\+String(\textquotesingle{}a'))-\/\texorpdfstring{$>$}{>}and(contains\+String(\textquotesingle{}b\textquotesingle{})){\ttfamily  is actually}both(contains\+String(\textquotesingle{}a\textquotesingle{}))-\/\texorpdfstring{$>$}{>}and\+Also(contains\+String(\textquotesingle{}b\textquotesingle{}))\`{}
+\item `either(contains\+String(\textquotesingle{}a'))-\/\texorpdfstring{$>$}{>}or(contains\+String(\textquotesingle{}b\textquotesingle{})){\ttfamily  is actually}either(contains\+String(\textquotesingle{}a\textquotesingle{}))-\/\texorpdfstring{$>$}{>}or\+Else(contains\+String(\textquotesingle{}b\textquotesingle{}))\`{}
+\item Unless it would be non-\/semantic for a matcher to do so, hamcrest-\/php allows dynamic typing for it\textquotesingle{}s input, in "{}the PHP way"{}. Exception are where semantics surrounding the type itself would suggest otherwise, such as string\+Contains() and greater\+Than().
+\item Several official matchers have not been ported because they don\textquotesingle{}t make sense or don\textquotesingle{}t apply in PHP\+:
+\begin{DoxyItemize}
+\item {\ttfamily type\+Compatible\+With(\$the\+Class)}
+\item {\ttfamily event\+From(\$source)}
+\item {\ttfamily has\+Property(\$name)} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}
+\item {\ttfamily same\+Property\+Values\+As(\$obj)} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}
+\end{DoxyItemize}
+\item When most of the collections matchers are finally ported, PHP-\/specific aliases will probably be created due to a difference in naming conventions between Java\textquotesingle{}s Arrays, Collections, Sets and Maps compared with PHP\textquotesingle{}s Arrays.
+\end{DoxyEnumerate}
+
+\DoxyHorRuler{0}
+ \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*} \mbox{[}Unless we consider POPO\textquotesingle{}s (Plain Old PHP Objects) akin to Java\+Beans\mbox{]}
+\begin{DoxyItemize}
+\item The POPO thing is a joke. Java devs coin the term POJO\textquotesingle{}s (Plain Old Java Objects).
+\end{DoxyItemize}\hypertarget{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md756}{}\doxysection{\texorpdfstring{Usage}{Usage}}\label{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md756}
+\doxylink{namespace_hamcrest}{Hamcrest} matchers are easy to use as\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Hamcrest\_MatcherAssert::assertThat(\textcolor{charliteral}{'a'},\ Hamcrest\_Matchers::equalToIgnoringCase(\textcolor{charliteral}{'A'}));}
+
+\end{DoxyCode}
+
+
+Alternatively, you can use the global proxy-\/functions\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$result\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\textcolor{comment}{//\ with\ an\ identifier}}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}result\ should\ be\ true"{}},\ \$result,\ \mbox{\hyperlink{namespace_carbon_1_1_traits_aa6e4e4d84bee5fad7e6b616da6b74740}{equalTo}}(\textcolor{keyword}{true}));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ without\ an\ identifier}}
+\DoxyCodeLine{assertThat(\$result,\ \mbox{\hyperlink{namespace_carbon_1_1_traits_aa6e4e4d84bee5fad7e6b616da6b74740}{equalTo}}(\textcolor{keyword}{true}));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ evaluate\ a\ boolean\ expression}}
+\DoxyCodeLine{assertThat(\$result\ ===\ \textcolor{keyword}{true});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ with\ syntactic\ sugar\ is()}}
+\DoxyCodeLine{assertThat(\textcolor{keyword}{true},\ \mbox{\hyperlink{namespace_carbon_1_1_traits_ad7c1373055f2e59c721251183e712a94}{is}}(\textcolor{keyword}{true}));}
+
+\end{DoxyCode}
+
+
+\+:warning\+: {\bfseries{NOTE\+:}} the global proxy-\/functions aren\textquotesingle{}t autoloaded by default, so you will need to load them first\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\(\backslash\)Hamcrest\(\backslash\)Util::registerGlobalFunctions();}
+
+\end{DoxyCode}
+
+
+For brevity, all of the examples below use the proxy-\/functions.\hypertarget{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md757}{}\doxysection{\texorpdfstring{Documentation}{Documentation}}\label{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md757}
+A tutorial can be found on the \href{https://code.google.com/archive/p/hamcrest/wikis/TutorialPHP.wiki}{\texttt{ Hamcrest site}}.\hypertarget{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md758}{}\doxysection{\texorpdfstring{Available Matchers}{Available Matchers}}\label{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md758}
+
+\begin{DoxyItemize}
+\item \href{../master/README.md\#array}{\texttt{ Array}}
+\item \href{../master/README.md\#collection}{\texttt{ Collection}}
+\item \href{../master/README.md\#object}{\texttt{ Object}}
+\item \href{../master/README.md\#numbers}{\texttt{ Numbers}}
+\item \href{../master/README.md\#type-checking}{\texttt{ Type checking}}
+\item \href{../master/README.md\#xml}{\texttt{ XML}}
+\end{DoxyItemize}\hypertarget{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md759}{}\doxysubsection{\texorpdfstring{Array}{Array}}\label{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md759}
+
+\begin{DoxyItemize}
+\item {\ttfamily an\+Array} -\/ evaluates an array 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([],\ anArray());}
+
+\end{DoxyCode}
+
+\item {\ttfamily has\+Item\+In\+Array} -\/ check if item exists in array 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$list\ =\ \mbox{\hyperlink{namespace_carbon_1_1_traits_a3868d62595946c978f9a2fd71bd3fab8}{range}}(2,\ 7,\ 2);}
+\DoxyCodeLine{\$item\ =\ 4;}
+\DoxyCodeLine{assertThat(\$list,\ hasItemInArray(\$item));}
+
+\end{DoxyCode}
+
+\item {\ttfamily has\+Value} -\/ alias of has\+Item\+In\+Array
+\item {\ttfamily array\+Containing\+In\+Any\+Order} -\/ check if array contains elements in any order 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([2,\ 4,\ 6],\ arrayContainingInAnyOrder([6,\ 4,\ 2]));}
+\DoxyCodeLine{assertThat([2,\ 4,\ 6],\ arrayContainingInAnyOrder([4,\ 2,\ 6]));}
+
+\end{DoxyCode}
+
+\item {\ttfamily contains\+In\+Any\+Order} -\/ alias of array\+Containing\+In\+Any\+Order
+\item {\ttfamily array\+Containing} -\/ An array with elements that match the given matchers in the same order. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([2,\ 4,\ 6],\ arrayContaining([2,\ 4,\ 6]));}
+\DoxyCodeLine{assertthat([2,\ 4,\ 6],\ not(arrayContaining([6,\ 4,\ 2])));}
+
+\end{DoxyCode}
+
+\item {\ttfamily contains} -\/ check array in same order 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([2,\ 4,\ 6],\ contains([2,\ 4,\ 6]));}
+
+\end{DoxyCode}
+
+\item {\ttfamily has\+Key\+In\+Array} -\/ check if array has given key 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([\textcolor{stringliteral}{'name'}=>\ \textcolor{stringliteral}{'foobar'}],\ hasKeyInArray(\textcolor{stringliteral}{'name'}));}
+
+\end{DoxyCode}
+
+\item {\ttfamily has\+Key} -\/ alias of has\+Key\+In\+Array
+\item {\ttfamily has\+Key\+Value\+Pair} -\/ check if arary has given key, value pair 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([\textcolor{stringliteral}{'name'}=>\ \textcolor{stringliteral}{'foobar'}],\ hasKeyValuePair(\textcolor{stringliteral}{'name'},\ \textcolor{stringliteral}{'foobar'}));}
+
+\end{DoxyCode}
+
+\item {\ttfamily has\+Entry} -\/ same as has\+Key\+Value\+Pair
+\item {\ttfamily array\+With\+Size} -\/ check array has given size 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertthat([2,\ 4,\ 6],\ arrayWithSize(3));}
+
+\end{DoxyCode}
+
+\item {\ttfamily empty\+Array} -\/ check if array is emtpy 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([],\ emptyArray());}
+
+\end{DoxyCode}
+
+\item {\ttfamily non\+Empty\+Array} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([1],\ nonEmptyArray());}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}\hypertarget{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md760}{}\doxysubsection{\texorpdfstring{Collection}{Collection}}\label{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md760}
+
+\begin{DoxyItemize}
+\item {\ttfamily empty\+Traversable} -\/ check if traversable is empty 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$empty\_it\ =\ \textcolor{keyword}{new}\ EmptyIterator;}
+\DoxyCodeLine{assertThat(\$empty\_it,\ emptyTraversable());}
+
+\end{DoxyCode}
+
+\item {\ttfamily non\+Empty\+Traversable} -\/ check if traversable isn\textquotesingle{}t empty 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$non\_empty\_it\ =\ \textcolor{keyword}{new}\ ArrayIterator(\mbox{\hyperlink{namespace_carbon_1_1_traits_a3868d62595946c978f9a2fd71bd3fab8}{range}}(1,\ 10));}
+\DoxyCodeLine{assertThat(\$non\_empty\_it,\ nonEmptyTraversable());}
+\DoxyCodeLine{a}
+
+\end{DoxyCode}
+
+\item {\ttfamily traversable\+With\+Size} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$non\_empty\_it\ =\ \textcolor{keyword}{new}\ ArrayIterator(\mbox{\hyperlink{namespace_carbon_1_1_traits_a3868d62595946c978f9a2fd71bd3fab8}{range}}(1,\ 10));}
+\DoxyCodeLine{assertThat(\$non\_empty\_it,\ traversableWithSize(count(\mbox{\hyperlink{namespace_carbon_1_1_traits_a3868d62595946c978f9a2fd71bd3fab8}{range}}(1,\ 10))));}
+\DoxyCodeLine{\`{}}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}\hypertarget{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md761}{}\doxysubsection{\texorpdfstring{Core}{Core}}\label{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md761}
+
+\begin{DoxyItemize}
+\item {\ttfamily all\+Of} -\/ Evaluates to true only if ALL of the passed in matchers evaluate to true. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([2,4,6],\ allOf(hasValue(2),\ arrayWithSize(3)));}
+
+\end{DoxyCode}
+
+\item {\ttfamily any\+Of} -\/ Evaluates to true if ANY of the passed in matchers evaluate to true. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([2,\ 4,\ 6],\ anyOf(hasValue(8),\ hasValue(2)));}
+
+\end{DoxyCode}
+
+\item {\ttfamily none\+Of} -\/ Evaluates to false if ANY of the passed in matchers evaluate to true. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([2,\ 4,\ 6],\ noneOf(hasValue(1),\ hasValue(3)));}
+
+\end{DoxyCode}
+
+\item {\ttfamily both} + {\ttfamily and\+Also} -\/ This is useful for fluently combining matchers that must both pass. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([2,\ 4,\ 6],\ both(hasValue(2))-\/>andAlso(hasValue(4)));}
+
+\end{DoxyCode}
+
+\item {\ttfamily either} + {\ttfamily or\+Else} -\/ This is useful for fluently combining matchers where either may pass, 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([2,\ 4,\ 6],\ either(hasValue(2))-\/>orElse(hasValue(4)));}
+
+\end{DoxyCode}
+
+\item {\ttfamily described\+As} -\/ Wraps an existing matcher and overrides the description when it fails. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$expected\ =\ \textcolor{stringliteral}{"{}Dog"{}};}
+\DoxyCodeLine{\$found\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\textcolor{comment}{//\ this\ assertion\ would\ result\ error\ message\ as\ Expected:\ is\ not\ null\ but:\ was\ null}}
+\DoxyCodeLine{\textcolor{comment}{//assertThat("{}Expected\ \{\$expected\},\ got\ \{\$found\}"{},\ \$found,\ is(notNullValue()));}}
+\DoxyCodeLine{\textcolor{comment}{//\ and\ this\ assertion\ would\ result\ error\ message\ as\ Expected:\ Dog\ but:\ was\ null}}
+\DoxyCodeLine{\textcolor{comment}{//assertThat(\$found,\ describedAs(\$expected,\ notNullValue()));}}
+
+\end{DoxyCode}
+
+\item {\ttfamily every\+Item} -\/ A matcher to apply to every element in an array. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([2,\ 4,\ 6],\ everyItem(notNullValue()));}
+
+\end{DoxyCode}
+
+\item {\ttfamily has\+Item} -\/ check array has given item, it can take a matcher argument 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([2,\ 4,\ 6],\ hasItem(\mbox{\hyperlink{namespace_carbon_1_1_traits_aa6e4e4d84bee5fad7e6b616da6b74740}{equalTo}}(2)));}
+
+\end{DoxyCode}
+
+\item {\ttfamily has\+Items} -\/ check array has givem items, it can take multiple matcher as arguments 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([1,\ 3,\ 5],\ hasItems(\mbox{\hyperlink{namespace_carbon_1_1_traits_aa6e4e4d84bee5fad7e6b616da6b74740}{equalTo}}(1),\ \mbox{\hyperlink{namespace_carbon_1_1_traits_aa6e4e4d84bee5fad7e6b616da6b74740}{equalTo}}(3)));}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}\hypertarget{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md762}{}\doxysubsection{\texorpdfstring{Object}{Object}}\label{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md762}
+
+\begin{DoxyItemize}
+\item {\ttfamily has\+To\+String} -\/ check {\ttfamily \+\_\+\+\_\+to\+String} or {\ttfamily to\+String} method 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{class\ }Foo\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_ab2fc40d43824ea3e1ce5d86dee0d763b}{\$name}}\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a7516ca30af0db3cdbf9a7739b48ce91d}{\_\_toString}}()\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}[Foo]Instance"{}};}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\$foo\ =\ \textcolor{keyword}{new}\ Foo;}
+\DoxyCodeLine{assertThat(\$foo,\ hasToString(\mbox{\hyperlink{namespace_carbon_1_1_traits_aa6e4e4d84bee5fad7e6b616da6b74740}{equalTo}}(\textcolor{stringliteral}{"{}[Foo]Instance"{}})));}
+
+\end{DoxyCode}
+
+\item {\ttfamily equal\+To} -\/ compares two instances using comparison operator \textquotesingle{}==\textquotesingle{} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$foo\ =\ \textcolor{keyword}{new}\ Foo;}
+\DoxyCodeLine{\$foo2\ =\ \textcolor{keyword}{new}\ Foo;}
+\DoxyCodeLine{assertThat(\$foo,\ \mbox{\hyperlink{namespace_carbon_1_1_traits_aa6e4e4d84bee5fad7e6b616da6b74740}{equalTo}}(\$foo2));}
+
+\end{DoxyCode}
+
+\item {\ttfamily identical\+To} -\/ compares two instances using identity operator \textquotesingle{}===\textquotesingle{} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\$foo,\ \mbox{\hyperlink{namespace_carbon_1_1_traits_ad7c1373055f2e59c721251183e712a94}{is}}(not(identicalTo(\$foo2))));}
+
+\end{DoxyCode}
+
+\item {\ttfamily an\+Instance\+Of} -\/ check instance is an instance\texorpdfstring{$\vert$}{|}sub-\/class of given class 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\$foo,\ anInstanceOf(Foo::class));}
+
+\end{DoxyCode}
+
+\item {\ttfamily any} -\/ alias of {\ttfamily an\+Instance\+Of}
+\item {\ttfamily null\+Value} check null 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{keyword}{null},\ \mbox{\hyperlink{namespace_carbon_1_1_traits_ad7c1373055f2e59c721251183e712a94}{is}}(nullValue()));}
+
+\end{DoxyCode}
+
+\item {\ttfamily not\+Null\+Value} check not null 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}"{}},\ notNullValue());}
+
+\end{DoxyCode}
+
+\item {\ttfamily same\+Instance} -\/ check for same instance 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\$foo,\ \mbox{\hyperlink{namespace_carbon_1_1_traits_ad7c1373055f2e59c721251183e712a94}{is}}(not(sameInstance(\$foo2))));}
+\DoxyCodeLine{assertThat(\$foo,\ \mbox{\hyperlink{namespace_carbon_1_1_traits_ad7c1373055f2e59c721251183e712a94}{is}}(sameInstance(\$foo)));}
+
+\end{DoxyCode}
+
+\item {\ttfamily type\+Of}-\/ check type 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(1,\ typeOf(\textcolor{stringliteral}{"{}integer"{}}));}
+
+\end{DoxyCode}
+
+\item {\ttfamily not\+Set} -\/ check if instance property is not set 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\$foo,\ notSet(\textcolor{stringliteral}{"{}name"{}}));}
+
+\end{DoxyCode}
+
+\item {\ttfamily set} -\/ check if instance property is set 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$foo-\/>name\ =\ \textcolor{stringliteral}{"{}bar"{}};}
+\DoxyCodeLine{assertThat(\$foo,\ \textcolor{keyword}{set}(\textcolor{stringliteral}{"{}name"{}}));}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}\hypertarget{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md763}{}\doxysubsection{\texorpdfstring{Numbers}{Numbers}}\label{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md763}
+
+\begin{DoxyItemize}
+\item {\ttfamily close\+To} -\/ check value close to a range 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(3,\ closeTo(3,\ 0.5));}
+
+\end{DoxyCode}
+
+\item {\ttfamily compares\+Equal\+To} -\/ check with \textquotesingle{}==\textquotesingle{} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(2,\ comparesEqualTo(2));}
+
+\end{DoxyCode}
+
+\item {\ttfamily greater\+Than} -\/ check \textquotesingle{}\texorpdfstring{$>$}{>}\textquotesingle{} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(2,\ greaterThan(1));}
+
+\end{DoxyCode}
+
+\item {\ttfamily greater\+Than\+Or\+Equal\+To} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(2,\ \mbox{\hyperlink{namespace_carbon_1_1_traits_a1bc5cb3889d665cdf1143b180d5faeec}{greaterThanOrEqualTo}}(2));}
+
+\end{DoxyCode}
+
+\item {\ttfamily at\+Least} -\/ The value is \texorpdfstring{$>$}{>}= given value 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(3,\ atLeast(2));}
+
+\end{DoxyCode}
+
+\item {\ttfamily less\+Than} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(2,\ \mbox{\hyperlink{namespace_carbon_1_1_traits_ab6a1f925e026e90db835e8da5c18b4e9}{lessThan}}(3));}
+
+\end{DoxyCode}
+
+\item {\ttfamily less\+Than\+Or\+Equal\+To} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(2,\ \mbox{\hyperlink{namespace_carbon_1_1_traits_ad0d56ccaf6c778976a7f78131aa92bee}{lessThanOrEqualTo}}(3));}
+
+\end{DoxyCode}
+
+\item {\ttfamily at\+Most} -\/ The value is \texorpdfstring{$<$}{<}= given value 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(2,\ atMost(3));}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}\hypertarget{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md764}{}\doxysubsection{\texorpdfstring{String}{String}}\label{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md764}
+
+\begin{DoxyItemize}
+\item {\ttfamily empty\+String} -\/ check for empty string 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}"{}},\ emptyString());}
+
+\end{DoxyCode}
+
+\item {\ttfamily is\+Empty\+Or\+Null\+String} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{keyword}{null},\ isEmptyOrNullString());}
+
+\end{DoxyCode}
+
+\item {\ttfamily null\+Or\+Empty\+String} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}"{}},\ nullOrEmptyString());}
+
+\end{DoxyCode}
+
+\item {\ttfamily is\+Non\+Empty\+String} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}foo"{}},\ isNonEmptyString());}
+
+\end{DoxyCode}
+
+\item {\ttfamily non\+Empty\+String} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}foo"{}},\ nonEmptyString());}
+
+\end{DoxyCode}
+
+\item {\ttfamily equal\+To\+Ignoring\+Case} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}Foo"{}},\ equalToIgnoringCase(\textcolor{stringliteral}{"{}foo"{}}));}
+
+\end{DoxyCode}
+
+\item {\ttfamily equal\+To\+Ignoring\+White\+Space} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}\ Foo\ "{}},\ equalToIgnoringWhiteSpace(\textcolor{stringliteral}{"{}Foo"{}}));}
+
+\end{DoxyCode}
+
+\item {\ttfamily matches\+Pattern} -\/ matches with regex pattern 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}foobarbaz"{}},\ matchesPattern(\textcolor{stringliteral}{'/(foo)(bar)(baz)/'}));}
+
+\end{DoxyCode}
+
+\item {\ttfamily contains\+String} -\/ check for substring 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}foobar"{}},\ containsString(\textcolor{stringliteral}{"{}foo"{}}));}
+
+\end{DoxyCode}
+
+\item {\ttfamily contains\+String\+Ignoring\+Case} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}fooBar"{}},\ containsStringIgnoringCase(\textcolor{stringliteral}{"{}bar"{}}));}
+
+\end{DoxyCode}
+
+\item {\ttfamily string\+Contains\+In\+Order} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}foo"{}},\ stringContainsInOrder(\textcolor{stringliteral}{"{}foo"{}}));}
+
+\end{DoxyCode}
+
+\item {\ttfamily ends\+With} -\/ check string that ends with given value 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}foo"{}},\ endsWith(\textcolor{stringliteral}{"{}oo"{}}));}
+
+\end{DoxyCode}
+
+\item {\ttfamily starts\+With} -\/ check string that starts with given value 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}bar"{}},\ startsWith(\textcolor{stringliteral}{"{}ba"{}}));}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}\hypertarget{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md765}{}\doxysubsection{\texorpdfstring{Type-\/checking}{Type-checking}}\label{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md765}
+
+\begin{DoxyItemize}
+\item {\ttfamily array\+Value} -\/ check array type 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat([],\ arrayValue());}
+
+\end{DoxyCode}
+
+\item {\ttfamily boolean\+Value} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{keyword}{true},\ booleanValue());}
+
+\end{DoxyCode}
+
+\item {\ttfamily bool\+Value} -\/ alias of boolean\+Value
+\item {\ttfamily callable\+Value} -\/ check if value is callable 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$func\ =\ \textcolor{keyword}{function}\ ()\ \{\};}
+\DoxyCodeLine{assertThat(\$func,\ callableValue());}
+
+\end{DoxyCode}
+
+\item {\ttfamily double\+Value} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(3.14,\ doubleValue());}
+
+\end{DoxyCode}
+
+\item {\ttfamily float\+Value} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(3.14,\ floatValue());}
+
+\end{DoxyCode}
+
+\item {\ttfamily integer\+Value} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(1,\ integerValue());}
+
+\end{DoxyCode}
+
+\item {\ttfamily int\+Value} -\/ alias of {\ttfamily integer\+Value}
+\item {\ttfamily numeric\+Value} -\/ check if value is numeric 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}123"{}},\ numericValue());}
+
+\end{DoxyCode}
+
+\item {\ttfamily object\+Value} -\/ check for object 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$obj\ =\ \textcolor{keyword}{new}\ stdClass;}
+\DoxyCodeLine{assertThat(\$obj,\ objectValue());}
+
+\end{DoxyCode}
+
+\item {\ttfamily an\+Object} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\$obj,\ anObject());}
+
+\end{DoxyCode}
+
+\item {\ttfamily resource\+Value} -\/ check resource type 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$fp\ =\ fopen(\textcolor{stringliteral}{"{}/tmp/foo"{}},\ \textcolor{stringliteral}{"{}w+"{}});}
+\DoxyCodeLine{assertThat(\$fp,\ resourceValue());}
+
+\end{DoxyCode}
+
+\item {\ttfamily scalar\+Value} -\/ check for scaler value 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(1,\ scalarValue());}
+
+\end{DoxyCode}
+
+\item {\ttfamily string\+Value} 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{assertThat(\textcolor{stringliteral}{"{}"{}},\ stringValue());}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}\hypertarget{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md766}{}\doxysubsection{\texorpdfstring{XML}{XML}}\label{md_vendor_2hamcrest_2hamcrest-php_2_r_e_a_d_m_e_autotoc_md766}
+
+\begin{DoxyItemize}
+\item {\ttfamily has\+XPath} -\/ check xml with a xpath 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{update__mime__types_8php_aa52a2a352e548e772b68229db4a48c25}{\$xml}}\ =\ <<<XML}
+\DoxyCodeLine{<books>}
+\DoxyCodeLine{\ \ <book>}
+\DoxyCodeLine{\ \ \ \ <isbn>1</isbn>\ \ \ }
+\DoxyCodeLine{\ \ </book>}
+\DoxyCodeLine{\ \ <book>}
+\DoxyCodeLine{\ \ \ \ <isbn>2</isbn>\ \ \ }
+\DoxyCodeLine{\ \ </book>}
+\DoxyCodeLine{</books>}
+\DoxyCodeLine{XML;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$doc\ =\ \textcolor{keyword}{new}\ DOMDocument;}
+\DoxyCodeLine{\$doc-\/>loadXML(\mbox{\hyperlink{update__mime__types_8php_aa52a2a352e548e772b68229db4a48c25}{\$xml}});}
+\DoxyCodeLine{assertThat(\$doc,\ hasXPath(\textcolor{stringliteral}{"{}book"{}},\ 2));}
+
+\end{DoxyCode}
+ 
+\end{DoxyItemize}

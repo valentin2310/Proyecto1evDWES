@@ -1,0 +1,101 @@
+\doxysection{Signal\+Handler.\+php}
+\hypertarget{_signal_handler_8php_source}{}\label{_signal_handler_8php_source}\index{vendor/monolog/monolog/src/Monolog/SignalHandler.php@{vendor/monolog/monolog/src/Monolog/SignalHandler.php}}
+\mbox{\hyperlink{_signal_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Monolog\ package.}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Jordi\ Boggiano\ <j.boggiano@seld.be>}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }Monolog;}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00014}00014\ use\ \mbox{\hyperlink{interface_psr_1_1_log_1_1_logger_interface}{Psr\(\backslash\)Log\(\backslash\)LoggerInterface}};}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_psr_1_1_log_1_1_log_level}{Psr\(\backslash\)Log\(\backslash\)LogLevel}};}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00016}00016\ use\ ReflectionExtension;}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00023}\mbox{\hyperlink{class_monolog_1_1_signal_handler}{00023}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_monolog_1_1_signal_handler}{SignalHandler}}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00024}00024\ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00025}00025\ \ \ \ \ \textcolor{keyword}{private}\ LoggerInterface\ \$logger;}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$previousSignalHandler\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$signalLevelMap\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$signalRestartSyscalls\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00034}\mbox{\hyperlink{class_monolog_1_1_signal_handler_a2bd426f7ee55a596b1893454a77a006a}{00034}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_signal_handler_a2bd426f7ee55a596b1893454a77a006a}{\_\_construct}}(LoggerInterface\ \$logger)}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00035}00035\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00036}00036\ \ \ \ \ \ \ \ \ \$this-\/>logger\ =\ \$logger;}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00037}00037\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00045}\mbox{\hyperlink{class_monolog_1_1_signal_handler_aacfb9ae7925684ab88ac3a7b3db490fc}{00045}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_signal_handler_aacfb9ae7925684ab88ac3a7b3db490fc}{registerSignalHandler}}(\textcolor{keywordtype}{int}\ \$signo,\ \textcolor{keywordtype}{int}|\textcolor{keywordtype}{string}|\mbox{\hyperlink{namespace_monolog_aeff7a6f4b907e38ff6e974c6166a9ac6}{Level}}\ \$level\ =\ LogLevel::CRITICAL,\ \textcolor{keywordtype}{bool}\ \$callPrevious\ =\ \textcolor{keyword}{true},\ \textcolor{keywordtype}{bool}\ \$restartSyscalls\ =\ \textcolor{keyword}{true},\ ?\textcolor{keywordtype}{bool}\ \$async\ =\ \textcolor{keyword}{true}):\ self}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00046}00046\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!extension\_loaded(\textcolor{stringliteral}{'pcntl'})\ ||\ !function\_exists(\textcolor{stringliteral}{'pcntl\_signal'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \$level\ =\ Logger::toMonologLevel(\$level)-\/>toPsrLogLevel();}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$callPrevious)\ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler\ =\ pcntl\_signal\_get\_handler(\$signo);}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>previousSignalHandler[\$signo]\ =\ \$handler;}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$this-\/>previousSignalHandler[\$signo]);}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \$this-\/>signalLevelMap[\$signo]\ =\ \$level;}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \$this-\/>signalRestartSyscalls[\$signo]\ =\ \$restartSyscalls;}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$async\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ pcntl\_async\_signals(\$async);}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ pcntl\_signal(\$signo,\ [\$this,\ \textcolor{stringliteral}{'handleSignal'}],\ \$restartSyscalls);}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00069}00069\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00074}00074\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ handleSignal(\textcolor{keywordtype}{int}\ \$signo,\ \$siginfo\ =\ \textcolor{keyword}{null}):\ void}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00075}00075\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \$signals\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)count(\$signals)\ ===\ 0\ \&\&\ extension\_loaded(\textcolor{stringliteral}{'pcntl'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \$pcntl\ =\ \textcolor{keyword}{new}\ ReflectionExtension(\textcolor{stringliteral}{'pcntl'});}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$pcntl-\/>getConstants()\ as\ \$name\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (substr(\$name,\ 0,\ 3)\ ===\ \textcolor{stringliteral}{'SIG'}\ \&\&\ \$name[3]\ !==\ \textcolor{charliteral}{'\_'}\ \&\&\ is\_int(\$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$signals[\$value]\ =\ \$name;}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \$level\ =\ \$this-\/>signalLevelMap[\$signo]\ ??\ LogLevel::CRITICAL;}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \$signal\ =\ \$signals[\$signo]\ ??\ \$signo;}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \$context\ =\ \$siginfo\ ??\ [];}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \$this-\/>logger-\/>log(\$level,\ sprintf(\textcolor{stringliteral}{'Program\ received\ signal\ \%s'},\ \$signal),\ \$context);}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>previousSignalHandler[\$signo]))\ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>previousSignalHandler[\$signo]\ ===\ SIG\_DFL)\ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (extension\_loaded(\textcolor{stringliteral}{'pcntl'})\ \&\&\ function\_exists(\textcolor{stringliteral}{'pcntl\_signal'})\ \&\&\ function\_exists(\textcolor{stringliteral}{'pcntl\_sigprocmask'})\ \&\&\ function\_exists(\textcolor{stringliteral}{'pcntl\_signal\_dispatch'})}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ extension\_loaded(\textcolor{stringliteral}{'posix'})\ \&\&\ function\_exists(\textcolor{stringliteral}{'posix\_getpid'})\ \&\&\ function\_exists(\textcolor{stringliteral}{'posix\_kill'})}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$restartSyscalls\ =\ \$this-\/>signalRestartSyscalls[\$signo]\ ??\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pcntl\_signal(\$signo,\ SIG\_DFL,\ \$restartSyscalls);}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pcntl\_sigprocmask(SIG\_UNBLOCK,\ [\$signo],\ \$oldset);}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ posix\_kill(posix\_getpid(),\ \$signo);}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pcntl\_signal\_dispatch();}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pcntl\_sigprocmask(SIG\_SETMASK,\ \$oldset);}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ pcntl\_signal(\$signo,\ [\$this,\ \textcolor{stringliteral}{'handleSignal'}],\ \$restartSyscalls);}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \}\ elseif\ (is\_callable(\$this-\/>previousSignalHandler[\$signo]))\ \{}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>previousSignalHandler[\$signo](\$signo,\ \$siginfo);}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00112}00112\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_signal_handler_8php_source_l00113}00113\ \}}
+
+\end{DoxyCode}

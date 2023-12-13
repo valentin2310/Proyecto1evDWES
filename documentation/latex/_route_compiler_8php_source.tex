@@ -1,0 +1,309 @@
+\doxysection{Route\+Compiler.\+php}
+\hypertarget{_route_compiler_8php_source}{}\label{_route_compiler_8php_source}\index{vendor/symfony/routing/RouteCompiler.php@{vendor/symfony/routing/RouteCompiler.php}}
+\mbox{\hyperlink{_route_compiler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing}{Symfony\(\backslash\)Component\(\backslash\)Routing}};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00020}\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_compiler}{00020}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_compiler}{RouteCompiler}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_routing_1_1_route_compiler_interface}{RouteCompilerInterface}}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00021}00021\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00027}\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_compiler_afcacdd975ec56878fc49ee28a7fc2794}{00027}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_compiler_afcacdd975ec56878fc49ee28a7fc2794}{SEPARATORS}}\ =\ \textcolor{stringliteral}{'/,;.:-\/\_\string~+*=@|'};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00035}\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_compiler_a4936c50baca56c4f8e92d74d4cdd2809}{00035}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_compiler_a4936c50baca56c4f8e92d74d4cdd2809}{VARIABLE\_MAXIMUM\_LENGTH}}\ =\ 32;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00043}\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_compiler_a4fdc4758df81e96c12254c9408f4ca03}{00043}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_compiler_a4fdc4758df81e96c12254c9408f4ca03}{compile}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route}{Route}}\ \$route):\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_compiled_route}{CompiledRoute}}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00044}00044\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \$hostVariables\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \$variables\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \$hostRegex\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \$hostTokens\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{''}\ !==\ \$host\ =\ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a39895a44b52bdced039e698588aaf18e}{getHost}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \$result\ =\ self::compilePattern(\$route,\ \$host,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \$hostVariables\ =\ \$result[\textcolor{stringliteral}{'variables'}];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \$variables\ =\ \$hostVariables;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \$hostTokens\ =\ \$result[\textcolor{stringliteral}{'tokens'}];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \$hostRegex\ =\ \$result[\textcolor{stringliteral}{'regex'}];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \$locale\ =\ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a5d7209124ceafc44833bb569c2fa7b13}{getDefault}}(\textcolor{stringliteral}{'\_locale'});}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$locale\ \&\&\ \textcolor{keyword}{null}\ !==\ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a5d7209124ceafc44833bb569c2fa7b13}{getDefault}}(\textcolor{stringliteral}{'\_canonical\_route'})\ \&\&\ preg\_quote(\$locale)\ ===\ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a4a4beade9d111e26bafb1f7a1dc07ca9}{getRequirement}}(\textcolor{stringliteral}{'\_locale'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \$requirements\ =\ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_aff95c0f46392b39d969c71bc621e7411}{getRequirements}}();}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$requirements[\textcolor{stringliteral}{'\_locale'}]);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a4f9b71f34dc212f763201d839366d94f}{setRequirements}}(\$requirements);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a3dc3df140ac09acec8515d71e3decb0d}{setPath}}(str\_replace(\textcolor{stringliteral}{'\{\_locale\}'},\ \$locale,\ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a30c5c67b2bf8e2e2ccc7e361faa20afe}{getPath}}()));}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \$path\ =\ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a30c5c67b2bf8e2e2ccc7e361faa20afe}{getPath}}();}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \$result\ =\ self::compilePattern(\$route,\ \$path,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \$staticPrefix\ =\ \$result[\textcolor{stringliteral}{'staticPrefix'}];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \$pathVariables\ =\ \$result[\textcolor{stringliteral}{'variables'}];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$pathVariables\ as\ \$pathParam)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'\_fragment'}\ ===\ \$pathParam)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(sprintf(\textcolor{stringliteral}{'Route\ pattern\ "{}\%s"{}\ cannot\ contain\ "{}\_fragment"{}\ as\ a\ path\ parameter.'},\ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a30c5c67b2bf8e2e2ccc7e361faa20afe}{getPath}}()));}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \$variables\ =\ array\_merge(\$variables,\ \$pathVariables);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}\ =\ \$result[\textcolor{stringliteral}{'tokens'}];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \$regex\ =\ \$result[\textcolor{stringliteral}{'regex'}];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_compiled_route}{CompiledRoute}}(}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \$staticPrefix,}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \$regex,}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}},}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \$pathVariables,}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \$hostRegex,}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \$hostTokens,}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \$hostVariables,}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ array\_unique(\$variables)}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00097}00097\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00099}00099\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ compilePattern(\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route}{Route}}\ \$route,\ \textcolor{keywordtype}{string}\ \$pattern,\ \textcolor{keywordtype}{bool}\ \$isHost):\ array}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00100}00100\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \$variables\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \$matches\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \$pos\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \$defaultSeparator\ =\ \$isHost\ ?\ \textcolor{charliteral}{'.'}\ :\ \textcolor{charliteral}{'/'};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \$useUtf8\ =\ preg\_match(\textcolor{stringliteral}{'//u'},\ \$pattern);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \$needsUtf8\ =\ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a07615874ab9f121e85edbb0e7fea3a97}{getOption}}(\textcolor{stringliteral}{'utf8'});}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$needsUtf8\ \&\&\ \$useUtf8\ \&\&\ preg\_match(\textcolor{stringliteral}{'/[\(\backslash\)x80-\/\(\backslash\)xFF]/'},\ \$pattern))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)LogicException(sprintf(\textcolor{stringliteral}{'Cannot\ use\ UTF-\/8\ route\ patterns\ without\ setting\ the\ "{}utf8"{}\ option\ for\ route\ "{}\%s"{}.'},\ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a30c5c67b2bf8e2e2ccc7e361faa20afe}{getPath}}()));}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$useUtf8\ \&\&\ \$needsUtf8)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)LogicException(sprintf(\textcolor{stringliteral}{'Cannot\ mix\ UTF-\/8\ requirements\ with\ non-\/UTF-\/8\ pattern\ "{}\%s"{}.'},\ \$pattern));}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Match\ all\ variables\ enclosed\ in\ "{}\{\}"{}\ and\ iterate\ over\ them.\ But\ we\ only\ want\ to\ match\ the\ innermost\ variable}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ in\ case\ of\ nested\ "{}\{\}"{},\ e.g.\ \{foo\{bar\}\}.\ This\ in\ ensured\ because\ \(\backslash\)w\ does\ not\ match\ "{}\{"{}\ or\ "{}\}"{}\ itself.}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ preg\_match\_all(\textcolor{stringliteral}{'\#\(\backslash\)\{(!)?([\(\backslash\)w\(\backslash\)x80-\/\(\backslash\)xFF]+)\(\backslash\)\}\#'},\ \$pattern,\ \$matches,\ \(\backslash\)PREG\_OFFSET\_CAPTURE\ |\ \(\backslash\)PREG\_SET\_ORDER);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$matches\ as\ \$match)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \$important\ =\ \$match[1][1]\ >=\ 0;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \$varName\ =\ \$match[2][0];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ get\ all\ static\ text\ preceding\ the\ current\ variable}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \$precedingText\ =\ substr(\$pattern,\ \$pos,\ \$match[0][1]\ -\/\ \$pos);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \$pos\ =\ \$match[0][1]\ +\ \(\backslash\)strlen(\$match[0][0]);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)strlen(\$precedingText))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$precedingChar\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$useUtf8)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ preg\_match(\textcolor{stringliteral}{'/.\$/u'},\ \$precedingText,\ \$precedingChar);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$precedingChar\ =\ \$precedingChar[0];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$precedingChar\ =\ substr(\$precedingText,\ -\/1);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \$isSeparator\ =\ \textcolor{stringliteral}{''}\ !==\ \$precedingChar\ \&\&\ str\_contains(static::SEPARATORS,\ \$precedingChar);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ A\ PCRE\ subpattern\ name\ must\ start\ with\ a\ non-\/digit.\ Also\ a\ PHP\ variable\ cannot\ start\ with\ a\ digit\ so\ the}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ variable\ would\ not\ be\ usable\ as\ a\ Controller\ action\ argument.}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (preg\_match(\textcolor{stringliteral}{'/\string^\(\backslash\)d/'},\ \$varName))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)DomainException(sprintf(\textcolor{stringliteral}{'Variable\ name\ "{}\%s"{}\ cannot\ start\ with\ a\ digit\ in\ route\ pattern\ "{}\%s"{}.\ Please\ use\ a\ different\ name.'},\ \$varName,\ \$pattern));}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)in\_array(\$varName,\ \$variables))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)LogicException(sprintf(\textcolor{stringliteral}{'Route\ pattern\ "{}\%s"{}\ cannot\ reference\ variable\ name\ "{}\%s"{}\ more\ than\ once.'},\ \$pattern,\ \$varName));}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)strlen(\$varName)\ >\ self::VARIABLE\_MAXIMUM\_LENGTH)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)DomainException(sprintf(\textcolor{stringliteral}{'Variable\ name\ "{}\%s"{}\ cannot\ be\ longer\ than\ \%d\ characters\ in\ route\ pattern\ "{}\%s"{}.\ Please\ use\ a\ shorter\ name.'},\ \$varName,\ self::VARIABLE\_MAXIMUM\_LENGTH,\ \$pattern));}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$isSeparator\ \&\&\ \$precedingText\ !==\ \$precedingChar)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[]\ =\ [\textcolor{stringliteral}{'text'},\ substr(\$precedingText,\ 0,\ -\/\(\backslash\)strlen(\$precedingChar))];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (!\$isSeparator\ \&\&\ \textcolor{stringliteral}{''}\ !==\ \$precedingText)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[]\ =\ [\textcolor{stringliteral}{'text'},\ \$precedingText];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \$regexp\ =\ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a4a4beade9d111e26bafb1f7a1dc07ca9}{getRequirement}}(\$varName);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$regexp)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$followingPattern\ =\ (string)\ substr(\$pattern,\ \$pos);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Find\ the\ next\ static\ character\ after\ the\ variable\ that\ functions\ as\ a\ separator.\ By\ default,\ this\ separator\ and\ '/'}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ are\ disallowed\ for\ the\ variable.\ This\ default\ requirement\ makes\ sure\ that\ optional\ variables\ can\ be\ matched\ at\ all}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ that\ the\ generating-\/matching-\/combination\ of\ URLs\ unambiguous,\ i.e.\ the\ params\ used\ for\ generating\ the\ URL\ are}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ same\ that\ will\ be\ matched.\ Example:\ new\ Route('/\{page\}.\{\_format\}',\ ['\_format'\ =>\ 'html'])}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ \{page\}\ would\ also\ match\ the\ separating\ dot,\ \{\_format\}\ would\ never\ match\ as\ \{page\}\ will\ eagerly\ consume\ everything.}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Also\ even\ if\ \{\_format\}\ was\ not\ optional\ the\ requirement\ prevents\ that\ \{page\}\ matches\ something\ that\ was\ originally}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ part\ of\ \{\_format\}\ when\ generating\ the\ URL,\ e.g.\ \_format\ =\ 'mobile.html'.}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$nextSeparator\ =\ self::findNextSeparator(\$followingPattern,\ \$useUtf8);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$regexp\ =\ sprintf(}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'[\string^\%s\%s]+'},}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ preg\_quote(\$defaultSeparator),}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$defaultSeparator\ !==\ \$nextSeparator\ \&\&\ \textcolor{stringliteral}{''}\ !==\ \$nextSeparator\ ?\ preg\_quote(\$nextSeparator)\ :\ \textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\textcolor{stringliteral}{''}\ !==\ \$nextSeparator\ \&\&\ !preg\_match(\textcolor{stringliteral}{'\#\string^\(\backslash\)\{[\(\backslash\)w\(\backslash\)x80-\/\(\backslash\)xFF]+\(\backslash\)\}\#'},\ \$followingPattern))\ ||\ \textcolor{stringliteral}{''}\ ===\ \$followingPattern)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ we\ have\ a\ separator,\ which\ is\ disallowed\ for\ the\ variable,\ we\ can\ optimize\ the\ regex\ with\ a\ possessive}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ quantifier.\ This\ prevents\ useless\ backtracking\ of\ PCRE\ and\ improves\ performance\ by\ 20\%\ for\ matching\ those\ patterns.}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Given\ the\ above\ example,\ there\ is\ no\ point\ in\ backtracking\ into\ \{page\}\ (that\ forbids\ the\ dot)\ when\ a\ dot\ must\ follow}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ after\ it.\ This\ optimization\ cannot\ be\ applied\ when\ the\ next\ char\ is\ no\ real\ separator\ or\ when\ the\ next\ variable\ is}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ directly\ adjacent,\ e.g.\ '/\{x\}\{y\}'.}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$regexp\ .=\ \textcolor{charliteral}{'+'};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!preg\_match(\textcolor{stringliteral}{'//u'},\ \$regexp))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$useUtf8\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (!\$needsUtf8\ \&\&\ preg\_match(\textcolor{stringliteral}{'/[\(\backslash\)x80-\/\(\backslash\)xFF]|(?<!\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\))\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)(?:\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\))*+(?-\/i:X|[pP][\(\backslash\)\{CLMNPSZ]|x\(\backslash\)\{[A-\/Fa-\/f0-\/9]\{3\})/'},\ \$regexp))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)LogicException(sprintf(\textcolor{stringliteral}{'Cannot\ use\ UTF-\/8\ route\ requirements\ without\ setting\ the\ "{}utf8"{}\ option\ for\ variable\ "{}\%s"{}\ in\ pattern\ "{}\%s"{}.'},\ \$varName,\ \$pattern));}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$useUtf8\ \&\&\ \$needsUtf8)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)LogicException(sprintf(\textcolor{stringliteral}{'Cannot\ mix\ UTF-\/8\ requirement\ with\ non-\/UTF-\/8\ charset\ for\ variable\ "{}\%s"{}\ in\ pattern\ "{}\%s"{}.'},\ \$varName,\ \$pattern));}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$regexp\ =\ self::transformCapturingGroupsToNonCapturings(\$regexp);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$important)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$token\ =\ [\textcolor{stringliteral}{'variable'},\ \$isSeparator\ ?\ \$precedingChar\ :\ \textcolor{stringliteral}{''},\ \$regexp,\ \$varName,\ \textcolor{keyword}{false},\ \textcolor{keyword}{true}];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$token\ =\ [\textcolor{stringliteral}{'variable'},\ \$isSeparator\ ?\ \$precedingChar\ :\ \textcolor{stringliteral}{''},\ \$regexp,\ \$varName];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[]\ =\ \$token;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \$variables[]\ =\ \$varName;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$pos\ <\ \(\backslash\)strlen(\$pattern))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[]\ =\ [\textcolor{stringliteral}{'text'},\ substr(\$pattern,\ \$pos)];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ find\ the\ first\ optional\ token}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \$firstOptional\ =\ \(\backslash\)PHP\_INT\_MAX;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$isHost)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ \(\backslash\)count(\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}})\ -\/\ 1;\ \$i\ >=\ 0;\ -\/-\/\$i)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$token\ =\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[\$i];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ variable\ is\ optional\ when\ it\ is\ not\ important\ and\ has\ a\ default\ value}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'variable'}\ ===\ \$token[0]\ \&\&\ !(\$token[5]\ ??\ \textcolor{keyword}{false})\ \&\&\ \$route-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_routing_1_1_route_a032e4e43568ec776314e33f7e63c6a62}{hasDefault}}(\$token[3]))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$firstOptional\ =\ \$i;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ compute\ the\ matching\ regexp}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \$regexp\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 0,\ \$nbToken\ =\ \(\backslash\)count(\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}});\ \$i\ <\ \$nbToken;\ ++\$i)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \$regexp\ .=\ self::computeRegexp(\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}},\ \$i,\ \$firstOptional);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \$regexp\ =\ \textcolor{stringliteral}{'\{\string^'}.\$regexp.\textcolor{stringliteral}{'\$\}sD'}.(\$isHost\ ?\ \textcolor{charliteral}{'i'}\ :\ \textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ enable\ Utf8\ matching\ if\ really\ required}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$needsUtf8)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \$regexp\ .=\ \textcolor{charliteral}{'u'};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 0,\ \$nbToken\ =\ \(\backslash\)count(\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}});\ \$i\ <\ \$nbToken;\ ++\$i)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'variable'}\ ===\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[\$i][0])\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[\$i][4]\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'staticPrefix'}\ =>\ self::determineStaticPrefix(\$route,\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}),}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'regex'}\ =>\ \$regexp,}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'tokens'}\ =>\ array\_reverse(\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}),}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'variables'}\ =>\ \$variables,}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00242}00242\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00247}00247\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ determineStaticPrefix(Route\ \$route,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}):\ string}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00248}00248\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'text'}\ !==\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[0][0])\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\$route-\/>hasDefault(\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[0][3])\ ||\ \textcolor{charliteral}{'/'}\ ===\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[0][1])\ ?\ \textcolor{stringliteral}{''}\ :\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[0][1];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \$prefix\ =\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[0][1];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[1][1])\ \&\&\ \textcolor{charliteral}{'/'}\ !==\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[1][1]\ \&\&\ \textcolor{keyword}{false}\ ===\ \$route-\/>hasDefault(\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[1][3]))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \$prefix\ .=\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[1][1];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$prefix;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00260}00260\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00265}00265\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ findNextSeparator(\textcolor{keywordtype}{string}\ \$pattern,\ \textcolor{keywordtype}{bool}\ \$useUtf8):\ string}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00266}00266\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{''}\ ==\ \$pattern)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ return\ empty\ string\ if\ pattern\ is\ empty\ or\ false\ (false\ which\ can\ be\ returned\ by\ substr)}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ first\ remove\ all\ placeholders\ from\ the\ pattern\ so\ we\ can\ find\ the\ next\ real\ static\ character}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{''}\ ===\ \$pattern\ =\ preg\_replace(\textcolor{stringliteral}{'\#\(\backslash\)\{[\(\backslash\)w\(\backslash\)x80-\/\(\backslash\)xFF]+\(\backslash\)\}\#'},\ \textcolor{stringliteral}{''},\ \$pattern))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$useUtf8)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ preg\_match(\textcolor{stringliteral}{'/\string^./u'},\ \$pattern,\ \$pattern);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00278}00278\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str\_contains(static::SEPARATORS,\ \$pattern[0])\ ?\ \$pattern[0]\ :\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00280}00280\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00289}00289\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ computeRegexp(array\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}},\ \textcolor{keywordtype}{int}\ \$index,\ \textcolor{keywordtype}{int}\ \$firstOptional):\ string}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00290}00290\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \$token\ =\ \mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}}[\$index];}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'text'}\ ===\ \$token[0])\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Text\ tokens}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ preg\_quote(\$token[1]);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Variable\ tokens}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (0\ ===\ \$index\ \&\&\ 0\ ===\ \$firstOptional)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ the\ only\ token\ is\ an\ optional\ variable\ token,\ the\ separator\ is\ required}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sprintf(\textcolor{stringliteral}{'\%s(?P<\%s>\%s)?'},\ preg\_quote(\$token[1]),\ \$token[3],\ \$token[2]);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00300}00300\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$regexp\ =\ sprintf(\textcolor{stringliteral}{'\%s(?P<\%s>\%s)'},\ preg\_quote(\$token[1]),\ \$token[3],\ \$token[2]);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00302}00302\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$index\ >=\ \$firstOptional)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00303}00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Enclose\ each\ optional\ token\ in\ a\ subpattern\ to\ make\ it\ optional.}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00304}00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ "{}?:"{}\ means\ it\ is\ non-\/capturing,\ i.e.\ the\ portion\ of\ the\ subject\ string\ that}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00305}00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ matched\ the\ optional\ subpattern\ is\ not\ passed\ back.}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00306}00306\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$regexp\ =\ \textcolor{stringliteral}{"{}(?:\$regexp"{}};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$nbTokens\ =\ \(\backslash\)count(\mbox{\hyperlink{rebuild_parsers_8php_a72ead29e4317fbc4335fd3ba764e8b59}{\$tokens}});}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$nbTokens\ -\/\ 1\ ==\ \$index)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Close\ the\ optional\ subpatterns}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$regexp\ .=\ str\_repeat(\textcolor{stringliteral}{')?'},\ \$nbTokens\ -\/\ \$firstOptional\ -\/\ (0\ ===\ \$firstOptional\ ?\ 1\ :\ 0));}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$regexp;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00317}00317\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00319}00319\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ transformCapturingGroupsToNonCapturings(\textcolor{keywordtype}{string}\ \$regexp):\ string}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00320}00320\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 0;\ \$i\ <\ \(\backslash\)strlen(\$regexp);\ ++\$i)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}\ ===\ \$regexp[\$i])\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\$i;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{charliteral}{'('}\ !==\ \$regexp[\$i]\ ||\ !isset(\$regexp[\$i\ +\ 2]))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00327}00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{charliteral}{'*'}\ ===\ \$regexp[++\$i]\ ||\ \textcolor{charliteral}{'?'}\ ===\ \$regexp[\$i])\ \{}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\$i;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \$regexp\ =\ substr\_replace(\$regexp,\ \textcolor{stringliteral}{'?:'},\ \$i,\ 0);}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ ++\$i;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00336}00336\ }
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$regexp;}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00338}00338\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_compiler_8php_source_l00339}00339\ \}}
+
+\end{DoxyCode}

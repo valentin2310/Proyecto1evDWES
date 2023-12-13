@@ -1,0 +1,127 @@
+\doxysection{Test\+Suite\+Builder.\+php}
+\hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source}{}\label{_text_u_i_2_configuration_2_test_suite_builder_8php_source}\index{vendor/phpunit/phpunit/src/TextUI/Configuration/TestSuiteBuilder.php@{vendor/phpunit/phpunit/src/TextUI/Configuration/TestSuiteBuilder.php}}
+\mbox{\hyperlink{_text_u_i_2_configuration_2_test_suite_builder_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ PHPUnit.}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_p_h_p_unit_1_1_text_u_i_1_1_configuration}{PHPUnit\(\backslash\)TextUI\(\backslash\)Configuration}};}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00012}00012\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}};}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ count;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ is\_dir;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ is\_file;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00016}00016\ use\ \textcolor{keyword}{function}\ realpath;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00017}00017\ use\ \textcolor{keyword}{function}\ str\_ends\_with;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade}{PHPUnit\(\backslash\)Event\(\backslash\)Facade}}\ as\ EventFacade;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00019}00019\ use\ \mbox{\hyperlink{interface_p_h_p_unit_1_1_exception}{PHPUnit\(\backslash\)Exception}};}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_suite_1_1_test_suite}{PHPUnit\(\backslash\)Framework\(\backslash\)TestSuite}};}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_test_suite_loader}{PHPUnit\(\backslash\)Runner\(\backslash\)TestSuiteLoader}};}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_runtime_exception}{PHPUnit\(\backslash\)TextUI\(\backslash\)RuntimeException}};}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_test_directory_not_found_exception}{PHPUnit\(\backslash\)TextUI\(\backslash\)TestDirectoryNotFoundException}};}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00024}00024\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_test_file_not_found_exception}{PHPUnit\(\backslash\)TextUI\(\backslash\)TestFileNotFoundException}};}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00025}00025\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_xml_configuration_1_1_test_suite_mapper}{PHPUnit\(\backslash\)TextUI\(\backslash\)XmlConfiguration\(\backslash\)TestSuiteMapper}};}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00026}00026\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_file_iterator_1_1_facade}{SebastianBergmann\(\backslash\)FileIterator\(\backslash\)Facade}}\ as\ FileIteratorFacade;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00031}\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_test_suite_builder}{00031}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_test_suite_builder}{TestSuiteBuilder}}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00032}00032\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00039}\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_test_suite_builder_ad7beaf50e2b558ff08fd9c17626d626b}{00039}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_test_suite_builder_ad7beaf50e2b558ff08fd9c17626d626b}{build}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration}{Configuration}}\ \$configuration):\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_suite}{TestSuite}}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00040}00040\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$configuration-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_ae4d9289662abdb06c05e0490786e7d3b}{hasCliArguments}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \$arguments\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$configuration-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_a94fe919564b9785ec1e14103d488ad72}{cliArguments}}()\ as\ \$cliArgument)\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$argument\ =\ realpath(\$cliArgument);}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$argument)\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_test_file_not_found_exception}{TestFileNotFoundException}}(\$cliArgument);}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$arguments[]\ =\ \$argument;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$arguments)\ ===\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testSuite\ =\ \$this-\/>testSuiteFromPath(}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$arguments[0],}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$configuration-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_a635f55ddf902f4fb10b635a922e129de}{testSuffixes}}(),}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testSuite\ =\ \$this-\/>testSuiteFromPathList(}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$arguments,}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$configuration-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_a635f55ddf902f4fb10b635a922e129de}{testSuffixes}}(),}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$testSuite))\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfigurationFile\ =\ \$configuration-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_a27f68d7e276fa60be8f8c5a5de80cf99}{hasConfigurationFile}}()\ ?\ \$configuration-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_a5535d288606a813026a797fc9bd64d20}{configurationFile}}()\ :\ \textcolor{stringliteral}{'Root\ Test\ Suite'};}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ assert(!empty(\$xmlConfigurationFile));}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \$testSuite\ =\ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_xml_configuration_1_1_test_suite_mapper}{TestSuiteMapper}})-\/>map(}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfigurationFile,}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$configuration-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_a5755b406e2caaa5393479d5792c787f3}{testSuite}}(),}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$configuration-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_ae558652fa10bd04ffbb6e720685968ea}{includeTestSuite}}(),}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$configuration-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_a5cbef975b913255557d44f0d09a6ef10}{excludeTestSuite}}(),}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade_a72dbe005bd689460a70770c42bddc02f}{EventFacade::emitter}}()-\/>testSuiteLoaded(\(\backslash\)PHPUnit\(\backslash\)\mbox{\hyperlink{interface_p_h_p_unit_1_1_event_1_1_event}{Event}}\(\backslash\)\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_suite}{TestSuite}}\(\backslash\)TestSuiteBuilder::from(\$testSuite));}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$testSuite;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00092}00092\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ testSuiteFromPath(\textcolor{keywordtype}{string}\ \$path,\ array\ \$suffixes,\ ?\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_suite}{TestSuite}}\ \$suite\ =\ \textcolor{keyword}{null}):\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_suite}{TestSuite}}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00093}00093\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_dir(\$path))\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \$files\ =\ (\textcolor{keyword}{new}\ FileIteratorFacade)-\/>getFilesAsArray(\$path,\ \$suffixes);}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \$suite\ =\ \$suite\ ?:\ TestSuite::empty(\textcolor{stringliteral}{'CLI\ Arguments'});}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \$suite-\/>addTestFiles(\$files);}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$suite;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_file(\$path)\ \&\&\ str\_ends\_with(\$path,\ \textcolor{stringliteral}{'.phpt'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \$suite\ =\ \$suite\ ?:\ TestSuite::empty(\$path);}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \$suite-\/>addTestFile(\$path);}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$suite;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \$testClass\ =\ (\textcolor{keyword}{new}\ TestSuiteLoader)-\/>load(\$path);}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Exception\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ print\ \$e-\/>getMessage()\ .\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ exit(1);}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$suite)\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ TestSuite::fromClassReflector(\$testClass);}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \$suite-\/>addTestSuite(\$testClass);}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$suite;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00125}00125\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00133}00133\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ testSuiteFromPathList(array\ \$paths,\ array\ \$suffixes):\ TestSuite}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00134}00134\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \$suite\ =\ TestSuite::empty(\textcolor{stringliteral}{'CLI\ Arguments'});}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$paths\ as\ \$path)\ \{}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testSuiteFromPath(\$path,\ \$suffixes,\ \$suite);}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$suite;}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00142}00142\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_text_u_i_2_configuration_2_test_suite_builder_8php_source_l00143}00143\ \}}
+
+\end{DoxyCode}

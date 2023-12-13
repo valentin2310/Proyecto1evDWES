@@ -1,0 +1,356 @@
+\doxysection{Ignition\+Service\+Provider.\+php}
+\hypertarget{_ignition_service_provider_8php_source}{}\label{_ignition_service_provider_8php_source}\index{vendor/spatie/laravel-\/ignition/src/IgnitionServiceProvider.php@{vendor/spatie/laravel-\/ignition/src/IgnitionServiceProvider.php}}
+\mbox{\hyperlink{_ignition_service_provider_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_spatie_1_1_laravel_ignition}{Spatie\(\backslash\)LaravelIgnition}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00005}00005\ use\ Exception;}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00006}00006\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_debug_1_1_exception_handler}{Illuminate\(\backslash\)Contracts\(\backslash\)Debug\(\backslash\)ExceptionHandler}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_illuminate_1_1_foundation_1_1_application}{Illuminate\(\backslash\)Foundation\(\backslash\)Application}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_facades_1_1_log}{Illuminate\(\backslash\)Support\(\backslash\)Facades\(\backslash\)Log}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider}{Illuminate\(\backslash\)Support\(\backslash\)ServiceProvider}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_view_1_1_view_exception}{Illuminate\(\backslash\)View\(\backslash\)ViewException}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00011}00011\ use\ Laravel\(\backslash\)Octane\(\backslash\)Events\(\backslash\)RequestReceived;}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00012}00012\ use\ Laravel\(\backslash\)Octane\(\backslash\)Events\(\backslash\)RequestTerminated;}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00013}00013\ use\ Laravel\(\backslash\)Octane\(\backslash\)Events\(\backslash\)TaskReceived;}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00014}00014\ use\ Laravel\(\backslash\)Octane\(\backslash\)Events\(\backslash\)TickReceived;}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00015}00015\ use\ Monolog\(\backslash\)Level;}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_monolog_1_1_logger}{Monolog\(\backslash\)Logger}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_spatie_1_1_flare_client_1_1_flare}{Spatie\(\backslash\)FlareClient\(\backslash\)Flare}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_spatie_1_1_flare_client_1_1_flare_middleware_1_1_add_solutions}{Spatie\(\backslash\)FlareClient\(\backslash\)FlareMiddleware\(\backslash\)AddSolutions}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_spatie_1_1_ignition_1_1_config_1_1_file_config_manager}{Spatie\(\backslash\)Ignition\(\backslash\)Config\(\backslash\)FileConfigManager}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_spatie_1_1_ignition_1_1_config_1_1_ignition_config}{Spatie\(\backslash\)Ignition\(\backslash\)Config\(\backslash\)IgnitionConfig}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00021}00021\ use\ \mbox{\hyperlink{interface_spatie_1_1_ignition_1_1_contracts_1_1_config_manager}{Spatie\(\backslash\)Ignition\(\backslash\)Contracts\(\backslash\)ConfigManager}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00022}00022\ use\ \mbox{\hyperlink{interface_spatie_1_1_ignition_1_1_contracts_1_1_solution_provider_repository}{Spatie\(\backslash\)Ignition\(\backslash\)Contracts\(\backslash\)SolutionProviderRepository}}\ as\ SolutionProviderRepositoryContract;}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_spatie_1_1_ignition_1_1_ignition}{Spatie\(\backslash\)Ignition\(\backslash\)Ignition}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00024}00024\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_commands_1_1_solution_make_command}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Commands\(\backslash\)SolutionMakeCommand}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00025}00025\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_commands_1_1_solution_provider_make_command}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Commands\(\backslash\)SolutionProviderMakeCommand}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00026}00026\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_commands_1_1_test_command}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Commands\(\backslash\)TestCommand}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00027}00027\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_context_providers_1_1_laravel_context_provider_detector}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)ContextProviders\(\backslash\)LaravelContextProviderDetector}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00028}00028\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_exceptions_1_1_invalid_config}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Exceptions\(\backslash\)InvalidConfig}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00029}00029\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_flare_middleware_1_1_add_jobs}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)FlareMiddleware\(\backslash\)AddJobs}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00030}00030\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_flare_middleware_1_1_add_logs}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)FlareMiddleware\(\backslash\)AddLogs}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00031}00031\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_flare_middleware_1_1_add_queries}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)FlareMiddleware\(\backslash\)AddQueries}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00032}00032\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_recorders_1_1_dump_recorder_1_1_dump_recorder}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Recorders\(\backslash\)DumpRecorder\(\backslash\)DumpRecorder}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00033}00033\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_recorders_1_1_job_recorder_1_1_job_recorder}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Recorders\(\backslash\)JobRecorder\(\backslash\)JobRecorder}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00034}00034\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_recorders_1_1_log_recorder_1_1_log_recorder}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Recorders\(\backslash\)LogRecorder\(\backslash\)LogRecorder}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00035}00035\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_recorders_1_1_query_recorder_1_1_query_recorder}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Recorders\(\backslash\)QueryRecorder\(\backslash\)QueryRecorder}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00036}00036\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_renderers_1_1_ignition_exception_renderer}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Renderers\(\backslash\)IgnitionExceptionRenderer}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00037}00037\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_solutions_1_1_solution_providers_1_1_solution_provider_repository}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Solutions\(\backslash\)SolutionProviders\(\backslash\)SolutionProviderRepository}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00038}00038\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_support_1_1_flare_log_handler}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Support\(\backslash\)FlareLogHandler}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00039}00039\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_support_1_1_sent_reports}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Support\(\backslash\)SentReports}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00040}00040\ use\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_views_1_1_view_exception_mapper}{Spatie\(\backslash\)LaravelIgnition\(\backslash\)Views\(\backslash\)ViewExceptionMapper}};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00042}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider}{00042}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider}{IgnitionServiceProvider}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider}{ServiceProvider}}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00043}00043\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00044}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_acc294a6cc8e69743746820e3d15e3f78}{00044}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{register}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00045}00045\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_ae3b55e0b197cd07e04673b8ddded82e8}{registerConfig}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_aa7da9e06a56fc708e07d4d43f947447b}{registerFlare}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a017597567dfcd5709f9191b68c8a7b08}{registerIgnition}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_ac98e6b32954bdfbf15769e7852a17343}{registerRenderer}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a2dbe5e55a8a44e24f51ddbd07df7bb28}{registerRecorders}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_af7f2253f2d536726224ab691eb79f052}{registerLogHandler}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00052}00052\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00054}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8814ea4b5beba763c570b4818980814e}{00054}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8814ea4b5beba763c570b4818980814e}{boot}}()}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00055}00055\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>app-\/>runningInConsole())\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a738c2b54ee8e6cb9b2b1453243005e27}{registerCommands}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a45b3c9ceaf7bae98804c7e3c0025e695}{publishConfigs}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a34523c9893718cea098dfc18d473f99b}{registerRoutes}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a7bd06219428dad8c064284ca5ab6642c}{configureTinker}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a3c06fe71b69e067686218c60a941c98d}{configureOctane}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8903efee621edc01a8168884e736c933}{registerViewExceptionMapper}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a0c063e2a5173398e210ef9bfef9a29df}{startRecorders}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8cd2a4fc5349ddd93b004a13899c2a16}{configureQueue}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00067}00067\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00069}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_ae3b55e0b197cd07e04673b8ddded82e8}{00069}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_ae3b55e0b197cd07e04673b8ddded82e8}{registerConfig}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00070}00070\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_a8a96f711ab543b6167205c847f7eb8d1}{mergeConfigFrom}}(\_\_DIR\_\_\ .\ \textcolor{stringliteral}{'/../config/flare.php'},\ \textcolor{stringliteral}{'flare'});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_a8a96f711ab543b6167205c847f7eb8d1}{mergeConfigFrom}}(\_\_DIR\_\_\ .\ \textcolor{stringliteral}{'/../config/ignition.php'},\ \textcolor{stringliteral}{'ignition'});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00073}00073\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00075}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a738c2b54ee8e6cb9b2b1453243005e27}{00075}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a738c2b54ee8e6cb9b2b1453243005e27}{registerCommands}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00076}00076\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>app[\textcolor{stringliteral}{'config'}]-\/>\textcolor{keyword}{get}(\textcolor{stringliteral}{'flare.key'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_a2455ef63738993e2453d3b6368535a35}{commands}}([}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ TestCommand::class,}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>app[\textcolor{stringliteral}{'config'}]-\/>\textcolor{keyword}{get}(\textcolor{stringliteral}{'ignition.register\_commands'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_a2455ef63738993e2453d3b6368535a35}{commands}}([}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SolutionMakeCommand::class,}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ SolutionProviderMakeCommand::class,}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00089}00089\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00091}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a45b3c9ceaf7bae98804c7e3c0025e695}{00091}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a45b3c9ceaf7bae98804c7e3c0025e695}{publishConfigs}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00092}00092\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_a1884a51264f0b383610e41f6b962292d}{publishes}}([}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \_\_DIR\_\_\ .\ \textcolor{stringliteral}{'/../config/ignition.php'}\ =>\ config\_path(\textcolor{stringliteral}{'ignition.php'}),}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ ],\ \textcolor{stringliteral}{'ignition-\/config'});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_a1884a51264f0b383610e41f6b962292d}{publishes}}([}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \_\_DIR\_\_\ .\ \textcolor{stringliteral}{'/../config/flare.php'}\ =>\ config\_path(\textcolor{stringliteral}{'flare.php'}),}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ ],\ \textcolor{stringliteral}{'flare-\/config'});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00100}00100\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00102}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_ac98e6b32954bdfbf15769e7852a17343}{00102}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_ac98e6b32954bdfbf15769e7852a17343}{registerRenderer}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00103}00103\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>bind(}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Illuminate\(\backslash\)Contracts\(\backslash\)Foundation\(\backslash\)ExceptionRenderer'},}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ fn\ (\mbox{\hyperlink{class_illuminate_1_1_foundation_1_1_application}{Application}}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}})\ =>\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}-\/>make(IgnitionExceptionRenderer::class)}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00108}00108\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00110}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_aa7da9e06a56fc708e07d4d43f947447b}{00110}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_aa7da9e06a56fc708e07d4d43f947447b}{registerFlare}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00111}00111\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(Flare::class,\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Flare::make()}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>setApiToken(config(\textcolor{stringliteral}{'flare.key'})\ ??\ \textcolor{stringliteral}{''})}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>setBaseUrl(config(\textcolor{stringliteral}{'flare.base\_url'},\ \textcolor{stringliteral}{'https://flareapp.io/api'}))}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>applicationPath(base\_path())}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>setStage(app()-\/>environment())}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>setContextProviderDetector(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_context_providers_1_1_laravel_context_provider_detector}{LaravelContextProviderDetector}}())}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>registerMiddleware(\$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a3e2700b8d9146fda7b9d0293bc2e5066}{getFlareMiddleware}}())}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>registerMiddleware(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_spatie_1_1_flare_client_1_1_flare_middleware_1_1_add_solutions}{AddSolutions}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_solutions_1_1_solution_providers_1_1_solution_provider_repository}{SolutionProviderRepository}}(\$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a7aaeb2666308b692b55a4e114e81e8e4}{getSolutionProviders}}())))}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>argumentReducers(config(\textcolor{stringliteral}{'ignition.argument\_reducers'},\ []))}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>withStackFrameArguments(config(\textcolor{stringliteral}{'ignition.with\_stack\_frame\_arguments'},\ \textcolor{keyword}{true}));}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(SentReports::class);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00128}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a017597567dfcd5709f9191b68c8a7b08}{00128}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a017597567dfcd5709f9191b68c8a7b08}{registerIgnition}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00129}00129\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ ConfigManager::class,}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ fn\ ()\ =>\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_spatie_1_1_ignition_1_1_config_1_1_file_config_manager}{FileConfigManager}}(config(\textcolor{stringliteral}{'ignition.settings\_file\_path'},\ \textcolor{stringliteral}{''}))}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \$ignitionConfig\ =\ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_spatie_1_1_ignition_1_1_config_1_1_ignition_config}{IgnitionConfig}}())}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>merge(config(\textcolor{stringliteral}{'ignition'},\ []))}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>loadConfigFile();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \$solutionProviders\ =\ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a7aaeb2666308b692b55a4e114e81e8e4}{getSolutionProviders}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \$solutionProviderRepository\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_solutions_1_1_solution_providers_1_1_solution_provider_repository}{SolutionProviderRepository}}(\$solutionProviders);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(IgnitionConfig::class,\ fn\ ()\ =>\ \$ignitionConfig);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(SolutionProviderRepositoryContract::class,\ fn\ ()\ =>\ \$solutionProviderRepository);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ Ignition::class,}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ fn\ ()\ =>\ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_spatie_1_1_ignition_1_1_ignition}{Ignition}}())}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>applicationPath(base\_path())}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00151}00151\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00153}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a2dbe5e55a8a44e24f51ddbd07df7bb28}{00153}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a2dbe5e55a8a44e24f51ddbd07df7bb28}{registerRecorders}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00154}00154\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(DumpRecorder::class);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(LogRecorder::class,\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_foundation_1_1_application}{Application}}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}):\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_recorders_1_1_log_recorder_1_1_log_recorder}{LogRecorder}}\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_recorders_1_1_log_recorder_1_1_log_recorder}{LogRecorder}}(}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}},}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ config()-\/>\textcolor{keyword}{get}(\textcolor{stringliteral}{'flare.flare\_middleware.'}\ .\ AddLogs::class\ .\ \textcolor{stringliteral}{'.maximum\_number\_of\_collected\_logs'})}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ QueryRecorder::class,}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_foundation_1_1_application}{Application}}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}):\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_recorders_1_1_query_recorder_1_1_query_recorder}{QueryRecorder}}\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_recorders_1_1_query_recorder_1_1_query_recorder}{QueryRecorder}}(}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}},}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ config(\textcolor{stringliteral}{'flare.flare\_middleware.'}\ .\ AddQueries::class\ .\ \textcolor{stringliteral}{'.report\_query\_bindings'},\ \textcolor{keyword}{true}),}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ config(\textcolor{stringliteral}{'flare.flare\_middleware.'}\ .\ AddQueries::class\ .\ \textcolor{stringliteral}{'.maximum\_number\_of\_collected\_queries'},\ 200)}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(JobRecorder::class,\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_foundation_1_1_application}{Application}}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}):\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_recorders_1_1_job_recorder_1_1_job_recorder}{JobRecorder}}\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_recorders_1_1_job_recorder_1_1_job_recorder}{JobRecorder}}(}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}},}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ config(\textcolor{stringliteral}{'flare.flare\_middleware.'}\ .\ AddJobs::class\ .\ \textcolor{stringliteral}{'.max\_chained\_job\_reporting\_depth'},\ 5)}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00181}00181\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00183}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a7bd06219428dad8c064284ca5ab6642c}{00183}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a7bd06219428dad8c064284ca5ab6642c}{configureTinker}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00184}00184\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>app-\/>runningInConsole())\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$\_SERVER[\textcolor{stringliteral}{'argv'}])\ \&\&\ [\textcolor{stringliteral}{'artisan'},\ \textcolor{stringliteral}{'tinker'}]\ ===\ \$\_SERVER[\textcolor{stringliteral}{'argv'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ app(Flare::class)-\/>sendReportsImmediately();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00190}00190\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00192}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a3c06fe71b69e067686218c60a941c98d}{00192}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a3c06fe71b69e067686218c60a941c98d}{configureOctane}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00193}00193\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$\_SERVER[\textcolor{stringliteral}{'LARAVEL\_OCTANE'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_ab5e90764a6d807bd9bf9336bb0064998}{setupOctane}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00197}00197\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00199}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8903efee621edc01a8168884e736c933}{00199}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8903efee621edc01a8168884e736c933}{registerViewExceptionMapper}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00200}00200\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \$handler\ =\ \$this-\/>app-\/>make(ExceptionHandler::class);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ method\_exists(\$handler,\ \textcolor{stringliteral}{'map'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \$handler-\/>map(\textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_view_1_1_view_exception}{ViewException}}\ \$viewException)\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>app-\/>make(ViewExceptionMapper::class)-\/>map(\$viewException);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00210}00210\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00212}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a34523c9893718cea098dfc18d473f99b}{00212}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a34523c9893718cea098dfc18d473f99b}{registerRoutes}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00213}00213\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_ac1243edc980ef87a0df719700fe42f61}{loadRoutesFrom}}(realpath(\_\_DIR\_\_\ .\ \textcolor{stringliteral}{'/ignition-\/routes.php'}));}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00215}00215\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00217}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_af7f2253f2d536726224ab691eb79f052}{00217}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_af7f2253f2d536726224ab691eb79f052}{registerLogHandler}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00218}00218\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(\textcolor{stringliteral}{'flare.logger'},\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}})\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_support_1_1_flare_log_handler}{FlareLogHandler}}(}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}-\/>make(Flare::class),}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}-\/>make(SentReports::class),}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \$logLevelString\ =\ config(\textcolor{stringliteral}{'logging.channels.flare.level'},\ \textcolor{stringliteral}{'error'});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \$logLevel\ =\ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_aa6c492aae1a6d74948dc726ba25ca469}{getLogLevel}}(\$logLevelString);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>setMinimumReportLogLevel(\$logLevel);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_monolog_1_1_logger}{Logger}}(\textcolor{stringliteral}{'Flare'}),}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fn\ (\mbox{\hyperlink{class_monolog_1_1_logger}{Logger}}\ \$logger)\ =>\ \$logger-\/>\mbox{\hyperlink{class_monolog_1_1_logger_af5f5232bdf608b6c5686736ffb61b808}{pushHandler}}(\$handler)}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ Log::extend(\textcolor{stringliteral}{'flare'},\ fn\ (\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}})\ =>\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}[\textcolor{stringliteral}{'flare.logger'}]);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00238}00238\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00240}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a0c063e2a5173398e210ef9bfef9a29df}{00240}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a0c063e2a5173398e210ef9bfef9a29df}{startRecorders}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00241}00241\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>app-\/>config[\textcolor{stringliteral}{'ignition.recorders'}]\ ??\ []\ as\ \$recorder)\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>app-\/>make(\$recorder)-\/>start();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00245}00245\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00247}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8cd2a4fc5349ddd93b004a13899c2a16}{00247}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8cd2a4fc5349ddd93b004a13899c2a16}{configureQueue}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00248}00248\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>app-\/>bound(\textcolor{stringliteral}{'queue'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \$queue\ =\ \$this-\/>app-\/>get(\textcolor{stringliteral}{'queue'});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Reset\ before\ executing\ a\ queue\ job\ to\ make\ sure\ the\ job's\ log/query/dump\ recorders\ are\ empty.}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ using\ a\ sync\ queue\ this\ also\ reports\ the\ queued\ reports\ from\ previous\ exceptions.}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \$queue-\/>before(\textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8be5676eb3a438975de0d571bf844a43}{resetFlareAndLaravelIgnition}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ app(Flare::class)-\/>sendReportsImmediately();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Send\ queued\ reports\ (and\ reset)\ after\ executing\ a\ queue\ job.}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \$queue-\/>after(\textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8be5676eb3a438975de0d571bf844a43}{resetFlareAndLaravelIgnition}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Note:\ the\ \$queue-\/>looping()\ event\ can't\ be\ used\ because\ it's\ not\ triggered\ on\ Vapor}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00268}00268\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00270}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_aa6c492aae1a6d74948dc726ba25ca469}{00270}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_aa6c492aae1a6d74948dc726ba25ca469}{getLogLevel}}(\textcolor{keywordtype}{string}\ \$logLevelString):\ int}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00271}00271\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \$logLevel\ =\ Level::fromName(\$logLevelString);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Exception\ \$exception)\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \$logLevel\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$logLevel)\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_exceptions_1_1_invalid_config_aa80d9ed50673fbbc780a937e25a1faf4}{InvalidConfig::invalidLogLevel}}(\$logLevelString);}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$logLevel-\/>value;}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00283}00283\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00285}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a3e2700b8d9146fda7b9d0293bc2e5066}{00285}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a3e2700b8d9146fda7b9d0293bc2e5066}{getFlareMiddleware}}():\ array}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00286}00286\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(config(\textcolor{stringliteral}{'flare.flare\_middleware'}))}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>map(\textcolor{keyword}{function}\ (\$value,\ \$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$key))\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$middlewareClass\ =\ \$key;}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$parameters\ =\ \$value\ ??\ [];}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$middlewareClass\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$parameters\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00296}00296\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \$middlewareClass(...array\_values(\$parameters));}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ \})}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>values()}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00300}00300\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>toArray();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00301}00301\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00303}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a7aaeb2666308b692b55a4e114e81e8e4}{00303}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a7aaeb2666308b692b55a4e114e81e8e4}{getSolutionProviders}}():\ array}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00304}00304\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00305}00305\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(config(\textcolor{stringliteral}{'ignition.solution\_providers'}))}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00306}00306\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>reject(}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fn\ (\textcolor{keywordtype}{string}\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}})\ =>\ in\_array(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}},\ config(\textcolor{stringliteral}{'ignition.ignored\_solution\_providers'}))}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>toArray();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00310}00310\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00311}00311\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00312}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_ab5e90764a6d807bd9bf9336bb0064998}{00312}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_ab5e90764a6d807bd9bf9336bb0064998}{setupOctane}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00313}00313\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \$this-\/>app[\textcolor{stringliteral}{'events'}]-\/>listen(RequestReceived::class,\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8be5676eb3a438975de0d571bf844a43}{resetFlareAndLaravelIgnition}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \$this-\/>app[\textcolor{stringliteral}{'events'}]-\/>listen(TaskReceived::class,\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8be5676eb3a438975de0d571bf844a43}{resetFlareAndLaravelIgnition}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00321}00321\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \$this-\/>app[\textcolor{stringliteral}{'events'}]-\/>listen(TickReceived::class,\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8be5676eb3a438975de0d571bf844a43}{resetFlareAndLaravelIgnition}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \$this-\/>app[\textcolor{stringliteral}{'events'}]-\/>listen(RequestTerminated::class,\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00327}00327\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8be5676eb3a438975de0d571bf844a43}{resetFlareAndLaravelIgnition}}();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00329}00329\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00331}\mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8be5676eb3a438975de0d571bf844a43}{00331}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_spatie_1_1_laravel_ignition_1_1_ignition_service_provider_a8be5676eb3a438975de0d571bf844a43}{resetFlareAndLaravelIgnition}}():\ void}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00332}00332\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>get(SentReports::class)-\/>clear();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>get(Ignition::class)-\/>reset();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config(\textcolor{stringliteral}{'flare.flare\_middleware.'}\ .\ AddLogs::class))\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>app-\/>make(LogRecorder::class)-\/>reset();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00340}00340\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config(\textcolor{stringliteral}{'flare.flare\_middleware.'}\ .\ AddQueries::class))\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00341}00341\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>app-\/>make(QueryRecorder::class)-\/>reset();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00342}00342\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00343}00343\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00344}00344\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config(\textcolor{stringliteral}{'flare.flare\_middleware.'}\ .\ AddJobs::class))\ \{}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>app-\/>make(JobRecorder::class)-\/>reset();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00347}00347\ }
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>make(DumpRecorder::class)-\/>reset();}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00349}00349\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_ignition_service_provider_8php_source_l00350}00350\ \}}
+
+\end{DoxyCode}

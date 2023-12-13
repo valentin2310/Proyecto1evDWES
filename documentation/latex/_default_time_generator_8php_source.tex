@@ -1,0 +1,105 @@
+\doxysection{Default\+Time\+Generator.\+php}
+\hypertarget{_default_time_generator_8php_source}{}\label{_default_time_generator_8php_source}\index{vendor/ramsey/uuid/src/Generator/DefaultTimeGenerator.php@{vendor/ramsey/uuid/src/Generator/DefaultTimeGenerator.php}}
+\mbox{\hyperlink{_default_time_generator_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00013}00013\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_ramsey_1_1_uuid_1_1_generator}{Ramsey\(\backslash\)Uuid\(\backslash\)Generator}};}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00017}00017\ use\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_converter_1_1_time_converter_interface}{Ramsey\(\backslash\)Uuid\(\backslash\)Converter\(\backslash\)TimeConverterInterface}};}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_exception_1_1_invalid_argument_exception}{Ramsey\(\backslash\)Uuid\(\backslash\)Exception\(\backslash\)InvalidArgumentException}};}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_exception_1_1_random_source_exception}{Ramsey\(\backslash\)Uuid\(\backslash\)Exception\(\backslash\)RandomSourceException}};}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_exception_1_1_time_source_exception}{Ramsey\(\backslash\)Uuid\(\backslash\)Exception\(\backslash\)TimeSourceException}};}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00021}00021\ use\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_provider_1_1_node_provider_interface}{Ramsey\(\backslash\)Uuid\(\backslash\)Provider\(\backslash\)NodeProviderInterface}};}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00022}00022\ use\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_provider_1_1_time_provider_interface}{Ramsey\(\backslash\)Uuid\(\backslash\)Provider\(\backslash\)TimeProviderInterface}};}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_type_1_1_hexadecimal}{Ramsey\(\backslash\)Uuid\(\backslash\)Type\(\backslash\)Hexadecimal}};}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00024}00024\ use\ Throwable;}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00026}00026\ use\ \textcolor{keyword}{function}\ dechex;}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00027}00027\ use\ \textcolor{keyword}{function}\ hex2bin;}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00028}00028\ use\ \textcolor{keyword}{function}\ is\_int;}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00029}00029\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_redis_1_1_connections_aadf5b6e1de066b74856a16eb2fe56838}{pack}};}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00030}00030\ use\ \textcolor{keyword}{function}\ preg\_match;}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00031}00031\ use\ \textcolor{keyword}{function}\ sprintf;}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00032}00032\ use\ \textcolor{keyword}{function}\ str\_pad;}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00033}00033\ use\ \textcolor{keyword}{function}\ strlen;}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00035}00035\ use\ \textcolor{keyword}{const}\ STR\_PAD\_LEFT;}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00041}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_generator_1_1_default_time_generator}{00041}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_generator_1_1_default_time_generator}{DefaultTimeGenerator}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_generator_1_1_time_generator_interface}{TimeGeneratorInterface}}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00042}00042\ \{}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00043}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_generator_1_1_default_time_generator_ac613b99014e448503580cc06816a7a5e}{00043}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_generator_1_1_default_time_generator_ac613b99014e448503580cc06816a7a5e}{\_\_construct}}(}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_provider_1_1_node_provider_interface}{NodeProviderInterface}}\ \$nodeProvider,}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_converter_1_1_time_converter_interface}{TimeConverterInterface}}\ \$timeConverter,}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_provider_1_1_time_provider_interface}{TimeProviderInterface}}\ \$timeProvider}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00047}00047\ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00048}00048\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00056}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_generator_1_1_default_time_generator_a8ce2bfb40818af23362132297f0c1806}{00056}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_generator_1_1_default_time_generator_a8ce2bfb40818af23362132297f0c1806}{generate}}(\$node\ =\ \textcolor{keyword}{null},\ ?\textcolor{keywordtype}{int}\ \$clockSeq\ =\ \textcolor{keyword}{null}):\ string}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00057}00057\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node\ instanceof\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_type_1_1_hexadecimal}{Hexadecimal}})\ \{}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \$node\ =\ \$node-\/>toString();}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \$node\ =\ \$this-\/>getValidNode(\$node);}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$clockSeq\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ does\ not\ use\ "{}stable\ storage"{};\ see\ RFC\ 4122,\ Section\ 4.2.1.1.}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$clockSeq\ =\ random\_int(0,\ 0x3fff);}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Throwable\ \$exception)\ \{}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_exception_1_1_random_source_exception}{RandomSourceException}}(}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$exception-\/>getMessage(),}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{int})\ \$exception-\/>getCode(),}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$exception}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \$time\ =\ \$this-\/>timeProvider-\/>getTime();}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \$uuidTime\ =\ \$this-\/>timeConverter-\/>calculateTime(}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \$time-\/>getSeconds()-\/>toString(),}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \$time-\/>getMicroseconds()-\/>toString()}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \$timeHex\ =\ str\_pad(\$uuidTime-\/>toString(),\ 16,\ \textcolor{charliteral}{'0'},\ STR\_PAD\_LEFT);}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strlen(\$timeHex)\ !==\ 16)\ \{}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_exception_1_1_time_source_exception}{TimeSourceException}}(sprintf(}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'The\ generated\ time\ of\ \(\backslash\)'\%s\(\backslash\)'\ is\ larger\ than\ expected'},}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$timeHex}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \$timeBytes\ =\ (string)\ hex2bin(\$timeHex);}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$timeBytes[4]\ .\ \$timeBytes[5]\ .\ \$timeBytes[6]\ .\ \$timeBytes[7]}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ .\ \$timeBytes[2]\ .\ \$timeBytes[3]}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ .\ \$timeBytes[0]\ .\ \$timeBytes[1]}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ .\ pack(\textcolor{stringliteral}{'n*'},\ \$clockSeq)}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ .\ \$node;}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00100}00100\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00112}00112\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getValidNode(\textcolor{keywordtype}{int}\ |\ \textcolor{keywordtype}{string}\ |\ \textcolor{keyword}{null}\ \$node):\ string}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00113}00113\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$node\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \$node\ =\ \$this-\/>nodeProvider-\/>getNode();}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Convert\ the\ node\ to\ hex,\ if\ it\ is\ still\ an\ integer.}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_int(\$node))\ \{}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \$node\ =\ dechex(\$node);}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!preg\_match(\textcolor{stringliteral}{'/\string^[A-\/Fa-\/f0-\/9]+\$/'},\ (\textcolor{keywordtype}{string})\ \$node)\ ||\ strlen((\textcolor{keywordtype}{string})\ \$node)\ >\ 12)\ \{}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidArgumentException(\textcolor{stringliteral}{'Invalid\ node\ value'});}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{string})\ hex2bin(str\_pad((\textcolor{keywordtype}{string})\ \$node,\ 12,\ \textcolor{charliteral}{'0'},\ STR\_PAD\_LEFT));}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00128}00128\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_default_time_generator_8php_source_l00129}00129\ \}}
+
+\end{DoxyCode}

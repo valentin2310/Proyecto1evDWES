@@ -1,0 +1,147 @@
+\doxysection{Wrapped\+Listener.\+php}
+\hypertarget{_wrapped_listener_8php_source}{}\label{_wrapped_listener_8php_source}\index{vendor/symfony/event-\/dispatcher/Debug/WrappedListener.php@{vendor/symfony/event-\/dispatcher/Debug/WrappedListener.php}}
+\mbox{\hyperlink{_wrapped_listener_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_event_dispatcher_1_1_debug}{Symfony\(\backslash\)Component\(\backslash\)EventDispatcher\(\backslash\)Debug}};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00014}00014\ use\ \mbox{\hyperlink{interface_psr_1_1_event_dispatcher_1_1_stoppable_event_interface}{Psr\(\backslash\)EventDispatcher\(\backslash\)StoppableEventInterface}};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00015}00015\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_interface}{Symfony\(\backslash\)Component\(\backslash\)EventDispatcher\(\backslash\)EventDispatcherInterface}};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00016}00016\ use\ Symfony\(\backslash\)Component\(\backslash\)Stopwatch\(\backslash\)Stopwatch;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_var_dumper_1_1_caster_1_1_class_stub}{Symfony\(\backslash\)Component\(\backslash\)VarDumper\(\backslash\)Caster\(\backslash\)ClassStub}};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00022}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener}{00022}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener}{WrappedListener}}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00023}00023\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00024}00024\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}|array|\textcolor{keywordtype}{object}\ \$listener;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00025}00025\ \ \ \ \ \textcolor{keyword}{private}\ ?\(\backslash\)Closure\ \$optimizedListener;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00026}00026\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$name;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00027}00027\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$called\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$stoppedPropagation\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{private}\ Stopwatch\ \$stopwatch;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{private}\ ?\mbox{\hyperlink{interface_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_interface}{EventDispatcherInterface}}\ \$dispatcher;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$pretty;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$callableRef;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00033}00033\ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_var_dumper_1_1_caster_1_1_class_stub}{ClassStub}}|\textcolor{keywordtype}{string}\ \$stub;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00034}00034\ \ \ \ \ \textcolor{keyword}{private}\ ?\textcolor{keywordtype}{int}\ \$priority\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00035}00035\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \$hasClassStub;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00037}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_a0273c958e97cd3745dbf492058d8b36c}{00037}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_a0273c958e97cd3745dbf492058d8b36c}{\_\_construct}}(callable|array\ \$listener,\ ?\textcolor{keywordtype}{string}\ \$name,\ Stopwatch\ \$stopwatch,\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_interface}{EventDispatcherInterface}}\ \$dispatcher\ =\ \textcolor{keyword}{null},\ \textcolor{keywordtype}{int}\ \$priority\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00038}00038\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \$this-\/>listener\ =\ \$listener;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \$this-\/>optimizedListener\ =\ \$listener\ instanceof\ \(\backslash\)Closure\ ?\ \$listener\ :\ (\(\backslash\)is\_callable(\$listener)\ ?\ \$listener(...)\ :\ \textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \$this-\/>stopwatch\ =\ \$stopwatch;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \$this-\/>dispatcher\ =\ \$dispatcher;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \$this-\/>priority\ =\ \$priority;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_array(\$listener))\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ [\$this-\/>name,\ \$this-\/>callableRef]\ =\ \$this-\/>parseListener(\$listener);}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pretty\ =\ \$this-\/>name.\textcolor{stringliteral}{'::'}.\$listener[1];}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>callableRef\ .=\ \textcolor{stringliteral}{'::'}.\$listener[1];}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$listener\ instanceof\ \(\backslash\)Closure)\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \$r\ =\ new\ \(\backslash\)ReflectionFunction(\$listener);}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$r-\/>name,\ \textcolor{stringliteral}{'\{closure\}'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pretty\ =\ \$this-\/>name\ =\ \textcolor{stringliteral}{'closure'};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}\ =\ \(\backslash\)PHP\_VERSION\_ID\ >=\ 80111\ ?\ \$r-\/>getClosureCalledClass()\ :\ \$r-\/>getClosureScopeClass())\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>name\ =\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}-\/>name;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pretty\ =\ \$this-\/>name.\textcolor{stringliteral}{'::'}.\$r-\/>name;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pretty\ =\ \$this-\/>name\ =\ \$r-\/>name;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \}\ elseif\ (\(\backslash\)is\_string(\$listener))\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pretty\ =\ \$this-\/>name\ =\ \$listener;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>name\ =\ get\_debug\_type(\$listener);}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>pretty\ =\ \$this-\/>name.\textcolor{stringliteral}{'::\_\_invoke'};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>callableRef\ =\ \$listener::class.\textcolor{stringliteral}{'::\_\_invoke'};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$name)\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>name\ =\ \$name;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ self::\$hasClassStub\ ??=\ class\_exists(ClassStub::class);}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00072}00072\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00074}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_aa9f69d2ae89c1723448dd51816e2b7d4}{00074}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_aa9f69d2ae89c1723448dd51816e2b7d4}{getWrappedListener}}():\ callable|array}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00075}00075\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>listener;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00077}00077\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00079}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_a3ff4ebe530648d6456f8c74144b31b4a}{00079}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_a3ff4ebe530648d6456f8c74144b31b4a}{wasCalled}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00080}00080\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>called;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00082}00082\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00084}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_ac63a0457b8743a0a3155c599c02ed569}{00084}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_ac63a0457b8743a0a3155c599c02ed569}{stoppedPropagation}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00085}00085\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>stoppedPropagation;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00087}00087\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00089}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_ab91a260c147a0095717b99b143a5f13a}{00089}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_ab91a260c147a0095717b99b143a5f13a}{getPretty}}():\ string}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00090}00090\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>pretty;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00092}00092\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00094}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_a713e166400b2062fbf06280042da9d2b}{00094}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_a713e166400b2062fbf06280042da9d2b}{getInfo}}(\textcolor{keywordtype}{string}\ \$eventName):\ array}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00095}00095\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \$this-\/>stub\ ??=\ self::\$hasClassStub\ ?\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_var_dumper_1_1_caster_1_1_class_stub}{ClassStub}}(\$this-\/>pretty.\textcolor{stringliteral}{'()'},\ \$this-\/>callableRef\ ??\ \$this-\/>listener)\ :\ \$this-\/>pretty.\textcolor{stringliteral}{'()'};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'event'}\ =>\ \$eventName,}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'priority'}\ =>\ \$this-\/>priority\ ??=\ \$this-\/>dispatcher?-\/>getListenerPriority(\$eventName,\ \$this-\/>listener),}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'pretty'}\ =>\ \$this-\/>pretty,}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'stub'}\ =>\ \$this-\/>stub,}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00104}00104\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00106}\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_a79171f2431c96e3917aaf91661b1010c}{00106}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_a79171f2431c96e3917aaf91661b1010c}{\_\_invoke}}(\textcolor{keywordtype}{object}\ \$event,\ \textcolor{keywordtype}{string}\ \$eventName,\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_interface}{EventDispatcherInterface}}\ \$dispatcher):\ void}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00107}00107\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \$dispatcher\ =\ \$this-\/>dispatcher\ ?:\ \$dispatcher;}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \$this-\/>called\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \$this-\/>priority\ ??=\ \$dispatcher-\/>\mbox{\hyperlink{interface_symfony_1_1_component_1_1_event_dispatcher_1_1_event_dispatcher_interface_ac96aeba0b14e0e4c1334cbbaca3442fa}{getListenerPriority}}(\$eventName,\ \$this-\/>listener);}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \$e\ =\ \$this-\/>stopwatch-\/>start(\$this-\/>name,\ \textcolor{stringliteral}{'event\_listener'});}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ (\$this-\/>optimizedListener\ ??\ \$this-\/>listener)(\$event,\ \$eventName,\ \$dispatcher);}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{finally}\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$e-\/>isStarted())\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$e-\/>stop();}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$event\ instanceof\ \mbox{\hyperlink{interface_psr_1_1_event_dispatcher_1_1_stoppable_event_interface}{StoppableEventInterface}}\ \&\&\ \$event-\/>\mbox{\hyperlink{interface_psr_1_1_event_dispatcher_1_1_stoppable_event_interface_aabfd0a1205a80881b10962db51a2902c}{isPropagationStopped}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_event_dispatcher_1_1_debug_1_1_wrapped_listener_ac63a0457b8743a0a3155c599c02ed569}{stoppedPropagation}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00128}00128\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ parseListener(array\ \$listener):\ array}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00129}00129\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$listener[0]\ instanceof\ \(\backslash\)Closure)\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ ((\textcolor{keyword}{new}\ \(\backslash\)ReflectionFunction(\$listener[0]))-\/>getAttributes(\(\backslash\)Closure::class)\ as\ \$attribute)\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$name\ =\ \$attribute-\/>getArguments()[\textcolor{stringliteral}{'name'}]\ ??\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\$name,\ \$attribute-\/>getArguments()[\textcolor{stringliteral}{'class'}]\ ??\ \$name];}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_object(\$listener[0]))\ \{}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [get\_debug\_type(\$listener[0]),\ \$listener[0]::class];}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\$listener[0],\ \$listener[0]];}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00143}00143\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_wrapped_listener_8php_source_l00144}00144\ \}}
+
+\end{DoxyCode}

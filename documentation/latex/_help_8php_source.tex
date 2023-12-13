@@ -1,0 +1,279 @@
+\doxysection{Help.\+php}
+\hypertarget{_help_8php_source}{}\label{_help_8php_source}\index{vendor/phpunit/phpunit/src/TextUI/Help.php@{vendor/phpunit/phpunit/src/TextUI/Help.php}}
+\mbox{\hyperlink{_help_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ PHPUnit.}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_p_h_p_unit_1_1_text_u_i}{PHPUnit\(\backslash\)TextUI}};}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00012}00012\ use\ \textcolor{keyword}{const}\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ count;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ explode;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a56d9fc87df339998f88486b0b09214c0}{max}};}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00016}00016\ use\ \textcolor{keyword}{function}\ preg\_replace\_callback;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00017}00017\ use\ \textcolor{keyword}{function}\ str\_pad;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00018}00018\ use\ \textcolor{keyword}{function}\ str\_repeat;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00019}00019\ use\ \textcolor{keyword}{function}\ strlen;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00020}00020\ use\ \textcolor{keyword}{function}\ wordwrap;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_color}{PHPUnit\(\backslash\)Util\(\backslash\)Color}};}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_environment_1_1_console}{SebastianBergmann\(\backslash\)Environment\(\backslash\)Console}};}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00027}\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_help}{00027}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_help}{Help}}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00028}00028\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ LEFT\_MARGIN\ =\ \textcolor{stringliteral}{'\ \ '};}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ HELP\_TEXT\ \ \ =\ [}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Usage'}\ =>\ [}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'text'}\ =>\ \textcolor{stringliteral}{'phpunit\ [options]\ <directory|file>\ ...'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00033}00033\ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Configuration'}\ =>\ [}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/bootstrap\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'A\ PHP\ script\ that\ is\ included\ before\ the\ tests\ run'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/c|-\/-\/configuration\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Read\ configuration\ from\ XML\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/no-\/configuration'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Ignore\ default\ configuration\ file\ (phpunit.xml)'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/no-\/extensions'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Do\ not\ load\ PHPUnit\ extensions'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/include-\/path\ <path(s)>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Prepend\ PHP\(\backslash\)'s\ include\_path\ with\ given\ path(s)'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/d\ <key[=value]>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Sets\ a\ php.ini\ value'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/cache-\/directory\ <dir>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Specify\ cache\ directory'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/generate-\/configuration'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Generate\ configuration\ file\ with\ suggested\ settings'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/migrate-\/configuration'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Migrate\ configuration\ file\ to\ current\ format'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/generate-\/baseline\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Generate\ baseline\ for\ issues'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/use-\/baseline\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Use\ baseline\ to\ ignore\ issues'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/ignore-\/baseline'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Do\ not\ use\ baseline\ to\ ignore\ issues'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Selection'}\ =>\ [}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/list-\/suites'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'List\ available\ test\ suites'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/testsuite\ <name>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Only\ run\ tests\ from\ the\ specified\ test\ suite(s)'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/exclude-\/testsuite\ <name>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Exclude\ tests\ from\ the\ specified\ test\ suite(s)'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/list-\/groups'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'List\ available\ test\ groups'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/group\ <name>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Only\ run\ tests\ from\ the\ specified\ group(s)'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/exclude-\/group\ <name>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Exclude\ tests\ from\ the\ specified\ group(s)'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/covers\ <name>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Only\ run\ tests\ that\ intend\ to\ cover\ <name>'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/uses\ <name>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Only\ run\ tests\ that\ intend\ to\ use\ <name>'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/list-\/tests'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'List\ available\ tests'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/list-\/tests-\/xml\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'List\ available\ tests\ in\ XML\ format'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/filter\ <pattern>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Filter\ which\ tests\ to\ run'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/test-\/suffix\ <suffixes>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Only\ search\ for\ test\ in\ files\ with\ specified\ suffix(es).\ Default:\ Test.php,.phpt'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Execution'}\ =>\ [}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/process-\/isolation'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Run\ each\ test\ in\ a\ separate\ PHP\ process'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/globals-\/backup'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Backup\ and\ restore\ \$GLOBALS\ for\ each\ test'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/static-\/backup'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Backup\ and\ restore\ static\ properties\ for\ each\ test'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'spacer'}\ =>\ \textcolor{stringliteral}{''}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/strict-\/coverage'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Be\ strict\ about\ code\ coverage\ metadata'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/strict-\/global-\/state'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Be\ strict\ about\ changes\ to\ global\ state'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/disallow-\/test-\/output'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Be\ strict\ about\ output\ during\ tests'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/enforce-\/time-\/limit'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Enforce\ time\ limit\ based\ on\ test\ size'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/default-\/time-\/limit\ <sec>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Timeout\ in\ seconds\ for\ tests\ that\ have\ no\ declared\ size'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/dont-\/report-\/useless-\/tests'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Do\ not\ report\ tests\ that\ do\ not\ test\ anything'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'spacer'}\ =>\ \textcolor{stringliteral}{''}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/defect'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Stop\ after\ first\ error,\ failure,\ warning,\ or\ risky\ test'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/error'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Stop\ after\ first\ error'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/failure'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Stop\ after\ first\ failure'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/warning'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Stop\ after\ first\ warning'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/risky'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Stop\ after\ first\ risky\ test'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/deprecation'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Stop\ after\ first\ test\ that\ triggered\ a\ deprecation'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/notice'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Stop\ after\ first\ test\ that\ triggered\ a\ notice'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/skipped'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Stop\ after\ first\ skipped\ test'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/stop-\/on-\/incomplete'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Stop\ after\ first\ incomplete\ test'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'spacer'}\ =>\ \textcolor{stringliteral}{''}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/warning'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Signal\ failure\ using\ shell\ exit\ code\ when\ a\ warning\ was\ triggered'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/risky'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Signal\ failure\ using\ shell\ exit\ code\ when\ a\ test\ was\ considered\ risky'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/deprecation'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Signal\ failure\ using\ shell\ exit\ code\ when\ a\ deprecation\ was\ triggered'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/notice'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Signal\ failure\ using\ shell\ exit\ code\ when\ a\ notice\ was\ triggered'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/skipped'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Signal\ failure\ using\ shell\ exit\ code\ when\ a\ test\ was\ skipped'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/fail-\/on-\/incomplete'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Signal\ failure\ using\ shell\ exit\ code\ when\ a\ test\ was\ marked\ incomplete'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'spacer'}\ =>\ \textcolor{stringliteral}{''}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/cache-\/result'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ test\ results\ to\ cache\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/do-\/not-\/cache-\/result'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Do\ not\ write\ test\ results\ to\ cache\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'spacer'}\ =>\ \textcolor{stringliteral}{''}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/order-\/by\ <order>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Run\ tests\ in\ order:\ default|defects|depends|duration|no-\/depends|random|reverse|size'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/random-\/order-\/seed\ <N>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Use\ the\ specified\ random\ seed\ when\ running\ tests\ in\ random\ order'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Reporting'}\ =>\ [}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/colors\ <flag>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Use\ colors\ in\ output\ ("{}never"{},\ "{}auto"{}\ or\ "{}always"{})'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/columns\ <n>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Number\ of\ columns\ to\ use\ for\ progress\ output'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/columns\ max'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Use\ maximum\ number\ of\ columns\ for\ progress\ output'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/stderr'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ to\ STDERR\ instead\ of\ STDOUT'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'spacer'}\ =>\ \textcolor{stringliteral}{''}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/no-\/progress'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Disable\ output\ of\ test\ execution\ progress'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/no-\/results'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Disable\ output\ of\ test\ results'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/no-\/output'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Disable\ all\ output'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'spacer'}\ =>\ \textcolor{stringliteral}{''}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/display-\/incomplete'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Display\ details\ for\ incomplete\ tests'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/display-\/skipped'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Display\ details\ for\ skipped\ tests'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/display-\/deprecations'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Display\ details\ for\ deprecations\ triggered\ by\ tests'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/display-\/errors'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Display\ details\ for\ errors\ triggered\ by\ tests'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/display-\/notices'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Display\ details\ for\ notices\ triggered\ by\ tests'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/display-\/warnings'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Display\ details\ for\ warnings\ triggered\ by\ tests'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ \ \ \ =>\ \textcolor{stringliteral}{'-\/-\/reverse-\/list'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Print\ defects\ in\ reverse\ order'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'spacer'}\ =>\ \textcolor{stringliteral}{''}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/teamcity'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Replace\ default\ progress\ and\ result\ output\ with\ TeamCity\ format'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/testdox'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Replace\ default\ result\ output\ with\ TestDox\ format'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Logging'}\ =>\ [}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/log-\/junit\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ test\ results\ in\ JUnit\ XML\ format\ to\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/log-\/teamcity\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ test\ results\ in\ TeamCity\ format\ to\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/testdox-\/html\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ test\ results\ in\ TestDox\ format\ (HTML)\ to\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/testdox-\/text\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ test\ results\ in\ TestDox\ format\ (plain\ text)\ to\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/log-\/events-\/text\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Stream\ events\ as\ plain\ text\ to\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/log-\/events-\/verbose-\/text\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Stream\ events\ as\ plain\ text\ with\ extended\ information\ to\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/no-\/logging'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Ignore\ logging\ configured\ in\ the\ XML\ configuration\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Code\ Coverage'}\ =>\ [}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/coverage-\/clover\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ code\ coverage\ report\ in\ Clover\ XML\ format\ to\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/coverage-\/cobertura\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ code\ coverage\ report\ in\ Cobertura\ XML\ format\ to\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/coverage-\/crap4j\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ code\ coverage\ report\ in\ Crap4J\ XML\ format\ to\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/coverage-\/html\ <dir>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ code\ coverage\ report\ in\ HTML\ format\ to\ directory'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/coverage-\/php\ <file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ serialized\ code\ coverage\ data\ to\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/coverage-\/text=<file>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ code\ coverage\ report\ in\ text\ format\ to\ file\ [default:\ standard\ output]'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/coverage-\/xml\ <dir>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Write\ code\ coverage\ report\ in\ XML\ format\ to\ directory'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/warm-\/coverage-\/cache'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Warm\ static\ analysis\ cache'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/coverage-\/filter\ <dir>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Include\ <dir>\ in\ code\ coverage\ reporting'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/path-\/coverage'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Report\ path\ coverage\ in\ addition\ to\ line\ coverage'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/disable-\/coverage-\/ignore'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Disable\ metadata\ for\ ignoring\ code\ coverage'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/no-\/coverage'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Ignore\ code\ coverage\ reporting\ configured\ in\ the\ XML\ configuration\ file'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Miscellaneous'}\ =>\ [}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/h|-\/-\/help'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Prints\ this\ usage\ information'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/version'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Prints\ the\ version\ and\ exits'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/atleast-\/version\ <min>'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Checks\ that\ version\ is\ greater\ than\ <min>\ and\ exits'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'arg'}\ =>\ \textcolor{stringliteral}{'-\/-\/check-\/version'},\ \textcolor{stringliteral}{'desc'}\ =>\ \textcolor{stringliteral}{'Check\ whether\ PHPUnit\ is\ the\ latest\ version\ and\ exits'}],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00163}00163\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00164}00164\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$lengthOfLongestOptionName\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00165}00165\ \ \ \ \ \textcolor{keyword}{private}\ readonly\ \textcolor{keywordtype}{int}\ \$columnsAvailableForDescription;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00166}00166\ \ \ \ \ \textcolor{keyword}{private}\ ?\textcolor{keywordtype}{bool}\ \$hasColor;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00168}\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_help_a6e8673c48cd1334f27a93e0aff0e2d3f}{00168}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_help_a6e8673c48cd1334f27a93e0aff0e2d3f}{\_\_construct}}(?\textcolor{keywordtype}{int}\ \$width\ =\ \textcolor{keyword}{null},\ ?\textcolor{keywordtype}{bool}\ \$withColor\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00169}00169\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$width\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \$width\ =\ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_environment_1_1_console}{Console}})-\/>getNumberOfColumns();}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$withColor\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasColor\ =\ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_environment_1_1_console}{Console}})-\/>hasColorSupport();}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>hasColor\ =\ \$withColor;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (self::HELP\_TEXT\ as\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ as\ \$option)\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$option[\textcolor{stringliteral}{'arg'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>lengthOfLongestOptionName\ =\ max(\$this-\/>lengthOfLongestOptionName,\ isset(\$option[\textcolor{stringliteral}{'arg'}])\ ?\ strlen(\$option[\textcolor{stringliteral}{'arg'}])\ :\ 0);}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \$this-\/>columnsAvailableForDescription\ =\ \$width\ -\/\ \$this-\/>lengthOfLongestOptionName\ -\/\ 4;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00189}00189\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00191}\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_help_a913873cf89f388d70a28de0b77d68884}{00191}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_help_a913873cf89f388d70a28de0b77d68884}{generate}}():\ string}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00192}00192\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>hasColor)\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>writeWithColor();}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>writeWithoutColor();}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00198}00198\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00200}00200\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ writeWithoutColor():\ string}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00201}00201\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \$buffer\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00203}00203\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (self::HELP\_TEXT\ as\ \$section\ =>\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ \textcolor{stringliteral}{"{}\{\$section\}:"{}}\ .\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$section\ !==\ \textcolor{stringliteral}{'Usage'})\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ as\ \$option)\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$option[\textcolor{stringliteral}{'spacer'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$option[\textcolor{stringliteral}{'text'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ self::LEFT\_MARGIN\ .\ \$option[\textcolor{stringliteral}{'text'}]\ .\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$option[\textcolor{stringliteral}{'arg'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$arg\ =\ str\_pad(\$option[\textcolor{stringliteral}{'arg'}],\ \$this-\/>lengthOfLongestOptionName);}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ self::LEFT\_MARGIN\ .\ \$arg\ .\ \textcolor{charliteral}{'\ '}\ .\ \$option[\textcolor{stringliteral}{'desc'}]\ .\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$buffer;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00231}00231\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00233}00233\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ writeWithColor():\ string}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00234}00234\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \$buffer\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (self::HELP\_TEXT\ as\ \$section\ =>\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}})\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ Color::colorize(\textcolor{stringliteral}{'fg-\/yellow'},\ \textcolor{stringliteral}{"{}\{\$section\}:"{}})\ .\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$section\ !==\ \textcolor{stringliteral}{'Usage'})\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ as\ \$option)\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$option[\textcolor{stringliteral}{'spacer'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$option[\textcolor{stringliteral}{'text'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ self::LEFT\_MARGIN\ .\ \$option[\textcolor{stringliteral}{'text'}]\ .\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$option[\textcolor{stringliteral}{'arg'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$arg\ =\ Color::colorize(\textcolor{stringliteral}{'fg-\/green'},\ str\_pad(\$option[\textcolor{stringliteral}{'arg'}],\ \$this-\/>lengthOfLongestOptionName));}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$arg\ =\ preg\_replace\_callback(}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'/(<[\string^>]+>)/'},}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ fn\ (\$matches)\ =>\ Color::colorize(\textcolor{stringliteral}{'fg-\/cyan'},\ \$matches[0]),}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$arg,}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$desc\ =\ explode(PHP\_EOL,\ wordwrap(\$option[\textcolor{stringliteral}{'desc'}],\ \$this-\/>columnsAvailableForDescription,\ PHP\_EOL));}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ self::LEFT\_MARGIN\ .\ \$arg\ .\ \textcolor{charliteral}{'\ '}\ .\ \$desc[0]\ .\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 1;\ \$i\ <\ count(\$desc);\ \$i++)\ \{}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ str\_repeat(\textcolor{charliteral}{'\ '},\ \$this-\/>lengthOfLongestOptionName\ +\ 3)\ .\ \$desc[\$i]\ .\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00270}00270\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \$buffer\ .=\ PHP\_EOL;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$buffer;}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00275}00275\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_help_8php_source_l00276}00276\ \}}
+
+\end{DoxyCode}

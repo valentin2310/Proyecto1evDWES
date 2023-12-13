@@ -1,0 +1,98 @@
+\doxysection{Image\+Renderer.\+php}
+\hypertarget{_image_renderer_8php_source}{}\label{_image_renderer_8php_source}\index{vendor/league/commonmark/src/Extension/CommonMark/Renderer/Inline/ImageRenderer.php@{vendor/league/commonmark/src/Extension/CommonMark/Renderer/Inline/ImageRenderer.php}}
+\mbox{\hyperlink{_image_renderer_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00003}00003\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00005}00005\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00006}00006\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ league/commonmark\ package.}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00008}00008\ \textcolor{comment}{\ *\ (c)\ Colin\ O'Dell\ <colinodell@gmail.com>}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00010}00010\ \textcolor{comment}{\ *\ Original\ code\ based\ on\ the\ CommonMark\ JS\ reference\ parser\ (https://bitly.com/commonmark-\/js)}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00011}00011\ \textcolor{comment}{\ *\ \ -\/\ (c)\ John\ MacFarlane}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00012}00012\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00013}00013\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00014}00014\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_renderer_1_1_inline}{League\(\backslash\)CommonMark\(\backslash\)Extension\(\backslash\)CommonMark\(\backslash\)Renderer\(\backslash\)Inline}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_node_1_1_inline_1_1_image}{League\(\backslash\)CommonMark\(\backslash\)Extension\(\backslash\)CommonMark\(\backslash\)Node\(\backslash\)Inline\(\backslash\)Image}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_node_1_1_inline_1_1_newline}{League\(\backslash\)CommonMark\(\backslash\)Node\(\backslash\)Inline\(\backslash\)Newline}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_node_1_1_node}{League\(\backslash\)CommonMark\(\backslash\)Node\(\backslash\)Node}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_node_1_1_node_iterator}{League\(\backslash\)CommonMark\(\backslash\)Node\(\backslash\)NodeIterator}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00023}00023\ use\ \mbox{\hyperlink{interface_league_1_1_common_mark_1_1_node_1_1_string_container_interface}{League\(\backslash\)CommonMark\(\backslash\)Node\(\backslash\)StringContainerInterface}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00024}00024\ use\ \mbox{\hyperlink{interface_league_1_1_common_mark_1_1_renderer_1_1_child_node_renderer_interface}{League\(\backslash\)CommonMark\(\backslash\)Renderer\(\backslash\)ChildNodeRendererInterface}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00025}00025\ use\ \mbox{\hyperlink{interface_league_1_1_common_mark_1_1_renderer_1_1_node_renderer_interface}{League\(\backslash\)CommonMark\(\backslash\)Renderer\(\backslash\)NodeRendererInterface}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00026}00026\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_util_1_1_html_element}{League\(\backslash\)CommonMark\(\backslash\)Util\(\backslash\)HtmlElement}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00027}00027\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_util_1_1_regex_helper}{League\(\backslash\)CommonMark\(\backslash\)Util\(\backslash\)RegexHelper}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00028}00028\ use\ \mbox{\hyperlink{interface_league_1_1_common_mark_1_1_xml_1_1_xml_node_renderer_interface}{League\(\backslash\)CommonMark\(\backslash\)Xml\(\backslash\)XmlNodeRendererInterface}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00029}00029\ use\ \mbox{\hyperlink{interface_league_1_1_config_1_1_configuration_aware_interface}{League\(\backslash\)Config\(\backslash\)ConfigurationAwareInterface}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00030}00030\ use\ \mbox{\hyperlink{interface_league_1_1_config_1_1_configuration_interface}{League\(\backslash\)Config\(\backslash\)ConfigurationInterface}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00032}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_renderer_1_1_inline_1_1_image_renderer}{00032}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_renderer_1_1_inline_1_1_image_renderer}{ImageRenderer}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_league_1_1_common_mark_1_1_renderer_1_1_node_renderer_interface}{NodeRendererInterface}},\ \mbox{\hyperlink{interface_league_1_1_common_mark_1_1_xml_1_1_xml_node_renderer_interface}{XmlNodeRendererInterface}},\ \mbox{\hyperlink{interface_league_1_1_config_1_1_configuration_aware_interface}{ConfigurationAwareInterface}}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00033}00033\ \{}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00035}00035\ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{interface_league_1_1_config_1_1_configuration_interface}{ConfigurationInterface}}\ \$config;}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00044}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_renderer_1_1_inline_1_1_image_renderer_a7e7ac971e2622e91f4b68fe1ae400c53}{00044}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_renderer_1_1_inline_1_1_image_renderer_a7e7ac971e2622e91f4b68fe1ae400c53}{render}}(\mbox{\hyperlink{class_league_1_1_common_mark_1_1_node_1_1_node}{Node}}\ \$node,\ \mbox{\hyperlink{interface_league_1_1_common_mark_1_1_renderer_1_1_child_node_renderer_interface}{ChildNodeRendererInterface}}\ \$childRenderer):\ \(\backslash\)Stringable}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00045}00045\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ Image::assertInstanceOf(\$node);}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \$attrs\ =\ \$node-\/>data-\/>get(\textcolor{stringliteral}{'attributes'});}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \$forbidUnsafeLinks\ =\ !\ \$this-\/>config-\/>get(\textcolor{stringliteral}{'allow\_unsafe\_links'});}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$forbidUnsafeLinks\ \&\&\ RegexHelper::isLinkPotentiallyUnsafe(\$node-\/>getUrl()))\ \{}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \$attrs[\textcolor{stringliteral}{'src'}]\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \$attrs[\textcolor{stringliteral}{'src'}]\ =\ \$node-\/>getUrl();}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \$attrs[\textcolor{stringliteral}{'alt'}]\ =\ \$this-\/>getAltText(\$node);}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\$title\ =\ \$node-\/>getTitle())\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \$attrs[\textcolor{stringliteral}{'title'}]\ =\ \$title;}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_util_1_1_html_element}{HtmlElement}}(\textcolor{stringliteral}{'img'},\ \$attrs,\ \textcolor{stringliteral}{''},\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00064}00064\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00066}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_renderer_1_1_inline_1_1_image_renderer_a56d8c82a2720557d20401be69d140803}{00066}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_renderer_1_1_inline_1_1_image_renderer_a56d8c82a2720557d20401be69d140803}{setConfiguration}}(\mbox{\hyperlink{interface_league_1_1_config_1_1_configuration_interface}{ConfigurationInterface}}\ \$configuration):\ void}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00067}00067\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \$this-\/>config\ =\ \$configuration;}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00069}00069\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00071}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_renderer_1_1_inline_1_1_image_renderer_a7dc3a888c489c8491f6225ae5a2f9015}{00071}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_renderer_1_1_inline_1_1_image_renderer_a7dc3a888c489c8491f6225ae5a2f9015}{getXmlTagName}}(\mbox{\hyperlink{class_league_1_1_common_mark_1_1_node_1_1_node}{Node}}\ \$node):\ string}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00072}00072\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'image'};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00074}00074\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00083}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_renderer_1_1_inline_1_1_image_renderer_acc283299b6b6e53e7716ca1f5493b8cd}{00083}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_renderer_1_1_inline_1_1_image_renderer_acc283299b6b6e53e7716ca1f5493b8cd}{getXmlAttributes}}(\mbox{\hyperlink{class_league_1_1_common_mark_1_1_node_1_1_node}{Node}}\ \$node):\ array}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00084}00084\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ Image::assertInstanceOf(\$node);}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'destination'}\ =>\ \$node-\/>getUrl(),}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'title'}\ =>\ \$node-\/>getTitle()\ ??\ \textcolor{stringliteral}{''},}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00091}00091\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00093}00093\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getAltText(\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_node_1_1_inline_1_1_image}{Image}}\ \$node):\ string}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00094}00094\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \$altText\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ ((\textcolor{keyword}{new}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_node_1_1_node_iterator}{NodeIterator}}(\$node))\ as\ \$n)\ \{}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$n\ instanceof\ \mbox{\hyperlink{interface_league_1_1_common_mark_1_1_node_1_1_string_container_interface}{StringContainerInterface}})\ \{}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$altText\ .=\ \$n-\/>getLiteral();}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$n\ instanceof\ Newline)\ \{}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$altText\ .=\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$altText;}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00106}00106\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_image_renderer_8php_source_l00107}00107\ \}}
+
+\end{DoxyCode}

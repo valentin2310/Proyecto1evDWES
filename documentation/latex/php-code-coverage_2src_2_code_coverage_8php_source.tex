@@ -1,0 +1,553 @@
+\doxysection{Code\+Coverage.\+php}
+\hypertarget{php-code-coverage_2src_2_code_coverage_8php_source}{}\label{php-code-coverage_2src_2_code_coverage_8php_source}\index{vendor/phpunit/php-\/code-\/coverage/src/CodeCoverage.php@{vendor/phpunit/php-\/code-\/coverage/src/CodeCoverage.php}}
+\mbox{\hyperlink{php-code-coverage_2src_2_code_coverage_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ phpunit/php-\/code-\/coverage.}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00010}\mbox{\hyperlink{namespace_sebastian_bergmann_1_1_code_coverage}{00010}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_sebastian_bergmann_1_1_code_coverage}{SebastianBergmann\(\backslash\)CodeCoverage}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00012}00012\ use\ \textcolor{keyword}{function}\ array\_diff;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ array\_diff\_key;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ array\_flip;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ array\_keys;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00016}00016\ use\ \textcolor{keyword}{function}\ array\_merge;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00017}00017\ use\ \textcolor{keyword}{function}\ array\_merge\_recursive;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00018}00018\ use\ \textcolor{keyword}{function}\ array\_unique;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00019}00019\ use\ \textcolor{keyword}{function}\ count;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00020}00020\ use\ \textcolor{keyword}{function}\ explode;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00021}00021\ use\ \textcolor{keyword}{function}\ is\_array;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00022}00022\ use\ \textcolor{keyword}{function}\ is\_file;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00023}00023\ use\ \textcolor{keyword}{function}\ sort;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00024}00024\ use\ ReflectionClass;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00025}00025\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_processed_code_coverage_data}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)Data\(\backslash\)ProcessedCodeCoverageData}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00026}00026\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_raw_code_coverage_data}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)Data\(\backslash\)RawCodeCoverageData}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00027}00027\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_driver_1_1_driver}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)Driver\(\backslash\)Driver}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00028}00028\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_node_1_1_builder}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)Node\(\backslash\)Builder}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00029}00029\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_node_1_1_directory}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)Node\(\backslash\)Directory}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00030}00030\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_caching_file_analyser}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)StaticAnalysis\(\backslash\)CachingFileAnalyser}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00031}00031\ use\ \mbox{\hyperlink{interface_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_file_analyser}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)StaticAnalysis\(\backslash\)FileAnalyser}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00032}00032\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)StaticAnalysis\(\backslash\)ParsingFileAnalyser}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00033}00033\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_size_1_1_test_size}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)Test\(\backslash\)TestSize\(\backslash\)TestSize}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00034}00034\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_status_1_1_test_status}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)Test\(\backslash\)TestStatus\(\backslash\)TestStatus}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00035}00035\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_unit_reverse_lookup_1_1_wizard}{SebastianBergmann\(\backslash\)CodeUnitReverseLookup\(\backslash\)Wizard}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00045}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage}{00045}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage}{CodeCoverage}}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00046}00046\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00047}00047\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ UNCOVERED\_FILES\ =\ \textcolor{stringliteral}{'UNCOVERED\_FILES'};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00048}00048\ \ \ \ \ \textcolor{keyword}{private}\ readonly\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_driver_1_1_driver}{Driver}}\ \$driver;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00049}00049\ \ \ \ \ \textcolor{keyword}{private}\ readonly\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_filter}{Filter}}\ \$filter;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00050}00050\ \ \ \ \ \textcolor{keyword}{private}\ readonly\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_unit_reverse_lookup_1_1_wizard}{Wizard}}\ \$wizard;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00051}00051\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$checkForUnintentionallyCoveredCode\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00052}00052\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$includeUncoveredFiles\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$ignoreDeprecatedCode\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00054}00054\ \ \ \ \ \textcolor{keyword}{private}\ ?\textcolor{keywordtype}{string}\ \$currentId\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00055}00055\ \ \ \ \ \textcolor{keyword}{private}\ ?\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_size_1_1_test_size}{TestSize}}\ \$currentSize\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00056}00056\ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_processed_code_coverage_data}{ProcessedCodeCoverageData}}\ \$data;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00057}00057\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$useAnnotationsForIgnoringCode\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00062}00062\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$linesToBeIgnored\ =\ [];}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00067}00067\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$tests\ =\ [];}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00072}00072\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$parentClassesExcludedFromUnintentionallyCoveredCodeCheck\ =\ [];}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00073}00073\ \ \ \ \ \textcolor{keyword}{private}\ ?\mbox{\hyperlink{interface_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_file_analyser}{FileAnalyser}}\ \$analyser\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00074}00074\ \ \ \ \ \textcolor{keyword}{private}\ ?\textcolor{keywordtype}{string}\ \$cacheDirectory\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00075}00075\ \ \ \ \ \textcolor{keyword}{private}\ ?\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_node_1_1_directory}{Directory}}\ \$cachedReport\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00077}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ad6fb2e47b53d87ca797cb5b04a7ab171}{00077}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ad6fb2e47b53d87ca797cb5b04a7ab171}{\_\_construct}}(\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_driver_1_1_driver}{Driver}}\ \$driver,\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_filter}{Filter}}\ \$filter)}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00078}00078\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \$this-\/>driver\ =\ \$driver;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a8122d3c1ef2a61359b75a97363a4d89b}{filter}}\ =\ \$filter;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \$this-\/>data\ \ \ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_processed_code_coverage_data}{ProcessedCodeCoverageData}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \$this-\/>wizard\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_unit_reverse_lookup_1_1_wizard}{Wizard}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00088}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a36065960e56a8f2637e2fb05bc233c80}{00088}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a36065960e56a8f2637e2fb05bc233c80}{getReport}}():\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_node_1_1_directory}{Directory}}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00089}00089\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>cachedReport\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>cachedReport\ =\ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_node_1_1_builder}{Builder}}(\$this-\/>analyser()))-\/>build(\$this);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>cachedReport;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00095}00095\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00100}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_aa821bec12eaa7e0f649397c9675ff505}{00100}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_aa821bec12eaa7e0f649397c9675ff505}{clear}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00101}00101\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \$this-\/>currentId\ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \$this-\/>currentSize\ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \$this-\/>data\ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_processed_code_coverage_data}{ProcessedCodeCoverageData}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \$this-\/>tests\ \ \ \ \ \ \ \ =\ [];}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \$this-\/>cachedReport\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00112}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ac01828cae86291d0bc8a78b24de6089f}{00112}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ac01828cae86291d0bc8a78b24de6089f}{clearCache}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00113}00113\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \$this-\/>cachedReport\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00115}00115\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00120}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a8122d3c1ef2a61359b75a97363a4d89b}{00120}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a8122d3c1ef2a61359b75a97363a4d89b}{filter}}():\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_filter}{Filter}}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00121}00121\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>filter;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00123}00123\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00128}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_aaab2a2d35d6c134f95a16297f2e9c587}{00128}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_aaab2a2d35d6c134f95a16297f2e9c587}{getData}}(\textcolor{keywordtype}{bool}\ \$raw\ =\ \textcolor{keyword}{false}):\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_processed_code_coverage_data}{ProcessedCodeCoverageData}}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00129}00129\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$raw)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a71524e853a2860516537c55fe24a78e5}{includeUncoveredFiles}})\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>addUncoveredFilesFromFilter();}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>data;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00137}00137\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00142}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a0cf0af08602576aa91ebc5b948c46d20}{00142}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a0cf0af08602576aa91ebc5b948c46d20}{setData}}(\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_processed_code_coverage_data}{ProcessedCodeCoverageData}}\ \$data):\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00143}00143\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \$this-\/>data\ =\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00145}00145\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00150}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a7e247dd31cc8d37a6c97353a062a0080}{00150}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a7e247dd31cc8d37a6c97353a062a0080}{getTests}}():\ array}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00151}00151\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>tests;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00153}00153\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00158}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a1607846b217222c6cdb30a847bdd0379}{00158}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a1607846b217222c6cdb30a847bdd0379}{setTests}}(array\ \$tests):\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00159}00159\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \$this-\/>tests\ =\ \$tests;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00161}00161\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00163}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a5f55d4cda769d394a6325213ba7f6ada}{00163}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a5f55d4cda769d394a6325213ba7f6ada}{start}}(\textcolor{keywordtype}{string}\ \$id,\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_size_1_1_test_size}{TestSize}}\ \$size\ =\ \textcolor{keyword}{null},\ \textcolor{keywordtype}{bool}\ \$clear\ =\ \textcolor{keyword}{false}):\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00164}00164\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$clear)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_aa821bec12eaa7e0f649397c9675ff505}{clear}}();}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \$this-\/>currentId\ \ \ =\ \$id;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \$this-\/>currentSize\ =\ \$size;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \$this-\/>driver-\/>start();}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \$this-\/>cachedReport\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00175}00175\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00180}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_abee6dbd979cee73f06fe0388a9a08867}{00180}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_abee6dbd979cee73f06fe0388a9a08867}{stop}}(\textcolor{keywordtype}{bool}\ \$append\ =\ \textcolor{keyword}{true},\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_status_1_1_test_status}{TestStatus}}\ \$status\ =\ \textcolor{keyword}{null},\ array|\textcolor{keyword}{false}\ \$linesToBeCovered\ =\ [],\ array\ \$linesToBeUsed\ =\ [],\ array\ \$linesToBeIgnored\ =\ []):\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_raw_code_coverage_data}{RawCodeCoverageData}}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00181}00181\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \$this-\/>driver-\/>stop();}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \$this-\/>linesToBeIgnored\ =\ array\_merge\_recursive(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>linesToBeIgnored,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \$linesToBeIgnored}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ab6188ae1280ff21ac8ff4c9307676e43}{append}}(\$data,\ \textcolor{keyword}{null},\ \$append,\ \$status,\ \$linesToBeCovered,\ \$linesToBeUsed,\ \$linesToBeIgnored);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \$this-\/>currentId\ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \$this-\/>currentSize\ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \$this-\/>cachedReport\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00196}00196\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00205}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ab6188ae1280ff21ac8ff4c9307676e43}{00205}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ab6188ae1280ff21ac8ff4c9307676e43}{append}}(\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_raw_code_coverage_data}{RawCodeCoverageData}}\ \$rawData,\ \textcolor{keywordtype}{string}\ \$id\ =\ \textcolor{keyword}{null},\ \textcolor{keywordtype}{bool}\ \$append\ =\ \textcolor{keyword}{true},\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_status_1_1_test_status}{TestStatus}}\ \$status\ =\ \textcolor{keyword}{null},\ array|\textcolor{keyword}{false}\ \$linesToBeCovered\ =\ [],\ array\ \$linesToBeUsed\ =\ [],\ array\ \$linesToBeIgnored\ =\ []):\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00206}00206\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$id\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \$id\ =\ \$this-\/>currentId;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$id\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_id_missing_exception}{TestIdMissingException}};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \$this-\/>cachedReport\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$status\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \$status\ =\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_status_1_1_test_status_ac9d917ac06a1cd255321076d72848406}{TestStatus::unknown}}();}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \$size\ =\ \$this-\/>currentSize;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$size\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \$size\ =\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_size_1_1_test_size_ac9d917ac06a1cd255321076d72848406}{TestSize::unknown}}();}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \$this-\/>applyFilter(\$rawData);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \$this-\/>applyExecutableLinesFilter(\$rawData);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>useAnnotationsForIgnoringCode)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>applyIgnoredLinesFilter(\$rawData,\ \$linesToBeIgnored);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \$this-\/>data-\/>initializeUnseenData(\$rawData);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$append)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$id\ ===\ self::UNCOVERED\_FILES)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \$this-\/>applyCoversAndUsesFilter(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \$rawData,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \$linesToBeCovered,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \$linesToBeUsed,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \$size}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$rawData-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_raw_code_coverage_data_abbb78851c14961a86ed06e3bef3b910e}{lineCoverage}}()))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \$this-\/>tests[\$id]\ =\ [}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'size'}\ \ \ =>\ \$size-\/>asString(),}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'status'}\ =>\ \$status-\/>asString(),}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \$this-\/>data-\/>markCodeAsExecutedByTestCase(\$id,\ \$rawData);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00262}00262\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00267}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a0e328b6815e48a30ca7e561bd22a3886}{00267}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a0e328b6815e48a30ca7e561bd22a3886}{merge}}(\textcolor{keyword}{self}\ \$that):\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00268}00268\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a8122d3c1ef2a61359b75a97363a4d89b}{filter}}-\/>includeFiles(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \$that-\/>filter()-\/>files()}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \$this-\/>data-\/>merge(\$that-\/>data);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \$this-\/>tests\ =\ array\_merge(\$this-\/>tests,\ \$that-\/>getTests());}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00276}00276\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \$this-\/>cachedReport\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00278}00278\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00280}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ae6b8bb9d651555a5a7a45a2686f7b077}{00280}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ae6b8bb9d651555a5a7a45a2686f7b077}{enableCheckForUnintentionallyCoveredCode}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00281}00281\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \$this-\/>checkForUnintentionallyCoveredCode\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00283}00283\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00285}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_afc9072c10fb6d70ae37c540217238dd9}{00285}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_afc9072c10fb6d70ae37c540217238dd9}{disableCheckForUnintentionallyCoveredCode}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00286}00286\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \$this-\/>checkForUnintentionallyCoveredCode\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00288}00288\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00290}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a71524e853a2860516537c55fe24a78e5}{00290}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a71524e853a2860516537c55fe24a78e5}{includeUncoveredFiles}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00291}00291\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a71524e853a2860516537c55fe24a78e5}{includeUncoveredFiles}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00293}00293\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00294}00294\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00295}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a61037da7f341e4b93d136b5cb8c446aa}{00295}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a61037da7f341e4b93d136b5cb8c446aa}{excludeUncoveredFiles}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00296}00296\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a71524e853a2860516537c55fe24a78e5}{includeUncoveredFiles}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00298}00298\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00300}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a722ae08d5bbbd3a415130cc2b507ffb5}{00300}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a722ae08d5bbbd3a415130cc2b507ffb5}{enableAnnotationsForIgnoringCode}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00301}00301\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00302}00302\ \ \ \ \ \ \ \ \ \$this-\/>useAnnotationsForIgnoringCode\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00303}00303\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00305}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a6c33e2e933dc28d2215704b693791199}{00305}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a6c33e2e933dc28d2215704b693791199}{disableAnnotationsForIgnoringCode}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00306}00306\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \$this-\/>useAnnotationsForIgnoringCode\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00308}00308\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00310}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a3af95559884700a0a8968d40d70d6d78}{00310}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a3af95559884700a0a8968d40d70d6d78}{ignoreDeprecatedCode}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00311}00311\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a3af95559884700a0a8968d40d70d6d78}{ignoreDeprecatedCode}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00313}00313\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00314}00314\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00315}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ad20b859a027106a0fcf508803dcb18dc}{00315}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ad20b859a027106a0fcf508803dcb18dc}{doNotIgnoreDeprecatedCode}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00316}00316\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a3af95559884700a0a8968d40d70d6d78}{ignoreDeprecatedCode}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00318}00318\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00323}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_aa590262f0b0b30560872a50950efe779}{00323}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_aa590262f0b0b30560872a50950efe779}{cachesStaticAnalysis}}():\ bool}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00324}00324\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00325}00325\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a4c12c8dc0fc629ea085b53e2bd3a3b17}{cacheDirectory}}\ !==\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00326}00326\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00328}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a8972f04f13a6c2d866b7d43a7e6ab35b}{00328}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a8972f04f13a6c2d866b7d43a7e6ab35b}{cacheStaticAnalysis}}(\textcolor{keywordtype}{string}\ \$directory):\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00329}00329\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a4c12c8dc0fc629ea085b53e2bd3a3b17}{cacheDirectory}}\ =\ \$directory;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00331}00331\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00333}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a55d7899d641b994fb4612d47825326b3}{00333}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a55d7899d641b994fb4612d47825326b3}{doNotCacheStaticAnalysis}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00334}00334\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a4c12c8dc0fc629ea085b53e2bd3a3b17}{cacheDirectory}}\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00336}00336\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00341}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a4c12c8dc0fc629ea085b53e2bd3a3b17}{00341}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a4c12c8dc0fc629ea085b53e2bd3a3b17}{cacheDirectory}}():\ string}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00342}00342\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_aa590262f0b0b30560872a50950efe779}{cachesStaticAnalysis}}())\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_cache_not_configured_exception}{StaticAnalysisCacheNotConfiguredException}}(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'The\ static\ analysis\ cache\ is\ not\ configured'}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00348}00348\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>cacheDirectory;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00350}00350\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00351}00351\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00355}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a7b757f5fad108bdee3a00d76ff1ba877}{00355}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a7b757f5fad108bdee3a00d76ff1ba877}{excludeSubclassesOfThisClassFromUnintentionallyCoveredCodeCheck}}(\textcolor{keywordtype}{string}\ \$className):\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00356}00356\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00357}00357\ \ \ \ \ \ \ \ \ \$this-\/>parentClassesExcludedFromUnintentionallyCoveredCodeCheck[]\ =\ \$className;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00358}00358\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00359}00359\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00360}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a4e76c5948cae4d53799966db73519816}{00360}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a4e76c5948cae4d53799966db73519816}{enableBranchAndPathCoverage}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00361}00361\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \$this-\/>driver-\/>enableBranchAndPathCoverage();}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00363}00363\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00365}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a6e7192129a3227d296cf7e7af66fce1d}{00365}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a6e7192129a3227d296cf7e7af66fce1d}{disableBranchAndPathCoverage}}():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00366}00366\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \$this-\/>driver-\/>disableBranchAndPathCoverage();}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00368}00368\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00369}00369\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00370}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ad0ba162f7cb3cfd0ed98c4d2ff49ea33}{00370}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ad0ba162f7cb3cfd0ed98c4d2ff49ea33}{collectsBranchAndPathCoverage}}():\ bool}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00371}00371\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>driver-\/>collectsBranchAndPathCoverage();}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00373}00373\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00375}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a6fbb967d808994947a5c57716e238727}{00375}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a6fbb967d808994947a5c57716e238727}{detectsDeadCode}}():\ bool}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00376}00376\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00377}00377\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>driver-\/>detectsDeadCode();}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00378}00378\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00379}00379\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00384}00384\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ applyCoversAndUsesFilter(\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_raw_code_coverage_data}{RawCodeCoverageData}}\ \$rawData,\ array|\textcolor{keyword}{false}\ \$linesToBeCovered,\ array\ \$linesToBeUsed,\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_size_1_1_test_size}{TestSize}}\ \$size):\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00385}00385\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$linesToBeCovered\ ===\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \ \ \ \ \$rawData-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_raw_code_coverage_data_aa821bec12eaa7e0f649397c9675ff505}{clear}}();}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00388}00388\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00391}00391\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$linesToBeCovered))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00395}00395\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00396}00396\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>checkForUnintentionallyCoveredCode\ \&\&\ !\$size-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_size_1_1_test_size_a2fb2cdcc4707037445dc5f7e60f3b527}{isMedium}}()\ \&\&\ !\$size-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_test_1_1_test_size_1_1_test_size_a1d7efe7edac17270d4af8dafe8e950ef}{isLarge}}())\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>performUnintentionallyCoveredCodeCheck(\$rawData,\ \$linesToBeCovered,\ \$linesToBeUsed);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00398}00398\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00399}00399\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00400}00400\ \ \ \ \ \ \ \ \ \$rawLineData\ \ \ \ \ \ \ \ \ =\ \$rawData-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_raw_code_coverage_data_abbb78851c14961a86ed06e3bef3b910e}{lineCoverage}}();}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \$filesWithNoCoverage\ =\ array\_diff\_key(\$rawLineData,\ \$linesToBeCovered);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00402}00402\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00403}00403\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (array\_keys(\$filesWithNoCoverage)\ as\ \$fileWithNoCoverage)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ \$rawData-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_raw_code_coverage_data_a6d0d3c7a5f25c41cc421252c1bb99d65}{removeCoverageDataForFile}}(\$fileWithNoCoverage);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00405}00405\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00406}00406\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00407}00407\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$linesToBeCovered))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$linesToBeCovered\ as\ \$fileToBeCovered\ =>\ \$includedLines)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$rawData-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_raw_code_coverage_data_a7a1b8373b16ad33202904cab7730b445}{keepLineCoverageDataOnlyForLines}}(\$fileToBeCovered,\ \$includedLines);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$rawData-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_raw_code_coverage_data_ad062b8b52ea4dc4d19a3585ce51320da}{keepFunctionCoverageDataOnlyForLines}}(\$fileToBeCovered,\ \$includedLines);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00412}00412\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00413}00413\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00414}00414\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00415}00415\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ applyFilter(RawCodeCoverageData\ \$data):\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00416}00416\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a8122d3c1ef2a61359b75a97363a4d89b}{filter}}-\/>isEmpty())\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00418}00418\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00419}00419\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00420}00420\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00421}00421\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (array\_keys(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}-\/>lineCoverage())\ as\ \$filename)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00422}00422\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a8122d3c1ef2a61359b75a97363a4d89b}{filter}}-\/>isExcluded(\$filename))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}-\/>removeCoverageDataForFile(\$filename);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00426}00426\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00428}00428\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ applyExecutableLinesFilter(RawCodeCoverageData\ \$data):\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00429}00429\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (array\_keys(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}-\/>lineCoverage())\ as\ \$filename)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a8122d3c1ef2a61359b75a97363a4d89b}{filter}}-\/>isFile(\$filename))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00434}00434\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \$linesToBranchMap\ =\ \$this-\/>analyser()-\/>executableLinesIn(\$filename);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}-\/>keepLineCoverageDataOnlyForLines(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$filename,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_keys(\$linesToBranchMap)}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}-\/>markExecutableLineByBranch(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$filename,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$linesToBranchMap}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00445}00445\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00446}00446\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00447}00447\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00448}00448\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00452}00452\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ applyIgnoredLinesFilter(RawCodeCoverageData\ \$data,\ array\ \$linesToBeIgnored):\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00453}00453\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (array\_keys(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}-\/>lineCoverage())\ as\ \$filename)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a8122d3c1ef2a61359b75a97363a4d89b}{filter}}-\/>isFile(\$filename))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00458}00458\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$linesToBeIgnored[\$filename]))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}-\/>removeCoverageDataForLines(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$filename,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$linesToBeIgnored[\$filename]}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00465}00465\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}-\/>removeCoverageDataForLines(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00467}00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$filename,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00468}00468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>analyser()-\/>ignoredLinesFor(\$filename)}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00470}00470\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00471}00471\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00472}00472\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00476}00476\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ addUncoveredFilesFromFilter():\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00477}00477\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \$uncoveredFiles\ =\ array\_diff(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a8122d3c1ef2a61359b75a97363a4d89b}{filter}}-\/>files(),}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>data-\/>coveredFiles()}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00482}00482\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00483}00483\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$uncoveredFiles\ as\ \$uncoveredFile)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_file(\$uncoveredFile))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_ab6188ae1280ff21ac8ff4c9307676e43}{append}}(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00486}00486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_data_1_1_raw_code_coverage_data_af30f0be2ad60ba8686e0dfa758810c3f}{RawCodeCoverageData::fromUncoveredFile}}(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00487}00487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$uncoveredFile,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>analyser()}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00490}00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self::UNCOVERED\_FILES,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00491}00491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ linesToBeIgnored:\ \$this-\/>linesToBeIgnored}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00492}00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00493}00493\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00495}00495\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00496}00496\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00501}00501\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ performUnintentionallyCoveredCodeCheck(RawCodeCoverageData\ \$data,\ array\ \$linesToBeCovered,\ array\ \$linesToBeUsed):\ void}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00502}00502\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00503}00503\ \ \ \ \ \ \ \ \ \$allowedLines\ =\ \$this-\/>getAllowedLines(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \$linesToBeCovered,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \ \ \ \$linesToBeUsed}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00506}00506\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00507}00507\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00508}00508\ \ \ \ \ \ \ \ \ \$unintentionallyCoveredUnits\ =\ [];}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}-\/>lineCoverage()\ as\ \$file\ =>\ \$\_data)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$\_data\ as\ \$line\ =>\ \$flag)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$flag\ ===\ 1\ \&\&\ !isset(\$allowedLines[\$file][\$line]))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$unintentionallyCoveredUnits[]\ =\ \$this-\/>wizard-\/>lookup(\$file,\ \$line);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00517}00517\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00518}00518\ \ \ \ \ \ \ \ \ \$unintentionallyCoveredUnits\ =\ \$this-\/>processUnintentionallyCoveredUnits(\$unintentionallyCoveredUnits);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00519}00519\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!empty(\$unintentionallyCoveredUnits))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ UnintentionallyCoveredCodeException(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$unintentionallyCoveredUnits}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00524}00524\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00525}00525\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00526}00526\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00527}00527\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getAllowedLines(array\ \$linesToBeCovered,\ array\ \$linesToBeUsed):\ array}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00528}00528\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \$allowedLines\ =\ [];}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00530}00530\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (array\_keys(\$linesToBeCovered)\ as\ \$file)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$allowedLines[\$file]))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00533}00533\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$allowedLines[\$file]\ =\ [];}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00535}00535\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ \$allowedLines[\$file]\ =\ array\_merge(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00537}00537\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$allowedLines[\$file],}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00538}00538\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$linesToBeCovered[\$file]}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00539}00539\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00541}00541\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (array\_keys(\$linesToBeUsed)\ as\ \$file)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00543}00543\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$allowedLines[\$file]))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$allowedLines[\$file]\ =\ [];}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00546}00546\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00547}00547\ \ \ \ \ \ \ \ \ \ \ \ \ \$allowedLines[\$file]\ =\ array\_merge(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00548}00548\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$allowedLines[\$file],}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$linesToBeUsed[\$file]}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00550}00550\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00551}00551\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00552}00552\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00553}00553\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (array\_keys(\$allowedLines)\ as\ \$file)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00554}00554\ \ \ \ \ \ \ \ \ \ \ \ \ \$allowedLines[\$file]\ =\ array\_flip(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00555}00555\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_unique(\$allowedLines[\$file])}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00556}00556\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00557}00557\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00558}00558\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00559}00559\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$allowedLines;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00560}00560\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00561}00561\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00569}00569\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ processUnintentionallyCoveredUnits(array\ \$unintentionallyCoveredUnits):\ array}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00570}00570\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00571}00571\ \ \ \ \ \ \ \ \ \$unintentionallyCoveredUnits\ =\ array\_unique(\$unintentionallyCoveredUnits);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00572}00572\ \ \ \ \ \ \ \ \ \$processed\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ [];}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00573}00573\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00574}00574\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$unintentionallyCoveredUnits\ as\ \$unintentionallyCoveredUnit)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00575}00575\ \ \ \ \ \ \ \ \ \ \ \ \ \$tmp\ =\ explode(\textcolor{stringliteral}{'::'},\ \$unintentionallyCoveredUnit);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00576}00576\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$tmp)\ !==\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00578}00578\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$processed[]\ =\ \$unintentionallyCoveredUnit;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00579}00579\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00580}00580\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00582}00582\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00583}00583\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}\ =\ \textcolor{keyword}{new}\ ReflectionClass(\$tmp[0]);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00585}00585\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00586}00586\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>parentClassesExcludedFromUnintentionallyCoveredCodeCheck\ as\ \$parentClass)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00587}00587\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}-\/>isSubclassOf(\$parentClass))\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00588}00588\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}\ 2;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00589}00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00590}00590\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00591}00591\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)ReflectionException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00592}00592\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ ReflectionException(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00593}00593\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$e-\/>getMessage(),}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00594}00594\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$e-\/>getCode(),}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00595}00595\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$e}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00597}00597\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00598}00598\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00599}00599\ \ \ \ \ \ \ \ \ \ \ \ \ \$processed[]\ =\ \$tmp[0];}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00600}00600\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00601}00601\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00602}00602\ \ \ \ \ \ \ \ \ \$processed\ =\ array\_unique(\$processed);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00603}00603\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00604}00604\ \ \ \ \ \ \ \ \ sort(\$processed);}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00605}00605\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00606}00606\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$processed;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00607}00607\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00608}00608\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00609}00609\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ analyser():\ FileAnalyser}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00610}00610\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>analyser\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00612}00612\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>analyser;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00613}00613\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00614}00614\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00615}00615\ \ \ \ \ \ \ \ \ \$this-\/>analyser\ =\ \textcolor{keyword}{new}\ ParsingFileAnalyser(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00616}00616\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>useAnnotationsForIgnoringCode,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00617}00617\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a3af95559884700a0a8968d40d70d6d78}{ignoreDeprecatedCode}}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00618}00618\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00619}00619\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00620}00620\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_aa590262f0b0b30560872a50950efe779}{cachesStaticAnalysis}}())\ \{}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>analyser\ =\ \textcolor{keyword}{new}\ CachingFileAnalyser(}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a4c12c8dc0fc629ea085b53e2bd3a3b17}{cacheDirectory}},}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00623}00623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>analyser,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>useAnnotationsForIgnoringCode,}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00625}00625\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_code_coverage_a3af95559884700a0a8968d40d70d6d78}{ignoreDeprecatedCode}}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00626}00626\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00627}00627\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00628}00628\ }
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00629}00629\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>analyser;}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00630}00630\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{php-code-coverage_2src_2_code_coverage_8php_source_l00631}00631\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,186 @@
+\doxysection{Logger.\+php}
+\hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source}{}\label{symfony_2http-kernel_2_log_2_logger_8php_source}\index{vendor/symfony/http-\/kernel/Log/Logger.php@{vendor/symfony/http-\/kernel/Log/Logger.php}}
+\mbox{\hyperlink{symfony_2http-kernel_2_log_2_logger_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_http_kernel_1_1_log}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)Log}};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_psr_1_1_log_1_1_abstract_logger}{Psr\(\backslash\)Log\(\backslash\)AbstractLogger}};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_psr_1_1_log_1_1_invalid_argument_exception}{Psr\(\backslash\)Log\(\backslash\)InvalidArgumentException}};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_psr_1_1_log_1_1_log_level}{Psr\(\backslash\)Log\(\backslash\)LogLevel}};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)Request}};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request_stack}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)RequestStack}};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00025}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger}{00025}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger}{Logger}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_psr_1_1_log_1_1_abstract_logger}{AbstractLogger}}\ implements\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_debug_logger_interface}{DebugLoggerInterface}}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00026}00026\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00027}00027\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ LEVELS\ =\ [}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00028}00028\ \ \ \ \ \ \ \ \ LogLevel::DEBUG\ =>\ 0,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00029}00029\ \ \ \ \ \ \ \ \ LogLevel::INFO\ =>\ 1,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00030}00030\ \ \ \ \ \ \ \ \ LogLevel::NOTICE\ =>\ 2,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00031}00031\ \ \ \ \ \ \ \ \ LogLevel::WARNING\ =>\ 3,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00032}00032\ \ \ \ \ \ \ \ \ LogLevel::ERROR\ =>\ 4,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00033}00033\ \ \ \ \ \ \ \ \ LogLevel::CRITICAL\ =>\ 5,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00034}00034\ \ \ \ \ \ \ \ \ LogLevel::ALERT\ =>\ 6,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00035}00035\ \ \ \ \ \ \ \ \ LogLevel::EMERGENCY\ =>\ 7,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00036}00036\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00037}00037\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ PRIORITIES\ =\ [}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00038}00038\ \ \ \ \ \ \ \ \ LogLevel::DEBUG\ =>\ 100,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ LogLevel::INFO\ =>\ 200,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ LogLevel::NOTICE\ =>\ 250,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ LogLevel::WARNING\ =>\ 300,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ LogLevel::ERROR\ =>\ 400,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ LogLevel::CRITICAL\ =>\ 500,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ LogLevel::ALERT\ =>\ 550,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ LogLevel::EMERGENCY\ =>\ 600,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00046}00046\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00048}00048\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$minLevelIndex;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00049}00049\ \ \ \ \ private\ \(\backslash\)Closure\ \$formatter;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00050}00050\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$debug\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00051}00051\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$logs\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00052}00052\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$errorCount\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00055}00055\ \ \ \ \ \textcolor{keyword}{private}\ \$handle;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00060}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger_ab4413127b057661457b451e1171c0b95}{00060}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger_ab4413127b057661457b451e1171c0b95}{\_\_construct}}(\textcolor{keywordtype}{string}\ \$minLevel\ =\ \textcolor{keyword}{null},\ \$output\ =\ \textcolor{keyword}{null},\ callable\ \$formatter\ =\ \textcolor{keyword}{null},\ \textcolor{keyword}{private}\ readonly\ ?\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request_stack}{RequestStack}}\ \$requestStack\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00061}00061\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$minLevel)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \$minLevel\ =\ \textcolor{keyword}{null}\ ===\ \$output\ ||\ \textcolor{stringliteral}{'php://stdout'}\ ===\ \$output\ ||\ \textcolor{stringliteral}{'php://stderr'}\ ===\ \$output\ ?\ LogLevel::ERROR\ :\ LogLevel::WARNING;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$\_ENV[\textcolor{stringliteral}{'SHELL\_VERBOSITY'}])\ ||\ isset(\$\_SERVER[\textcolor{stringliteral}{'SHELL\_VERBOSITY'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$minLevel\ =\ match\ ((\textcolor{keywordtype}{int})\ (\$\_ENV[\textcolor{stringliteral}{'SHELL\_VERBOSITY'}]\ ??\ \$\_SERVER[\textcolor{stringliteral}{'SHELL\_VERBOSITY'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/1\ =>\ LogLevel::ERROR,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 1\ =>\ LogLevel::NOTICE,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 2\ =>\ LogLevel::INFO,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 3\ =>\ LogLevel::DEBUG,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}\ =>\ \$minLevel,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(self::LEVELS[\$minLevel]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psr_1_1_log_1_1_invalid_argument_exception}{InvalidArgumentException}}(sprintf(\textcolor{stringliteral}{'The\ log\ level\ "{}\%s"{}\ does\ not\ exist.'},\ \$minLevel));}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \$this-\/>minLevelIndex\ =\ self::LEVELS[\$minLevel];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \$this-\/>formatter\ =\ \textcolor{keyword}{null}\ !==\ \$formatter\ ?\ \$formatter(...)\ :\ \$this-\/>format(...);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$output\ \&\&\ \textcolor{keyword}{false}\ ===\ \$this-\/>handle\ =\ \(\backslash\)is\_resource(\$output)\ ?\ \$output\ :\ @fopen(\$output,\ \textcolor{charliteral}{'a'}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psr_1_1_log_1_1_invalid_argument_exception}{InvalidArgumentException}}(sprintf(\textcolor{stringliteral}{'Unable\ to\ open\ "{}\%s"{}.'},\ \$output));}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00085}00085\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00087}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger_a942b0cfbc1005c9bb0a5f2b0f7d25a25}{00087}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger_a942b0cfbc1005c9bb0a5f2b0f7d25a25}{enableDebug}}():\ void}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00088}00088\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{interface_psr_1_1_log_1_1_logger_interface_a9f4d565c7cf96fd112241bf91b224b5b}{debug}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00090}00090\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00092}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger_ad320d8ce87763c6e2d94b69584ccae3f}{00092}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger_ad320d8ce87763c6e2d94b69584ccae3f}{log}}(\$level,\ \$message,\ array\ \$context\ =\ []):\ void}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00093}00093\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(self::LEVELS[\$level]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psr_1_1_log_1_1_invalid_argument_exception}{InvalidArgumentException}}(sprintf(\textcolor{stringliteral}{'The\ log\ level\ "{}\%s"{}\ does\ not\ exist.'},\ \$level));}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (self::LEVELS[\$level]\ <\ \$this-\/>minLevelIndex)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \$formatter\ =\ \$this-\/>formatter;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>handle)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ @fwrite(\$this-\/>handle,\ \$formatter(\$level,\ \$message,\ \$context).\(\backslash\)PHP\_EOL);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ error\_log(\$formatter(\$level,\ \$message,\ \$context,\ \textcolor{keyword}{false}));}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{interface_psr_1_1_log_1_1_logger_interface_a9f4d565c7cf96fd112241bf91b224b5b}{debug}}\ \&\&\ \$this-\/>requestStack)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>record(\$level,\ \$message,\ \$context);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00112}00112\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00114}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger_a0a6960e6e1892177fb6ec98519608284}{00114}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger_a0a6960e6e1892177fb6ec98519608284}{getLogs}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request\ =\ \textcolor{keyword}{null}):\ array}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00115}00115\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$request)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>logs[spl\_object\_id(\$request)]\ ??\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_merge(...array\_values(\$this-\/>logs));}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00121}00121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00123}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger_a3e3357e47f469f57159279f091056014}{00123}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger_a3e3357e47f469f57159279f091056014}{countErrors}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request\ =\ \textcolor{keyword}{null}):\ int}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00124}00124\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$request)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>errorCount[spl\_object\_id(\$request)]\ ??\ 0;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_sum(\$this-\/>errorCount);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00130}00130\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00132}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger_aa821bec12eaa7e0f649397c9675ff505}{00132}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_log_1_1_logger_aa821bec12eaa7e0f649397c9675ff505}{clear}}():\ void}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00133}00133\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \$this-\/>logs\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \$this-\/>errorCount\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00136}00136\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00138}00138\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ format(\textcolor{keywordtype}{string}\ \$level,\ \textcolor{keywordtype}{string}\ \$message,\ array\ \$context,\ \textcolor{keywordtype}{bool}\ \$prefixDate\ =\ \textcolor{keyword}{true}):\ string}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00139}00139\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$message,\ \textcolor{charliteral}{'\{'}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \$replacements\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$context\ as\ \$key\ =>\ \$val)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$val\ ||\ \(\backslash\)is\_scalar(\$val)\ ||\ \$val\ instanceof\ \(\backslash\)Stringable)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$replacements[\textcolor{stringliteral}{"{}\{\{\$key\}\}"{}}]\ =\ \$val;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$val\ instanceof\ \(\backslash\)DateTimeInterface)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$replacements[\textcolor{stringliteral}{"{}\{\{\$key\}\}"{}}]\ =\ \$val-\/>format(\(\backslash\)DateTimeInterface::RFC3339);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\(\backslash\)is\_object(\$val))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$replacements[\textcolor{stringliteral}{"{}\{\{\$key\}\}"{}}]\ =\ \textcolor{stringliteral}{'[object\ '}.\$val::class.\textcolor{charliteral}{']'};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$replacements[\textcolor{stringliteral}{"{}\{\{\$key\}\}"{}}]\ =\ \textcolor{charliteral}{'['}.\(\backslash\)gettype(\$val).\textcolor{charliteral}{']'};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ strtr(\$message,\ \$replacements);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \$log\ =\ sprintf(\textcolor{stringliteral}{'[\%s]\ \%s'},\ \$level,\ \$message);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$prefixDate)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \$log\ =\ date(\(\backslash\)DateTimeInterface::RFC3339).\textcolor{charliteral}{'\ '}.\$log;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$log;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00163}00163\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00165}00165\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ record(\$level,\ \$message,\ array\ \$context):\ void}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00166}00166\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \$request\ =\ \$this-\/>requestStack-\/>getCurrentRequest();}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \$key\ =\ \$request\ ?\ spl\_object\_id(\$request)\ :\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \$this-\/>logs[\$key][]\ =\ [}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'channel'}\ =>\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'context'}\ =>\ \$context,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'message'}\ =>\ \$message,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'priority'}\ =>\ self::PRIORITIES[\$level],}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'priorityName'}\ =>\ \$level,}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'timestamp'}\ =>\ time(),}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'timestamp\_rfc3339'}\ =>\ date(\(\backslash\)DATE\_RFC3339\_EXTENDED),}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \$this-\/>errorCount[\$key]\ ??=\ 0;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$level)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ LogLevel::ERROR:}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ LogLevel::CRITICAL:}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ LogLevel::ALERT:}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ LogLevel::EMERGENCY:}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\$this-\/>errorCount[\$key];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00188}00188\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_log_2_logger_8php_source_l00189}00189\ \}}
+
+\end{DoxyCode}

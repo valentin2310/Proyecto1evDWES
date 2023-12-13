@@ -1,0 +1,579 @@
+\doxysection{Strings.\+php}
+\hypertarget{_strings_8php_source}{}\label{_strings_8php_source}\index{vendor/nette/utils/src/Utils/Strings.php@{vendor/nette/utils/src/Utils/Strings.php}}
+\mbox{\hyperlink{_strings_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00008}00008\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_nette_1_1_utils}{Nette\(\backslash\)Utils}};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00012}00012\ use\ JetBrains\(\backslash\)PhpStorm\(\backslash\)Language;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00013}00013\ use\ \mbox{\hyperlink{namespace_nette}{Nette}};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ is\_array,\ is\_object,\ strlen;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00020}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings}{00020}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings}{Strings}}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00021}00021\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00022}00022\ \ \ \ \ use\ Nette\(\backslash\)StaticClass;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00024}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a5db9c9b482ef4de978d300faacdb1d0c}{00024}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a5db9c9b482ef4de978d300faacdb1d0c}{TrimCharacters}}\ =\ \textcolor{stringliteral}{"{}\ \(\backslash\)t\(\backslash\)n\(\backslash\)r\(\backslash\)0\(\backslash\)x0B\(\backslash\)u\{A0\}"{}};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00027}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a8d799a150015bf1680c87c9a88e1ea3f}{00027}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a8d799a150015bf1680c87c9a88e1ea3f}{TRIM\_CHARACTERS}}\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a5db9c9b482ef4de978d300faacdb1d0c}{self::TrimCharacters}};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00033}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ac389ff4e25c98b7708d452e633963e1f}{00033}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ac389ff4e25c98b7708d452e633963e1f}{checkEncoding}}(\textcolor{keywordtype}{string}\ \$s):\ bool}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00034}00034\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$s\ ===\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aa47608d8c93ad0617126d4cefc4a9f11}{self::fixEncoding}}(\$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00036}00036\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00042}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aa47608d8c93ad0617126d4cefc4a9f11}{00042}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aa47608d8c93ad0617126d4cefc4a9f11}{fixEncoding}}(\textcolor{keywordtype}{string}\ \$s):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00043}00043\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ removes\ xD800-\/xDFFF,\ x110000\ and\ higher}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ htmlspecialchars\_decode(htmlspecialchars(\$s,\ ENT\_NOQUOTES\ |\ ENT\_IGNORE,\ \textcolor{stringliteral}{'UTF-\/8'}),\ ENT\_NOQUOTES);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00046}00046\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00053}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a24ff2a9288e8e767ae56299f594d6099}{00053}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a24ff2a9288e8e767ae56299f594d6099}{chr}}(\textcolor{keywordtype}{int}\ \$code):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00054}00054\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$code\ <\ 0\ ||\ (\$code\ >=\ 0xD800\ \&\&\ \$code\ <=\ 0xDFFF)\ ||\ \$code\ >\ 0x10FFFF)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_nette_1_1_invalid_argument_exception}{Nette\(\backslash\)InvalidArgumentException}}(\textcolor{stringliteral}{'Code\ point\ must\ be\ in\ range\ 0x0\ to\ 0xD7FF\ or\ 0xE000\ to\ 0x10FFFF.'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \}\ elseif\ (!extension\_loaded(\textcolor{stringliteral}{'iconv'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_nette_1_1_not_supported_exception}{Nette\(\backslash\)NotSupportedException}}(\_\_METHOD\_\_\ .\ \textcolor{stringliteral}{'()\ requires\ ICONV\ extension\ that\ is\ not\ loaded.'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ iconv(\textcolor{stringliteral}{'UTF-\/32BE'},\ \textcolor{stringliteral}{'UTF-\/8//IGNORE'},\ pack(\textcolor{charliteral}{'N'},\ \$code));}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00068}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ab53aa465c9c7393a9dc3ad96686bfa25}{00068}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ab53aa465c9c7393a9dc3ad96686bfa25}{ord}}(\textcolor{keywordtype}{string}\ \$c):\ int}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00069}00069\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!extension\_loaded(\textcolor{stringliteral}{'iconv'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_nette_1_1_not_supported_exception}{Nette\(\backslash\)NotSupportedException}}(\_\_METHOD\_\_\ .\ \textcolor{stringliteral}{'()\ requires\ ICONV\ extension\ that\ is\ not\ loaded.'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \$tmp\ =\ iconv(\textcolor{stringliteral}{'UTF-\/8'},\ \textcolor{stringliteral}{'UTF-\/32BE//IGNORE'},\ \$c);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$tmp)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_nette_1_1_invalid_argument_exception}{Nette\(\backslash\)InvalidArgumentException}}(\textcolor{stringliteral}{'Invalid\ UTF-\/8\ character\ "{}'}\ .\ (\$c\ ===\ \textcolor{stringliteral}{''}\ ?\ \textcolor{stringliteral}{''}\ :\ \textcolor{charliteral}{'\(\backslash\)x'}\ .\ strtoupper(bin2hex(\$c)))\ .\ \textcolor{stringliteral}{'"{}.'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ unpack(\textcolor{charliteral}{'N'},\ \$tmp)[1];}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00080}00080\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00086}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a155e158a30306cdc59190c6cff1ccfb8}{00086}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a155e158a30306cdc59190c6cff1ccfb8}{startsWith}}(\textcolor{keywordtype}{string}\ \$haystack,\ \textcolor{keywordtype}{string}\ \$needle):\ bool}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00087}00087\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str\_starts\_with(\$haystack,\ \$needle);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00089}00089\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00095}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a2549562216f3498de2fb3645a6fb10e0}{00095}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a2549562216f3498de2fb3645a6fb10e0}{endsWith}}(\textcolor{keywordtype}{string}\ \$haystack,\ \textcolor{keywordtype}{string}\ \$needle):\ bool}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00096}00096\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str\_ends\_with(\$haystack,\ \$needle);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00098}00098\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00104}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ac8d5aa5464d266ae0a8fdba5d6af5c25}{00104}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ac8d5aa5464d266ae0a8fdba5d6af5c25}{contains}}(\textcolor{keywordtype}{string}\ \$haystack,\ \textcolor{keywordtype}{string}\ \$needle):\ bool}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00105}00105\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str\_contains(\$haystack,\ \$needle);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00114}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a04ec11e7845ee5b93cdb92fd9160a0d2}{00114}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a04ec11e7845ee5b93cdb92fd9160a0d2}{substring}}(\textcolor{keywordtype}{string}\ \$s,\ \textcolor{keywordtype}{int}\ \$start,\ ?\textcolor{keywordtype}{int}\ \$length\ =\ \textcolor{keyword}{null}):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00115}00115\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (function\_exists(\textcolor{stringliteral}{'mb\_substr'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ mb\_substr(\$s,\ \$start,\ \$length,\ \textcolor{stringliteral}{'UTF-\/8'});\ \textcolor{comment}{//\ MB\ is\ much\ faster}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \}\ elseif\ (!extension\_loaded(\textcolor{stringliteral}{'iconv'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_nette_1_1_not_supported_exception}{Nette\(\backslash\)NotSupportedException}}(\_\_METHOD\_\_\ .\ \textcolor{stringliteral}{'()\ requires\ extension\ ICONV\ or\ MBSTRING,\ neither\ is\ loaded.'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$length\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \$length\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9db0cba2a9b64e0d7eeadea120d6e750}{self::length}}(\$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$start\ <\ 0\ \&\&\ \$length\ <\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \$start\ +=\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9db0cba2a9b64e0d7eeadea120d6e750}{self::length}}(\$s);\ \textcolor{comment}{//\ unifies\ iconv\_substr\ behavior\ with\ mb\_substr}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ iconv\_substr(\$s,\ \$start,\ \$length,\ \textcolor{stringliteral}{'UTF-\/8'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00127}00127\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00134}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a6423e463392e6287014144c5be06bb7f}{00134}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a6423e463392e6287014144c5be06bb7f}{normalize}}(\textcolor{keywordtype}{string}\ \$s):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00135}00135\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ convert\ to\ compressed\ normal\ form\ (NFC)}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (class\_exists(\textcolor{stringliteral}{'Normalizer'},\ \textcolor{keyword}{false})\ \&\&\ (\$n\ =\ \(\backslash\)\mbox{\hyperlink{class_symfony_1_1_polyfill_1_1_intl_1_1_normalizer_1_1_normalizer_a590efec66fbd14223923c425c02fe488}{Normalizer::normalize}}(\$s,\ \(\backslash\)\mbox{\hyperlink{class_normalizer_a8ea48b092538b3ffa5464a9ef8b757e3}{Normalizer::FORM\_C}}))\ !==\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ \$n;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \$s\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a548d96abd9e3c13f2504a7fd31ea7ca5}{self::unixNewLines}}(\$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ remove\ control\ characters;\ leave\ \(\backslash\)t\ +\ \(\backslash\)n}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \$s\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{self::pcre}}(\textcolor{stringliteral}{'preg\_replace'},\ [\textcolor{stringliteral}{'\#[\(\backslash\)x00-\/\(\backslash\)x08\(\backslash\)x0B-\/\(\backslash\)x1F\(\backslash\)x7F-\/\(\backslash\)x9F]+\#u'},\ \textcolor{stringliteral}{''},\ \$s]);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ right\ trim}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \$s\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{self::pcre}}(\textcolor{stringliteral}{'preg\_replace'},\ [\textcolor{stringliteral}{'\#[\(\backslash\)t\ ]+\$\#m'},\ \textcolor{stringliteral}{''},\ \$s]);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ leading\ and\ trailing\ blank\ lines}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \$s\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a5d69a54563d1a732331a2dd03b73a18b}{trim}}(\$s,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$s;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00153}00153\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00157}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a2859fdbeb43db49c5648792e21398b1e}{00157}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a2859fdbeb43db49c5648792e21398b1e}{normalizeNewLines}}(\textcolor{keywordtype}{string}\ \$s):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00158}00158\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a548d96abd9e3c13f2504a7fd31ea7ca5}{self::unixNewLines}}(\$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00160}00160\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00167}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a548d96abd9e3c13f2504a7fd31ea7ca5}{00167}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a548d96abd9e3c13f2504a7fd31ea7ca5}{unixNewLines}}(\textcolor{keywordtype}{string}\ \$s):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00168}00168\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ preg\_replace(\textcolor{stringliteral}{"{}\string~\(\backslash\)r\(\backslash\)n?|\(\backslash\)u\{2028\}|\(\backslash\)u\{2029\}\string~"{}},\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ \$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00170}00170\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00177}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a6e01933296f93538d987e51c2a8b5ad0}{00177}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a6e01933296f93538d987e51c2a8b5ad0}{platformNewLines}}(\textcolor{keywordtype}{string}\ \$s):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00178}00178\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ preg\_replace(\textcolor{stringliteral}{"{}\string~\(\backslash\)r\(\backslash\)n?|\(\backslash\)n|\(\backslash\)u\{2028\}|\(\backslash\)u\{2029\}\string~"{}},\ PHP\_EOL,\ \$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00180}00180\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00186}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ac648255fe21f6ebe6def44068ab92525}{00186}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ac648255fe21f6ebe6def44068ab92525}{toAscii}}(\textcolor{keywordtype}{string}\ \$s):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00187}00187\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \$iconv\ =\ defined(\textcolor{stringliteral}{'ICONV\_IMPL'})\ ?\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a5d69a54563d1a732331a2dd03b73a18b}{trim}}(ICONV\_IMPL,\ \textcolor{stringliteral}{'"{}\(\backslash\)''})\ :\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \$transliterator\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$transliterator\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (class\_exists(\textcolor{stringliteral}{'Transliterator'},\ \textcolor{keyword}{false}))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$transliterator\ =\ \(\backslash\)Transliterator::create(\textcolor{stringliteral}{'Any-\/Latin;\ Latin-\/ASCII'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ trigger\_error(\_\_METHOD\_\_\ .\ \textcolor{stringliteral}{"{}():\ it\ is\ recommended\ to\ enable\ PHP\ extensions\ 'intl'."{}},\ E\_USER\_NOTICE);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$transliterator\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ remove\ control\ characters\ and\ check\ UTF-\/8\ validity}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \$s\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{self::pcre}}(\textcolor{stringliteral}{'preg\_replace'},\ [\textcolor{stringliteral}{'\#[\string^\(\backslash\)x09\(\backslash\)x0A\(\backslash\)x0D\(\backslash\)x20-\/\(\backslash\)x7E\(\backslash\)xA0-\/\(\backslash\)x\{2FF\}\(\backslash\)x\{370\}-\/\(\backslash\)x\{10FFFF\}]\#u'},\ \textcolor{stringliteral}{''},\ \$s]);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ transliteration\ (by\ Transliterator\ and\ iconv)\ is\ not\ optimal,\ replace\ some\ characters\ directly}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \$s\ =\ strtr(\$s,\ [\textcolor{stringliteral}{"{}\(\backslash\)u\{201E\}"{}}\ =>\ \textcolor{charliteral}{'"{}'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{201C\}"{}}\ =>\ \textcolor{charliteral}{'"{}'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{201D\}"{}}\ =>\ \textcolor{charliteral}{'"{}'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{201A\}"{}}\ =>\ \textcolor{stringliteral}{"{}'"{}},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2018\}"{}}\ =>\ \textcolor{stringliteral}{"{}'"{}},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2019\}"{}}\ =>\ \textcolor{stringliteral}{"{}'"{}},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{B0\}"{}}\ =>\ \textcolor{charliteral}{'\string^'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{42F\}"{}}\ =>\ \textcolor{stringliteral}{'Ya'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{44F\}"{}}\ =>\ \textcolor{stringliteral}{'ya'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{42E\}"{}}\ =>\ \textcolor{stringliteral}{'Yu'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{44E\}"{}}\ =>\ \textcolor{stringliteral}{'yu'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{c4\}"{}}\ =>\ \textcolor{stringliteral}{'Ae'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{d6\}"{}}\ =>\ \textcolor{stringliteral}{'Oe'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{dc\}"{}}\ =>\ \textcolor{stringliteral}{'Ue'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{1e9e\}"{}}\ =>\ \textcolor{stringliteral}{'Ss'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{e4\}"{}}\ =>\ \textcolor{stringliteral}{'ae'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{f6\}"{}}\ =>\ \textcolor{stringliteral}{'oe'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{fc\}"{}}\ =>\ \textcolor{stringliteral}{'ue'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{df\}"{}}\ =>\ \textcolor{stringliteral}{'ss'}]);\ \textcolor{comment}{//\ „\ “\ ”\ ‚\ ‘\ ’\ °\ Я\ я\ Ю\ ю\ Ä\ Ö\ Ü\ ẞ\ ä\ ö\ ü\ ß}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$iconv\ !==\ \textcolor{stringliteral}{'libiconv'})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ strtr(\$s,\ [\textcolor{stringliteral}{"{}\(\backslash\)u\{AE\}"{}}\ =>\ \textcolor{stringliteral}{'(R)'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{A9\}"{}}\ =>\ \textcolor{stringliteral}{'(c)'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2026\}"{}}\ =>\ \textcolor{stringliteral}{'...'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{AB\}"{}}\ =>\ \textcolor{stringliteral}{'<<'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{BB\}"{}}\ =>\ \textcolor{stringliteral}{'>>'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{A3\}"{}}\ =>\ \textcolor{stringliteral}{'lb'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{A5\}"{}}\ =>\ \textcolor{stringliteral}{'yen'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{B2\}"{}}\ =>\ \textcolor{stringliteral}{'\string^2'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{B3\}"{}}\ =>\ \textcolor{stringliteral}{'\string^3'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{B5\}"{}}\ =>\ \textcolor{charliteral}{'u'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{B9\}"{}}\ =>\ \textcolor{stringliteral}{'\string^1'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{BA\}"{}}\ =>\ \textcolor{charliteral}{'o'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{BF\}"{}}\ =>\ \textcolor{charliteral}{'?'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2CA\}"{}}\ =>\ \textcolor{stringliteral}{"{}'"{}},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2CD\}"{}}\ =>\ \textcolor{charliteral}{'\_'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2DD\}"{}}\ =>\ \textcolor{charliteral}{'"{}'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{1FEF\}"{}}\ =>\ \textcolor{stringliteral}{''},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{20AC\}"{}}\ =>\ \textcolor{stringliteral}{'EUR'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2122\}"{}}\ =>\ \textcolor{stringliteral}{'TM'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{212E\}"{}}\ =>\ \textcolor{charliteral}{'e'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2190\}"{}}\ =>\ \textcolor{stringliteral}{'<-\/'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2191\}"{}}\ =>\ \textcolor{charliteral}{'\string^'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2192\}"{}}\ =>\ \textcolor{stringliteral}{'-\/>'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2193\}"{}}\ =>\ \textcolor{charliteral}{'V'},\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2194\}"{}}\ =>\ \textcolor{stringliteral}{'<-\/>'}]);\ \textcolor{comment}{//\ ®\ ©\ …\ «\ »\ £\ ¥\ ²\ ³\ µ\ ¹\ º\ ¿\ ˊ\ ˍ\ ˝\ `\ €\ ™\ ℮\ ←\ ↑\ →\ ↓\ ↔}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$transliterator)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ \$transliterator-\/>transliterate(\$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ use\ iconv\ because\ The\ transliterator\ leaves\ some\ characters\ out\ of\ ASCII,\ eg\ →\ ʾ}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$iconv\ ===\ \textcolor{stringliteral}{'glibc'})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ strtr(\$s,\ \textcolor{charliteral}{'?'},\ \textcolor{stringliteral}{"{}\(\backslash\)x01"{}});\ \textcolor{comment}{//\ temporarily\ hide\ ?\ to\ distinguish\ them\ from\ the\ garbage\ that\ iconv\ creates}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ iconv(\textcolor{stringliteral}{'UTF-\/8'},\ \textcolor{stringliteral}{'ASCII//TRANSLIT//IGNORE'},\ \$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ str\_replace([\textcolor{charliteral}{'?'},\ \textcolor{stringliteral}{"{}\(\backslash\)x01"{}}],\ [\textcolor{stringliteral}{''},\ \textcolor{charliteral}{'?'}],\ \$s);\ \textcolor{comment}{//\ remove\ garbage\ and\ restore\ ?\ characters}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$iconv\ ===\ \textcolor{stringliteral}{'libiconv'})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ iconv(\textcolor{stringliteral}{'UTF-\/8'},\ \textcolor{stringliteral}{'ASCII//TRANSLIT//IGNORE'},\ \$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{\ \textcolor{comment}{//\ null\ or\ 'unknown'\ (\#216)}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{self::pcre}}(\textcolor{stringliteral}{'preg\_replace'},\ [\textcolor{stringliteral}{'\#[\string^\(\backslash\)x00-\/\(\backslash\)x7F]++\#'},\ \textcolor{stringliteral}{''},\ \$s]);\ \textcolor{comment}{//\ remove\ non-\/ascii\ chars}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$iconv\ ===\ \textcolor{stringliteral}{'glibc'}\ ||\ \$iconv\ ===\ \textcolor{stringliteral}{'libiconv'})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ temporarily\ hide\ these\ characters\ to\ distinguish\ them\ from\ the\ garbage\ that\ iconv\ creates}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ strtr(\$s,\ \textcolor{stringliteral}{'\`{}\(\backslash\)'"{}\string^\string~?'},\ \textcolor{stringliteral}{"{}\(\backslash\)x01\(\backslash\)x02\(\backslash\)x03\(\backslash\)x04\(\backslash\)x05\(\backslash\)x06"{}});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$iconv\ ===\ \textcolor{stringliteral}{'glibc'})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ glibc\ implementation\ is\ very\ limited.\ transliterate\ into\ Windows-\/1250\ and\ then\ into\ ASCII,\ so\ most\ Eastern\ European\ characters\ are\ preserved}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ iconv(\textcolor{stringliteral}{'UTF-\/8'},\ \textcolor{stringliteral}{'WINDOWS-\/1250//TRANSLIT//IGNORE'},\ \$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ strtr(}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$s,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)xa5\(\backslash\)xa3\(\backslash\)xbc\(\backslash\)x8c\(\backslash\)xa7\(\backslash\)x8a\(\backslash\)xaa\(\backslash\)x8d\(\backslash\)x8f\(\backslash\)x8e\(\backslash\)xaf\(\backslash\)xb9\(\backslash\)xb3\(\backslash\)xbe\(\backslash\)x9c\(\backslash\)x9a\(\backslash\)xba\(\backslash\)x9d\(\backslash\)x9f\(\backslash\)x9e\(\backslash\)xbf\(\backslash\)xc0\(\backslash\)xc1\(\backslash\)xc2\(\backslash\)xc3\(\backslash\)xc4\(\backslash\)xc5\(\backslash\)xc6\(\backslash\)xc7\(\backslash\)xc8\(\backslash\)xc9\(\backslash\)xca\(\backslash\)xcb\(\backslash\)xcc\(\backslash\)xcd\(\backslash\)xce\(\backslash\)xcf\(\backslash\)xd0\(\backslash\)xd1\(\backslash\)xd2\(\backslash\)xd3\(\backslash\)xd4\(\backslash\)xd5\(\backslash\)xd6\(\backslash\)xd7\(\backslash\)xd8\(\backslash\)xd9\(\backslash\)xda\(\backslash\)xdb\(\backslash\)xdc\(\backslash\)xdd\(\backslash\)xde\(\backslash\)xdf\(\backslash\)xe0\(\backslash\)xe1\(\backslash\)xe2\(\backslash\)xe3\(\backslash\)xe4\(\backslash\)xe5\(\backslash\)xe6\(\backslash\)xe7\(\backslash\)xe8\(\backslash\)xe9\(\backslash\)xea\(\backslash\)xeb\(\backslash\)xec\(\backslash\)xed\(\backslash\)xee\(\backslash\)xef\(\backslash\)xf0\(\backslash\)xf1\(\backslash\)xf2\(\backslash\)xf3\(\backslash\)xf4\(\backslash\)xf5\(\backslash\)xf6\(\backslash\)xf8\(\backslash\)xf9\(\backslash\)xfa\(\backslash\)xfb\(\backslash\)xfc\(\backslash\)xfd\(\backslash\)xfe\(\backslash\)x96\(\backslash\)xa0\(\backslash\)x8b\(\backslash\)x97\(\backslash\)x9b\(\backslash\)xa6\(\backslash\)xad\(\backslash\)xb7"{}},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'ALLSSSSTZZZallssstzzzRAAAALCCCEEEEIIDDNNOOOOxRUUUUYTsraaaalccceeeeiiddnnooooruuuuyt-\/\ <-\/>|-\/.'},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{self::pcre}}(\textcolor{stringliteral}{'preg\_replace'},\ [\textcolor{stringliteral}{'\#[\string^\(\backslash\)x00-\/\(\backslash\)x7F]++\#'},\ \textcolor{stringliteral}{''},\ \$s]);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ iconv(\textcolor{stringliteral}{'UTF-\/8'},\ \textcolor{stringliteral}{'ASCII//TRANSLIT//IGNORE'},\ \$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ remove\ garbage\ that\ iconv\ creates\ during\ transliteration\ (eg\ Ý\ -\/>\ Y')}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ str\_replace([\textcolor{charliteral}{'`'},\ \textcolor{stringliteral}{"{}'"{}},\ \textcolor{charliteral}{'"{}'},\ \textcolor{charliteral}{'\string^'},\ \textcolor{charliteral}{'\string~'},\ \textcolor{charliteral}{'?'}],\ \textcolor{stringliteral}{''},\ \$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ restore\ temporarily\ hidden\ characters}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ strtr(\$s,\ \textcolor{stringliteral}{"{}\(\backslash\)x01\(\backslash\)x02\(\backslash\)x03\(\backslash\)x04\(\backslash\)x05\(\backslash\)x06"{}},\ \textcolor{stringliteral}{'\`{}\(\backslash\)'"{}\string^\string~?'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{self::pcre}}(\textcolor{stringliteral}{'preg\_replace'},\ [\textcolor{stringliteral}{'\#[\string^\(\backslash\)x00-\/\(\backslash\)x7F]++\#'},\ \textcolor{stringliteral}{''},\ \$s]);\ \textcolor{comment}{//\ remove\ non-\/ascii\ chars}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$s;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00245}00245\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00252}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aedfc4b0eb74cc612cf87e26165e5c3b9}{00252}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aedfc4b0eb74cc612cf87e26165e5c3b9}{webalize}}(\textcolor{keywordtype}{string}\ \$s,\ ?\textcolor{keywordtype}{string}\ \$charlist\ =\ \textcolor{keyword}{null},\ \textcolor{keywordtype}{bool}\ \$lower\ =\ \textcolor{keyword}{true}):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00253}00253\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \$s\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ac648255fe21f6ebe6def44068ab92525}{self::toAscii}}(\$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$lower)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ strtolower(\$s);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \$s\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{self::pcre}}(\textcolor{stringliteral}{'preg\_replace'},\ [\textcolor{stringliteral}{'\#[\string^a-\/z0-\/9'}\ .\ (\$charlist\ !==\ \textcolor{keyword}{null}\ ?\ preg\_quote(\$charlist,\ \textcolor{charliteral}{'\#'})\ :\ \textcolor{stringliteral}{''})\ .\ \textcolor{stringliteral}{']+\#i'},\ \textcolor{charliteral}{'-\/'},\ \$s]);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \$s\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a5d69a54563d1a732331a2dd03b73a18b}{trim}}(\$s,\ \textcolor{charliteral}{'-\/'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$s;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00262}00262\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00269}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aae39506aae6974091596fb534b401225}{00269}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aae39506aae6974091596fb534b401225}{truncate}}(\textcolor{keywordtype}{string}\ \$s,\ \textcolor{keywordtype}{int}\ \$maxLen,\ \textcolor{keywordtype}{string}\ \$append\ =\ \textcolor{stringliteral}{"{}\(\backslash\)u\{2026\}"{}}):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00270}00270\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (self::length(\$s)\ >\ \$maxLen)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \$maxLen\ -\/=\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9db0cba2a9b64e0d7eeadea120d6e750}{self::length}}(\$append);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$maxLen\ <\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$append;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$matches\ =\ self::match(\$s,\ \textcolor{stringliteral}{'\#\string^.\{1,'}\ .\ \$maxLen\ .\ \textcolor{stringliteral}{'\}(?=[\(\backslash\)s\(\backslash\)x00-\//:-\/@\(\backslash\)[-\/`\{-\/\string~])\#us'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$matches[0]\ .\ \$append;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00278}00278\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a04ec11e7845ee5b93cdb92fd9160a0d2}{self::substring}}(\$s,\ 0,\ \$maxLen)\ .\ \$append;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00284}00284\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$s;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00285}00285\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00287}00287\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00292}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aedf16362453d927012f94b6fd2305da1}{00292}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aedf16362453d927012f94b6fd2305da1}{indent}}(\textcolor{keywordtype}{string}\ \$s,\ \textcolor{keywordtype}{int}\ \$level\ =\ 1,\ \textcolor{keywordtype}{string}\ \$chars\ =\ \textcolor{stringliteral}{"{}\(\backslash\)t"{}}):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00293}00293\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$level\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ab3ed35e59045e460f940cb65955d19e9}{self::replace}}(\$s,\ \textcolor{stringliteral}{'\#(?:\string^|[\(\backslash\)r\(\backslash\)n]+)(?=[\string^\(\backslash\)r\(\backslash\)n])\#'},\ \textcolor{stringliteral}{'\$0'}\ .\ str\_repeat(\$chars,\ \$level));}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$s;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00299}00299\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00301}00301\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00305}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a214c5743a9e6dd4129bd91c986c2af5a}{00305}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a214c5743a9e6dd4129bd91c986c2af5a}{lower}}(\textcolor{keywordtype}{string}\ \$s):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00306}00306\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ mb\_strtolower(\$s,\ \textcolor{stringliteral}{'UTF-\/8'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00308}00308\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00314}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a040613e4290d8284b05400d843ee400d}{00314}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a040613e4290d8284b05400d843ee400d}{firstLower}}(\textcolor{keywordtype}{string}\ \$s):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00315}00315\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a214c5743a9e6dd4129bd91c986c2af5a}{self::lower}}(self::substring(\$s,\ 0,\ 1))\ .\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a04ec11e7845ee5b93cdb92fd9160a0d2}{self::substring}}(\$s,\ 1);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00317}00317\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00323}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a2c067a060cc44194fedad6fabb456019}{00323}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a2c067a060cc44194fedad6fabb456019}{upper}}(\textcolor{keywordtype}{string}\ \$s):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00324}00324\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00325}00325\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ mb\_strtoupper(\$s,\ \textcolor{stringliteral}{'UTF-\/8'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00326}00326\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00328}00328\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00332}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ab5652da623e978150d92851b36ffc21f}{00332}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ab5652da623e978150d92851b36ffc21f}{firstUpper}}(\textcolor{keywordtype}{string}\ \$s):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00333}00333\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a2c067a060cc44194fedad6fabb456019}{self::upper}}(self::substring(\$s,\ 0,\ 1))\ .\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a04ec11e7845ee5b93cdb92fd9160a0d2}{self::substring}}(\$s,\ 1);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00335}00335\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00336}00336\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00341}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a923af259543547d43b5da5fa5f6e3e60}{00341}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a923af259543547d43b5da5fa5f6e3e60}{capitalize}}(\textcolor{keywordtype}{string}\ \$s):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00342}00342\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ mb\_convert\_case(\$s,\ MB\_CASE\_TITLE,\ \textcolor{stringliteral}{'UTF-\/8'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00344}00344\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00345}00345\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00352}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a71234f7cff58fe4eba54c4039d8ca684}{00352}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a71234f7cff58fe4eba54c4039d8ca684}{compare}}(\textcolor{keywordtype}{string}\ \$left,\ \textcolor{keywordtype}{string}\ \$right,\ ?\textcolor{keywordtype}{int}\ \$length\ =\ \textcolor{keyword}{null}):\ bool}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00353}00353\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (class\_exists(\textcolor{stringliteral}{'Normalizer'},\ \textcolor{keyword}{false}))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \$left\ =\ \(\backslash\)Normalizer::normalize(\$left,\ \(\backslash\)\mbox{\hyperlink{class_normalizer_a3268c69c32569ef30dd2a5417d9234f9}{Normalizer::FORM\_D}});\ \textcolor{comment}{//\ form\ NFD\ is\ faster}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \$right\ =\ \(\backslash\)Normalizer::normalize(\$right,\ \(\backslash\)\mbox{\hyperlink{class_normalizer_a3268c69c32569ef30dd2a5417d9234f9}{Normalizer::FORM\_D}});\ \textcolor{comment}{//\ form\ NFD\ is\ faster}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00357}00357\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00358}00358\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00359}00359\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$length\ <\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \$left\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a04ec11e7845ee5b93cdb92fd9160a0d2}{self::substring}}(\$left,\ \$length,\ -\/\$length);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \$right\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a04ec11e7845ee5b93cdb92fd9160a0d2}{self::substring}}(\$right,\ \$length,\ -\/\$length);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$length\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \ \ \ \$left\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a04ec11e7845ee5b93cdb92fd9160a0d2}{self::substring}}(\$left,\ 0,\ \$length);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \$right\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a04ec11e7845ee5b93cdb92fd9160a0d2}{self::substring}}(\$right,\ 0,\ \$length);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00365}00365\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a214c5743a9e6dd4129bd91c986c2af5a}{self::lower}}(\$left)\ ===\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a214c5743a9e6dd4129bd91c986c2af5a}{self::lower}}(\$right);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00368}00368\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00369}00369\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00370}00370\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00375}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a0a4ef75e1647d23f109bf28ab4c47a46}{00375}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a0a4ef75e1647d23f109bf28ab4c47a46}{findPrefix}}(array\ \$strings):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00376}00376\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00377}00377\ \ \ \ \ \ \ \ \ \$first\ =\ array\_shift(\$strings);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00378}00378\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 0;\ \$i\ <\ strlen(\$first);\ \$i++)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$strings\ as\ \$s)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00380}00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$s[\$i])\ ||\ \$first[\$i]\ !==\ \$s[\$i])\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\$i\ \&\&\ \$first[\$i\ -\/\ 1]\ >=\ \textcolor{stringliteral}{"{}\(\backslash\)x80"{}}\ \&\&\ \$first[\$i]\ >=\ \textcolor{stringliteral}{"{}\(\backslash\)x80"{}}\ \&\&\ \$first[\$i]\ <\ \textcolor{stringliteral}{"{}\(\backslash\)xC0"{}})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$i-\/-\/;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00384}00384\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00385}00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ substr(\$first,\ 0,\ \$i);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$first;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00391}00391\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00393}00393\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00398}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9db0cba2a9b64e0d7eeadea120d6e750}{00398}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9db0cba2a9b64e0d7eeadea120d6e750}{length}}(\textcolor{keywordtype}{string}\ \$s):\ int}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00399}00399\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00400}00400\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_abc3a1e6dd2433ba5ec6e8aa550d12dcd}{match}}\ (\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ extension\_loaded(\textcolor{stringliteral}{'mbstring'})\ =>\ mb\_strlen(\$s,\ \textcolor{stringliteral}{'UTF-\/8'}),}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ extension\_loaded(\textcolor{stringliteral}{'iconv'})\ =>\ iconv\_strlen(\$s,\ \textcolor{stringliteral}{'UTF-\/8'}),}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}\ =>\ strlen(@utf8\_decode(\$s)),\ \textcolor{comment}{//\ deprecated}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00405}00405\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00406}00406\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00407}00407\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00411}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a5d69a54563d1a732331a2dd03b73a18b}{00411}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a5d69a54563d1a732331a2dd03b73a18b}{trim}}(\textcolor{keywordtype}{string}\ \$s,\ \textcolor{keywordtype}{string}\ \$charlist\ =\ self::TrimCharacters):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00412}00412\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00413}00413\ \ \ \ \ \ \ \ \ \$charlist\ =\ preg\_quote(\$charlist,\ \textcolor{charliteral}{'\#'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00414}00414\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ab3ed35e59045e460f940cb65955d19e9}{self::replace}}(\$s,\ \textcolor{stringliteral}{'\#\string^['}\ .\ \$charlist\ .\ \textcolor{stringliteral}{']+|['}\ .\ \$charlist\ .\ \textcolor{stringliteral}{']+\$\#Du'},\ \textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00415}00415\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00417}00417\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00422}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a05c499af879727336055c0ebc13df2b0}{00422}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a05c499af879727336055c0ebc13df2b0}{padLeft}}(\textcolor{keywordtype}{string}\ \$s,\ \textcolor{keywordtype}{int}\ \$length,\ \textcolor{keywordtype}{string}\ \$pad\ =\ \textcolor{charliteral}{'\ '}):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00423}00423\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00424}00424\ \ \ \ \ \ \ \ \ \$length\ =\ max(0,\ \$length\ -\/\ self::length(\$s));}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \$padLen\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9db0cba2a9b64e0d7eeadea120d6e750}{self::length}}(\$pad);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00426}00426\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str\_repeat(\$pad,\ (\textcolor{keywordtype}{int})\ (\$length\ /\ \$padLen))\ .\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a04ec11e7845ee5b93cdb92fd9160a0d2}{self::substring}}(\$pad,\ 0,\ \$length\ \%\ \$padLen)\ .\ \$s;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00427}00427\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00428}00428\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00429}00429\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00434}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ae7e29658c1ea0c84b12e26a94376580b}{00434}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ae7e29658c1ea0c84b12e26a94376580b}{padRight}}(\textcolor{keywordtype}{string}\ \$s,\ \textcolor{keywordtype}{int}\ \$length,\ \textcolor{keywordtype}{string}\ \$pad\ =\ \textcolor{charliteral}{'\ '}):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00435}00435\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ \$length\ =\ max(0,\ \$length\ -\/\ self::length(\$s));}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \$padLen\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9db0cba2a9b64e0d7eeadea120d6e750}{self::length}}(\$pad);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$s\ .\ str\_repeat(\$pad,\ (\textcolor{keywordtype}{int})\ (\$length\ /\ \$padLen))\ .\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a04ec11e7845ee5b93cdb92fd9160a0d2}{self::substring}}(\$pad,\ 0,\ \$length\ \%\ \$padLen);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00439}00439\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00440}00440\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00445}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a6c8576df86a22d739a7929f79303a338}{00445}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a6c8576df86a22d739a7929f79303a338}{reverse}}(\textcolor{keywordtype}{string}\ \$s):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00446}00446\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00447}00447\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!extension\_loaded(\textcolor{stringliteral}{'iconv'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_nette_1_1_not_supported_exception}{Nette\(\backslash\)NotSupportedException}}(\_\_METHOD\_\_\ .\ \textcolor{stringliteral}{'()\ requires\ ICONV\ extension\ that\ is\ not\ loaded.'});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00450}00450\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ iconv(\textcolor{stringliteral}{'UTF-\/32LE'},\ \textcolor{stringliteral}{'UTF-\/8'},\ strrev(iconv(\textcolor{stringliteral}{'UTF-\/8'},\ \textcolor{stringliteral}{'UTF-\/32BE'},\ \$s)));}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00452}00452\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00453}00453\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00454}00454\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00459}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aa0f4f4e1f6c54e38df61fefd328f5b21}{00459}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aa0f4f4e1f6c54e38df61fefd328f5b21}{before}}(\textcolor{keywordtype}{string}\ \$haystack,\ \textcolor{keywordtype}{string}\ \$needle,\ \textcolor{keywordtype}{int}\ \$nth\ =\ 1):\ ?string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00460}00460\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00461}00461\ \ \ \ \ \ \ \ \ \$pos\ =\ self::pos(\$haystack,\ \$needle,\ \$nth);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$pos\ ===\ \textcolor{keyword}{null}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ null}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ :\ substr(\$haystack,\ 0,\ \$pos);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00465}00465\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00466}00466\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00472}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aeb11e79ce03254a8ee23987af23368f7}{00472}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_aeb11e79ce03254a8ee23987af23368f7}{after}}(\textcolor{keywordtype}{string}\ \$haystack,\ \textcolor{keywordtype}{string}\ \$needle,\ \textcolor{keywordtype}{int}\ \$nth\ =\ 1):\ ?string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00473}00473\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00474}00474\ \ \ \ \ \ \ \ \ \$pos\ =\ self::pos(\$haystack,\ \$needle,\ \$nth);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$pos\ ===\ \textcolor{keyword}{null}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ null}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \ \ \ \ :\ substr(\$haystack,\ \$pos\ +\ strlen(\$needle));}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00478}00478\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00479}00479\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00480}00480\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00485}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a0fe151aac4595e3249432ef39e74376c}{00485}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a0fe151aac4595e3249432ef39e74376c}{indexOf}}(\textcolor{keywordtype}{string}\ \$haystack,\ \textcolor{keywordtype}{string}\ \$needle,\ \textcolor{keywordtype}{int}\ \$nth\ =\ 1):\ ?int}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00486}00486\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00487}00487\ \ \ \ \ \ \ \ \ \$pos\ =\ self::pos(\$haystack,\ \$needle,\ \$nth);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$pos\ ===\ \textcolor{keyword}{null}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ null}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00490}00490\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9db0cba2a9b64e0d7eeadea120d6e750}{self::length}}(substr(\$haystack,\ 0,\ \$pos));}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00491}00491\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00492}00492\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00493}00493\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00497}00497\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ pos(\textcolor{keywordtype}{string}\ \$haystack,\ \textcolor{keywordtype}{string}\ \$needle,\ \textcolor{keywordtype}{int}\ \$nth\ =\ 1):\ ?int}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00498}00498\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00499}00499\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$nth)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00501}00501\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$nth\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$needle\ ===\ \textcolor{stringliteral}{''})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00503}00503\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00505}00505\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00506}00506\ \ \ \ \ \ \ \ \ \ \ \ \ \$pos\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00507}00507\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ ((\$pos\ =\ strpos(\$haystack,\ \$needle,\ \$pos))\ !==\ \textcolor{keyword}{false}\ \&\&\ -\/-\/\$nth)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00508}00508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$pos++;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00509}00509\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \$len\ =\ strlen(\$haystack);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$needle\ ===\ \textcolor{stringliteral}{''})\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$len;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$len\ ===\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00517}00517\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00518}00518\ \ \ \ \ \ \ \ \ \ \ \ \ \$pos\ =\ \$len\ -\/\ 1;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ ((\$pos\ =\ strrpos(\$haystack,\ \$needle,\ \$pos\ -\/\ \$len))\ !==\ \textcolor{keyword}{false}\ \&\&\ ++\$nth)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$pos-\/-\/;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00523}00523\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00524}00524\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_helpers_a8ba91ebb2a418f9b813215b32f17d585}{Helpers::falseToNull}}(\$pos);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00525}00525\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00526}00526\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00527}00527\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00531}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_af7cc8b30234cbb90a84bf18fe57eb4fe}{00531}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_af7cc8b30234cbb90a84bf18fe57eb4fe}{split}}(}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \$subject,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00533}00533\ \ \ \ \ \ \ \ \ \#[Language(\textcolor{stringliteral}{'RegExp'})]}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \$pattern,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00535}00535\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}|\textcolor{keywordtype}{int}\ \$captureOffset\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00536}00536\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$skipEmpty\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00537}00537\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \$limit\ =\ -\/1,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00538}00538\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$utf8\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00539}00539\ \ \ \ \ ):\ array}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00540}00540\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00541}00541\ \ \ \ \ \ \ \ \ \$flags\ =\ is\_int(\$captureOffset)\ \ \textcolor{comment}{//\ back\ compatibility}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$captureOffset}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00543}00543\ \ \ \ \ \ \ \ \ \ \ \ \ :\ (\$captureOffset\ ?\ PREG\_SPLIT\_OFFSET\_CAPTURE\ :\ 0)\ |\ (\$skipEmpty\ ?\ PREG\_SPLIT\_NO\_EMPTY\ :\ 0);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00544}00544\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \$pattern\ .=\ \$utf8\ ?\ \textcolor{charliteral}{'u'}\ :\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00546}00546\ \ \ \ \ \ \ \ \ \$m\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{self::pcre}}(\textcolor{stringliteral}{'preg\_split'},\ [\$pattern,\ \$subject,\ \$limit,\ \$flags\ |\ PREG\_SPLIT\_DELIM\_CAPTURE]);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00547}00547\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$utf8\ \&\&\ \$captureOffset}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00548}00548\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ self::bytesToChars(\$subject,\ [\$m])[0]}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$m;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00550}00550\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00551}00551\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00552}00552\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00553}00553\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00558}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_abc3a1e6dd2433ba5ec6e8aa550d12dcd}{00558}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_abc3a1e6dd2433ba5ec6e8aa550d12dcd}{match}}(}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00559}00559\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \$subject,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00560}00560\ \ \ \ \ \ \ \ \ \#[Language(\textcolor{stringliteral}{'RegExp'})]}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \$pattern,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00562}00562\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}|\textcolor{keywordtype}{int}\ \$captureOffset\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00563}00563\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \$offset\ =\ 0,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$unmatchedAsNull\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00565}00565\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$utf8\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00566}00566\ \ \ \ \ ):\ ?array}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00567}00567\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00568}00568\ \ \ \ \ \ \ \ \ \$flags\ =\ is\_int(\$captureOffset)\ \textcolor{comment}{//\ back\ compatibility}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$captureOffset}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00570}00570\ \ \ \ \ \ \ \ \ \ \ \ \ :\ (\$captureOffset\ ?\ PREG\_OFFSET\_CAPTURE\ :\ 0)\ |\ (\$unmatchedAsNull\ ?\ PREG\_UNMATCHED\_AS\_NULL\ :\ 0);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00571}00571\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00572}00572\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$utf8)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00573}00573\ \ \ \ \ \ \ \ \ \ \ \ \ \$offset\ =\ strlen(self::substring(\$subject,\ 0,\ \$offset));}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00574}00574\ \ \ \ \ \ \ \ \ \ \ \ \ \$pattern\ .=\ \textcolor{charliteral}{'u'};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00575}00575\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00576}00576\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$offset\ >\ strlen(\$subject))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00578}00578\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00579}00579\ \ \ \ \ \ \ \ \ \}\ elseif\ (!self::pcre(\textcolor{stringliteral}{'preg\_match'},\ [\$pattern,\ \$subject,\ \&\$m,\ \$flags,\ \$offset]))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00580}00580\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$utf8\ \&\&\ \$captureOffset)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00582}00582\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::bytesToChars(\$subject,\ [\$m])[0];}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00583}00583\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$m;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00585}00585\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00586}00586\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00587}00587\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00588}00588\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00593}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_adaa65791d83dff8a0071ac9e062710c6}{00593}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_adaa65791d83dff8a0071ac9e062710c6}{matchAll}}(}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00594}00594\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \$subject,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00595}00595\ \ \ \ \ \ \ \ \ \#[Language(\textcolor{stringliteral}{'RegExp'})]}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \$pattern,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00597}00597\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}|\textcolor{keywordtype}{int}\ \$captureOffset\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00598}00598\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \$offset\ =\ 0,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00599}00599\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$unmatchedAsNull\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00600}00600\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$patternOrder\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00601}00601\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$utf8\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00602}00602\ \ \ \ \ ):\ array}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00603}00603\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00604}00604\ \ \ \ \ \ \ \ \ \$flags\ =\ is\_int(\$captureOffset)\ \textcolor{comment}{//\ back\ compatibility}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00605}00605\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$captureOffset}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00606}00606\ \ \ \ \ \ \ \ \ \ \ \ \ :\ (\$captureOffset\ ?\ PREG\_OFFSET\_CAPTURE\ :\ 0)\ |\ (\$unmatchedAsNull\ ?\ PREG\_UNMATCHED\_AS\_NULL\ :\ 0)\ |\ (\$patternOrder\ ?\ PREG\_PATTERN\_ORDER\ :\ 0);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00607}00607\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00608}00608\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$utf8)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \ \ \$offset\ =\ strlen(self::substring(\$subject,\ 0,\ \$offset));}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \ \ \ \ \$pattern\ .=\ \textcolor{charliteral}{'u'};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00612}00612\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00613}00613\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$offset\ >\ strlen(\$subject))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00614}00614\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00615}00615\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00616}00616\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00617}00617\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{self::pcre}}(\textcolor{stringliteral}{'preg\_match\_all'},\ [}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00618}00618\ \ \ \ \ \ \ \ \ \ \ \ \ \$pattern,\ \$subject,\ \&\$m,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00619}00619\ \ \ \ \ \ \ \ \ \ \ \ \ (\$flags\ \&\ PREG\_PATTERN\_ORDER)\ ?\ \$flags\ :\ (\$flags\ |\ PREG\_SET\_ORDER),}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00620}00620\ \ \ \ \ \ \ \ \ \ \ \ \ \$offset,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00622}00622\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$utf8\ \&\&\ \$captureOffset}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00623}00623\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ self::bytesToChars(\$subject,\ \$m)}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$m;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00625}00625\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00626}00626\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00627}00627\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00628}00628\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00632}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ab3ed35e59045e460f940cb65955d19e9}{00632}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_ab3ed35e59045e460f940cb65955d19e9}{replace}}(}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00633}00633\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ \$subject,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00634}00634\ \ \ \ \ \ \ \ \ \#[Language(\textcolor{stringliteral}{'RegExp'})]}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00635}00635\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}|array\ \$pattern,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00636}00636\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}|callable\ \$replacement\ =\ \textcolor{stringliteral}{''},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00637}00637\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \$limit\ =\ -\/1,}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00638}00638\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$captureOffset\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00639}00639\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$unmatchedAsNull\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00640}00640\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \$utf8\ =\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00641}00641\ \ \ \ \ ):\ string}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00642}00642\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00643}00643\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_object(\$replacement)\ ||\ is\_array(\$replacement))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00644}00644\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_callable(\$replacement,\ \textcolor{keyword}{false},\ \$textual))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00645}00645\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_nette_1_1_invalid_state_exception}{Nette\(\backslash\)InvalidStateException}}(\textcolor{stringliteral}{"{}Callback\ '\$textual'\ is\ not\ callable."{}});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00646}00646\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00647}00647\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00648}00648\ \ \ \ \ \ \ \ \ \ \ \ \ \$flags\ =\ (\$captureOffset\ ?\ PREG\_OFFSET\_CAPTURE\ :\ 0)\ |\ (\$unmatchedAsNull\ ?\ PREG\_UNMATCHED\_AS\_NULL\ :\ 0);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00649}00649\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$utf8)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00650}00650\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$pattern\ .=\ \textcolor{charliteral}{'u'};}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00651}00651\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$captureOffset)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00652}00652\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$replacement\ =\ fn(\$m)\ =>\ \$replacement(self::bytesToChars(\$subject,\ [\$m])[0]);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00653}00653\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00654}00654\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00655}00655\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00656}00656\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{self::pcre}}(\textcolor{stringliteral}{'preg\_replace\_callback'},\ [\$pattern,\ \$replacement,\ \$subject,\ \$limit,\ 0,\ \$flags]);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00657}00657\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00658}00658\ \ \ \ \ \ \ \ \ \}\ elseif\ (is\_array(\$pattern)\ \&\&\ is\_string(key(\$pattern)))\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00659}00659\ \ \ \ \ \ \ \ \ \ \ \ \ \$replacement\ =\ array\_values(\$pattern);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00660}00660\ \ \ \ \ \ \ \ \ \ \ \ \ \$pattern\ =\ array\_keys(\$pattern);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00661}00661\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00662}00662\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00663}00663\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$utf8)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00664}00664\ \ \ \ \ \ \ \ \ \ \ \ \ \$pattern\ =\ array\_map(fn(\$item)\ =>\ \$item\ .\ \textcolor{charliteral}{'u'},\ (array)\ \$pattern);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00665}00665\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00666}00666\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00667}00667\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{self::pcre}}(\textcolor{stringliteral}{'preg\_replace'},\ [\$pattern,\ \$replacement,\ \$subject,\ \$limit]);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00668}00668\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00669}00669\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00670}00670\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00671}00671\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ bytesToChars(\textcolor{keywordtype}{string}\ \$s,\ array\ \$groups):\ array}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00672}00672\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00673}00673\ \ \ \ \ \ \ \ \ \$lastBytes\ =\ \$lastChars\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00674}00674\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$groups\ as\ \&\$matches)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00675}00675\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$matches\ as\ \&\$match)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00676}00676\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$match[1]\ >\ \$lastBytes)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00677}00677\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$lastChars\ +=\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9db0cba2a9b64e0d7eeadea120d6e750}{self::length}}(substr(\$s,\ \$lastBytes,\ \$match[1]\ -\/\ \$lastBytes));}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00678}00678\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$match[1]\ <\ \$lastBytes)\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00679}00679\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$lastChars\ -\/=\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9db0cba2a9b64e0d7eeadea120d6e750}{self::length}}(substr(\$s,\ \$match[1],\ \$lastBytes\ -\/\ \$match[1]));}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00680}00680\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00681}00681\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00682}00682\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$lastBytes\ =\ \$match[1];}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00683}00683\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$match[1]\ =\ \$lastChars;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00684}00684\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00685}00685\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00686}00686\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00687}00687\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$groups;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00688}00688\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00689}00689\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00690}00690\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00692}\mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{00692}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_strings_a9dc7d275039af7e9d2e1b1178f68d2c2}{pcre}}(\textcolor{keywordtype}{string}\ \$func,\ array\ \$args)}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00693}00693\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00694}00694\ \ \ \ \ \ \ \ \ \$res\ =\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_callback_a7087206f28882e8735e502d802e60be5}{Callback::invokeSafe}}(\$func,\ \$args,\ \textcolor{keyword}{function}\ (\textcolor{keywordtype}{string}\ \$message)\ use\ (\$args):\ \textcolor{keywordtype}{void}\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00695}00695\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ compile-\/time\ error,\ not\ detectable\ by\ preg\_last\_error}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00696}00696\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_regexp_exception}{RegexpException}}(\$message\ .\ \textcolor{stringliteral}{'\ in\ pattern:\ '}\ .\ implode(\textcolor{stringliteral}{'\ or\ '},\ (array)\ \$args[0]));}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00697}00697\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00698}00698\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00699}00699\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\$code\ =\ preg\_last\_error())\ \textcolor{comment}{//\ run-\/time\ error,\ but\ preg\_last\_error\ \&\ return\ code\ are\ liars}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00700}00700\ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ (\$res\ ===\ \textcolor{keyword}{null}\ ||\ !in\_array(\$func,\ [\textcolor{stringliteral}{'preg\_filter'},\ \textcolor{stringliteral}{'preg\_replace\_callback'},\ \textcolor{stringliteral}{'preg\_replace'}],\ \textcolor{keyword}{true}))}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00701}00701\ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00702}00702\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_nette_1_1_utils_1_1_regexp_exception}{RegexpException}}(preg\_last\_error\_msg()}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00703}00703\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\ \textcolor{stringliteral}{'\ (pattern:\ '}\ .\ implode(\textcolor{stringliteral}{'\ or\ '},\ (array)\ \$args[0])\ .\ \textcolor{charliteral}{')'},\ \$code);}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00704}00704\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00705}00705\ }
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00706}00706\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$res;}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00707}00707\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_strings_8php_source_l00708}00708\ \}}
+
+\end{DoxyCode}

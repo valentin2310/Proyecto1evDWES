@@ -1,0 +1,891 @@
+\doxysection{Container.\+php}
+\hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source}{}\label{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source}\index{vendor/laravel/framework/src/Illuminate/Container/Container.php@{vendor/laravel/framework/src/Illuminate/Container/Container.php}}
+\mbox{\hyperlink{laravel_2framework_2src_2_illuminate_2_container_2_container_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_container}{Illuminate\(\backslash\)Container}};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00005}00005\ use\ ArrayAccess;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00006}00006\ use\ Closure;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00007}00007\ use\ Exception;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_contracts_1_1_container_1_1_binding_resolution_exception}{Illuminate\(\backslash\)Contracts\(\backslash\)Container\(\backslash\)BindingResolutionException}};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_contracts_1_1_container_1_1_circular_dependency_exception}{Illuminate\(\backslash\)Contracts\(\backslash\)Container\(\backslash\)CircularDependencyException}};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00010}00010\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_container_1_1_container}{Illuminate\(\backslash\)Contracts\(\backslash\)Container\(\backslash\)Container}}\ as\ ContainerContract;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00011}00011\ use\ LogicException;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00012}00012\ use\ ReflectionClass;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00013}00013\ use\ ReflectionException;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00014}00014\ use\ ReflectionFunction;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00015}00015\ use\ ReflectionParameter;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00016}00016\ use\ TypeError;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00018}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container}{00018}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container}{Container}}\ \textcolor{keyword}{implements}\ ArrayAccess,\ ContainerContract}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00019}00019\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00025}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad9d7ce33ebb142b70e58b68052ca0ea8}{00025}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{static}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad9d7ce33ebb142b70e58b68052ca0ea8}{\$instance}};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00032}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a8ef4b8151ba4ff5cc63312d4cd1fbf43}{00032}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a8ef4b8151ba4ff5cc63312d4cd1fbf43}{\$resolved}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00039}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_adacdcea57647569304169243ff32cd10}{00039}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_adacdcea57647569304169243ff32cd10}{\$bindings}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00046}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a02ed57a52a1faaa4c9fee099267f5251}{00046}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a02ed57a52a1faaa4c9fee099267f5251}{\$methodBindings}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00053}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a1a63b63bdad280ed9a89dfed1fadc771}{00053}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a1a63b63bdad280ed9a89dfed1fadc771}{\$instances}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00060}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ab7a8da86c5cbd9d84b3c8bec398e6021}{00060}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ab7a8da86c5cbd9d84b3c8bec398e6021}{\$scopedInstances}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00067}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7e6d29edbd9ec5d8ec9d478cf98fba03}{00067}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7e6d29edbd9ec5d8ec9d478cf98fba03}{\$aliases}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00074}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a28fe08fd998b0e6b2a13e7d6e14254d5}{00074}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a28fe08fd998b0e6b2a13e7d6e14254d5}{\$abstractAliases}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00081}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2ec94fac34b670fa662896a99b8caa9a}{00081}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2ec94fac34b670fa662896a99b8caa9a}{\$extenders}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00088}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a475a6a63b85186663d34151bcbd21590}{00088}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a475a6a63b85186663d34151bcbd21590}{\$tags}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00095}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a912b9a7fd2600989dac6a6d9cffc7d49}{00095}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a912b9a7fd2600989dac6a6d9cffc7d49}{\$buildStack}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00102}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a575ec3cd45566351149a2d4f1d4bbd58}{00102}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a575ec3cd45566351149a2d4f1d4bbd58}{\$with}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00109}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a09f739e51432ce79a3e8e9b84ca2be03}{00109}}\ \ \ \ \ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a09f739e51432ce79a3e8e9b84ca2be03}{\$contextual}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00116}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2c45a8b9f29e928e47338123c613808e}{00116}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2c45a8b9f29e928e47338123c613808e}{\$reboundCallbacks}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00123}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a276f32f10ce7ef7bdfd669ced6b524ab}{00123}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a276f32f10ce7ef7bdfd669ced6b524ab}{\$globalBeforeResolvingCallbacks}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00130}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_abc34418f574d52d52e625cc359843160}{00130}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_abc34418f574d52d52e625cc359843160}{\$globalResolvingCallbacks}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00137}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a66edbbc05b8b7720b0ec4a079d461090}{00137}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a66edbbc05b8b7720b0ec4a079d461090}{\$globalAfterResolvingCallbacks}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00144}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aea9686725597939eacde0db6cda73f23}{00144}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aea9686725597939eacde0db6cda73f23}{\$beforeResolvingCallbacks}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00151}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a17c79cf57c7b2ba7aa59b5c4f47d8c68}{00151}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a17c79cf57c7b2ba7aa59b5c4f47d8c68}{\$resolvingCallbacks}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00158}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a274778ad93bf678f19f7f48d6f041bf9}{00158}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a274778ad93bf678f19f7f48d6f041bf9}{\$afterResolvingCallbacks}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00166}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a15052914d6720a5f97734e04cb15b76c}{00166}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a15052914d6720a5f97734e04cb15b76c}{when}}(\$concrete)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00167}00167\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7e6d29edbd9ec5d8ec9d478cf98fba03}{\$aliases}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{class_illuminate_1_1_container_1_1_util_a46eaa18a6849cc43760e8be9164d7d4a}{Util::arrayWrap}}(\$concrete)\ as\ \$c)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7e6d29edbd9ec5d8ec9d478cf98fba03}{\$aliases}}[]\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7ea389b4ec4a2b24ea654b6b72881770}{getAlias}}(\$c);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_contextual_binding_builder}{ContextualBindingBuilder}}(\$this,\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7e6d29edbd9ec5d8ec9d478cf98fba03}{\$aliases}});}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00175}00175\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00183}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2d36d9dee8b6acd73c354b7b45dff9c7}{00183}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2d36d9dee8b6acd73c354b7b45dff9c7}{bound}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00184}00184\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ isset(\$this-\/>bindings[\$abstract])\ ||}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ isset(\$this-\/>instances[\$abstract])\ ||}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a394a80b7c208bfeefa44fcdab60a8dd3}{isAlias}}(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00188}00188\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00195}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a967ac33cd3aaf062fd84b40592c9fc3c}{00195}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a967ac33cd3aaf062fd84b40592c9fc3c}{has}}(\textcolor{keywordtype}{string}\ \$id):\ bool}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00196}00196\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2d36d9dee8b6acd73c354b7b45dff9c7}{bound}}(\$id);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00198}00198\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00206}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aa28da95cea829e529ce92a2efe7910fd}{00206}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aa28da95cea829e529ce92a2efe7910fd}{resolved}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00207}00207\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a394a80b7c208bfeefa44fcdab60a8dd3}{isAlias}}(\$abstract))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \$abstract\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7ea389b4ec4a2b24ea654b6b72881770}{getAlias}}(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ isset(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aa28da95cea829e529ce92a2efe7910fd}{resolved}}[\$abstract])\ ||}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ isset(\$this-\/>instances[\$abstract]);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00214}00214\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00222}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a1400825c547389022e2ee2d864ee8eb3}{00222}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a1400825c547389022e2ee2d864ee8eb3}{isShared}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00223}00223\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ isset(\$this-\/>instances[\$abstract])\ ||}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (isset(\$this-\/>bindings[\$abstract][\textcolor{stringliteral}{'shared'}])\ \&\&}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>bindings[\$abstract][\textcolor{stringliteral}{'shared'}]\ ===\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00227}00227\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00235}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a394a80b7c208bfeefa44fcdab60a8dd3}{00235}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a394a80b7c208bfeefa44fcdab60a8dd3}{isAlias}}(\$name)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00236}00236\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ isset(\$this-\/>aliases[\$name]);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00238}00238\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00250}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6f935d2ccd5c874c0a326e467363eac0}{00250}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6f935d2ccd5c874c0a326e467363eac0}{bind}}(\$abstract,\ \$concrete\ =\ \textcolor{keyword}{null},\ \$shared\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00251}00251\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6b883ce3e4c5934bf16347aba616a96e}{dropStaleInstances}}(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ no\ concrete\ type\ was\ given,\ we\ will\ simply\ set\ the\ concrete\ type\ to\ the}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ abstract\ type.\ After\ that,\ the\ concrete\ type\ to\ be\ registered\ as\ shared}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ without\ being\ forced\ to\ state\ their\ classes\ in\ both\ of\ the\ parameters.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$concrete))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \$concrete\ =\ \$abstract;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ factory\ is\ not\ a\ Closure,\ it\ means\ it\ is\ just\ a\ class\ name\ which\ is}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ bound\ into\ this\ container\ to\ the\ abstract\ type\ and\ we\ will\ just\ wrap\ it}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ up\ inside\ its\ own\ Closure\ to\ give\ us\ more\ convenience\ when\ extending.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$concrete\ instanceof\ Closure)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_string(\$concrete))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ TypeError(self::class.\textcolor{stringliteral}{'::bind():\ Argument\ \#2\ (\$concrete)\ must\ be\ of\ type\ Closure|string|null'});}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \$concrete\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad6816b151db7142ab6983f935c63b4d9}{getClosure}}(\$abstract,\ \$concrete);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \$this-\/>bindings[\$abstract]\ =\ compact(\textcolor{stringliteral}{'concrete'},\ \textcolor{stringliteral}{'shared'});}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ abstract\ type\ was\ already\ resolved\ in\ this\ container\ we'll\ fire\ the}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ rebound\ listener\ so\ that\ any\ objects\ which\ have\ already\ gotten\ resolved}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ can\ have\ their\ copy\ of\ the\ object\ updated\ via\ the\ listener\ callbacks.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aa28da95cea829e529ce92a2efe7910fd}{resolved}}(\$abstract))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a0bf8dc02f4a816153a4f3e7248a537e0}{rebound}}(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00280}00280\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00289}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad6816b151db7142ab6983f935c63b4d9}{00289}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad6816b151db7142ab6983f935c63b4d9}{getClosure}}(\$abstract,\ \$concrete)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00290}00290\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{function}\ (\$container,\ \$parameters\ =\ [])\ use\ (\$abstract,\ \$concrete)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$abstract\ ==\ \$concrete)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$container-\/>build(\$concrete);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$container-\/>resolve(}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$concrete,\ \$parameters,\ \$raiseEvents\ =\ \textcolor{keyword}{false}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00299}00299\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00300}00300\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00301}00301\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00308}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_acb098c8d469e430d200ce3e3993efe4d}{00308}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_acb098c8d469e430d200ce3e3993efe4d}{hasMethodBinding}}(\$method)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00309}00309\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ isset(\$this-\/>methodBindings[\$method]);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00311}00311\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00312}00312\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00320}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aa13466a912a138b3b8e889ee46560413}{00320}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aa13466a912a138b3b8e889ee46560413}{bindMethod}}(\$method,\ \$callback)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00321}00321\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \$this-\/>methodBindings[\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a948f5c3b496e63cc0547413eeaa7b462}{parseBindMethod}}(\$method)]\ =\ \$callback;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00323}00323\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00324}00324\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00331}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a948f5c3b496e63cc0547413eeaa7b462}{00331}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a948f5c3b496e63cc0547413eeaa7b462}{parseBindMethod}}(\$method)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00332}00332\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$method))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$method[0].\textcolor{charliteral}{'@'}.\$method[1];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00336}00336\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$method;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00338}00338\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00347}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a1632a4e4887f332209fef26224571f21}{00347}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a1632a4e4887f332209fef26224571f21}{callMethodBinding}}(\$method,\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad9d7ce33ebb142b70e58b68052ca0ea8}{\$instance}})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00348}00348\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ call\_user\_func(\$this-\/>methodBindings[\$method],\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad9d7ce33ebb142b70e58b68052ca0ea8}{\$instance}},\ \$this);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00350}00350\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00351}00351\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00360}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ac9962bafac9ec8286de59b080212095b}{00360}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ac9962bafac9ec8286de59b080212095b}{addContextualBinding}}(\$concrete,\ \$abstract,\ \$implementation)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00361}00361\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \$this-\/>contextual[\$concrete][\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7ea389b4ec4a2b24ea654b6b72881770}{getAlias}}(\$abstract)]\ =\ \$implementation;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00363}00363\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00373}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ac7076f0f57230ad50534fb2da2a1c8f5}{00373}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ac7076f0f57230ad50534fb2da2a1c8f5}{bindIf}}(\$abstract,\ \$concrete\ =\ \textcolor{keyword}{null},\ \$shared\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00374}00374\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00375}00375\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2d36d9dee8b6acd73c354b7b45dff9c7}{bound}}(\$abstract))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00376}00376\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6f935d2ccd5c874c0a326e467363eac0}{bind}}(\$abstract,\ \$concrete,\ \$shared);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00377}00377\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00378}00378\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00379}00379\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00387}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a59c8cb85245a4ea9205f688547fc570e}{00387}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a59c8cb85245a4ea9205f688547fc570e}{singleton}}(\$abstract,\ \$concrete\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00388}00388\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6f935d2ccd5c874c0a326e467363eac0}{bind}}(\$abstract,\ \$concrete,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00390}00390\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00391}00391\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00399}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6c8658ff4337673f2aa4f364acdecec0}{00399}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6c8658ff4337673f2aa4f364acdecec0}{singletonIf}}(\$abstract,\ \$concrete\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00400}00400\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2d36d9dee8b6acd73c354b7b45dff9c7}{bound}}(\$abstract))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a59c8cb85245a4ea9205f688547fc570e}{singleton}}(\$abstract,\ \$concrete);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00403}00403\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00404}00404\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00405}00405\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00413}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ae55c6f0e9d6e647f8717687f48567e53}{00413}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ae55c6f0e9d6e647f8717687f48567e53}{scoped}}(\$abstract,\ \$concrete\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00414}00414\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00415}00415\ \ \ \ \ \ \ \ \ \$this-\/>scopedInstances[]\ =\ \$abstract;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a59c8cb85245a4ea9205f688547fc570e}{singleton}}(\$abstract,\ \$concrete);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00418}00418\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00419}00419\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00427}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a0e3f5ab279db35edfa00e3b8653e6ac4}{00427}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a0e3f5ab279db35edfa00e3b8653e6ac4}{scopedIf}}(\$abstract,\ \$concrete\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00428}00428\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00429}00429\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2d36d9dee8b6acd73c354b7b45dff9c7}{bound}}(\$abstract))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ae55c6f0e9d6e647f8717687f48567e53}{scoped}}(\$abstract,\ \$concrete);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00432}00432\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00433}00433\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00443}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aa506377a7dc23ab21a9b8f2a4915bccc}{00443}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aa506377a7dc23ab21a9b8f2a4915bccc}{extend}}(\$abstract,\ Closure\ \$closure)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00444}00444\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00445}00445\ \ \ \ \ \ \ \ \ \$abstract\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7ea389b4ec4a2b24ea654b6b72881770}{getAlias}}(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00446}00446\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00447}00447\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>instances[\$abstract]))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>instances[\$abstract]\ =\ \$closure(\$this-\/>instances[\$abstract],\ \$this);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00449}00449\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a0bf8dc02f4a816153a4f3e7248a537e0}{rebound}}(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00452}00452\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>extenders[\$abstract][]\ =\ \$closure;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00453}00453\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aa28da95cea829e529ce92a2efe7910fd}{resolved}}(\$abstract))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a0bf8dc02f4a816153a4f3e7248a537e0}{rebound}}(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00458}00458\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00459}00459\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00467}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ab5e1121e7cec7da324793b93ae13a449}{00467}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ab5e1121e7cec7da324793b93ae13a449}{instance}}(\$abstract,\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad9d7ce33ebb142b70e58b68052ca0ea8}{\$instance}})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00468}00468\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aee20507816c6de64202e604edaa86881}{removeAbstractAlias}}(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00470}00470\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \$isBound\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2d36d9dee8b6acd73c354b7b45dff9c7}{bound}}(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00472}00472\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00473}00473\ \ \ \ \ \ \ \ \ unset(\$this-\/>aliases[\$abstract]);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00474}00474\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We'll\ check\ to\ determine\ if\ this\ type\ has\ been\ bound\ before,\ and\ if\ it\ has}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ will\ fire\ the\ rebound\ callbacks\ registered\ with\ the\ container\ and\ it}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ can\ be\ updated\ with\ consuming\ classes\ that\ have\ gotten\ resolved\ here.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \$this-\/>instances[\$abstract]\ =\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad9d7ce33ebb142b70e58b68052ca0ea8}{\$instance}};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00479}00479\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$isBound)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a0bf8dc02f4a816153a4f3e7248a537e0}{rebound}}(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00482}00482\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00483}00483\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00484}00484\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad9d7ce33ebb142b70e58b68052ca0ea8}{\$instance}};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00485}00485\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00486}00486\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00493}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aee20507816c6de64202e604edaa86881}{00493}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aee20507816c6de64202e604edaa86881}{removeAbstractAlias}}(\$searched)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00494}00494\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00495}00495\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ isset(\$this-\/>aliases[\$searched]))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00497}00497\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00498}00498\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00499}00499\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>abstractAliases\ as\ \$abstract\ =>\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7e6d29edbd9ec5d8ec9d478cf98fba03}{\$aliases}})\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7e6d29edbd9ec5d8ec9d478cf98fba03}{\$aliases}}\ as\ \$index\ =>\ \$alias)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00501}00501\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$alias\ ==\ \$searched)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$this-\/>abstractAliases[\$abstract][\$index]);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00503}00503\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00505}00505\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00506}00506\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00507}00507\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00515}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a98fcb79ac1c178fea32e5cc39c483f37}{00515}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a98fcb79ac1c178fea32e5cc39c483f37}{tag}}(\$abstracts,\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a475a6a63b85186663d34151bcbd21590}{\$tags}})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00516}00516\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a475a6a63b85186663d34151bcbd21590}{\$tags}}\ =\ is\_array(\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a475a6a63b85186663d34151bcbd21590}{\$tags}})\ ?\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a475a6a63b85186663d34151bcbd21590}{\$tags}}\ :\ array\_slice(func\_get\_args(),\ 1);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00518}00518\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a475a6a63b85186663d34151bcbd21590}{\$tags}}\ as\ \$tag)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ isset(\$this-\/>tags[\$tag]))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>tags[\$tag]\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00523}00523\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00524}00524\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ ((array)\ \$abstracts\ as\ \$abstract)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00525}00525\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>tags[\$tag][]\ =\ \$abstract;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00527}00527\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00528}00528\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00529}00529\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00536}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a60ff4ecba178e8b8331925121b634e50}{00536}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a60ff4ecba178e8b8331925121b634e50}{tagged}}(\$tag)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00537}00537\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00538}00538\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ isset(\$this-\/>tags[\$tag]))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00539}00539\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00541}00541\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_rewindable_generator}{RewindableGenerator}}(\textcolor{keyword}{function}\ ()\ use\ (\$tag)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00543}00543\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>tags[\$tag]\ as\ \$abstract)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ yield\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a5a021626af70f98aff076449f0d5d7f2}{make}}(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00546}00546\ \ \ \ \ \ \ \ \ \},\ count(\$this-\/>tags[\$tag]));}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00547}00547\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00548}00548\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00558}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2313d941fc3db93cf1e670c9a4508469}{00558}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2313d941fc3db93cf1e670c9a4508469}{alias}}(\$abstract,\ \$alias)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00559}00559\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00560}00560\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$alias\ ===\ \$abstract)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ LogicException(\textcolor{stringliteral}{"{}[\{\$abstract\}]\ is\ aliased\ to\ itself."{}});}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00562}00562\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00563}00563\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \$this-\/>aliases[\$alias]\ =\ \$abstract;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00565}00565\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00566}00566\ \ \ \ \ \ \ \ \ \$this-\/>abstractAliases[\$abstract][]\ =\ \$alias;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00567}00567\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00568}00568\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00576}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a81d38f40047b652b12643d1b0e445037}{00576}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a81d38f40047b652b12643d1b0e445037}{rebinding}}(\$abstract,\ Closure\ \$callback)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00577}00577\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00578}00578\ \ \ \ \ \ \ \ \ \$this-\/>reboundCallbacks[\$abstract\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7ea389b4ec4a2b24ea654b6b72881770}{getAlias}}(\$abstract)][]\ =\ \$callback;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00579}00579\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00580}00580\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2d36d9dee8b6acd73c354b7b45dff9c7}{bound}}(\$abstract))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a5a021626af70f98aff076449f0d5d7f2}{make}}(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00582}00582\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00583}00583\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00584}00584\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00593}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a5eb2a4dbb89f3857c5fc853261739a2a}{00593}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a5eb2a4dbb89f3857c5fc853261739a2a}{refresh}}(\$abstract,\ \$target,\ \$method)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00594}00594\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00595}00595\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a81d38f40047b652b12643d1b0e445037}{rebinding}}(\$abstract,\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{bootstrap_2app_8php_a62522999959415eece8538d7b01e7ae0}{\$app}},\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad9d7ce33ebb142b70e58b68052ca0ea8}{\$instance}})\ use\ (\$target,\ \$method)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \ \ \ \ \$target-\/>\{\$method\}(\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad9d7ce33ebb142b70e58b68052ca0ea8}{\$instance}});}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00597}00597\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00598}00598\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00599}00599\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00606}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a0bf8dc02f4a816153a4f3e7248a537e0}{00606}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a0bf8dc02f4a816153a4f3e7248a537e0}{rebound}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00607}00607\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00608}00608\ \ \ \ \ \ \ \ \ \$instance\ =\ \$this-\/>make(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00609}00609\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>getReboundCallbacks(\$abstract)\ as\ \$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \ \ \ \ \$callback(\$this,\ \$instance);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00612}00612\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00613}00613\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00614}00614\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00621}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_afcf86ad96d79dc5e5556bfc78a52ec32}{00621}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_afcf86ad96d79dc5e5556bfc78a52ec32}{getReboundCallbacks}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00622}00622\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00623}00623\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>reboundCallbacks[\$abstract]\ ??\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00624}00624\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00625}00625\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00633}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a77d79e28bf5b6ec47988769916a8660b}{00633}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a77d79e28bf5b6ec47988769916a8660b}{wrap}}(Closure\ \$callback,\ array\ \$parameters\ =\ [])}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00634}00634\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00635}00635\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fn\ ()\ =>\ \$this-\/>call(\$callback,\ \$parameters);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00636}00636\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00637}00637\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00648}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a5d946533ebbf090e357800628d79253b}{00648}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a5d946533ebbf090e357800628d79253b}{call}}(\$callback,\ array\ \$parameters\ =\ [],\ \$defaultMethod\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00649}00649\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00650}00650\ \ \ \ \ \ \ \ \ \$pushedToBuildStack\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00651}00651\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00652}00652\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\$className\ =\ \$this-\/>getClassForCallable(\$callback))\ \&\&\ !\ in\_array(}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00653}00653\ \ \ \ \ \ \ \ \ \ \ \ \ \$className,}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00654}00654\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>buildStack,}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00655}00655\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{true}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00656}00656\ \ \ \ \ \ \ \ \ ))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00657}00657\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>buildStack[]\ =\ \$className;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00658}00658\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00659}00659\ \ \ \ \ \ \ \ \ \ \ \ \ \$pushedToBuildStack\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00660}00660\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00661}00661\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00662}00662\ \ \ \ \ \ \ \ \ \$result\ =\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_bound_method_abfb7c7ea11baf3de8421649d8f071e3e}{BoundMethod::call}}(\$this,\ \$callback,\ \$parameters,\ \$defaultMethod);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00663}00663\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00664}00664\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$pushedToBuildStack)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00665}00665\ \ \ \ \ \ \ \ \ \ \ \ \ array\_pop(\$this-\/>buildStack);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00666}00666\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00667}00667\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00668}00668\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$result;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00669}00669\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00670}00670\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00677}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a96333e2a2b0a4deb762e9b4fcd1d5eea}{00677}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a96333e2a2b0a4deb762e9b4fcd1d5eea}{getClassForCallable}}(\$callback)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00678}00678\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00679}00679\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (PHP\_VERSION\_ID\ >=\ 80200)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00680}00680\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_callable(\$callback)\ \&\&}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00681}00681\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !\ (\$reflector\ =\ \textcolor{keyword}{new}\ ReflectionFunction(\$callback(...)))-\/>isAnonymous())\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00682}00682\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$reflector-\/>getClosureScopeClass()-\/>name\ ??\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00683}00683\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00684}00684\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00685}00685\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00686}00686\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00687}00687\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00688}00688\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_array(\$callback))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00689}00689\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00690}00690\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00691}00691\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00692}00692\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_string(\$callback[0])\ ?\ \$callback[0]\ :\ get\_class(\$callback[0]);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00693}00693\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00694}00694\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00701}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad6ef853910a7a9ba0b04cd0b91d6c32a}{00701}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad6ef853910a7a9ba0b04cd0b91d6c32a}{factory}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00702}00702\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00703}00703\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fn\ ()\ =>\ \$this-\/>make(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00704}00704\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00705}00705\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00715}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ac1636893ddd9544ebbf9f6dc8d212ea6}{00715}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ac1636893ddd9544ebbf9f6dc8d212ea6}{makeWith}}(\$abstract,\ array\ \$parameters\ =\ [])}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00716}00716\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00717}00717\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>make(\$abstract,\ \$parameters);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00718}00718\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00719}00719\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00729}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a5a021626af70f98aff076449f0d5d7f2}{00729}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a5a021626af70f98aff076449f0d5d7f2}{make}}(\$abstract,\ array\ \$parameters\ =\ [])}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00730}00730\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00731}00731\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>resolve(\$abstract,\ \$parameters);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00732}00732\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00733}00733\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00739}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a5ac35cd9b27eb36bb68f58f665b440e5}{00739}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{get}(\textcolor{keywordtype}{string}\ \$id)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00740}00740\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00741}00741\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00742}00742\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>resolve(\$id);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00743}00743\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Exception\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00744}00744\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>has(\$id)\ ||\ \$e\ instanceof\ \mbox{\hyperlink{class_illuminate_1_1_contracts_1_1_container_1_1_circular_dependency_exception}{CircularDependencyException}})\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00745}00745\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00746}00746\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00747}00747\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00748}00748\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_entry_not_found_exception}{EntryNotFoundException}}(\$id,\ is\_int(\$e-\/>getCode())\ ?\ \$e-\/>getCode()\ :\ 0,\ \$e);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00749}00749\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00750}00750\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00751}00751\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00763}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ab77b35390828f9b7ebf3cefcf80ced00}{00763}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ab77b35390828f9b7ebf3cefcf80ced00}{resolve}}(\$abstract,\ \$parameters\ =\ [],\ \$raiseEvents\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00764}00764\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00765}00765\ \ \ \ \ \ \ \ \ \$abstract\ =\ \$this-\/>getAlias(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00766}00766\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00767}00767\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ First\ we'll\ fire\ any\ event\ handlers\ which\ handle\ the\ "{}before"{}\ resolving\ of}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00768}00768\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ specific\ types.\ This\ gives\ some\ hooks\ the\ chance\ to\ add\ various\ extends}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00769}00769\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ calls\ to\ change\ the\ resolution\ of\ objects\ that\ they're\ interested\ in.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00770}00770\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$raiseEvents)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00771}00771\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>fireBeforeResolvingCallbacks(\$abstract,\ \$parameters);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00772}00772\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00773}00773\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00774}00774\ \ \ \ \ \ \ \ \ \$concrete\ =\ \$this-\/>getContextualConcrete(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00775}00775\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00776}00776\ \ \ \ \ \ \ \ \ \$needsContextualBuild\ =\ !\ empty(\$parameters)\ ||\ !\ is\_null(\$concrete);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00777}00777\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00778}00778\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ an\ instance\ of\ the\ type\ is\ currently\ being\ managed\ as\ a\ singleton\ we'll}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00779}00779\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ just\ return\ an\ existing\ instance\ instead\ of\ instantiating\ new\ instances}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00780}00780\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ so\ the\ developer\ can\ keep\ using\ the\ same\ objects\ instance\ every\ time.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00781}00781\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>instances[\$abstract])\ \&\&\ !\ \$needsContextualBuild)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00782}00782\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>instances[\$abstract];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00783}00783\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00784}00784\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00785}00785\ \ \ \ \ \ \ \ \ \$this-\/>with[]\ =\ \$parameters;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00786}00786\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00787}00787\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$concrete))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00788}00788\ \ \ \ \ \ \ \ \ \ \ \ \ \$concrete\ =\ \$this-\/>getConcrete(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00789}00789\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00790}00790\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00791}00791\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We're\ ready\ to\ instantiate\ an\ instance\ of\ the\ concrete\ type\ registered\ for}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00792}00792\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ binding.\ This\ will\ instantiate\ the\ types,\ as\ well\ as\ resolve\ any\ of}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00793}00793\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ its\ "{}nested"{}\ dependencies\ recursively\ until\ all\ have\ gotten\ resolved.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00794}00794\ \ \ \ \ \ \ \ \ \$object\ =\ \$this-\/>isBuildable(\$concrete,\ \$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00795}00795\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$this-\/>build(\$concrete)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00796}00796\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$this-\/>make(\$concrete);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00797}00797\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00798}00798\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ defined\ any\ extenders\ for\ this\ type,\ we'll\ need\ to\ spin\ through\ them}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00799}00799\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ apply\ them\ to\ the\ object\ being\ built.\ This\ allows\ for\ the\ extension}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00800}00800\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ of\ services,\ such\ as\ changing\ configuration\ or\ decorating\ the\ object.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00801}00801\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>getExtenders(\$abstract)\ as\ \$extender)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00802}00802\ \ \ \ \ \ \ \ \ \ \ \ \ \$object\ =\ \$extender(\$object,\ \$this);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00803}00803\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00804}00804\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00805}00805\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ requested\ type\ is\ registered\ as\ a\ singleton\ we'll\ want\ to\ cache\ off}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00806}00806\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ instances\ in\ "{}memory"{}\ so\ we\ can\ return\ it\ later\ without\ creating\ an}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00807}00807\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ entirely\ new\ instance\ of\ an\ object\ on\ each\ subsequent\ request\ for\ it.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00808}00808\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>isShared(\$abstract)\ \&\&\ !\ \$needsContextualBuild)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00809}00809\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>instances[\$abstract]\ =\ \$object;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00810}00810\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00811}00811\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00812}00812\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$raiseEvents)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00813}00813\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>fireResolvingCallbacks(\$abstract,\ \$object);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00814}00814\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00815}00815\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00816}00816\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Before\ returning,\ we\ will\ also\ set\ the\ resolved\ flag\ to\ "{}true"{}\ and\ pop\ off}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00817}00817\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ parameter\ overrides\ for\ this\ build.\ After\ those\ two\ things\ are\ done}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00818}00818\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ will\ be\ ready\ to\ return\ back\ the\ fully\ constructed\ class\ instance.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00819}00819\ \ \ \ \ \ \ \ \ \$this-\/>resolved[\$abstract]\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00820}00820\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00821}00821\ \ \ \ \ \ \ \ \ array\_pop(\$this-\/>with);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00822}00822\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00823}00823\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$object;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00824}00824\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00825}00825\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00832}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_acf9a29f62786e04c0e515f0f9b2039fd}{00832}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_acf9a29f62786e04c0e515f0f9b2039fd}{getConcrete}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00833}00833\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00834}00834\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ don't\ have\ a\ registered\ resolver\ or\ concrete\ for\ the\ type,\ we'll\ just}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00835}00835\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ assume\ each\ type\ is\ a\ concrete\ name\ and\ will\ attempt\ to\ resolve\ it\ as\ is}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00836}00836\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ since\ the\ container\ should\ be\ able\ to\ resolve\ concretes\ automatically.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00837}00837\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>bindings[\$abstract]))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00838}00838\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>bindings[\$abstract][\textcolor{stringliteral}{'concrete'}];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00839}00839\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00840}00840\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00841}00841\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$abstract;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00842}00842\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00843}00843\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00850}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a76ddbe03f25757eb70e7c9019c0eb345}{00850}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a76ddbe03f25757eb70e7c9019c0eb345}{getContextualConcrete}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00851}00851\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00852}00852\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$binding\ =\ \$this-\/>findInContextualBindings(\$abstract)))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00853}00853\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$binding;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00854}00854\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00855}00855\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00856}00856\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Next\ we\ need\ to\ see\ if\ a\ contextual\ binding\ might\ be\ bound\ under\ an\ alias\ of\ the}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00857}00857\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ given\ abstract\ type.\ So,\ we\ will\ need\ to\ check\ if\ any\ aliases\ exist\ with\ this}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00858}00858\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ type\ and\ then\ spin\ through\ them\ and\ check\ for\ contextual\ bindings\ on\ these.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00859}00859\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$this-\/>abstractAliases[\$abstract]))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00860}00860\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00861}00861\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00862}00862\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00863}00863\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>abstractAliases[\$abstract]\ as\ \$alias)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00864}00864\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$binding\ =\ \$this-\/>findInContextualBindings(\$alias)))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00865}00865\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$binding;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00866}00866\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00867}00867\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00868}00868\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00869}00869\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00876}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aafcdec267f264c5939e51d4edeea6469}{00876}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aafcdec267f264c5939e51d4edeea6469}{findInContextualBindings}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00877}00877\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00878}00878\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>contextual[end(\$this-\/>buildStack)][\$abstract]\ ??\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00879}00879\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00880}00880\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00888}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ab554b55b369204ce7974a2ae76733ee8}{00888}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ab554b55b369204ce7974a2ae76733ee8}{isBuildable}}(\$concrete,\ \$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00889}00889\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00890}00890\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$concrete\ ===\ \$abstract\ ||\ \$concrete\ instanceof\ Closure;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00891}00891\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00892}00892\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00902}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a3d405d755e5a2a9ed329558bb0ad21bc}{00902}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a3d405d755e5a2a9ed329558bb0ad21bc}{build}}(\$concrete)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00903}00903\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00904}00904\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ concrete\ type\ is\ actually\ a\ Closure,\ we\ will\ just\ execute\ it\ and}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00905}00905\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ hand\ back\ the\ results\ of\ the\ functions,\ which\ allows\ functions\ to\ be}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00906}00906\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ used\ as\ resolvers\ for\ more\ fine-\/tuned\ resolution\ of\ these\ objects.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00907}00907\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$concrete\ instanceof\ Closure)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00908}00908\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$concrete(\$this,\ \$this-\/>getLastParameterOverride());}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00909}00909\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00910}00910\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00911}00911\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00912}00912\ \ \ \ \ \ \ \ \ \ \ \ \ \$reflector\ =\ \textcolor{keyword}{new}\ ReflectionClass(\$concrete);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00913}00913\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (ReflectionException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00914}00914\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_contracts_1_1_container_1_1_binding_resolution_exception}{BindingResolutionException}}(\textcolor{stringliteral}{"{}Target\ class\ [\$concrete]\ does\ not\ exist."{}},\ 0,\ \$e);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00915}00915\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00916}00916\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00917}00917\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ type\ is\ not\ instantiable,\ the\ developer\ is\ attempting\ to\ resolve}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00918}00918\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ an\ abstract\ type\ such\ as\ an\ Interface\ or\ Abstract\ Class\ and\ there\ is}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00919}00919\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ no\ binding\ registered\ for\ the\ abstractions\ so\ we\ need\ to\ bail\ out.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00920}00920\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$reflector-\/>isInstantiable())\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00921}00921\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>notInstantiable(\$concrete);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00922}00922\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00923}00923\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00924}00924\ \ \ \ \ \ \ \ \ \$this-\/>buildStack[]\ =\ \$concrete;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00925}00925\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00926}00926\ \ \ \ \ \ \ \ \ \$constructor\ =\ \$reflector-\/>getConstructor();}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00927}00927\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00928}00928\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ there\ are\ no\ constructors,\ that\ means\ there\ are\ no\ dependencies\ then}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00929}00929\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ can\ just\ resolve\ the\ instances\ of\ the\ objects\ right\ away,\ without}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00930}00930\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ resolving\ any\ other\ types\ or\ dependencies\ out\ of\ these\ containers.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00931}00931\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$constructor))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00932}00932\ \ \ \ \ \ \ \ \ \ \ \ \ array\_pop(\$this-\/>buildStack);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00933}00933\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00934}00934\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \$concrete;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00935}00935\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00936}00936\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00937}00937\ \ \ \ \ \ \ \ \ \$dependencies\ =\ \$constructor-\/>getParameters();}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00938}00938\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00939}00939\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Once\ we\ have\ all\ the\ constructor's\ parameters\ we\ can\ create\ each\ of\ the}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00940}00940\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ dependency\ instances\ and\ then\ use\ the\ reflection\ instances\ to\ make\ a}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00941}00941\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ new\ instance\ of\ this\ class,\ injecting\ the\ created\ dependencies\ in.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00942}00942\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00943}00943\ \ \ \ \ \ \ \ \ \ \ \ \ \$instances\ =\ \$this-\/>resolveDependencies(\$dependencies);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00944}00944\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{class_illuminate_1_1_contracts_1_1_container_1_1_binding_resolution_exception}{BindingResolutionException}}\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00945}00945\ \ \ \ \ \ \ \ \ \ \ \ \ array\_pop(\$this-\/>buildStack);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00946}00946\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00947}00947\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00948}00948\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00949}00949\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00950}00950\ \ \ \ \ \ \ \ \ array\_pop(\$this-\/>buildStack);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00951}00951\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00952}00952\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$reflector-\/>newInstanceArgs(\$instances);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00953}00953\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00954}00954\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00963}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2fd156db546738ee01f0a08bfd95a588}{00963}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2fd156db546738ee01f0a08bfd95a588}{resolveDependencies}}(array\ \$dependencies)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00964}00964\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00965}00965\ \ \ \ \ \ \ \ \ \$results\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00966}00966\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00967}00967\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$dependencies\ as\ \$dependency)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00968}00968\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ dependency\ has\ an\ override\ for\ this\ particular\ build\ we\ will\ use}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00969}00969\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ that\ instead\ as\ the\ value.\ Otherwise,\ we\ will\ continue\ with\ this\ run}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00970}00970\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ of\ resolutions\ and\ let\ reflection\ attempt\ to\ determine\ the\ result.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00971}00971\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>hasParameterOverride(\$dependency))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00972}00972\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$results[]\ =\ \$this-\/>getParameterOverride(\$dependency);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00973}00973\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00974}00974\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00975}00975\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00976}00976\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00977}00977\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ class\ is\ null,\ it\ means\ the\ dependency\ is\ a\ string\ or\ some\ other}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00978}00978\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ primitive\ type\ which\ we\ can\ not\ resolve\ since\ it\ is\ not\ a\ class\ and}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00979}00979\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ will\ just\ bomb\ out\ with\ an\ error\ since\ we\ have\ no-\/where\ to\ go.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00980}00980\ \ \ \ \ \ \ \ \ \ \ \ \ \$result\ =\ is\_null(\mbox{\hyperlink{class_illuminate_1_1_container_1_1_util_a9e8f2d2eda2a72ac16b1019ef2161d4b}{Util::getParameterClassName}}(\$dependency))}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00981}00981\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$this-\/>resolvePrimitive(\$dependency)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00982}00982\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$this-\/>resolveClass(\$dependency);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00983}00983\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00984}00984\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$dependency-\/>isVariadic())\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00985}00985\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$results\ =\ array\_merge(\$results,\ \$result);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00986}00986\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00987}00987\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$results[]\ =\ \$result;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00988}00988\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00989}00989\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00990}00990\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00991}00991\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$results;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00992}00992\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l00993}00993\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01000}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ab668fd20ee128aee5a1a4df011b700a9}{01000}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ab668fd20ee128aee5a1a4df011b700a9}{hasParameterOverride}}(\$dependency)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01001}01001\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01002}01002\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_key\_exists(}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01003}01003\ \ \ \ \ \ \ \ \ \ \ \ \ \$dependency-\/>name,\ \$this-\/>getLastParameterOverride()}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01004}01004\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01005}01005\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01006}01006\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01013}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_acb79c6ef48c9dcb1e4c23eb2930d4440}{01013}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_acb79c6ef48c9dcb1e4c23eb2930d4440}{getParameterOverride}}(\$dependency)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01014}01014\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01015}01015\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>getLastParameterOverride()[\$dependency-\/>name];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01016}01016\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01017}01017\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01023}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a9a538dff19d982c41fe5e6f1c2bdc0e5}{01023}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a9a538dff19d982c41fe5e6f1c2bdc0e5}{getLastParameterOverride}}()}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01024}01024\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01025}01025\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ count(\$this-\/>with)\ ?\ end(\$this-\/>with)\ :\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01026}01026\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01027}01027\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01036}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a692fb2c36c08222de3dc068861cf1cec}{01036}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a692fb2c36c08222de3dc068861cf1cec}{resolvePrimitive}}(ReflectionParameter\ \$parameter)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01037}01037\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01038}01038\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_null(\$concrete\ =\ \$this-\/>getContextualConcrete(\textcolor{charliteral}{'\$'}.\$parameter-\/>getName())))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01039}01039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_util_ad12016b9d2d0197e2f1bb5b029c56531}{Util::unwrapIfClosure}}(\$concrete,\ \$this);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01040}01040\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01041}01041\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01042}01042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$parameter-\/>isDefaultValueAvailable())\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01043}01043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$parameter-\/>getDefaultValue();}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01044}01044\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01045}01045\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01046}01046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$parameter-\/>isVariadic())\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01047}01047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01048}01048\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01049}01049\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01050}01050\ \ \ \ \ \ \ \ \ \$this-\/>unresolvablePrimitive(\$parameter);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01051}01051\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01052}01052\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01061}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6ed66066a5cc6650b251c48b07cf63ad}{01061}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6ed66066a5cc6650b251c48b07cf63ad}{resolveClass}}(ReflectionParameter\ \$parameter)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01062}01062\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01063}01063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01064}01064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$parameter-\/>isVariadic()}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01065}01065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$this-\/>resolveVariadicClass(\$parameter)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01066}01066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$this-\/>make(\mbox{\hyperlink{class_illuminate_1_1_container_1_1_util_a9e8f2d2eda2a72ac16b1019ef2161d4b}{Util::getParameterClassName}}(\$parameter));}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01067}01067\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01068}01068\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01069}01069\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ can\ not\ resolve\ the\ class\ instance,\ we\ will\ check\ to\ see\ if\ the\ value}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01070}01070\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ is\ optional,\ and\ if\ it\ is\ we\ will\ return\ the\ optional\ parameter\ value\ as}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01071}01071\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ value\ of\ the\ dependency,\ similarly\ to\ how\ we\ do\ this\ with\ scalars.}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01072}01072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{class_illuminate_1_1_contracts_1_1_container_1_1_binding_resolution_exception}{BindingResolutionException}}\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01073}01073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$parameter-\/>isDefaultValueAvailable())\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01074}01074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_pop(\$this-\/>with);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01075}01075\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01076}01076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$parameter-\/>getDefaultValue();}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01077}01077\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01078}01078\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01079}01079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$parameter-\/>isVariadic())\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01080}01080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_pop(\$this-\/>with);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01081}01081\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01082}01082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01083}01083\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01084}01084\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01085}01085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$e;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01086}01086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01087}01087\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01088}01088\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01095}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a4aef03cfda580d9bef1e3f9d3d1f2aaa}{01095}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a4aef03cfda580d9bef1e3f9d3d1f2aaa}{resolveVariadicClass}}(ReflectionParameter\ \$parameter)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01096}01096\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01097}01097\ \ \ \ \ \ \ \ \ \$className\ =\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_util_a9e8f2d2eda2a72ac16b1019ef2161d4b}{Util::getParameterClassName}}(\$parameter);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01098}01098\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01099}01099\ \ \ \ \ \ \ \ \ \$abstract\ =\ \$this-\/>getAlias(\$className);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01100}01100\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01101}01101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_array(\$concrete\ =\ \$this-\/>getContextualConcrete(\$abstract)))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01102}01102\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>make(\$className);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01103}01103\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01104}01104\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01105}01105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_map(fn\ (\$abstract)\ =>\ \$this-\/>resolve(\$abstract),\ \$concrete);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01106}01106\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01107}01107\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01116}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a3f174f351aa85a6860190cf4f5ccf4c7}{01116}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a3f174f351aa85a6860190cf4f5ccf4c7}{notInstantiable}}(\$concrete)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01117}01117\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01118}01118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ empty(\$this-\/>buildStack))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01119}01119\ \ \ \ \ \ \ \ \ \ \ \ \ \$previous\ =\ implode(\textcolor{stringliteral}{',\ '},\ \$this-\/>buildStack);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01120}01120\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01121}01121\ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \textcolor{stringliteral}{"{}Target\ [\$concrete]\ is\ not\ instantiable\ while\ building\ [\$previous]."{}};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01122}01122\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01123}01123\ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \textcolor{stringliteral}{"{}Target\ [\$concrete]\ is\ not\ instantiable."{}};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01124}01124\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01125}01125\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01126}01126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_contracts_1_1_container_1_1_binding_resolution_exception}{BindingResolutionException}}(\$message);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01127}01127\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01128}01128\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01137}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a8d8b2af247151ca231ef4b4dc2752e24}{01137}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a8d8b2af247151ca231ef4b4dc2752e24}{unresolvablePrimitive}}(ReflectionParameter\ \$parameter)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01138}01138\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01139}01139\ \ \ \ \ \ \ \ \ \$message\ =\ \textcolor{stringliteral}{"{}Unresolvable\ dependency\ resolving\ [\$parameter]\ in\ class\ \{\$parameter-\/>getDeclaringClass()-\/>getName()\}"{}};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01140}01140\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01141}01141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_contracts_1_1_container_1_1_binding_resolution_exception}{BindingResolutionException}}(\$message);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01142}01142\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01143}01143\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01151}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2b1f4d9234f6d26442e4d297846770ff}{01151}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a2b1f4d9234f6d26442e4d297846770ff}{beforeResolving}}(\$abstract,\ Closure\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01152}01152\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01153}01153\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$abstract))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01154}01154\ \ \ \ \ \ \ \ \ \ \ \ \ \$abstract\ =\ \$this-\/>getAlias(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01155}01155\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01156}01156\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01157}01157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$abstract\ instanceof\ Closure\ \&\&\ is\_null(\$callback))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01158}01158\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>globalBeforeResolvingCallbacks[]\ =\ \$abstract;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01159}01159\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01160}01160\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>beforeResolvingCallbacks[\$abstract][]\ =\ \$callback;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01161}01161\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01162}01162\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01163}01163\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01171}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ae8d397f4e30f42df232ee8e3e6a0b245}{01171}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ae8d397f4e30f42df232ee8e3e6a0b245}{resolving}}(\$abstract,\ Closure\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01172}01172\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01173}01173\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$abstract))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01174}01174\ \ \ \ \ \ \ \ \ \ \ \ \ \$abstract\ =\ \$this-\/>getAlias(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01175}01175\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01176}01176\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01177}01177\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$callback)\ \&\&\ \$abstract\ instanceof\ Closure)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01178}01178\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>globalResolvingCallbacks[]\ =\ \$abstract;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01179}01179\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01180}01180\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>resolvingCallbacks[\$abstract][]\ =\ \$callback;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01181}01181\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01182}01182\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01183}01183\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01191}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aacc1402466f372c1fce91da13b7b1c1f}{01191}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_aacc1402466f372c1fce91da13b7b1c1f}{afterResolving}}(\$abstract,\ Closure\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01192}01192\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01193}01193\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$abstract))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01194}01194\ \ \ \ \ \ \ \ \ \ \ \ \ \$abstract\ =\ \$this-\/>getAlias(\$abstract);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01195}01195\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01196}01196\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01197}01197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$abstract\ instanceof\ Closure\ \&\&\ is\_null(\$callback))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01198}01198\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>globalAfterResolvingCallbacks[]\ =\ \$abstract;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01199}01199\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01200}01200\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>afterResolvingCallbacks[\$abstract][]\ =\ \$callback;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01201}01201\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01202}01202\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01203}01203\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01211}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_adeee37dcac7d231e6384bb2694d60001}{01211}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_adeee37dcac7d231e6384bb2694d60001}{fireBeforeResolvingCallbacks}}(\$abstract,\ \$parameters\ =\ [])}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01212}01212\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01213}01213\ \ \ \ \ \ \ \ \ \$this-\/>fireBeforeCallbackArray(\$abstract,\ \$parameters,\ \$this-\/>globalBeforeResolvingCallbacks);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01214}01214\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01215}01215\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>beforeResolvingCallbacks\ as\ \$type\ =>\ \$callbacks)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01216}01216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$type\ ===\ \$abstract\ ||\ is\_subclass\_of(\$abstract,\ \$type))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01217}01217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>fireBeforeCallbackArray(\$abstract,\ \$parameters,\ \$callbacks);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01218}01218\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01219}01219\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01220}01220\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01221}01221\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01230}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad1360d39a625c5527dbc66433bd31d73}{01230}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad1360d39a625c5527dbc66433bd31d73}{fireBeforeCallbackArray}}(\$abstract,\ \$parameters,\ array\ \$callbacks)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01231}01231\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01232}01232\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$callbacks\ as\ \$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01233}01233\ \ \ \ \ \ \ \ \ \ \ \ \ \$callback(\$abstract,\ \$parameters,\ \$this);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01234}01234\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01235}01235\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01236}01236\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01244}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a15fd756f563074482815aa15491c8d7d}{01244}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a15fd756f563074482815aa15491c8d7d}{fireResolvingCallbacks}}(\$abstract,\ \$object)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01245}01245\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01246}01246\ \ \ \ \ \ \ \ \ \$this-\/>fireCallbackArray(\$object,\ \$this-\/>globalResolvingCallbacks);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01247}01247\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01248}01248\ \ \ \ \ \ \ \ \ \$this-\/>fireCallbackArray(}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01249}01249\ \ \ \ \ \ \ \ \ \ \ \ \ \$object,\ \$this-\/>getCallbacksForType(\$abstract,\ \$object,\ \$this-\/>resolvingCallbacks)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01250}01250\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01251}01251\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01252}01252\ \ \ \ \ \ \ \ \ \$this-\/>fireAfterResolvingCallbacks(\$abstract,\ \$object);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01253}01253\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01254}01254\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01262}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a0a62670dbc82a17fb9ed7db2264d757c}{01262}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a0a62670dbc82a17fb9ed7db2264d757c}{fireAfterResolvingCallbacks}}(\$abstract,\ \$object)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01263}01263\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01264}01264\ \ \ \ \ \ \ \ \ \$this-\/>fireCallbackArray(\$object,\ \$this-\/>globalAfterResolvingCallbacks);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01265}01265\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01266}01266\ \ \ \ \ \ \ \ \ \$this-\/>fireCallbackArray(}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01267}01267\ \ \ \ \ \ \ \ \ \ \ \ \ \$object,\ \$this-\/>getCallbacksForType(\$abstract,\ \$object,\ \$this-\/>afterResolvingCallbacks)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01268}01268\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01269}01269\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01270}01270\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01279}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a69a1b8e87172c8de2570429ccda91bda}{01279}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a69a1b8e87172c8de2570429ccda91bda}{getCallbacksForType}}(\$abstract,\ \$object,\ array\ \$callbacksPerType)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01280}01280\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01281}01281\ \ \ \ \ \ \ \ \ \$results\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01282}01282\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01283}01283\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$callbacksPerType\ as\ \$type\ =>\ \$callbacks)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01284}01284\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$type\ ===\ \$abstract\ ||\ \$object\ instanceof\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01285}01285\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$results\ =\ array\_merge(\$results,\ \$callbacks);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01286}01286\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01287}01287\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01288}01288\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01289}01289\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$results;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01290}01290\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01291}01291\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01299}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_adf60acf03d095363df747b62bd6ac018}{01299}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_adf60acf03d095363df747b62bd6ac018}{fireCallbackArray}}(\$object,\ array\ \$callbacks)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01300}01300\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01301}01301\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$callbacks\ as\ \$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01302}01302\ \ \ \ \ \ \ \ \ \ \ \ \ \$callback(\$object,\ \$this);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01303}01303\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01304}01304\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01305}01305\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01311}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad89786cda7caa3dc6dd46f4e4af51ede}{01311}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ad89786cda7caa3dc6dd46f4e4af51ede}{getBindings}}()}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01312}01312\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01313}01313\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>bindings;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01314}01314\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01315}01315\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01322}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7ea389b4ec4a2b24ea654b6b72881770}{01322}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7ea389b4ec4a2b24ea654b6b72881770}{getAlias}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01323}01323\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01324}01324\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ isset(\$this-\/>aliases[\$abstract])}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01325}01325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$this-\/>getAlias(\$this-\/>aliases[\$abstract])}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01326}01326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$abstract;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01327}01327\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01328}01328\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01335}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a0c8f9ea0789f6a96fa91619faf6ea13c}{01335}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a0c8f9ea0789f6a96fa91619faf6ea13c}{getExtenders}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01336}01336\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01337}01337\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>extenders[\$this-\/>getAlias(\$abstract)]\ ??\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01338}01338\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01339}01339\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01346}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a81976c0df5fd7ca2fd7775fe7e5dd2f9}{01346}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a81976c0df5fd7ca2fd7775fe7e5dd2f9}{forgetExtenders}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01347}01347\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01348}01348\ \ \ \ \ \ \ \ \ unset(\$this-\/>extenders[\$this-\/>getAlias(\$abstract)]);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01349}01349\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01350}01350\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01357}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6b883ce3e4c5934bf16347aba616a96e}{01357}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6b883ce3e4c5934bf16347aba616a96e}{dropStaleInstances}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01358}01358\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01359}01359\ \ \ \ \ \ \ \ \ unset(\$this-\/>instances[\$abstract],\ \$this-\/>aliases[\$abstract]);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01360}01360\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01361}01361\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01368}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a5da7e83db8d5b0b79397c86a86f63630}{01368}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a5da7e83db8d5b0b79397c86a86f63630}{forgetInstance}}(\$abstract)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01369}01369\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01370}01370\ \ \ \ \ \ \ \ \ unset(\$this-\/>instances[\$abstract]);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01371}01371\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01372}01372\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01378}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a417e426ebd6aeba268ab1a0f71b3be31}{01378}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a417e426ebd6aeba268ab1a0f71b3be31}{forgetInstances}}()}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01379}01379\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01380}01380\ \ \ \ \ \ \ \ \ \$this-\/>instances\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01381}01381\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01382}01382\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01388}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a9787f0f5bc037b2a003fc3ad4f6d663a}{01388}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a9787f0f5bc037b2a003fc3ad4f6d663a}{forgetScopedInstances}}()}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01389}01389\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01390}01390\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>scopedInstances\ as\ \$scoped)\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01391}01391\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$this-\/>instances[\$scoped]);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01392}01392\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01393}01393\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01394}01394\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01400}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7751f77b5263bcf940ece6e824a05b38}{01400}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a7751f77b5263bcf940ece6e824a05b38}{flush}}()}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01401}01401\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01402}01402\ \ \ \ \ \ \ \ \ \$this-\/>aliases\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01403}01403\ \ \ \ \ \ \ \ \ \$this-\/>resolved\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01404}01404\ \ \ \ \ \ \ \ \ \$this-\/>bindings\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01405}01405\ \ \ \ \ \ \ \ \ \$this-\/>instances\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01406}01406\ \ \ \ \ \ \ \ \ \$this-\/>abstractAliases\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01407}01407\ \ \ \ \ \ \ \ \ \$this-\/>scopedInstances\ =\ [];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01408}01408\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01409}01409\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01415}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ac93fbec81f07e5d15f80db907e63dc10}{01415}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_ac93fbec81f07e5d15f80db907e63dc10}{getInstance}}()}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01416}01416\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01417}01417\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(static::\$instance))\ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01418}01418\ \ \ \ \ \ \ \ \ \ \ \ \ static::\$instance\ =\ \textcolor{keyword}{new}\ \textcolor{keyword}{static};}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01419}01419\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01420}01420\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01421}01421\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ static::\$instance;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01422}01422\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01423}01423\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01430}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a42de71add663233881f545798ec5c82e}{01430}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a42de71add663233881f545798ec5c82e}{setInstance}}(ContainerContract\ \$container\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01431}01431\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01432}01432\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ static::\$instance\ =\ \$container;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01433}01433\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01434}01434\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01441}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a72b9545b16ea105298bb0d2109bd2fbe}{01441}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a72b9545b16ea105298bb0d2109bd2fbe}{offsetExists}}(\$key):\ bool}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01442}01442\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01443}01443\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>bound(\$key);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01444}01444\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01445}01445\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01452}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6e8e2b3128ee9bd6be930cb296c02ac7}{01452}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a6e8e2b3128ee9bd6be930cb296c02ac7}{offsetGet}}(\$key):\ mixed}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01453}01453\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01454}01454\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>make(\$key);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01455}01455\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01456}01456\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01464}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a3199adfa66a63d34fb355f3ccf39bf0a}{01464}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a3199adfa66a63d34fb355f3ccf39bf0a}{offsetSet}}(\$key,\ \$value):\ void}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01465}01465\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01466}01466\ \ \ \ \ \ \ \ \ \$this-\/>bind(\$key,\ \$value\ instanceof\ Closure\ ?\ \$value\ :\ fn\ ()\ =>\ \$value);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01467}01467\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01468}01468\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01475}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a1d11d3dade07ef846d01a397abfaf0d9}{01475}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a1d11d3dade07ef846d01a397abfaf0d9}{offsetUnset}}(\$key):\ void}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01476}01476\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01477}01477\ \ \ \ \ \ \ \ \ unset(\$this-\/>bindings[\$key],\ \$this-\/>instances[\$key],\ \$this-\/>resolved[\$key]);}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01478}01478\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01479}01479\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01486}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a4537dad3b44254124991341cc91b28fb}{01486}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a4537dad3b44254124991341cc91b28fb}{\_\_get}}(\$key)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01487}01487\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01488}01488\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this[\$key];}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01489}01489\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01490}01490\ }
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01498}\mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a79b36d71c6f1d4f9e6c4c3e34c081456}{01498}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container_a79b36d71c6f1d4f9e6c4c3e34c081456}{\_\_set}}(\$key,\ \$value)}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01499}01499\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01500}01500\ \ \ \ \ \ \ \ \ \$this[\$key]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01501}01501\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{laravel_2framework_2src_2_illuminate_2_container_2_container_8php_source_l01502}01502\ \}}
+
+\end{DoxyCode}

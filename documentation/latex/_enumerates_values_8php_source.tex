@@ -1,0 +1,625 @@
+\doxysection{Enumerates\+Values.\+php}
+\hypertarget{_enumerates_values_8php_source}{}\label{_enumerates_values_8php_source}\index{vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php@{vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php}}
+\mbox{\hyperlink{_enumerates_values_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00003}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits}{00003}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits}{Illuminate\(\backslash\)Support\(\backslash\)Traits}};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00005}00005\ use\ CachingIterator;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00006}00006\ use\ Closure;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00007}00007\ use\ Exception;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00008}00008\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_arrayable}{Illuminate\(\backslash\)Contracts\(\backslash\)Support\(\backslash\)Arrayable}};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00009}00009\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_jsonable}{Illuminate\(\backslash\)Contracts\(\backslash\)Support\(\backslash\)Jsonable}};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_arr}{Illuminate\(\backslash\)Support\(\backslash\)Arr}};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_collection}{Illuminate\(\backslash\)Support\(\backslash\)Collection}};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00012}00012\ use\ \mbox{\hyperlink{interface_illuminate_1_1_support_1_1_enumerable}{Illuminate\(\backslash\)Support\(\backslash\)Enumerable}};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00013}00013\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_higher_order_collection_proxy}{Illuminate\(\backslash\)Support\(\backslash\)HigherOrderCollectionProxy}};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00014}00014\ use\ JsonSerializable;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_var_dumper_1_1_var_dumper}{Symfony\(\backslash\)Component\(\backslash\)VarDumper\(\backslash\)VarDumper}};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00016}00016\ use\ Traversable;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00017}00017\ use\ UnexpectedValueException;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00018}00018\ use\ UnitEnum;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00055}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ae72c7fb8610f988629794630caf8f859}{00055}}\ trait\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ae72c7fb8610f988629794630caf8f859}{EnumeratesValues}}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00056}00056\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00057}00057\ \ \ \ \ use\ Conditionable;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00064}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a23320181745fbc0e7117d8d505fa321b}{00064}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a23320181745fbc0e7117d8d505fa321b}{\$escapeWhenCastingToString}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{static}\ \$proxies\ =\ [}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'average'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'avg'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'contains'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'doesntContain'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'each'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'every'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'filter'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'first'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'flatMap'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'groupBy'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'keyBy'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'map'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'max'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'min'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'partition'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'percentage'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'reject'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'skipUntil'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'skipWhile'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'some'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'sortBy'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'sortByDesc'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'sum'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'takeUntil'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'takeWhile'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'unique'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'unless'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'until'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'when'},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00101}00101\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00112}00112\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ make(\$items\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00113}00113\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \textcolor{keyword}{static}(\$items);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00115}00115\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00125}00125\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ wrap(\$value)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00126}00126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_support_1_1_enumerable}{Enumerable}}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \textcolor{keyword}{new}\ \textcolor{keyword}{static}(\$value)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ :\ new\ static(\mbox{\hyperlink{class_illuminate_1_1_support_1_1_arr}{Arr}}::wrap(\$value));}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00130}00130\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00141}00141\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ unwrap(\$value)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00142}00142\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value\ instanceof\ Enumerable\ ?\ \$value-\/>all()\ :\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00144}00144\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00151}00151\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ empty()}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00152}00152\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \textcolor{keyword}{static}([]);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00154}00154\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00165}00165\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ times(\$number,\ callable\ \$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00166}00166\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$number\ <\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \textcolor{keyword}{static};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ static::range(1,\ \$number)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>unless(\$callback\ ==\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>map(\$callback);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00174}00174\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00182}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_acc5ff0ce6aad56c67213acca7dbc5f5d}{00182}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_acc5ff0ce6aad56c67213acca7dbc5f5d}{average}}(\$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00183}00183\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>avg(\$callback);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00185}00185\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00195}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_acf2a14c7c0c3d5d530dbb36d33c9b49c}{00195}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_acf2a14c7c0c3d5d530dbb36d33c9b49c}{some}}(\$key,\ \$operator\ =\ \textcolor{keyword}{null},\ \$value\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00196}00196\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>contains(...func\_get\_args());}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00198}00198\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00206}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a7bd4e8916a6c5746dd1005dd1ca8d81b}{00206}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a7bd4e8916a6c5746dd1005dd1ca8d81b}{dd}}(...\$args)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00207}00207\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a5bf63e4ac70cfd9d97e3f2eab936ec8b}{dump}}(...\$args);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ exit(1);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00211}00211\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00218}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a5bf63e4ac70cfd9d97e3f2eab936ec8b}{00218}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a5bf63e4ac70cfd9d97e3f2eab936ec8b}{dump}}()}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00219}00219\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_collection}{Collection}}(func\_get\_args()))}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>push(\$this-\/>all())}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a250aed01ee1641984f4a8f96be76f927}{each}}(\textcolor{keyword}{function}\ (\$item)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_symfony_1_1_component_1_1_var_dumper_1_1_var_dumper_a20663321d545a4551b30162244405f2a}{VarDumper::dump}}(\$item);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00227}00227\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00235}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a250aed01ee1641984f4a8f96be76f927}{00235}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a250aed01ee1641984f4a8f96be76f927}{each}}(callable\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00236}00236\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this\ as\ \$key\ =>\ \$item)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$callback(\$item,\ \$key)\ ===\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00244}00244\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00252}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a02aeddecc7f9c674e43327c8fd6ba7a1}{00252}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a02aeddecc7f9c674e43327c8fd6ba7a1}{eachSpread}}(callable\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00253}00253\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a250aed01ee1641984f4a8f96be76f927}{each}}(\textcolor{keyword}{function}\ (\$chunk,\ \$key)\ use\ (\$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \$chunk[]\ =\ \$key;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$callback(...\$chunk);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00259}00259\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00269}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a693afc27222448eb36cd6c610337e9c3}{00269}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a693afc27222448eb36cd6c610337e9c3}{every}}(\$key,\ \$operator\ =\ \textcolor{keyword}{null},\ \$value\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00270}00270\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (func\_num\_args()\ ===\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \$callback\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aa65bd2d446918a2af74a51b81c3be2d2}{valueRetriever}}(\$key);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this\ as\ \$k\ =>\ \$v)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$callback(\$v,\ \$k))\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a693afc27222448eb36cd6c610337e9c3}{every}}(\$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ad7658c9ae3fa24386ca35d9de7764535}{operatorForWhere}}(...func\_get\_args()));}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00284}00284\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00294}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af9b1bd57cc4b37e19342270f0d7ba3f9}{00294}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af9b1bd57cc4b37e19342270f0d7ba3f9}{firstWhere}}(\$key,\ \$operator\ =\ \textcolor{keyword}{null},\ \$value\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00295}00295\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>first(\$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ad7658c9ae3fa24386ca35d9de7764535}{operatorForWhere}}(...func\_get\_args()));}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00297}00297\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00298}00298\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00308}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a3f200fdf9641e6aa8934d7b044ee6295}{00308}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a3f200fdf9641e6aa8934d7b044ee6295}{value}}(\$key,\ \$default\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00309}00309\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af9b1bd57cc4b37e19342270f0d7ba3f9}{firstWhere}}(\$key))\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ data\_get(\$value,\ \$key,\ \$default);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a3f200fdf9641e6aa8934d7b044ee6295}{value}}(\$default);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00315}00315\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00316}00316\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00327}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a604a1a5719d669c3986334aa155e3070}{00327}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a604a1a5719d669c3986334aa155e3070}{ensure}}(\$type)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00328}00328\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a250aed01ee1641984f4a8f96be76f927}{each}}(\textcolor{keyword}{function}\ (\$item)\ use\ (\$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \$itemType\ =\ get\_debug\_type(\$item);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00331}00331\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$itemType\ !==\ \$type\ \&\&\ !\ \$item\ instanceof\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ UnexpectedValueException(}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sprintf(\textcolor{stringliteral}{"{}Collection\ should\ only\ include\ '\%s'\ items,\ but\ '\%s'\ found."{}},\ \$type,\ \$itemType)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00338}00338\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00345}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a7df677167890c55cd94b713fbf568626}{00345}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a7df677167890c55cd94b713fbf568626}{isNotEmpty}}()}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00346}00346\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\ \$this-\/>isEmpty();}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00348}00348\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00358}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ab5243ec509311d7664c97f0bb56d115e}{00358}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ab5243ec509311d7664c97f0bb56d115e}{mapSpread}}(callable\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00359}00359\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>map(\textcolor{keyword}{function}\ (\$chunk,\ \$key)\ use\ (\$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \$chunk[]\ =\ \$key;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00362}00362\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$callback(...\$chunk);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00365}00365\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00378}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a8fcbfee16cfe88058930fb63bed52e7d}{00378}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a8fcbfee16cfe88058930fb63bed52e7d}{mapToGroups}}(callable\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00379}00379\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00380}00380\ \ \ \ \ \ \ \ \ \$groups\ =\ \$this-\/>mapToDictionary(\$callback);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00381}00381\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$groups-\/>map([\$this,\ \textcolor{stringliteral}{'make'}]);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00383}00383\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00384}00384\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00394}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ae2d65f8b5caa651ae5bcbef73976cdf1}{00394}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ae2d65f8b5caa651ae5bcbef73976cdf1}{flatMap}}(callable\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00395}00395\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00396}00396\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>map(\$callback)-\/>collapse();}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00397}00397\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00407}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a401c5c73bdf7df148aeb0b715fbfd3b3}{00407}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a401c5c73bdf7df148aeb0b715fbfd3b3}{mapInto}}(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00408}00408\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00409}00409\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>map(fn\ (\$value,\ \$key)\ =>\ \textcolor{keyword}{new}\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}(\$value,\ \$key));}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00410}00410\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00411}00411\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00418}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aa30b199f9fa7f4a6520e728618735a2d}{00418}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aa30b199f9fa7f4a6520e728618735a2d}{min}}(\$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00419}00419\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00420}00420\ \ \ \ \ \ \ \ \ \$callback\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aa65bd2d446918a2af74a51b81c3be2d2}{valueRetriever}}(\$callback);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00421}00421\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00422}00422\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>map(fn\ (\$value)\ =>\ \$callback(\$value))}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>filter(fn\ (\$value)\ =>\ !\ is\_null(\$value))}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ -\/>reduce(fn\ (\$result,\ \$value)\ =>\ is\_null(\$result)\ ||\ \$value\ <\ \$result\ ?\ \$value\ :\ \$result);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00425}00425\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00426}00426\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00433}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a56d9fc87df339998f88486b0b09214c0}{00433}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a56d9fc87df339998f88486b0b09214c0}{max}}(\$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00434}00434\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \$callback\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aa65bd2d446918a2af74a51b81c3be2d2}{valueRetriever}}(\$callback);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>filter(fn\ (\$value)\ =>\ !\ is\_null(\$value))-\/>reduce(\textcolor{keyword}{function}\ (\$result,\ \$item)\ use\ (\$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \$callback(\$item);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00439}00439\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_null(\$result)\ ||\ \$value\ >\ \$result\ ?\ \$value\ :\ \$result;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00441}00441\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00442}00442\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00443}00443\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00451}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a5235f2cfc5f6f6d9e2ba8aee56b5c0ef}{00451}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a5235f2cfc5f6f6d9e2ba8aee56b5c0ef}{forPage}}(\$page,\ \$perPage)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00452}00452\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \$offset\ =\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a56d9fc87df339998f88486b0b09214c0}{max}}(0,\ (\$page\ -\/\ 1)\ *\ \$perPage);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00454}00454\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>slice(\$offset,\ \$perPage);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00456}00456\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00457}00457\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00466}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ac73ed81e9fb06c843620ba21c2aecdd8}{00466}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ac73ed81e9fb06c843620ba21c2aecdd8}{partition}}(\$key,\ \$operator\ =\ \textcolor{keyword}{null},\ \$value\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00467}00467\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00468}00468\ \ \ \ \ \ \ \ \ \$passed\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \$failed\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00470}00470\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \$callback\ =\ func\_num\_args()\ ===\ 1}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aa65bd2d446918a2af74a51b81c3be2d2}{valueRetriever}}(\$key)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ad7658c9ae3fa24386ca35d9de7764535}{operatorForWhere}}(...func\_get\_args());}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00474}00474\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this\ as\ \$key\ =>\ \$item)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$callback(\$item,\ \$key))\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$passed[\$key]\ =\ \$item;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$failed[\$key]\ =\ \$item;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00482}00482\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00483}00483\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \textcolor{keyword}{static}([\textcolor{keyword}{new}\ \textcolor{keyword}{static}(\$passed),\ \textcolor{keyword}{new}\ \textcolor{keyword}{static}(\$failed)]);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00484}00484\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00485}00485\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00493}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_abe35d860045b2109db02146c1c16a38c}{00493}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_abe35d860045b2109db02146c1c16a38c}{percentage}}(callable\ \$callback,\ \textcolor{keywordtype}{int}\ \$precision\ =\ 2)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00494}00494\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00495}00495\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>isEmpty())\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00497}00497\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00498}00498\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00499}00499\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ round(}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>filter(\$callback)-\/>count()\ /\ \$this-\/>count()\ *\ 100,}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00501}00501\ \ \ \ \ \ \ \ \ \ \ \ \ \$precision}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00502}00502\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00503}00503\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00504}00504\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00511}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ad719dfc938503c8b1cc19e55900106ec}{00511}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ad719dfc938503c8b1cc19e55900106ec}{sum}}(\$callback\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00512}00512\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \$callback\ =\ is\_null(\$callback)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af98365ecb8f6de9af94e0c22b813511b}{identity}}()}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aa65bd2d446918a2af74a51b81c3be2d2}{valueRetriever}}(\$callback);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00516}00516\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af1dfb0d44fb942573bdba4d8a2288710}{reduce}}(fn\ (\$result,\ \$item)\ =>\ \$result\ +\ \$callback(\$item),\ 0);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00518}00518\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00519}00519\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00529}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a4f4cb8cc3263169a057ccfaf2abf1920}{00529}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a4f4cb8cc3263169a057ccfaf2abf1920}{whenEmpty}}(callable\ \$callback,\ callable\ \$default\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00530}00530\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>when(\$this-\/>isEmpty(),\ \$callback,\ \$default);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00532}00532\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00533}00533\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00543}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_afc54a626b4ce0f9677d6c1bb71288dfd}{00543}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_afc54a626b4ce0f9677d6c1bb71288dfd}{whenNotEmpty}}(callable\ \$callback,\ callable\ \$default\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00544}00544\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>when(\$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a7df677167890c55cd94b713fbf568626}{isNotEmpty}}(),\ \$callback,\ \$default);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00546}00546\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00547}00547\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00557}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aa88d969d094b8c2561d4e4f684d09400}{00557}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aa88d969d094b8c2561d4e4f684d09400}{unlessEmpty}}(callable\ \$callback,\ callable\ \$default\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00558}00558\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00559}00559\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_afc54a626b4ce0f9677d6c1bb71288dfd}{whenNotEmpty}}(\$callback,\ \$default);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00560}00560\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00561}00561\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00571}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ae9e252f1477c576260041d81fa12fb7d}{00571}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ae9e252f1477c576260041d81fa12fb7d}{unlessNotEmpty}}(callable\ \$callback,\ callable\ \$default\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00572}00572\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00573}00573\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a4f4cb8cc3263169a057ccfaf2abf1920}{whenEmpty}}(\$callback,\ \$default);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00574}00574\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00575}00575\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00584}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a31428ddb78f082c4c41e7bb4612884fc}{00584}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a31428ddb78f082c4c41e7bb4612884fc}{where}}(\$key,\ \$operator\ =\ \textcolor{keyword}{null},\ \$value\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00585}00585\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00586}00586\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>filter(\$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ad7658c9ae3fa24386ca35d9de7764535}{operatorForWhere}}(...func\_get\_args()));}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00587}00587\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00588}00588\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00595}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af9e57944e833d6ab297d591107b4dbe5}{00595}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af9e57944e833d6ab297d591107b4dbe5}{whereNull}}(\$key\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00596}00596\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00597}00597\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a32d832b6d80fe9edefddca88a494f007}{whereStrict}}(\$key,\ \textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00598}00598\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00599}00599\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00606}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a6d32e1e432b4530906844cf70b2d4ecb}{00606}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a6d32e1e432b4530906844cf70b2d4ecb}{whereNotNull}}(\$key\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00607}00607\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00608}00608\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a31428ddb78f082c4c41e7bb4612884fc}{where}}(\$key,\ \textcolor{stringliteral}{'!=='},\ \textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00609}00609\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00610}00610\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00618}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a32d832b6d80fe9edefddca88a494f007}{00618}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a32d832b6d80fe9edefddca88a494f007}{whereStrict}}(\$key,\ \$value)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00619}00619\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00620}00620\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a31428ddb78f082c4c41e7bb4612884fc}{where}}(\$key,\ \textcolor{stringliteral}{'==='},\ \$value);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00621}00621\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00622}00622\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00631}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a5cabf3e9c84bdb1fe3e0a89cbe8a4cab}{00631}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a5cabf3e9c84bdb1fe3e0a89cbe8a4cab}{whereIn}}(\$key,\ \$values,\ \$strict\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00632}00632\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00633}00633\ \ \ \ \ \ \ \ \ \$values\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a16d1d00d0d5b3210951d570e35cde835}{getArrayableItems}}(\$values);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00634}00634\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00635}00635\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>filter(fn\ (\$item)\ =>\ in\_array(data\_get(\$item,\ \$key),\ \$values,\ \$strict));}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00636}00636\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00637}00637\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00645}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a154986b3fc32b54577003bb49384e6e3}{00645}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a154986b3fc32b54577003bb49384e6e3}{whereInStrict}}(\$key,\ \$values)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00646}00646\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00647}00647\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a5cabf3e9c84bdb1fe3e0a89cbe8a4cab}{whereIn}}(\$key,\ \$values,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00648}00648\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00649}00649\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00657}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a7e0d5f6f6e06ce4f469241db47e5fbe8}{00657}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a7e0d5f6f6e06ce4f469241db47e5fbe8}{whereBetween}}(\$key,\ \$values)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00658}00658\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00659}00659\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a31428ddb78f082c4c41e7bb4612884fc}{where}}(\$key,\ \textcolor{stringliteral}{'>='},\ reset(\$values))-\/>where(\$key,\ \textcolor{stringliteral}{'<='},\ end(\$values));}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00660}00660\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00661}00661\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00669}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a8cfc0cb8d59878f8d324b7027e69ff6e}{00669}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a8cfc0cb8d59878f8d324b7027e69ff6e}{whereNotBetween}}(\$key,\ \$values)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00670}00670\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00671}00671\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>filter(}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00672}00672\ \ \ \ \ \ \ \ \ \ \ \ \ fn\ (\$item)\ =>\ data\_get(\$item,\ \$key)\ <\ reset(\$values)\ ||\ data\_get(\$item,\ \$key)\ >\ end(\$values)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00673}00673\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00674}00674\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00675}00675\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00684}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ae3f731bd73c1010dd624138459ba1124}{00684}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ae3f731bd73c1010dd624138459ba1124}{whereNotIn}}(\$key,\ \$values,\ \$strict\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00685}00685\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00686}00686\ \ \ \ \ \ \ \ \ \$values\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a16d1d00d0d5b3210951d570e35cde835}{getArrayableItems}}(\$values);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00687}00687\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00688}00688\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_afd78efd9d7457d6d8b26b03a3464a6ff}{reject}}(fn\ (\$item)\ =>\ in\_array(data\_get(\$item,\ \$key),\ \$values,\ \$strict));}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00689}00689\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00690}00690\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00698}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a74927d2be15d0da43bb5dc560d9aa7c0}{00698}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a74927d2be15d0da43bb5dc560d9aa7c0}{whereNotInStrict}}(\$key,\ \$values)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00699}00699\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00700}00700\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ae3f731bd73c1010dd624138459ba1124}{whereNotIn}}(\$key,\ \$values,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00701}00701\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00702}00702\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00711}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_abf86edefac6546f34fac4520874d8214}{00711}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_abf86edefac6546f34fac4520874d8214}{whereInstanceOf}}(\$type)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00712}00712\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00713}00713\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>filter(\textcolor{keyword}{function}\ (\$value)\ use\ (\$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00714}00714\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$type))\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00715}00715\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$type\ as\ \$classType)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00716}00716\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ instanceof\ \$classType)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00717}00717\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00718}00718\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00719}00719\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00720}00720\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00721}00721\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00722}00722\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00723}00723\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00724}00724\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value\ instanceof\ \$type;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00725}00725\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00726}00726\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00727}00727\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00736}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a916d21d7e7535115fb623833304f1c08}{00736}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a916d21d7e7535115fb623833304f1c08}{pipe}}(callable\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00737}00737\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00738}00738\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$callback(\$this);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00739}00739\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00740}00740\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00749}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a89682070e2a0cbe3fb8243d7567e706e}{00749}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a89682070e2a0cbe3fb8243d7567e706e}{pipeInto}}(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00750}00750\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00751}00751\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}(\$this);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00752}00752\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00753}00753\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00760}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a213a9730c29984e75330df79e26525c0}{00760}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a213a9730c29984e75330df79e26525c0}{pipeThrough}}(\$callbacks)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00761}00761\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00762}00762\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{interface_illuminate_1_1_support_1_1_enumerable_a661f2520220df3db1ac1a9bf366c091a}{Collection::make}}(\$callbacks)-\/>reduce(}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00763}00763\ \ \ \ \ \ \ \ \ \ \ \ \ fn\ (\$carry,\ \$callback)\ =>\ \$callback(\$carry),}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00764}00764\ \ \ \ \ \ \ \ \ \ \ \ \ \$this,}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00765}00765\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00766}00766\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00767}00767\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00778}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af1dfb0d44fb942573bdba4d8a2288710}{00778}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af1dfb0d44fb942573bdba4d8a2288710}{reduce}}(callable\ \$callback,\ \$initial\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00779}00779\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00780}00780\ \ \ \ \ \ \ \ \ \$result\ =\ \$initial;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00781}00781\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00782}00782\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00783}00783\ \ \ \ \ \ \ \ \ \ \ \ \ \$result\ =\ \$callback(\$result,\ \$value,\ \$key);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00784}00784\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00785}00785\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00786}00786\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$result;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00787}00787\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00788}00788\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00798}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aed5f527c7b699e282bc91a6e18ff7366}{00798}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aed5f527c7b699e282bc91a6e18ff7366}{reduceSpread}}(callable\ \$callback,\ ...\$initial)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00799}00799\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00800}00800\ \ \ \ \ \ \ \ \ \$result\ =\ \$initial;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00801}00801\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00802}00802\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00803}00803\ \ \ \ \ \ \ \ \ \ \ \ \ \$result\ =\ call\_user\_func\_array(\$callback,\ array\_merge(\$result,\ [\$value,\ \$key]));}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00804}00804\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00805}00805\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_array(\$result))\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00806}00806\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ UnexpectedValueException(sprintf(}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00807}00807\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\%s::reduceSpread\ expects\ reducer\ to\ return\ an\ array,\ but\ got\ a\ '\%s'\ instead."{}},}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00808}00808\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ class\_basename(static::class),\ gettype(\$result)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00809}00809\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00810}00810\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00811}00811\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00812}00812\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00813}00813\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$result;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00814}00814\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00815}00815\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00826}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ac5371524dcec7360c4c2e10e93fcde1c}{00826}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ac5371524dcec7360c4c2e10e93fcde1c}{reduceWithKeys}}(callable\ \$callback,\ \$initial\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00827}00827\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00828}00828\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af1dfb0d44fb942573bdba4d8a2288710}{reduce}}(\$callback,\ \$initial);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00829}00829\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00830}00830\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00837}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_afd78efd9d7457d6d8b26b03a3464a6ff}{00837}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_afd78efd9d7457d6d8b26b03a3464a6ff}{reject}}(\$callback\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00838}00838\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00839}00839\ \ \ \ \ \ \ \ \ \$useAsCallable\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aeca2dd3c500bfd6e732193cec329198e}{useAsCallable}}(\$callback);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00840}00840\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00841}00841\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>filter(\textcolor{keyword}{function}\ (\$value,\ \$key)\ use\ (\$callback,\ \$useAsCallable)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00842}00842\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$useAsCallable}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00843}00843\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ !\ \$callback(\$value,\ \$key)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00844}00844\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$value\ !=\ \$callback;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00845}00845\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00846}00846\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00847}00847\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00854}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a26a23e2d5cb3fa8059177af91fe58407}{00854}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a26a23e2d5cb3fa8059177af91fe58407}{tap}}(callable\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00855}00855\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00856}00856\ \ \ \ \ \ \ \ \ \$callback(\$this);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00857}00857\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00858}00858\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00859}00859\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00860}00860\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00868}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a931f07da64c20257fd49da7e5fb9854f}{00868}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a931f07da64c20257fd49da7e5fb9854f}{unique}}(\$key\ =\ \textcolor{keyword}{null},\ \$strict\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00869}00869\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00870}00870\ \ \ \ \ \ \ \ \ \$callback\ =\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aa65bd2d446918a2af74a51b81c3be2d2}{valueRetriever}}(\$key);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00871}00871\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00872}00872\ \ \ \ \ \ \ \ \ \$exists\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00873}00873\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00874}00874\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_afd78efd9d7457d6d8b26b03a3464a6ff}{reject}}(\textcolor{keyword}{function}\ (\$item,\ \$key)\ use\ (\$callback,\ \$strict,\ \&\$exists)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00875}00875\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\$id\ =\ \$callback(\$item,\ \$key),\ \$exists,\ \$strict))\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00876}00876\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00877}00877\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00878}00878\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00879}00879\ \ \ \ \ \ \ \ \ \ \ \ \ \$exists[]\ =\ \$id;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00880}00880\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00881}00881\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00882}00882\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00889}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a2e27405705159d0d9ae402a913105575}{00889}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a2e27405705159d0d9ae402a913105575}{uniqueStrict}}(\$key\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00890}00890\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00891}00891\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a931f07da64c20257fd49da7e5fb9854f}{unique}}(\$key,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00892}00892\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00893}00893\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00899}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_abd38cbf58ce99ee77abe51199d143d99}{00899}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_abd38cbf58ce99ee77abe51199d143d99}{collect}}()}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00900}00900\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00901}00901\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_collection}{Collection}}(\$this-\/>all());}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00902}00902\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00903}00903\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00909}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a658defb34762c8f40085aec87e16ba1a}{00909}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a658defb34762c8f40085aec87e16ba1a}{toArray}}()}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00910}00910\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00911}00911\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>map(fn\ (\$value)\ =>\ \$value\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_arrayable}{Arrayable}}\ ?\ \$value-\/>\mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_arrayable_a658defb34762c8f40085aec87e16ba1a}{toArray}}()\ :\ \$value)-\/>all();}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00912}00912\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00913}00913\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00919}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ad402d8679325bc514874370f02b5c2ac}{00919}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ad402d8679325bc514874370f02b5c2ac}{jsonSerialize}}():\ array}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00920}00920\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00921}00921\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_map(\textcolor{keyword}{function}\ (\$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00922}00922\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ instanceof\ JsonSerializable)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00923}00923\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value-\/>jsonSerialize();}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00924}00924\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$value\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_jsonable}{Jsonable}})\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00925}00925\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ json\_decode(\$value-\/>toJson(),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00926}00926\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$value\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_arrayable}{Arrayable}})\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00927}00927\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value-\/>toArray();}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00928}00928\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00929}00929\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00930}00930\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00931}00931\ \ \ \ \ \ \ \ \ \},\ \$this-\/>all());}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00932}00932\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00933}00933\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00940}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a2155a600ee9969f88dc2881d6171e73b}{00940}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a2155a600ee9969f88dc2881d6171e73b}{toJson}}(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ 0)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00941}00941\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00942}00942\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ json\_encode(\$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ad402d8679325bc514874370f02b5c2ac}{jsonSerialize}}(),\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00943}00943\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00944}00944\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00951}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a3e9b1f59a46248716127903b74f359d0}{00951}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a3e9b1f59a46248716127903b74f359d0}{getCachingIterator}}(\$flags\ =\ CachingIterator::CALL\_TOSTRING)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00952}00952\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00953}00953\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ CachingIterator(\$this-\/>getIterator(),\ \$flags);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00954}00954\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00955}00955\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00961}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a7516ca30af0db3cdbf9a7739b48ce91d}{00961}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a7516ca30af0db3cdbf9a7739b48ce91d}{\_\_toString}}()}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00962}00962\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00963}00963\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a123e2fcd007e3774e94ada15eebb66c1}{escapeWhenCastingToString}}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00964}00964\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ e(\$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a2155a600ee9969f88dc2881d6171e73b}{toJson}}())}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00965}00965\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a2155a600ee9969f88dc2881d6171e73b}{toJson}}();}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00966}00966\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00967}00967\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00974}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a123e2fcd007e3774e94ada15eebb66c1}{00974}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a123e2fcd007e3774e94ada15eebb66c1}{escapeWhenCastingToString}}(\$escape\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00975}00975\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00976}00976\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a123e2fcd007e3774e94ada15eebb66c1}{escapeWhenCastingToString}}\ =\ \$escape;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00977}00977\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00978}00978\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00979}00979\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00980}00980\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00987}00987\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ proxy(\$method)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00988}00988\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00989}00989\ \ \ \ \ \ \ \ \ static::\$proxies[]\ =\ \$method;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00990}00990\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l00991}00991\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01000}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a4537dad3b44254124991341cc91b28fb}{01000}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a4537dad3b44254124991341cc91b28fb}{\_\_get}}(\$key)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01001}01001\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01002}01002\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ in\_array(\$key,\ static::\$proxies))\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01003}01003\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ Exception(\textcolor{stringliteral}{"{}Property\ [\{\$key\}]\ does\ not\ exist\ on\ this\ collection\ instance."{}});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01004}01004\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01005}01005\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01006}01006\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_higher_order_collection_proxy}{HigherOrderCollectionProxy}}(\$this,\ \$key);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01007}01007\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01008}01008\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01015}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a16d1d00d0d5b3210951d570e35cde835}{01015}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a16d1d00d0d5b3210951d570e35cde835}{getArrayableItems}}(\$items)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01016}01016\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01017}01017\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$items))\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01018}01018\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$items;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01019}01019\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01020}01020\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01021}01021\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ match\ (\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01022}01022\ \ \ \ \ \ \ \ \ \ \ \ \ \$items\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_support_1_1_enumerable}{Enumerable}}\ =>\ \$items-\/>\mbox{\hyperlink{interface_illuminate_1_1_support_1_1_enumerable_af9d14e4ae6227970ad603987781573ca}{all}}(),}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01023}01023\ \ \ \ \ \ \ \ \ \ \ \ \ \$items\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_arrayable}{Arrayable}}\ =>\ \$items-\/>\mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_arrayable_a658defb34762c8f40085aec87e16ba1a}{toArray}}(),}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01024}01024\ \ \ \ \ \ \ \ \ \ \ \ \ \$items\ instanceof\ Traversable\ =>\ iterator\_to\_array(\$items),}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01025}01025\ \ \ \ \ \ \ \ \ \ \ \ \ \$items\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_jsonable}{Jsonable}}\ =>\ json\_decode(\$items-\/>toJson(),\ \textcolor{keyword}{true}),}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01026}01026\ \ \ \ \ \ \ \ \ \ \ \ \ \$items\ instanceof\ JsonSerializable\ =>\ (array)\ \$items-\/>jsonSerialize(),}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01027}01027\ \ \ \ \ \ \ \ \ \ \ \ \ \$items\ instanceof\ UnitEnum\ =>\ [\$items],}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01028}01028\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}\ =>\ (array)\ \$items,}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01029}01029\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01030}01030\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01031}01031\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01040}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ad7658c9ae3fa24386ca35d9de7764535}{01040}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_ad7658c9ae3fa24386ca35d9de7764535}{operatorForWhere}}(\$key,\ \$operator\ =\ \textcolor{keyword}{null},\ \$value\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01041}01041\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01042}01042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aeca2dd3c500bfd6e732193cec329198e}{useAsCallable}}(\$key))\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01043}01043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$key;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01044}01044\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01045}01045\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01046}01046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (func\_num\_args()\ ===\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01047}01047\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01048}01048\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01049}01049\ \ \ \ \ \ \ \ \ \ \ \ \ \$operator\ =\ \textcolor{charliteral}{'='};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01050}01050\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01051}01051\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01052}01052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (func\_num\_args()\ ===\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01053}01053\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \$operator;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01054}01054\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01055}01055\ \ \ \ \ \ \ \ \ \ \ \ \ \$operator\ =\ \textcolor{charliteral}{'='};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01056}01056\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01057}01057\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01058}01058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{function}\ (\$item)\ use\ (\$key,\ \$operator,\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01059}01059\ \ \ \ \ \ \ \ \ \ \ \ \ \$retrieved\ =\ data\_get(\$item,\ \$key);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01060}01060\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01061}01061\ \ \ \ \ \ \ \ \ \ \ \ \ \$strings\ =\ array\_filter([\$retrieved,\ \$value],\ \textcolor{keyword}{function}\ (\$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01062}01062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_string(\$value)\ ||\ (is\_object(\$value)\ \&\&\ method\_exists(\$value,\ \textcolor{stringliteral}{'\_\_toString'}));}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01063}01063\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01064}01064\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01065}01065\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$strings)\ <\ 2\ \&\&\ count(array\_filter([\$retrieved,\ \$value],\ \textcolor{stringliteral}{'is\_object'}))\ ==\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01066}01066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ in\_array(\$operator,\ [\textcolor{stringliteral}{'!='},\ \textcolor{stringliteral}{'<>'},\ \textcolor{stringliteral}{'!=='}]);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01067}01067\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01068}01068\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01069}01069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\$operator)\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01070}01070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01071}01071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'='}:}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01072}01072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'=='}:\ \ \textcolor{keywordflow}{return}\ \$retrieved\ ==\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01073}01073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'!='}:}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01074}01074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'<>'}:\ \ \textcolor{keywordflow}{return}\ \$retrieved\ !=\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01075}01075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'<'}:\ \ \ \textcolor{keywordflow}{return}\ \$retrieved\ <\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01076}01076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{charliteral}{'>'}:\ \ \ \textcolor{keywordflow}{return}\ \$retrieved\ >\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01077}01077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'<='}:\ \ \textcolor{keywordflow}{return}\ \$retrieved\ <=\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01078}01078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'>='}:\ \ \textcolor{keywordflow}{return}\ \$retrieved\ >=\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01079}01079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'==='}:\ \textcolor{keywordflow}{return}\ \$retrieved\ ===\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01080}01080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'!=='}:\ \textcolor{keywordflow}{return}\ \$retrieved\ !==\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01081}01081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \textcolor{stringliteral}{'<=>'}:\ \textcolor{keywordflow}{return}\ \$retrieved\ <=>\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01082}01082\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01083}01083\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01084}01084\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01085}01085\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01092}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aeca2dd3c500bfd6e732193cec329198e}{01092}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aeca2dd3c500bfd6e732193cec329198e}{useAsCallable}}(\$value)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01093}01093\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01094}01094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\ is\_string(\$value)\ \&\&\ is\_callable(\$value);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01095}01095\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01096}01096\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01103}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aa65bd2d446918a2af74a51b81c3be2d2}{01103}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aa65bd2d446918a2af74a51b81c3be2d2}{valueRetriever}}(\$value)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01104}01104\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01105}01105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_aeca2dd3c500bfd6e732193cec329198e}{useAsCallable}}(\$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01106}01106\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01107}01107\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01108}01108\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01109}01109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fn\ (\$item)\ =>\ data\_get(\$item,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01110}01110\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01111}01111\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01118}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a6c8c5c14b4dbd337561068f1d1890ed6}{01118}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a6c8c5c14b4dbd337561068f1d1890ed6}{equality}}(\$value)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01119}01119\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01120}01120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fn\ (\$item)\ =>\ \$item\ ===\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01121}01121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01122}01122\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01129}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a054d4e189e323b6ecf95d8e33cb217e8}{01129}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a054d4e189e323b6ecf95d8e33cb217e8}{negate}}(Closure\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01130}01130\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01131}01131\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fn\ (...\$params)\ =>\ !\ \$callback(...\$params);}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01132}01132\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01133}01133\ }
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01139}\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af98365ecb8f6de9af94e0c22b813511b}{01139}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_af98365ecb8f6de9af94e0c22b813511b}{identity}}()}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01140}01140\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01141}01141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ fn\ (\$value)\ =>\ \$value;}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01142}01142\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_enumerates_values_8php_source_l01143}01143\ \}}
+
+\end{DoxyCode}

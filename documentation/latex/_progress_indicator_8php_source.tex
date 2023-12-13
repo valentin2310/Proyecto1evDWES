@@ -1,0 +1,192 @@
+\doxysection{Progress\+Indicator.\+php}
+\hypertarget{_progress_indicator_8php_source}{}\label{_progress_indicator_8php_source}\index{vendor/symfony/console/Helper/ProgressIndicator.php@{vendor/symfony/console/Helper/ProgressIndicator.php}}
+\mbox{\hyperlink{_progress_indicator_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_console_1_1_helper}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Helper}};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_exception_1_1_invalid_argument_exception}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Exception\(\backslash\)InvalidArgumentException}};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_exception_1_1_logic_exception}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Exception\(\backslash\)LogicException}};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00016}00016\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_output_1_1_output_interface}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Output\(\backslash\)OutputInterface}};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00021}\mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator}{00021}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator}{ProgressIndicator}}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00022}00022\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ FORMATS\ =\ [}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'normal'}\ =>\ \textcolor{stringliteral}{'\ \%indicator\%\ \%message\%'},}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00025}00025\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'normal\_no\_ansi'}\ =>\ \textcolor{stringliteral}{'\ \%message\%'},}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00027}00027\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'verbose'}\ =>\ \textcolor{stringliteral}{'\ \%indicator\%\ \%message\%\ (\%elapsed:6s\%)'},}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'verbose\_no\_ansi'}\ =>\ \textcolor{stringliteral}{'\ \%message\%\ (\%elapsed:6s\%)'},}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'very\_verbose'}\ =>\ \textcolor{stringliteral}{'\ \%indicator\%\ \%message\%\ (\%elapsed:6s\%,\ \%memory:6s\%)'},}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00031}00031\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'very\_verbose\_no\_ansi'}\ =>\ \textcolor{stringliteral}{'\ \%message\%\ (\%elapsed:6s\%,\ \%memory:6s\%)'},}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00032}00032\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00034}00034\ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_output_1_1_output_interface}{OutputInterface}}\ \$output;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00035}00035\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$startTime;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{private}\ ?\textcolor{keywordtype}{string}\ \$format\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00037}00037\ \ \ \ \ \textcolor{keyword}{private}\ ?\textcolor{keywordtype}{string}\ \$message\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00038}00038\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$indicatorValues;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00039}00039\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$indicatorCurrent;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00040}00040\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$indicatorChangeInterval;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00041}00041\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{float}\ \$indicatorUpdateTime;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00042}00042\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$started\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00047}00047\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ array\ \$formatters;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00053}\mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_a2947bb52fb2f615b7b238f860d961951}{00053}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_a2947bb52fb2f615b7b238f860d961951}{\_\_construct}}(\mbox{\hyperlink{interface_symfony_1_1_component_1_1_console_1_1_output_1_1_output_interface}{OutputInterface}}\ \$output,\ \textcolor{keywordtype}{string}\ \$format\ =\ \textcolor{keyword}{null},\ \textcolor{keywordtype}{int}\ \$indicatorChangeInterval\ =\ 100,\ array\ \$indicatorValues\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00054}00054\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \$this-\/>output\ =\ \$output;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \$format\ ??=\ \$this-\/>determineBestFormat();}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \$indicatorValues\ ??=\ [\textcolor{charliteral}{'-\/'},\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ \textcolor{charliteral}{'|'},\ \textcolor{charliteral}{'/'}];}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \$indicatorValues\ =\ array\_values(\$indicatorValues);}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (2\ >\ \(\backslash\)count(\$indicatorValues))\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_exception_1_1_invalid_argument_exception}{InvalidArgumentException}}(\textcolor{stringliteral}{'Must\ have\ at\ least\ 2\ indicator\ value\ characters.'});}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \$this-\/>format\ =\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_ab9ae9405f117baf0e7fc8f87d9248b54}{self::getFormatDefinition}}(\$format);}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \$this-\/>indicatorChangeInterval\ =\ \$indicatorChangeInterval;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \$this-\/>indicatorValues\ =\ \$indicatorValues;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \$this-\/>startTime\ =\ time();}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00069}00069\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00076}\mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_a6ef696c29d8c44493f457ce9b47b243e}{00076}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_a6ef696c29d8c44493f457ce9b47b243e}{setMessage}}(?\textcolor{keywordtype}{string}\ \$message)}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00077}00077\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \$this-\/>message\ =\ \$message;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \$this-\/>display();}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00081}00081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00088}\mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_a45330209de008650543080e313bd675f}{00088}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_a45330209de008650543080e313bd675f}{start}}(\textcolor{keywordtype}{string}\ \$message)}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00089}00089\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>started)\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_exception_1_1_logic_exception}{LogicException}}(\textcolor{stringliteral}{'Progress\ indicator\ already\ started.'});}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \$this-\/>message\ =\ \$message;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \$this-\/>started\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \$this-\/>startTime\ =\ time();}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \$this-\/>indicatorUpdateTime\ =\ \$this-\/>getCurrentTimeInMilliseconds()\ +\ \$this-\/>indicatorChangeInterval;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \$this-\/>indicatorCurrent\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \$this-\/>display();}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00101}00101\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00108}\mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_a18d42fb84f7ac42f482bc70ca78d5f5a}{00108}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_a18d42fb84f7ac42f482bc70ca78d5f5a}{advance}}()}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00109}00109\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>started)\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_exception_1_1_logic_exception}{LogicException}}(\textcolor{stringliteral}{'Progress\ indicator\ has\ not\ yet\ been\ started.'});}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>output-\/>isDecorated())\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \$currentTime\ =\ \$this-\/>getCurrentTimeInMilliseconds();}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$currentTime\ <\ \$this-\/>indicatorUpdateTime)\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \$this-\/>indicatorUpdateTime\ =\ \$currentTime\ +\ \$this-\/>indicatorChangeInterval;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ ++\$this-\/>indicatorCurrent;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \$this-\/>display();}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00128}00128\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00135}\mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_a1d0ff68b433b06ff1336f88d0d208ad6}{00135}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_a1d0ff68b433b06ff1336f88d0d208ad6}{finish}}(\textcolor{keywordtype}{string}\ \$message)}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00136}00136\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>started)\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_exception_1_1_logic_exception}{LogicException}}(\textcolor{stringliteral}{'Progress\ indicator\ has\ not\ yet\ been\ started.'});}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \$this-\/>message\ =\ \$message;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \$this-\/>display();}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(\textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \$this-\/>started\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00145}00145\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00150}\mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_ab9ae9405f117baf0e7fc8f87d9248b54}{00150}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_ab9ae9405f117baf0e7fc8f87d9248b54}{getFormatDefinition}}(\textcolor{keywordtype}{string}\ \$name):\ ?string}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00151}00151\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::FORMATS[\$name]\ ??\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00153}00153\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00162}\mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_a0df125a5829bc5cbc4fe05894823546f}{00162}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_a0df125a5829bc5cbc4fe05894823546f}{setPlaceholderFormatterDefinition}}(\textcolor{keywordtype}{string}\ \$name,\ callable\ \$callable)}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00163}00163\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ self::\$formatters\ ??=\ self::initPlaceholderFormatters();}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ self::\$formatters[\$name]\ =\ \$callable;}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00167}00167\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00172}\mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_aac33b850f421ac7607d0ba60a831855a}{00172}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_progress_indicator_aac33b850f421ac7607d0ba60a831855a}{getPlaceholderFormatterDefinition}}(\textcolor{keywordtype}{string}\ \$name):\ ?callable}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00173}00173\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ self::\$formatters\ ??=\ self::initPlaceholderFormatters();}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::\$formatters[\$name]\ ??\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00177}00177\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00179}00179\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ display():\ void}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00180}00180\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (OutputInterface::VERBOSITY\_QUIET\ ===\ \$this-\/>output-\/>getVerbosity())\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \$this-\/>overwrite(preg\_replace\_callback(\textcolor{stringliteral}{"{}\{\%([a-\/z\(\backslash\)-\/\_]+)(?:\(\backslash\):([\string^\%]+))?\%\}i"{}},\ \textcolor{keyword}{function}\ (\$matches)\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$formatter\ =\ self::getPlaceholderFormatterDefinition(\$matches[1]))\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$formatter(\$this);}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$matches[0];}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \},\ \$this-\/>format\ ??\ \textcolor{stringliteral}{''}));}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00192}00192\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00194}00194\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ determineBestFormat():\ string}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00195}00195\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ match\ (\$this-\/>output-\/>getVerbosity())\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ OutputInterface::VERBOSITY\_QUIET:\ display\ is\ disabled\ anyway}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ OutputInterface::VERBOSITY\_VERBOSE\ =>\ \$this-\/>output-\/>isDecorated()\ ?\ \textcolor{stringliteral}{'verbose'}\ :\ \textcolor{stringliteral}{'verbose\_no\_ansi'},}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ OutputInterface::VERBOSITY\_VERY\_VERBOSE,}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ OutputInterface::VERBOSITY\_DEBUG\ =>\ \$this-\/>output-\/>isDecorated()\ ?\ \textcolor{stringliteral}{'very\_verbose'}\ :\ \textcolor{stringliteral}{'very\_verbose\_no\_ansi'},}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{default}\ =>\ \$this-\/>output-\/>isDecorated()\ ?\ \textcolor{stringliteral}{'normal'}\ :\ \textcolor{stringliteral}{'normal\_no\_ansi'},}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00203}00203\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00208}00208\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ overwrite(\textcolor{keywordtype}{string}\ \$message):\ void}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00209}00209\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>output-\/>isDecorated())\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>write(\textcolor{stringliteral}{"{}\(\backslash\)x0D\(\backslash\)x1B[2K"{}});}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>write(\$message);}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(\$message);}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00216}00216\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00218}00218\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getCurrentTimeInMilliseconds():\ float}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00219}00219\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_carbon_1_1_traits_ace53e8387d2dc53df1a22bcfc6798955}{round}}(microtime(\textcolor{keyword}{true})\ *\ 1000);}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00221}00221\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00226}00226\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ initPlaceholderFormatters():\ array}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00227}00227\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'indicator'}\ =>\ fn\ (\textcolor{keyword}{self}\ \$indicator)\ =>\ \$indicator-\/>indicatorValues[\$indicator-\/>indicatorCurrent\ \%\ \(\backslash\)count(\$indicator-\/>indicatorValues)],}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'message'}\ =>\ fn\ (\textcolor{keyword}{self}\ \$indicator)\ =>\ \$indicator-\/>message,}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'elapsed'}\ =>\ fn\ (\textcolor{keyword}{self}\ \$indicator)\ =>\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_helper_ab683c362e542f5cecd386bddee826113}{Helper::formatTime}}(time()\ -\/\ \$indicator-\/>startTime),}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'memory'}\ =>\ fn\ ()\ =>\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_helper_1_1_helper_abc0f789a5409f11629725fa51985082b}{Helper::formatMemory}}(memory\_get\_usage(\textcolor{keyword}{true})),}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00234}00234\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_progress_indicator_8php_source_l00235}00235\ \}}
+
+\end{DoxyCode}

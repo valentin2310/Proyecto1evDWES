@@ -1,0 +1,243 @@
+\doxysection{Schedule.\+php}
+\hypertarget{_schedule_8php_source}{}\label{_schedule_8php_source}\index{vendor/laravel/framework/src/Illuminate/Console/Scheduling/Schedule.php@{vendor/laravel/framework/src/Illuminate/Console/Scheduling/Schedule.php}}
+\mbox{\hyperlink{_schedule_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_console_1_1_scheduling}{Illuminate\(\backslash\)Console\(\backslash\)Scheduling}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00005}00005\ use\ Closure;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00006}00006\ use\ DateTimeInterface;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_illuminate_1_1_bus_1_1_unique_lock}{Illuminate\(\backslash\)Bus\(\backslash\)UniqueLock}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_application}{Illuminate\(\backslash\)Console\(\backslash\)Application}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container}{Illuminate\(\backslash\)Container\(\backslash\)Container}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00010}00010\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_bus_1_1_dispatcher}{Illuminate\(\backslash\)Contracts\(\backslash\)Bus\(\backslash\)Dispatcher}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00011}00011\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_cache_1_1_repository}{Illuminate\(\backslash\)Contracts\(\backslash\)Cache\(\backslash\)Repository}}\ as\ Cache;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00012}00012\ use\ \mbox{\hyperlink{class_illuminate_1_1_contracts_1_1_container_1_1_binding_resolution_exception}{Illuminate\(\backslash\)Contracts\(\backslash\)Container\(\backslash\)BindingResolutionException}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00013}00013\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_should_be_unique}{Illuminate\(\backslash\)Contracts\(\backslash\)Queue\(\backslash\)ShouldBeUnique}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00014}00014\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_should_queue}{Illuminate\(\backslash\)Contracts\(\backslash\)Queue\(\backslash\)ShouldQueue}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_closure}{Illuminate\(\backslash\)Queue\(\backslash\)CallQueuedClosure}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_process_utils}{Illuminate\(\backslash\)Support\(\backslash\)ProcessUtils}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00017}00017\ use\ Illuminate\(\backslash\)Support\(\backslash\)Traits\(\backslash\)Macroable;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00018}00018\ use\ RuntimeException;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00020}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule}{00020}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule}{Schedule}}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00021}00021\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00022}00022\ \ \ \ \ use\ Macroable;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00024}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_ac5c26d877708768b4eef18e826189c22}{00024}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_ac5c26d877708768b4eef18e826189c22}{SUNDAY}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00026}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aac0e64cd060a8f887e3c5efee3b7d7d6}{00026}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aac0e64cd060a8f887e3c5efee3b7d7d6}{MONDAY}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00028}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aeecb8ddc2c107073ed2bdad09e29272e}{00028}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aeecb8ddc2c107073ed2bdad09e29272e}{TUESDAY}}\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00030}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a2fad2b3d6dd956e805fa9ea6751ac47d}{00030}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a2fad2b3d6dd956e805fa9ea6751ac47d}{WEDNESDAY}}\ =\ 3;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00032}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_af6aba0e33a610220df74f1d823324f15}{00032}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_af6aba0e33a610220df74f1d823324f15}{THURSDAY}}\ =\ 4;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00034}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a23ee8dab6a52c0c54a01bc1434cdcadc}{00034}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a23ee8dab6a52c0c54a01bc1434cdcadc}{FRIDAY}}\ =\ 5;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00036}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aa182e91d1e8f33a2da3564476700e9ad}{00036}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aa182e91d1e8f33a2da3564476700e9ad}{SATURDAY}}\ =\ 6;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00043}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a1bcec9bbd34255927faaf155bf3a940a}{00043}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a1bcec9bbd34255927faaf155bf3a940a}{\$events}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00050}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a15825599e80039a409bbf5d330f2d5c4}{00050}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a15825599e80039a409bbf5d330f2d5c4}{\$eventMutex}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00057}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a7d9ff98ef011102cdcdae1073b75f2bd}{00057}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a7d9ff98ef011102cdcdae1073b75f2bd}{\$schedulingMutex}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00064}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_af1cceca0f6633f202e2e3eccb72912af}{00064}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_af1cceca0f6633f202e2e3eccb72912af}{\$timezone}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00071}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_ab1d5b769b8d51cf3de5b1f1c4a9e6298}{00071}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_ab1d5b769b8d51cf3de5b1f1c4a9e6298}{\$dispatcher}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00078}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a37adc85961b195ef461395c11044d98b}{00078}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a37adc85961b195ef461395c11044d98b}{\$mutexCache}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00088}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a6939ed1dbce1c8bb00214cc248f12985}{00088}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a6939ed1dbce1c8bb00214cc248f12985}{\_\_construct}}(\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_af1cceca0f6633f202e2e3eccb72912af}{\$timezone}}\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00089}00089\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \$this-\/>timezone\ =\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_af1cceca0f6633f202e2e3eccb72912af}{\$timezone}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ class\_exists(Container::class))\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'A\ container\ implementation\ is\ required\ to\ use\ the\ scheduler.\ Please\ install\ the\ illuminate/container\ package.'}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \$container\ =\ Container::getInstance();}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \$this-\/>eventMutex\ =\ \$container-\/>bound(EventMutex::class)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$container-\/>make(EventMutex::class)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$container-\/>make(CacheEventMutex::class);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \$this-\/>schedulingMutex\ =\ \$container-\/>bound(SchedulingMutex::class)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \$container-\/>make(SchedulingMutex::class)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \$container-\/>make(CacheSchedulingMutex::class);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00116}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a666f3f3886483c84168c3c180d12a9c5}{00116}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a666f3f3886483c84168c3c180d12a9c5}{call}}(\$callback,\ array\ \$parameters\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00117}00117\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_ade509b07f1df45730d31589b81a26efb}{events}}[]\ =\ \$event\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_callback_event}{CallbackEvent}}(}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>eventMutex,\ \$callback,\ \$parameters,\ \$this-\/>timezone}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$event;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00123}00123\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00132}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a65e3a43d1ea49636fc315c4e42982432}{00132}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a65e3a43d1ea49636fc315c4e42982432}{command}}(\$command,\ array\ \$parameters\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00133}00133\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (class\_exists(\$command))\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \$command\ =\ Container::getInstance()-\/>make(\$command);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_adb1a836534ad24e90c3bc9036bf00dea}{exec}}(}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_application_a977905543cb34015f98a288c66ec338f}{Application::formatCommandString}}(\$command-\/>getName()),\ \$parameters,}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ )-\/>description(\$command-\/>getDescription());}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_adb1a836534ad24e90c3bc9036bf00dea}{exec}}(}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_application_a977905543cb34015f98a288c66ec338f}{Application::formatCommandString}}(\$command),\ \$parameters}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00145}00145\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00155}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a790f3cea6be584da1d966f6f0f1caaff}{00155}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a790f3cea6be584da1d966f6f0f1caaff}{job}}(\$job,\ \$queue\ =\ \textcolor{keyword}{null},\ \$connection\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00156}00156\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a666f3f3886483c84168c3c180d12a9c5}{call}}(\textcolor{keyword}{function}\ ()\ use\ (\$job,\ \$queue,\ \$connection)\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \$job\ =\ is\_string(\$job)\ ?\ Container::getInstance()-\/>make(\$job)\ :\ \$job;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$job\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_should_queue}{ShouldQueue}})\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a05f65a19e3e5c37979a93831f7d32708}{dispatchToQueue}}(\$job,\ \$queue\ ??\ \$job-\/>queue,\ \$connection\ ??\ \$job-\/>connection);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a9fefedd0cf43531378b67a912bf00e1f}{dispatchNow}}(\$job);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \})-\/>name(is\_string(\$job)\ ?\ \$job\ :\ get\_class(\$job));}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00166}00166\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00167}00167\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00178}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a05f65a19e3e5c37979a93831f7d32708}{00178}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a05f65a19e3e5c37979a93831f7d32708}{dispatchToQueue}}(\$job,\ \$queue,\ \$connection)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00179}00179\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$job\ instanceof\ Closure)\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ class\_exists(CallQueuedClosure::class))\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'To\ enable\ support\ for\ closure\ jobs,\ please\ install\ the\ illuminate/queue\ package.'}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \$job\ =\ CallQueuedClosure::create(\$job);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$job\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_should_be_unique}{ShouldBeUnique}})\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aa8d8f1fc5b95fcac441a903ca8be0bc6}{dispatchUniqueJobToQueue}}(\$job,\ \$queue,\ \$connection);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a2c6ae191baffbfeb2260f88736bbb15b}{getDispatcher}}()-\/>dispatch(}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \$job-\/>onConnection(\$connection)-\/>onQueue(\$queue)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00197}00197\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00209}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aa8d8f1fc5b95fcac441a903ca8be0bc6}{00209}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aa8d8f1fc5b95fcac441a903ca8be0bc6}{dispatchUniqueJobToQueue}}(\$job,\ \$queue,\ \$connection)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00210}00210\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ Container::getInstance()-\/>bound(Cache::class))\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(\textcolor{stringliteral}{'Cache\ driver\ not\ available.\ Scheduling\ unique\ jobs\ not\ supported.'});}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_bus_1_1_unique_lock}{UniqueLock}}(Container::getInstance()-\/>make(Cache::class)))-\/>acquire(\$job))\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a2c6ae191baffbfeb2260f88736bbb15b}{getDispatcher}}()-\/>dispatch(}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \$job-\/>onConnection(\$connection)-\/>onQueue(\$queue)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00222}00222\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00230}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a9fefedd0cf43531378b67a912bf00e1f}{00230}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a9fefedd0cf43531378b67a912bf00e1f}{dispatchNow}}(\$job)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00231}00231\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a2c6ae191baffbfeb2260f88736bbb15b}{getDispatcher}}()-\/>dispatchNow(\$job);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00233}00233\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00242}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_adb1a836534ad24e90c3bc9036bf00dea}{00242}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_adb1a836534ad24e90c3bc9036bf00dea}{exec}}(\$command,\ array\ \$parameters\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00243}00243\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (count(\$parameters))\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \$command\ .=\ \textcolor{charliteral}{'\ '}.\$this-\/>compileParameters(\$parameters);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_ade509b07f1df45730d31589b81a26efb}{events}}[]\ =\ \$event\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_event}{Event}}(\$this-\/>eventMutex,\ \$command,\ \$this-\/>timezone);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00249}00249\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$event;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00251}00251\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00259}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aea9b69d24f9b3084bdb8cea7f934b502}{00259}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aea9b69d24f9b3084bdb8cea7f934b502}{compileParameters}}(array\ \$parameters)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00260}00260\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$parameters)-\/>map(\textcolor{keyword}{function}\ (\$value,\ \$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a83d2182645e0313383fd2107d07c9528}{compileArrayInput}}(\$key,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_numeric(\$value)\ \&\&\ !\ preg\_match(\textcolor{stringliteral}{'/\string^(-\/.\$|-\/-\/.*)/i'},\ \$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_process_utils_ae7ec6eab5d66aa6aa7e3757c89371ffe}{ProcessUtils::escapeArgument}}(\$value);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_numeric(\$key)\ ?\ \$value\ :\ \textcolor{stringliteral}{"{}\{\$key\}=\{\$value\}"{}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \})-\/>implode(\textcolor{charliteral}{'\ '});}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00272}00272\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00281}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a83d2182645e0313383fd2107d07c9528}{00281}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a83d2182645e0313383fd2107d07c9528}{compileArrayInput}}(\$key,\ \$value)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00282}00282\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \$value\ =\ collect(\$value)-\/>map(\textcolor{keyword}{function}\ (\$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_process_utils_ae7ec6eab5d66aa6aa7e3757c89371ffe}{ProcessUtils::escapeArgument}}(\$value);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00285}00285\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\$key,\ \textcolor{stringliteral}{'-\/-\/'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \$value-\/>map(\textcolor{keyword}{function}\ (\$value)\ use\ (\$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\{\$key\}=\{\$value\}"{}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \}\ elseif\ (str\_starts\_with(\$key,\ \textcolor{charliteral}{'-\/'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \$value-\/>map(\textcolor{keyword}{function}\ (\$value)\ use\ (\$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}\{\$key\}\ \{\$value\}"{}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00296}00296\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value-\/>implode(\textcolor{charliteral}{'\ '});}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00298}00298\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00307}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aaa2ea5f21613b929fdcd864e4d4a4ef3}{00307}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aaa2ea5f21613b929fdcd864e4d4a4ef3}{serverShouldRun}}(\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_event}{Event}}\ \$event,\ DateTimeInterface\ \$time)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00308}00308\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>mutexCache[\$event-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_event_aff946477faceb32b02be63c44295804e}{mutexName}}()]\ ??=\ \$this-\/>schedulingMutex-\/>create(\$event,\ \$time);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00310}00310\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00311}00311\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00318}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aa3e07124dc190cbb6c23c8fa26e3d78f}{00318}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_aa3e07124dc190cbb6c23c8fa26e3d78f}{dueEvents}}(\mbox{\hyperlink{bootstrap_2app_8php_a62522999959415eece8538d7b01e7ae0}{\$app}})}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00319}00319\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$this-\/>\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_ade509b07f1df45730d31589b81a26efb}{events}})-\/>filter-\/>isDue(\mbox{\hyperlink{bootstrap_2app_8php_a62522999959415eece8538d7b01e7ae0}{\$app}});}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00321}00321\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00328}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_ade509b07f1df45730d31589b81a26efb}{00328}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_ade509b07f1df45730d31589b81a26efb}{events}}()}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00329}00329\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a1bcec9bbd34255927faaf155bf3a940a}{\$this-\/>events}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00331}00331\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00339}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a62b42265a214f1bb644e0dcfcb4f298e}{00339}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a62b42265a214f1bb644e0dcfcb4f298e}{useCache}}(\$store)}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00340}00340\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00341}00341\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>eventMutex\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_console_1_1_scheduling_1_1_cache_aware}{CacheAware}})\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>eventMutex-\/>useStore(\$store);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00344}00344\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>schedulingMutex\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_console_1_1_scheduling_1_1_cache_aware}{CacheAware}})\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>schedulingMutex-\/>useStore(\$store);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00348}00348\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00350}00350\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00351}00351\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00359}\mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a2c6ae191baffbfeb2260f88736bbb15b}{00359}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_a2c6ae191baffbfeb2260f88736bbb15b}{getDispatcher}}()}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00360}00360\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>dispatcher\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>dispatcher\ =\ Container::getInstance()-\/>make(Dispatcher::class);}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{class_illuminate_1_1_contracts_1_1_container_1_1_binding_resolution_exception}{BindingResolutionException}}\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Unable\ to\ resolve\ the\ dispatcher\ from\ the\ service\ container.\ Please\ bind\ it\ or\ install\ the\ illuminate/bus\ package.'},}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ is\_int(\$e-\/>getCode())\ ?\ \$e-\/>getCode()\ :\ 0,\ \$e}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00370}00370\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00371}00371\ }
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_console_1_1_scheduling_1_1_schedule_ab1d5b769b8d51cf3de5b1f1c4a9e6298}{\$this-\/>dispatcher}};}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00373}00373\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_schedule_8php_source_l00374}00374\ \}}
+
+\end{DoxyCode}

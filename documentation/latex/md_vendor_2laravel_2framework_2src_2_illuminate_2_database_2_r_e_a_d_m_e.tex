@@ -1,0 +1,81 @@
+\chapter{Illuminate Database}
+\hypertarget{md_vendor_2laravel_2framework_2src_2_illuminate_2_database_2_r_e_a_d_m_e}{}\label{md_vendor_2laravel_2framework_2src_2_illuminate_2_database_2_r_e_a_d_m_e}\index{Illuminate Database@{Illuminate Database}}
+\label{md_vendor_2laravel_2framework_2src_2_illuminate_2_database_2_r_e_a_d_m_e_autotoc_md912}%
+\Hypertarget{md_vendor_2laravel_2framework_2src_2_illuminate_2_database_2_r_e_a_d_m_e_autotoc_md912}%
+ The Illuminate Database component is a full database toolkit for PHP, providing an expressive query builder, Active\+Record style ORM, and schema builder. It currently supports My\+SQL, Postgres, SQL Server, and SQLite. It also serves as the database layer of the Laravel PHP framework.\hypertarget{md_vendor_2laravel_2framework_2src_2_illuminate_2_database_2_r_e_a_d_m_e_autotoc_md913}{}\doxysubsection{\texorpdfstring{Usage Instructions}{Usage Instructions}}\label{md_vendor_2laravel_2framework_2src_2_illuminate_2_database_2_r_e_a_d_m_e_autotoc_md913}
+First, create a new "{}\+Capsule"{} manager instance. Capsule aims to make configuring the library for usage outside of the Laravel framework as easy as possible.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_capsule_1_1_manager}{Illuminate\(\backslash\)Database\(\backslash\)Capsule\(\backslash\)Manager}}\ as\ Capsule;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$capsule\ =\ \textcolor{keyword}{new}\ Capsule;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$capsule-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_capsule_1_1_manager_a70b4cf5a4892ab65e81ec54d0c8f0454}{addConnection}}([}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'driver'}\ =>\ \textcolor{stringliteral}{'mysql'},}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'host'}\ =>\ \textcolor{stringliteral}{'localhost'},}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'database'}\ =>\ \textcolor{stringliteral}{'database'},}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'username'}\ =>\ \textcolor{stringliteral}{'root'},}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'password'}\ =>\ \textcolor{stringliteral}{'password'},}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'charset'}\ =>\ \textcolor{stringliteral}{'utf8'},}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'collation'}\ =>\ \textcolor{stringliteral}{'utf8\_unicode\_ci'},}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'prefix'}\ =>\ \textcolor{stringliteral}{''},}
+\DoxyCodeLine{]);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Set\ the\ event\ dispatcher\ used\ by\ Eloquent\ models...\ (optional)}}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_illuminate_1_1_events_1_1_dispatcher}{Illuminate\(\backslash\)Events\(\backslash\)Dispatcher}};}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container}{Illuminate\(\backslash\)Container\(\backslash\)Container}};}
+\DoxyCodeLine{\$capsule-\/>setEventDispatcher(\textcolor{keyword}{new}\ Dispatcher(\textcolor{keyword}{new}\ Container));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Make\ this\ Capsule\ instance\ available\ globally\ via\ static\ methods...\ (optional)}}
+\DoxyCodeLine{\$capsule-\/>setAsGlobal();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Setup\ the\ Eloquent\ ORM...\ (optional;\ unless\ you've\ used\ setEventDispatcher())}}
+\DoxyCodeLine{\$capsule-\/>bootEloquent();}
+
+\end{DoxyCode}
+
+
+\begin{quote}
+{\ttfamily composer require "{}illuminate/events"{}} required when you need to use observers with Eloquent. \end{quote}
+Once the Capsule instance has been registered. You may use it like so\+:
+
+{\bfseries{Using The Query Builder}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$users\ =\ Capsule::table(\textcolor{stringliteral}{'users'})-\/>where(\textcolor{stringliteral}{'votes'},\ \textcolor{charliteral}{'>'},\ 100)-\/>get();}
+
+\end{DoxyCode}
+ Other core methods may be accessed directly from the Capsule in the same manner as from the DB facade\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$results\ =\ Capsule::select(\textcolor{stringliteral}{'select\ *\ from\ users\ where\ id\ =\ ?'},\ [1]);}
+
+\end{DoxyCode}
+
+
+{\bfseries{Using The Schema Builder}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Capsule::schema()-\/>create(\textcolor{stringliteral}{'users'},\ \textcolor{keyword}{function}\ (\$table)\ \{}
+\DoxyCodeLine{\ \ \ \ \$table-\/>increments(\textcolor{stringliteral}{'id'});}
+\DoxyCodeLine{\ \ \ \ \$table-\/>string(\textcolor{stringliteral}{'email'})-\/>\mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a931f07da64c20257fd49da7e5fb9854f}{unique}}();}
+\DoxyCodeLine{\ \ \ \ \$table-\/>timestamps();}
+\DoxyCodeLine{\});}
+
+\end{DoxyCode}
+
+
+{\bfseries{Using The Eloquent ORM}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{class\ }User\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)Model}}\ \{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$users\ =\ User::where(\textcolor{stringliteral}{'votes'},\ \textcolor{charliteral}{'>'},\ 1)-\/>get();}
+
+\end{DoxyCode}
+
+
+For further documentation on using the various database facilities this library provides, consult the \href{https://laravel.com/docs}{\texttt{ Laravel framework documentation}}. 

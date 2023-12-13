@@ -1,0 +1,920 @@
+\chapter{Guzzle Upgrade Guide}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g}{}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g}\index{Guzzle Upgrade Guide@{Guzzle Upgrade Guide}}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md432}{}\doxysection{\texorpdfstring{6.\+0 to 7.\+0}{6.0 to 7.0}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md432}
+In order to take advantage of the new features of PHP, Guzzle dropped the support of PHP 5. The minimum supported PHP version is now PHP 7.\+2. Type hints and return types for functions and methods have been added wherever possible.
+
+Please make sure\+:
+\begin{DoxyItemize}
+\item You are calling a function or a method with the correct type.
+\item If you extend a class of Guzzle; update all signatures on methods you override.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md433}{}\doxysubsubsection{\texorpdfstring{Other backwards compatibility breaking changes}{Other backwards compatibility breaking changes}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md433}
+
+\begin{DoxyItemize}
+\item Class {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Uri\+Template} is removed.
+\item Class {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Exception\textbackslash{}Seek\+Exception} is removed.
+\item Classes {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Exception\textbackslash{}Bad\+Response\+Exception}, {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Exception\textbackslash{}Client\+Exception}, {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Exception\textbackslash{}Server\+Exception} can no longer be initialized with an empty Response as argument.
+\item Class {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Exception\textbackslash{}Connect\+Exception} now extends {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Exception\textbackslash{}Transfer\+Exception} instead of {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Exception\textbackslash{}Request\+Exception}.
+\item Function {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Exception\textbackslash{}Connect\+Exception\+::get\+Response()} is removed.
+\item Function {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Exception\textbackslash{}Connect\+Exception\+::has\+Response()} is removed.
+\item Constant {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Client\+Interface\+::\+VERSION} is removed. Added {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Client\+Interface\+::\+MAJOR\+\_\+\+VERSION} instead.
+\item Function {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Exception\textbackslash{}Request\+Exception\+::get\+Response\+Body\+Summary} is removed. Use {\ttfamily \textbackslash{}\doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Psr7\textbackslash{}get\+\_\+message\+\_\+body\+\_\+summary} as an alternative.
+\item Function {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Cookie\textbackslash{}Cookie\+Jar\+::get\+Cookie\+Value} is removed.
+\item Request option {\ttfamily exceptions} is removed. Please use {\ttfamily http\+\_\+errors}.
+\item Request option {\ttfamily save\+\_\+to} is removed. Please use {\ttfamily sink}.
+\item Pool option {\ttfamily pool\+\_\+size} is removed. Please use {\ttfamily concurrency}.
+\item We now look for environment variables in the {\ttfamily \$\+\_\+\+SERVER} super global, due to thread safety issues with {\ttfamily getenv}. We continue to fallback to {\ttfamily getenv} in CLI environments, for maximum compatibility.
+\item The {\ttfamily get}, {\ttfamily head}, {\ttfamily put}, {\ttfamily post}, {\ttfamily patch}, {\ttfamily delete}, {\ttfamily get\+Async}, {\ttfamily head\+Async}, {\ttfamily put\+Async}, {\ttfamily post\+Async}, {\ttfamily patch\+Async}, and {\ttfamily delete\+Async} methods are now implemented as genuine methods on {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Client}, with strong typing. The original {\ttfamily \+\_\+\+\_\+call} implementation remains unchanged for now, for maximum backwards compatibility, but won\textquotesingle{}t be invoked under normal operation.
+\item The {\ttfamily log} middleware will log the errors with level {\ttfamily error} instead of {\ttfamily notice}
+\item Support for international domain names (IDN) is now disabled by default, and enabling it requires installing ext-\/intl, linked against a modern version of the C library (ICU 4.\+6 or higher).
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md434}{}\doxysubsubsection{\texorpdfstring{Native functions calls}{Native functions calls}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md434}
+All internal native functions calls of Guzzle are now prefixed with a slash. This change makes it impossible for method overloading by other libraries or applications. Example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ Before:}}
+\DoxyCodeLine{curl\_version();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ After:}}
+\DoxyCodeLine{\(\backslash\)curl\_version();}
+
+\end{DoxyCode}
+
+
+For the full diff you can check \href{https://github.com/guzzle/guzzle/compare/6.5.4..master}{\texttt{ here}}.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md435}{}\doxysection{\texorpdfstring{5.\+0 to 6.\+0}{5.0 to 6.0}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md435}
+Guzzle now uses \href{https://www.php-fig.org/psr/psr-7/}{\texttt{ PSR-\/7}} for HTTP messages. Due to the fact that these messages are immutable, this prompted a refactoring of Guzzle to use a middleware based system rather than an event system. Any HTTP message interaction (e.\+g., {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Request}) need to be updated to work with the new immutable PSR-\/7 request and response objects. Any event listeners or subscribers need to be updated to become middleware functions that wrap handlers (or are injected into a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Handler\+Stack}).
+
+
+\begin{DoxyItemize}
+\item Removed {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Batch\+Results}
+\item Removed {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Collection}
+\item Removed {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Has\+Data\+Trait}
+\item Removed {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}To\+Array\+Interface}
+\item The {\ttfamily guzzlehttp/streams} dependency has been removed. Stream functionality is now present in the {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Psr7} namespace provided by the {\ttfamily guzzlehttp/psr7} package.
+\item Guzzle no longer uses React\+PHP promises and now uses the {\ttfamily guzzlehttp/promises} library. We use a custom promise library for three significant reasons\+:
+\begin{DoxyEnumerate}
+\item React promises (at the time of writing this) are recursive. Promise chaining and promise resolution will eventually blow the stack. Guzzle promises are not recursive as they use a sort of trampolining technique. Note\+: there has been movement in the React project to modify promises to no longer utilize recursion.
+\item Guzzle needs to have the ability to synchronously block on a promise to wait for a result. Guzzle promises allows this functionality (and does not require the use of recursion).
+\item Because we need to be able to wait on a result, doing so using React promises requires wrapping react promises with Ring\+PHP futures. This overhead is no longer needed, reducing stack sizes, reducing complexity, and improving performance.
+\end{DoxyEnumerate}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Mimetypes} has been moved to a function in {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Psr7\textbackslash{}mimetype\+\_\+from\+\_\+extension} and {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Psr7\textbackslash{}mimetype\+\_\+from\+\_\+filename}.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Query} and {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Query\+Parser} have been removed. Query strings must now be passed into request objects as strings, or provided to the {\ttfamily query} request option when creating requests with clients. The {\ttfamily query} option uses PHP\textquotesingle{}s {\ttfamily http\+\_\+build\+\_\+query} to convert an array to a string. If you need a different serialization technique, you will need to pass the query string in as a string. There are a couple helper functions that will make working with query strings easier\+: {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Psr7\textbackslash{}parse\+\_\+query} and {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Psr7\textbackslash{}build\+\_\+query}.
+\item Guzzle no longer has a dependency on Ring\+PHP. Due to the use of a middleware system based on PSR-\/7, using Ring\+PHP and it\textquotesingle{}s middleware system as well adds more complexity than the benefits it provides. All HTTP handlers that were present in Ring\+PHP have been modified to work directly with PSR-\/7 messages and placed in the {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Handler} namespace. This significantly reduces complexity in Guzzle, removes a dependency, and improves performance. Ring\+PHP will be maintained for Guzzle 5 support, but will no longer be a part of Guzzle 6.
+\item As Guzzle now uses a middleware based systems the event system and Ring\+PHP integration has been removed. Note\+: while the event system has been removed, it is possible to add your own type of event system that is powered by the middleware system.
+\begin{DoxyItemize}
+\item Removed the {\ttfamily Event} namespace.
+\item Removed the {\ttfamily Subscriber} namespace.
+\item Removed {\ttfamily Transaction} class
+\item Removed {\ttfamily Request\+Fsm}
+\item Removed {\ttfamily Ring\+Bridge}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}Cookie} is now provided by {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Middleware\+::cookies}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}Http\+Error} is now provided by {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Middleware\+::http\+Error}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}History} is now provided by {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Middleware\+::history}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}Mock} is now provided by {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Handler\textbackslash{}Mock\+Handler}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}Prepare} is now provided by {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Prepare\+Body\+Middleware}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}Redirect} is now provided by {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Redirect\+Middleware}
+\end{DoxyItemize}
+\item Guzzle now uses {\ttfamily Psr\textbackslash{}Http\textbackslash{}Message\textbackslash{}Uri\+Interface} (implements in {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Psr7\textbackslash{}Uri}) for URI support. {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Url} is now gone.
+\item Static functions in {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Utils} have been moved to namespaced functions under the {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}} namespace. This requires either a \doxylink{namespace_composer}{Composer} based autoloader or you to include functions.\+php.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Client\+Interface\+::get\+Default\+Option} has been renamed to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Client\+Interface\+::get\+Config}.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Client\+Interface\+::set\+Default\+Option} has been removed.
+\item The {\ttfamily json} and {\ttfamily xml} methods of response objects has been removed. With the migration to strictly adhering to PSR-\/7 as the interface for Guzzle messages, adding methods to message interfaces would actually require Guzzle messages to extend from PSR-\/7 messages rather then work with them directly.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md436}{}\doxysection{\texorpdfstring{Migrating to middleware}{Migrating to middleware}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md436}
+The change to PSR-\/7 unfortunately required significant refactoring to Guzzle due to the fact that PSR-\/7 messages are immutable. Guzzle 5 relied on an event system from plugins. The event system relied on mutability of HTTP messages and side effects in order to work. With immutable messages, you have to change your workflow to become more about either returning a value (e.\+g., functional middlewares) or setting a value on an object. Guzzle v6 has chosen the functional middleware approach.
+
+Instead of using the event system to listen for things like the {\ttfamily before} event, you now create a stack based middleware function that intercepts a request on the way in and the promise of the response on the way out. This is a much simpler and more predictable approach than the event system and works nicely with PSR-\/7 middleware. Due to the use of promises, the middleware system is also asynchronous.
+
+v5\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ GuzzleHttp\(\backslash\)Event\(\backslash\)BeforeEvent;}
+\DoxyCodeLine{\$client\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_guzzle_http_1_1_client}{GuzzleHttp\(\backslash\)Client}}();}
+\DoxyCodeLine{\textcolor{comment}{//\ Get\ the\ emitter\ and\ listen\ to\ the\ before\ event.}}
+\DoxyCodeLine{\$client-\/>getEmitter()-\/>on(\textcolor{stringliteral}{'before'},\ \textcolor{keyword}{function}\ (BeforeEvent\ \$e)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Guzzle\ v5\ events\ relied\ on\ mutation}}
+\DoxyCodeLine{\ \ \ \ \$e-\/>getRequest()-\/>setHeader(\textcolor{stringliteral}{'X-\/Foo'},\ \textcolor{stringliteral}{'Bar'});}
+\DoxyCodeLine{\});}
+
+\end{DoxyCode}
+
+
+v6\+:
+
+In v6, you can modify the request before it is sent using the {\ttfamily map\+Request} middleware. The idiomatic way in v6 to modify the request/response lifecycle is to setup a handler middleware stack up front and inject the handler into a client.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_middleware}{GuzzleHttp\(\backslash\)Middleware}};}
+\DoxyCodeLine{\textcolor{comment}{//\ Create\ a\ handler\ stack\ that\ has\ all\ of\ the\ default\ middlewares\ attached}}
+\DoxyCodeLine{\$handler\ =\ GuzzleHttp\(\backslash\)HandlerStack::create();}
+\DoxyCodeLine{\textcolor{comment}{//\ Push\ the\ handler\ onto\ the\ handler\ stack}}
+\DoxyCodeLine{\$handler-\/>push(Middleware::mapRequest(\textcolor{keyword}{function}\ (RequestInterface\ \$request)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Notice\ that\ we\ have\ to\ return\ a\ request\ object}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \$request-\/>withHeader(\textcolor{stringliteral}{'X-\/Foo'},\ \textcolor{stringliteral}{'Bar'});}
+\DoxyCodeLine{\}));}
+\DoxyCodeLine{\textcolor{comment}{//\ Inject\ the\ handler\ into\ the\ client}}
+\DoxyCodeLine{\$client\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_guzzle_http_1_1_client}{GuzzleHttp\(\backslash\)Client}}([\textcolor{stringliteral}{'handler'}\ =>\ \$handler]);}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md437}{}\doxysection{\texorpdfstring{POST Requests}{POST Requests}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md437}
+This version added the \href{http://guzzle.readthedocs.org/en/latest/request-options.html\#form_params}{\texttt{ {\ttfamily form\+\_\+params}}} and {\ttfamily multipart} request options. {\ttfamily form\+\_\+params} is an associative array of strings or array of strings and is used to serialize an {\ttfamily application/x-\/www-\/form-\/urlencoded} POST request. The \href{http://guzzle.readthedocs.org/en/latest/request-options.html\#multipart}{\texttt{ {\ttfamily multipart}}} option is now used to send a multipart/form-\/data POST request.
+
+{\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Post\textbackslash{}Post\+File} has been removed. Use the {\ttfamily multipart} option to add POST files to a multipart/form-\/data request.
+
+The {\ttfamily body} option no longer accepts an array to send POST requests. Please use {\ttfamily multipart} or {\ttfamily form\+\_\+params} instead.
+
+The {\ttfamily base\+\_\+url} option has been renamed to {\ttfamily base\+\_\+uri}.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md438}{}\doxysection{\texorpdfstring{4.\+x to 5.\+0}{4.x to 5.0}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md438}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md439}{}\doxysection{\texorpdfstring{Rewritten Adapter Layer}{Rewritten Adapter Layer}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md439}
+Guzzle now uses \href{http://ringphp.readthedocs.org/en/latest}{\texttt{ Ring\+PHP}} to send HTTP requests. The {\ttfamily adapter} option in a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Client} constructor is still supported, but it has now been renamed to {\ttfamily handler}. Instead of passing a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Adapter\textbackslash{}Adapter\+Interface}, you must now pass a PHP {\ttfamily callable} that follows the Ring\+PHP specification.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md440}{}\doxysection{\texorpdfstring{Removed Fluent Interfaces}{Removed Fluent Interfaces}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md440}
+\href{https://ocramius.github.io/blog/fluent-interfaces-are-evil/}{\texttt{ Fluent interfaces were removed}} from the following classes\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Collection}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Url}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Query}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Post\textbackslash{}Post\+Body}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Cookie\textbackslash{}Set\+Cookie}
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md441}{}\doxysection{\texorpdfstring{Removed functions.\+php}{Removed functions.php}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md441}
+Removed "{}functions.\+php"{}, so that Guzzle is truly PSR-\/4 compliant. The following functions can be used as replacements.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}json\+\_\+decode} -\/\texorpdfstring{$>$}{>} {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Utils\+::json\+Decode}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}get\+\_\+path} -\/\texorpdfstring{$>$}{>} {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Utils\+::get\+Path}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Utils\+::set\+Path} -\/\texorpdfstring{$>$}{>} {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}set\+\_\+path}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Pool\+::batch} -\/\texorpdfstring{$>$}{>} {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}batch}. This function is, however, deprecated in favor of using {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Pool\+::batch()}.
+\end{DoxyItemize}
+
+The "{}procedural"{} global client has been removed with no replacement (e.\+g., {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}get()}, {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}post()}, etc.). Use a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Client} object as a replacement.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md442}{}\doxysection{\texorpdfstring{$<$tt$>$throw\+Immediately$<$/tt$>$ has been removed}{<tt>throwImmediately</tt> has been removed}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md442}
+The concept of "{}throw\+Immediately"{} has been removed from exceptions and error events. This control mechanism was used to stop a transfer of concurrent requests from completing. This can now be handled by throwing the exception or by cancelling a pool of requests or each outstanding future request individually.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md443}{}\doxysection{\texorpdfstring{headers event has been removed}{headers event has been removed}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md443}
+Removed the "{}headers"{} event. This event was only useful for changing the body a response once the headers of the response were known. You can implement a similar behavior in a number of ways. One example might be to use a Fn\+Stream that has access to the transaction being sent. For example, when the first byte is written, you could check if the response headers match your expectations, and if so, change the actual stream body that is being written to.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md444}{}\doxysection{\texorpdfstring{Updates to HTTP Messages}{Updates to HTTP Messages}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md444}
+Removed the {\ttfamily as\+Array} parameter from {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Message\+Interface\+::get\+Header}. If you want to get a header value as an array, then use the newly added {\ttfamily get\+Header\+As\+Array()} method of {\ttfamily Message\+Interface}. This change makes the Guzzle interfaces compatible with the PSR-\/7 interfaces.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md445}{}\doxysection{\texorpdfstring{3.\+x to 4.\+0}{3.x to 4.0}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md445}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md446}{}\doxysection{\texorpdfstring{Overarching changes\+:}{Overarching changes:}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md446}
+
+\begin{DoxyItemize}
+\item Now requires PHP 5.\+4 or greater.
+\item No longer requires c\+URL to send requests.
+\item Guzzle no longer wraps every exception it throws. Only exceptions that are recoverable are now wrapped by Guzzle.
+\item Various namespaces have been removed or renamed.
+\item No longer requiring the Symfony Event\+Dispatcher. A custom event dispatcher based on the Symfony Event\+Dispatcher is now utilized in {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Emitter\+Interface} (resulting in significant speed and functionality improvements).
+\end{DoxyItemize}
+
+Changes per Guzzle 3.\+x namespace are described below.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md447}{}\doxysection{\texorpdfstring{Batch}{Batch}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md447}
+The {\ttfamily Guzzle\textbackslash{}Batch} namespace has been removed. This is best left to third-\/parties to implement on top of Guzzle\textquotesingle{}s core HTTP library.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md448}{}\doxysection{\texorpdfstring{Cache}{Cache}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md448}
+The {\ttfamily Guzzle\textbackslash{}Cache} namespace has been removed. (Todo\+: No suitable replacement has been implemented yet, but hoping to utilize a PSR cache interface).\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md449}{}\doxysection{\texorpdfstring{Common}{Common}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md449}
+
+\begin{DoxyItemize}
+\item Removed all of the wrapped exceptions. It\textquotesingle{}s better to use the standard PHP library for unrecoverable exceptions.
+\item {\ttfamily From\+Config\+Interface} has been removed.
+\item {\ttfamily Guzzle\textbackslash{}Common\textbackslash{}Version} has been removed. The VERSION constant can be found at {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Client\+Interface\+::\+VERSION}.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md450}{}\doxysubsection{\texorpdfstring{Collection}{Collection}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md450}
+
+\begin{DoxyItemize}
+\item {\ttfamily get\+All} has been removed. Use {\ttfamily to\+Array} to convert a collection to an array.
+\item {\ttfamily inject} has been removed.
+\item {\ttfamily key\+Search} has been removed.
+\item {\ttfamily get\+Path} no longer supports wildcard expressions. Use something better like JMESPath for this.
+\item {\ttfamily set\+Path} now supports appending to an existing array via the {\ttfamily \mbox{[}\mbox{]}} notation.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md451}{}\doxysubsection{\texorpdfstring{Events}{Events}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md451}
+Guzzle no longer requires Symfony\textquotesingle{}s Event\+Dispatcher component. Guzzle now uses {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Emitter}.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily Symfony\textbackslash{}Component\textbackslash{}Event\+Dispatcher\textbackslash{}Event\+Dispatcher\+Interface} is replaced by {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Emitter\+Interface}.
+\item {\ttfamily Symfony\textbackslash{}Component\textbackslash{}Event\+Dispatcher\textbackslash{}Event\+Dispatcher} is replaced by {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Emitter}.
+\item {\ttfamily Symfony\textbackslash{}Component\textbackslash{}Event\+Dispatcher\textbackslash{}Event} is replaced by {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Event}, and Guzzle now has an Event\+Interface in {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Event\+Interface}.
+\item {\ttfamily Abstract\+Has\+Dispatcher} has moved to a trait, {\ttfamily Has\+Emitter\+Trait}, and {\ttfamily Has\+Dispatcher\+Interface} has moved to {\ttfamily Has\+Emitter\+Interface}. Retrieving the event emitter of a request, client, etc. now uses the {\ttfamily get\+Emitter} method rather than the {\ttfamily get\+Dispatcher} method.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md452}{}\doxysubsubsection{\texorpdfstring{Emitter}{Emitter}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md452}
+
+\begin{DoxyItemize}
+\item Use the {\ttfamily once()} method to add a listener that automatically removes itself the first time it is invoked.
+\item Use the {\ttfamily listeners()} method to retrieve a list of event listeners rather than the {\ttfamily get\+Listeners()} method.
+\item Use {\ttfamily emit()} instead of {\ttfamily dispatch()} to emit an event from an emitter.
+\item Use {\ttfamily attach()} instead of {\ttfamily add\+Subscriber()} and {\ttfamily detach()} instead of {\ttfamily remove\+Subscriber()}.
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$mock\ =\ \textcolor{keyword}{new}\ Mock();}
+\DoxyCodeLine{\textcolor{comment}{//\ 3.x}}
+\DoxyCodeLine{\$request-\/>getEventDispatcher()-\/>addSubscriber(\$mock);}
+\DoxyCodeLine{\$request-\/>getEventDispatcher()-\/>removeSubscriber(\$mock);}
+\DoxyCodeLine{\textcolor{comment}{//\ 4.x}}
+\DoxyCodeLine{\$request-\/>getEmitter()-\/>attach(\$mock);}
+\DoxyCodeLine{\$request-\/>getEmitter()-\/>detach(\$mock);}
+
+\end{DoxyCode}
+
+
+Use the {\ttfamily on()} method to add a listener rather than the {\ttfamily add\+Listener()} method.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ 3.x}}
+\DoxyCodeLine{\$request-\/>getEventDispatcher()-\/>addListener(\textcolor{stringliteral}{'foo'},\ \textcolor{keyword}{function}\ (Event\ \$event)\ \{\ \textcolor{comment}{/*\ ...\ */}\ \}\ );}
+\DoxyCodeLine{\textcolor{comment}{//\ 4.x}}
+\DoxyCodeLine{\$request-\/>getEmitter()-\/>on(\textcolor{stringliteral}{'foo'},\ \textcolor{keyword}{function}\ (Event\ \$event,\ \$name)\ \{\ \textcolor{comment}{/*\ ...\ */}\ \}\ );}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md453}{}\doxysection{\texorpdfstring{Http}{Http}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md453}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md454}{}\doxysubsection{\texorpdfstring{General changes}{General changes}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md454}
+
+\begin{DoxyItemize}
+\item The cacert.\+pem certificate has been moved to {\ttfamily src/cacert.\+pem}.
+\item Added the concept of adapters that are used to transfer requests over the wire.
+\item Simplified the event system.
+\item Sending requests in parallel is still possible, but batching is no longer a concept of the HTTP layer. Instead, you must use the {\ttfamily complete} and {\ttfamily error} events to asynchronously manage parallel request transfers.
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Url} has moved to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Url}.
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Query\+String} has moved to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Query}.
+\item Query\+Aggregators have been rewritten so that they are simply callable functions.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Static\+Client} has been removed. Use the functions provided in {\ttfamily functions.\+php} for an easy to use static client instance.
+\item Exceptions in {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Exception} have been updated to all extend from {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Exception\textbackslash{}Transfer\+Exception}.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md455}{}\doxysubsection{\texorpdfstring{Client}{Client}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md455}
+Calling methods like {\ttfamily get()}, {\ttfamily post()}, {\ttfamily head()}, etc. no longer create and return a request, but rather creates a request, sends the request, and returns the response.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ 3.0}}
+\DoxyCodeLine{\$request\ =\ \$client-\/>get(\textcolor{charliteral}{'/'});}
+\DoxyCodeLine{\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \$request-\/>send();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ 4.0}}
+\DoxyCodeLine{\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \$client-\/>get(\textcolor{charliteral}{'/'});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ or,\ to\ mirror\ the\ previous\ behavior}}
+\DoxyCodeLine{\$request\ =\ \$client-\/>createRequest(\textcolor{stringliteral}{'GET'},\ \textcolor{charliteral}{'/'});}
+\DoxyCodeLine{\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \$client-\/>send(\$request);}
+
+\end{DoxyCode}
+
+
+{\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Client\+Interface} has changed.
+
+
+\begin{DoxyItemize}
+\item The {\ttfamily send} method no longer accepts more than one request. Use {\ttfamily send\+All} to send multiple requests in parallel.
+\item {\ttfamily set\+User\+Agent()} has been removed. Use a default request option instead. You could, for example, do something like\+: `\$client-\/\texorpdfstring{$>$}{>}set\+Config(\textquotesingle{}defaults/headers/\+User-\/\+Agent', \textquotesingle{}Foo/\+Bar \textquotesingle{} . \$client\+::get\+Default\+User\+Agent()){\ttfamily . -\/}set\+Ssl\+Verification(){\ttfamily has been removed. Use default request options instead, like}\$client-\/\texorpdfstring{$>$}{>}set\+Config(\textquotesingle{}defaults/verify\textquotesingle{}, true)\`{}.
+\end{DoxyItemize}
+
+{\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Client} has changed.
+
+
+\begin{DoxyItemize}
+\item The constructor now accepts only an associative array. You can include a {\ttfamily base\+\_\+url} string or array to use a URI template as the base URL of a client. You can also specify a {\ttfamily defaults} key that is an associative array of default request options. You can pass an {\ttfamily adapter} to use a custom adapter, {\ttfamily batch\+\_\+adapter} to use a custom adapter for sending requests in parallel, or a {\ttfamily message\+\_\+factory} to change the factory used to create HTTP requests and responses.
+\item The client no longer emits a {\ttfamily client.\+create\+\_\+request} event.
+\item Creating requests with a client no longer automatically utilize a URI template. You must pass an array into a creational method (e.\+g., {\ttfamily create\+Request}, {\ttfamily get}, {\ttfamily put}, etc.) in order to expand a URI template.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md456}{}\doxysubsection{\texorpdfstring{Messages}{Messages}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md456}
+Messages no longer have references to their counterparts (i.\+e., a request no longer has a reference to it\textquotesingle{}s response, and a response no loger has a reference to its request). This association is now managed through a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Adapter\textbackslash{}Transaction\+Interface} object. You can get references to these transaction objects using request events that are emitted over the lifecycle of a request.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md457}{}\doxysubsubsection{\texorpdfstring{Requests with a body}{Requests with a body}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md457}
+
+\begin{DoxyItemize}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Entity\+Enclosing\+Request} and {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Entity\+Enclosing\+Request\+Interface} have been removed. The separation between requests that contain a body and requests that do not contain a body has been removed, and now {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Request\+Interface} handles both use cases.
+\item Any method that previously accepts a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Response} object now accept a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Response\+Interface}.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Request\+Factory\+Interface} has been renamed to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Message\+Factory\+Interface}. This interface is used to create both requests and responses and is implemented in {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Message\+Factory}.
+\item POST field and file methods have been removed from the request object. You must now use the methods made available to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Post\textbackslash{}Post\+Body\+Interface} to control the format of a POST body. Requests that are created using a standard {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Message\+Factory\+Interface} will automatically use a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Post\textbackslash{}Post\+Body} body if the body was passed as an array or if the method is POST and no body is provided.
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$request\ =\ \$client-\/>createRequest(\textcolor{stringliteral}{'POST'},\ \textcolor{charliteral}{'/'});}
+\DoxyCodeLine{\$request-\/>getBody()-\/>setField(\textcolor{stringliteral}{'foo'},\ \textcolor{stringliteral}{'bar'});}
+\DoxyCodeLine{\$request-\/>getBody()-\/>addFile(\textcolor{keyword}{new}\ PostFile(\textcolor{stringliteral}{'file\_key'},\ fopen(\textcolor{stringliteral}{'/path/to/content'},\ \textcolor{charliteral}{'r'})));}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md458}{}\doxysubsubsection{\texorpdfstring{Headers}{Headers}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md458}
+
+\begin{DoxyItemize}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Header} has been removed. Header values are now simply represented by an array of values or as a string. Header values are returned as a string by default when retrieving a header value from a message. You can pass an optional argument of {\ttfamily true} to retrieve a header value as an array of strings instead of a single concatenated string.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Post\+File} and {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Post\+File\+Interface} have been moved to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Post}. This interface has been simplified and now allows the addition of arbitrary headers.
+\item Custom headers like {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Header\textbackslash{}Link} have been removed. Most of the custom headers are now handled separately in specific subscribers/plugins, and {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Header\+Values\+::parse\+Params()} has been updated to properly handle headers that contain parameters (like the {\ttfamily Link} header).
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md459}{}\doxysubsubsection{\texorpdfstring{Responses}{Responses}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md459}
+
+\begin{DoxyItemize}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Response\+::get\+Info()} and {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Response\+::set\+Info()} have been removed. Use the event system to retrieve this type of information.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Response\+::get\+Raw\+Headers()} has been removed.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Response\+::get\+Message()} has been removed.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Response\+::calculate\+Age()} and other cache specific methods have moved to the Cache\+Subscriber.
+\item Header specific helper functions like {\ttfamily get\+Content\+Md5()} have been removed. Just use `get\+Header(\textquotesingle{}Content-\/\+MD5'){\ttfamily instead. -\/}\doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}\+Message\textbackslash{}\+Response\+::set\+Request(){\ttfamily and }\doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}\+Message\textbackslash{}\+Response\+::get\+Request(){\ttfamily have been removed. Use the event system to work with request and response objects as a transaction. -\/}\doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}\+Message\textbackslash{}\+Response\+::get\+Redirect\+Count(){\ttfamily has been removed. Use the Redirect subscriber instead. -\/}\doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}\+Message\textbackslash{}\+Response\+::is\+Successful(){\ttfamily and other related methods have been removed. Use}get\+Status\+Code()\`{} instead.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md460}{}\doxysubsubsection{\texorpdfstring{Streaming responses}{Streaming responses}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md460}
+Streaming requests can now be created by a client directly, returning a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Response\+Interface} object that contains a body stream referencing an open PHP HTTP stream.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ 3.0}}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Stream\(\backslash\)PhpStreamRequestFactory;}
+\DoxyCodeLine{\$request\ =\ \$client-\/>get(\textcolor{charliteral}{'/'});}
+\DoxyCodeLine{\$factory\ =\ \textcolor{keyword}{new}\ PhpStreamRequestFactory();}
+\DoxyCodeLine{\$stream\ =\ \$factory-\/>fromRequest(\$request);}
+\DoxyCodeLine{\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \$stream-\/>read(1024);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ 4.0}}
+\DoxyCodeLine{\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \$client-\/>get(\textcolor{charliteral}{'/'},\ [\textcolor{stringliteral}{'stream'}\ =>\ \textcolor{keyword}{true}]);}
+\DoxyCodeLine{\textcolor{comment}{//\ Read\ some\ data\ off\ of\ the\ stream\ in\ the\ response\ body}}
+\DoxyCodeLine{\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getBody()-\/>read(1024);}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md461}{}\doxysubsubsection{\texorpdfstring{Redirects}{Redirects}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md461}
+The {\ttfamily configure\+Redirects()} method has been removed in favor of a {\ttfamily allow\+\_\+redirects} request option.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ Standard\ redirects\ with\ a\ default\ of\ a\ max\ of\ 5\ redirects}}
+\DoxyCodeLine{\$request\ =\ \$client-\/>createRequest(\textcolor{stringliteral}{'GET'},\ \textcolor{charliteral}{'/'},\ [\textcolor{stringliteral}{'allow\_redirects'}\ =>\ \textcolor{keyword}{true}]);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Strict\ redirects\ with\ a\ custom\ number\ of\ redirects}}
+\DoxyCodeLine{\$request\ =\ \$client-\/>createRequest(\textcolor{stringliteral}{'GET'},\ \textcolor{charliteral}{'/'},\ [}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{'allow\_redirects'}\ =>\ [\textcolor{stringliteral}{'max'}\ =>\ 5,\ \textcolor{stringliteral}{'strict'}\ =>\ \textcolor{keyword}{true}]}
+\DoxyCodeLine{]);}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md462}{}\doxysubsubsection{\texorpdfstring{Entity\+Body}{EntityBody}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md462}
+Entity\+Body interfaces and classes have been removed or moved to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream}. All classes and interfaces that once required {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Entity\+Body\+Interface} now require {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}Stream\+Interface}. Creating a new body for a request no longer uses {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Entity\+Body\+::factory} but now uses {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}Stream\+::factory} or even better\+: {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}create()}.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Entity\+Body\+Interface} is now {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}Stream\+Interface}
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Entity\+Body} is now {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}Stream}
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Caching\+Entity\+Body} is now {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}Caching\+Stream}
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Read\+Limit\+Entity\+Body} is now {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}Limit\+Stream}
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Io\+Emittyin\+Entity\+Body} has been removed.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md463}{}\doxysubsubsection{\texorpdfstring{Request lifecycle events}{Request lifecycle events}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md463}
+Requests previously submitted a large number of requests. The number of events emitted over the lifecycle of a request has been significantly reduced to make it easier to understand how to extend the behavior of a request. All events emitted during the lifecycle of a request now emit a custom {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Event\+Interface} object that contains context providing methods and a way in which to modify the transaction at that specific point in time (e.\+g., intercept the request and set a response on the transaction).
+
+
+\begin{DoxyItemize}
+\item {\ttfamily request.\+before\+\_\+send} has been renamed to {\ttfamily before} and now emits a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Before\+Event}
+\item {\ttfamily request.\+complete} has been renamed to {\ttfamily complete} and now emits a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Complete\+Event}.
+\item {\ttfamily request.\+sent} has been removed. Use {\ttfamily complete}.
+\item {\ttfamily request.\+success} has been removed. Use {\ttfamily complete}.
+\item {\ttfamily error} is now an event that emits a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Error\+Event}.
+\item {\ttfamily request.\+exception} has been removed. Use {\ttfamily error}.
+\item {\ttfamily request.\+receive.\+status\+\_\+line} has been removed.
+\item {\ttfamily curl.\+callback.\+progress} has been removed. Use a custom {\ttfamily Stream\+Interface} to maintain a status update.
+\item {\ttfamily curl.\+callback.\+write} has been removed. Use a custom {\ttfamily Stream\+Interface} to intercept writes.
+\item {\ttfamily curl.\+callback.\+read} has been removed. Use a custom {\ttfamily Stream\+Interface} to intercept reads.
+\end{DoxyItemize}
+
+{\ttfamily headers} is a new event that is emitted after the response headers of a request have been received before the body of the response is downloaded. This event emits a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Headers\+Event}.
+
+You can intercept a request and inject a response using the {\ttfamily intercept()} event of a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Before\+Event}, {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Complete\+Event}, and {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Event\textbackslash{}Error\+Event} event.
+
+See\+: \href{http://docs.guzzlephp.org/en/latest/events.html}{\texttt{ http\+://docs.\+guzzlephp.\+org/en/latest/events.\+html}}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md464}{}\doxysection{\texorpdfstring{Inflection}{Inflection}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md464}
+The {\ttfamily Guzzle\textbackslash{}Inflection} namespace has been removed. This is not a core concern of Guzzle.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md465}{}\doxysection{\texorpdfstring{Iterator}{Iterator}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md465}
+The {\ttfamily Guzzle\textbackslash{}Iterator} namespace has been removed.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily Guzzle\textbackslash{}Iterator\textbackslash{}Append\+Iterator}, {\ttfamily Guzzle\textbackslash{}Iterator\textbackslash{}Chunked\+Iterator}, and {\ttfamily Guzzle\textbackslash{}Iterator\textbackslash{}Method\+Proxy\+Iterator} are nice, but not a core requirement of Guzzle itself.
+\item {\ttfamily Guzzle\textbackslash{}Iterator\textbackslash{}Filter\+Iterator} is no longer needed because an equivalent class is shipped with PHP 5.\+4.
+\item {\ttfamily Guzzle\textbackslash{}Iterator\textbackslash{}Map\+Iterator} is not really needed when using PHP 5.\+5 because it\textquotesingle{}s easier to just wrap an iterator in a generator that maps values.
+\end{DoxyItemize}
+
+For a replacement of these iterators, see \href{https://github.com/nikic/iter}{\texttt{ https\+://github.\+com/nikic/iter}}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md466}{}\doxysection{\texorpdfstring{Log}{Log}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md466}
+The Log\+Plugin has moved to \href{https://github.com/guzzle/log-subscriber}{\texttt{ https\+://github.\+com/guzzle/log-\/subscriber}}. The {\ttfamily Guzzle\textbackslash{}Log} namespace has been removed. Guzzle now relies on {\ttfamily Psr\textbackslash{}Log\textbackslash{}Logger\+Interface} for all logging. The Message\+Formatter class has been moved to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}Log\textbackslash{}Formatter}.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md467}{}\doxysection{\texorpdfstring{Parser}{Parser}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md467}
+The {\ttfamily Guzzle\textbackslash{}Parser} namespace has been removed. This was previously used to make it possible to plug in custom parsers for cookies, messages, URI templates, and URLs; however, this level of complexity is not needed in Guzzle so it has been removed.
+
+
+\begin{DoxyItemize}
+\item Cookie\+: Cookie parsing logic has been moved to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Cookie\textbackslash{}Set\+Cookie\+::from\+String}.
+\item Message\+: Message parsing logic for both requests and responses has been moved to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Message\textbackslash{}Message\+Factory\+::from\+Message}. Message parsing is only used in debugging or deserializing messages, so it doesn\textquotesingle{}t make sense for Guzzle as a library to add this level of complexity to parsing messages.
+\item Uri\+Template\+: URI template parsing has been moved to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Uri\+Template}. The Guzzle library will automatically use the PECL URI template library if it is installed.
+\item Url\+: URL parsing is now performed in {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Url\+::from\+String} (previously it was {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Url\+::factory()}). If custom URL parsing is necessary, then developers are free to subclass {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Url}.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md468}{}\doxysection{\texorpdfstring{Plugin}{Plugin}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md468}
+The {\ttfamily Guzzle\textbackslash{}Plugin} namespace has been renamed to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber}. Several plugins are shipping with the core Guzzle library under this namespace.
+
+
+\begin{DoxyItemize}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}Cookie}\+: Replaces the old Cookie\+Plugin. Cookie jar code has moved to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Cookie}.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}History}\+: Replaces the old History\+Plugin.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}Http\+Error}\+: Throws errors when a bad HTTP response is received.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}Mock}\+: Replaces the old Mock\+Plugin.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}Prepare}\+: Prepares the body of a request just before sending. This subscriber is attached to all requests by default.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}Redirect}\+: Replaces the Redirect\+Plugin.
+\end{DoxyItemize}
+
+The following plugins have been removed (third-\/parties are free to re-\/implement these if needed)\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Plugin\textbackslash{}Async} has been removed.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Plugin\textbackslash{}Curl\+Auth} has been removed.
+\item {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Plugin\textbackslash{}Error\+Response\textbackslash{}Error\+Response\+Plugin} has been removed. This functionality should instead be implemented with event listeners that occur after normal response parsing occurs in the guzzle/command package.
+\end{DoxyItemize}
+
+The following plugins are not part of the core Guzzle package, but are provided in separate repositories\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Plugin\textbackslash{}Backoff\+Plugin} has been rewritten to be much simpler to build custom retry policies using simple functions rather than various chained classes. See\+: \href{https://github.com/guzzle/retry-subscriber}{\texttt{ https\+://github.\+com/guzzle/retry-\/subscriber}}
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Plugin\textbackslash{}Cache\textbackslash{}Cache\+Plugin} has moved to \href{https://github.com/guzzle/cache-subscriber}{\texttt{ https\+://github.\+com/guzzle/cache-\/subscriber}}
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Plugin\textbackslash{}Log\textbackslash{}Log\+Plugin} has moved to \href{https://github.com/guzzle/log-subscriber}{\texttt{ https\+://github.\+com/guzzle/log-\/subscriber}}
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Plugin\textbackslash{}Md5\textbackslash{}Md5\+Plugin} has moved to \href{https://github.com/guzzle/message-integrity-subscriber}{\texttt{ https\+://github.\+com/guzzle/message-\/integrity-\/subscriber}}
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Plugin\textbackslash{}Mock\textbackslash{}Mock\+Plugin} has moved to {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Subscriber\textbackslash{}Mock\+Subscriber}.
+\item {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Plugin\textbackslash{}Oauth\textbackslash{}Oauth\+Plugin} has moved to \href{https://github.com/guzzle/oauth-subscriber}{\texttt{ https\+://github.\+com/guzzle/oauth-\/subscriber}}
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md469}{}\doxysection{\texorpdfstring{Service}{Service}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md469}
+The service description layer of Guzzle has moved into two separate packages\+:
+
+
+\begin{DoxyItemize}
+\item \href{http://github.com/guzzle/command}{\texttt{ http\+://github.\+com/guzzle/command}} Provides a high level abstraction over web services by representing web service operations using commands.
+\item \href{http://github.com/guzzle/guzzle-services}{\texttt{ http\+://github.\+com/guzzle/guzzle-\/services}} Provides an implementation of guzzle/command that provides request serialization and response parsing using Guzzle service descriptions.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md470}{}\doxysection{\texorpdfstring{Stream}{Stream}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md470}
+Stream have moved to a separate package available at \href{https://github.com/guzzle/streams}{\texttt{ https\+://github.\+com/guzzle/streams}}.
+
+{\ttfamily Guzzle\textbackslash{}Stream\textbackslash{}Stream\+Interface} has been given a large update to cleanly take on the responsibilities of {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Entity\+Body} and {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Entity\+Body\+Interface} now that they have been removed. The number of methods implemented by the {\ttfamily Stream\+Interface} has been drastically reduced to allow developers to more easily extend and decorate stream behavior.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md471}{}\doxysection{\texorpdfstring{Removed methods from Stream\+Interface}{Removed methods from StreamInterface}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md471}
+
+\begin{DoxyItemize}
+\item {\ttfamily get\+Stream} and {\ttfamily set\+Stream} have been removed to better encapsulate streams.
+\item {\ttfamily get\+Metadata} and {\ttfamily set\+Metadata} have been removed in favor of {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}Metadata\+Stream\+Interface}.
+\item {\ttfamily get\+Wrapper}, {\ttfamily get\+Wrapper\+Data}, {\ttfamily get\+Stream\+Type}, and {\ttfamily get\+Uri} have all been removed. This data is accessible when using streams that implement {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}Metadata\+Stream\+Interface}.
+\item {\ttfamily rewind} has been removed. Use {\ttfamily seek(0)} for a similar behavior.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md472}{}\doxysection{\texorpdfstring{Renamed methods}{Renamed methods}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md472}
+
+\begin{DoxyItemize}
+\item {\ttfamily detach\+Stream} has been renamed to {\ttfamily detach}.
+\item {\ttfamily feof} has been renamed to {\ttfamily eof}.
+\item {\ttfamily ftell} has been renamed to {\ttfamily tell}.
+\item {\ttfamily read\+Line} has moved from an instance method to a static class method of {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}Stream}.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md473}{}\doxysection{\texorpdfstring{Metadata streams}{Metadata streams}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md473}
+{\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}Metadata\+Stream\+Interface} has been added to denote streams that contain additional metadata accessible via {\ttfamily get\+Metadata()}. {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}Stream\+Interface\+::get\+Metadata} and {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Stream\textbackslash{}Stream\+Interface\+::set\+Metadata} have been removed.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md474}{}\doxysection{\texorpdfstring{Stream\+Request\+Factory}{StreamRequestFactory}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md474}
+The entire concept of the Stream\+Request\+Factory has been removed. The way this was used in Guzzle 3 broke the actual interface of sending streaming requests (instead of getting back a Response, you got a Stream\+Interface). Streaming PHP requests are now implemented through the {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Adapter\textbackslash{}Stream\+Adapter}.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md475}{}\doxysection{\texorpdfstring{3.\+6 to 3.\+7}{3.6 to 3.7}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md475}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md476}{}\doxysubsection{\texorpdfstring{Deprecations}{Deprecations}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md476}
+
+\begin{DoxyItemize}
+\item You can now enable E\+\_\+\+USER\+\_\+\+DEPRECATED warnings to see if you are using any deprecated methods.\+:
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\(\backslash\)Guzzle\(\backslash\)Common\(\backslash\)Version::\$emitWarnings\ =\ \textcolor{keyword}{true};}
+
+\end{DoxyCode}
+
+
+The following APIs and options have been marked as deprecated\+:
+
+
+\begin{DoxyItemize}
+\item Marked {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Message\textbackslash{}Request\+::is\+Response\+Body\+Repeatable()} as deprecated. Use {\ttfamily \$request-\/\texorpdfstring{$>$}{>}get\+Response\+Body()-\/\texorpdfstring{$>$}{>}is\+Repeatable()} instead.
+\item Marked {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Message\textbackslash{}Request\+::can\+Cache()} as deprecated. Use {\ttfamily Guzzle\textbackslash{}Plugin\textbackslash{}Cache\textbackslash{}Default\+Can\+Cache\+Strategy-\/\texorpdfstring{$>$}{>}can\+Cache\+Request()} instead.
+\item Marked {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Message\textbackslash{}Request\+::can\+Cache()} as deprecated. Use {\ttfamily Guzzle\textbackslash{}Plugin\textbackslash{}Cache\textbackslash{}Default\+Can\+Cache\+Strategy-\/\texorpdfstring{$>$}{>}can\+Cache\+Request()} instead.
+\item Marked {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Message\textbackslash{}Request\+::set\+Is\+Redirect()} as deprecated. Use the History\+Plugin instead.
+\item Marked {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Message\textbackslash{}Request\+::is\+Redirect()} as deprecated. Use the History\+Plugin instead.
+\item Marked {\ttfamily Guzzle\textbackslash{}Cache\textbackslash{}Cache\+Adapter\+Factory\+::factory()} as deprecated
+\item Marked {\ttfamily Guzzle\textbackslash{}Service\textbackslash{}Client\+::enable\+Magic\+Methods()} as deprecated. Magic methods can no longer be disabled on a Guzzle\textbackslash{}\+Service\textbackslash{}\+Client.
+\item Marked {\ttfamily Guzzle\textbackslash{}Parser\textbackslash{}Url\textbackslash{}Url\+Parser} as deprecated. Just use PHP\textquotesingle{}s {\ttfamily parse\+\_\+url()} and percent encode your UTF-\/8.
+\item Marked {\ttfamily Guzzle\textbackslash{}Common\textbackslash{}Collection\+::inject()} as deprecated.
+\item Marked {\ttfamily Guzzle\textbackslash{}Plugin\textbackslash{}Curl\+Auth\textbackslash{}Curl\+Auth\+Plugin} as deprecated. Use `\$client-\/\texorpdfstring{$>$}{>}get\+Config()-\/\texorpdfstring{$>$}{>}set\+Path(\textquotesingle{}request.\+options/auth', array(\textquotesingle{}user\textquotesingle{}, \textquotesingle{}pass\textquotesingle{}, \textquotesingle{}Basic\texorpdfstring{$\vert$}{|}\+Digest\texorpdfstring{$\vert$}{|}\+NTLM\texorpdfstring{$\vert$}{|}\+Any\textquotesingle{}));{\ttfamily or }\$client-\/\texorpdfstring{$>$}{>}set\+Default\+Option(\textquotesingle{}auth\textquotesingle{}, array(\textquotesingle{}user\textquotesingle{}, \textquotesingle{}pass\textquotesingle{}, \textquotesingle{}Basic\texorpdfstring{$\vert$}{|}\+Digest\texorpdfstring{$\vert$}{|}\+NTLM\texorpdfstring{$\vert$}{|}\+Any\textquotesingle{}));\`{}
+\end{DoxyItemize}
+
+3.\+7 introduces {\ttfamily request.\+options} as a parameter for a client configuration and as an optional argument to all creational request methods. When paired with a client\textquotesingle{}s configuration settings, these options allow you to specify default settings for various aspects of a request. Because these options make other previous configuration options redundant, several configuration options and methods of a client and Abstract\+Command have been deprecated.
+
+
+\begin{DoxyItemize}
+\item Marked {\ttfamily Guzzle\textbackslash{}Service\textbackslash{}Client\+::get\+Default\+Headers()} as deprecated. Use `\$client-\/\texorpdfstring{$>$}{>}get\+Default\+Option(\textquotesingle{}headers'){\ttfamily .}
+\item {\ttfamily Marked}Guzzle\textbackslash{}\+Service\textbackslash{}\+Client\+::set\+Default\+Headers(){\ttfamily as deprecated. Use}\$client-\/\texorpdfstring{$>$}{>}set\+Default\+Option(\textquotesingle{}headers/\{header\+\_\+name\}\textquotesingle{}, \textquotesingle{}value\textquotesingle{})`.
+\item Marked \textquotesingle{}request.\+params' for {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Client} as deprecated. Use `\$client-\/\texorpdfstring{$>$}{>}set\+Default\+Option(\textquotesingle{}params/\{param\+\_\+name\}', \textquotesingle{}value\textquotesingle{})`
+\item Marked \textquotesingle{}command.\+headers', \textquotesingle{}command.\+response\+\_\+body\textquotesingle{} and \textquotesingle{}command.\+on\+\_\+complete\textquotesingle{} as deprecated for Abstract\+Command. These will work through Guzzle 4.\+0 \begin{DoxyVerb}  $command = $client->getCommand('foo', array(
+      'command.headers' => array('Test' => '123'),
+      'command.response_body' => '/path/to/file'
+  ));
+
+  // Should be changed to:
+
+  $command = $client->getCommand('foo', array(
+      'command.request_options' => array(
+          'headers' => array('Test' => '123'),
+          'save_as' => '/path/to/file'
+      )
+  ));
+\end{DoxyVerb}
+ 
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md477}{}\doxysubsection{\texorpdfstring{Interface changes}{Interface changes}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md477}
+Additions and changes (you will need to update any implementations or subclasses you may have created)\+:
+
+
+\begin{DoxyItemize}
+\item Added an {\ttfamily \$options} argument to the end of the following methods of {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Client\+Interface}\+: create\+Request, head, delete, put, patch, post, options, prepare\+Request
+\item Added an {\ttfamily \$options} argument to the end of {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Message\textbackslash{}Request\textbackslash{}Request\+Factory\+Interface\+::create\+Request()}
+\item Added an {\ttfamily apply\+Options()} method to {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Message\textbackslash{}Request\textbackslash{}Request\+Factory\+Interface}
+\item Changed {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Client\+Interface\+::get(\$uri = null, \$headers = null, \$body = null)} to {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Client\+Interface\+::get(\$uri = null, \$headers = null, \$options = array())}. You can still pass in a resource, string, or Entity\+Body into the \$options parameter to specify the download location of the response.
+\item Changed {\ttfamily Guzzle\textbackslash{}Common\textbackslash{}Collection\+::\+\_\+\+\_\+construct(\$data)} to no longer accepts a null value for {\ttfamily \$data} but a default {\ttfamily array()}
+\item Added {\ttfamily Guzzle\textbackslash{}Stream\textbackslash{}Stream\+Interface\+::is\+Repeatable}
+\item Made {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Client\+::expand\+Template} and {\ttfamily get\+Uri\+Template} protected methods.
+\end{DoxyItemize}
+
+The following methods were removed from interfaces. All of these methods are still available in the concrete classes that implement them, but you should update your code to use alternative methods\+:
+
+
+\begin{DoxyItemize}
+\item Removed {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Client\+Interface\+::set\+Default\+Headers(). Use }\$client-\/\texorpdfstring{$>$}{>}get\+Config()-\/\texorpdfstring{$>$}{>}set\+Path(\textquotesingle{}request.\+options/headers/\{header\+\_\+name\}\textquotesingle{}, \textquotesingle{}value\textquotesingle{}){\ttfamily . or }\$client-\/\texorpdfstring{$>$}{>}get\+Config()-\/\texorpdfstring{$>$}{>}set\+Path(\textquotesingle{}request.\+options/headers\textquotesingle{}, array(\textquotesingle{}header\+\_\+name\textquotesingle{} =\texorpdfstring{$>$}{>} \textquotesingle{}value\textquotesingle{})){\ttfamily or }\$client-\/\texorpdfstring{$>$}{>}set\+Default\+Option(\textquotesingle{}headers/\{header\+\_\+name\}\textquotesingle{}, \textquotesingle{}value\textquotesingle{}){\ttfamily . or }\$client-\/\texorpdfstring{$>$}{>}set\+Default\+Option(\textquotesingle{}headers\textquotesingle{}, array(\textquotesingle{}header\+\_\+name\textquotesingle{} =\texorpdfstring{$>$}{>} \textquotesingle{}value\textquotesingle{})){\ttfamily .}
+\item {\ttfamily Removed}Guzzle\textbackslash{}\+Http\textbackslash{}\+Client\+Interface\+::get\+Default\+Headers(). Use `\$client-\/\texorpdfstring{$>$}{>}get\+Config()-\/\texorpdfstring{$>$}{>}get\+Path(\textquotesingle{}request.\+options/headers'){\ttfamily .}
+\item {\ttfamily Removed}Guzzle\textbackslash{}\+Http\textbackslash{}\+Client\+Interface\+::expand\+Template(){\ttfamily . This is an implementation detail.}
+\item {\ttfamily Removed}Guzzle\textbackslash{}\+Http\textbackslash{}\+Client\+Interface\+::set\+Request\+Factory(){\ttfamily . This is an implementation detail.}
+\item {\ttfamily Removed}Guzzle\textbackslash{}\+Http\textbackslash{}\+Client\+Interface\+::get\+Curl\+Multi(){\ttfamily . This is a very specific implementation detail.}
+\item {\ttfamily Removed}Guzzle\textbackslash{}\+Http\textbackslash{}\+Message\textbackslash{}\+Request\+Interface\+::can\+Cache{\ttfamily . Use the Cache\+Plugin.}
+\item {\ttfamily Removed}Guzzle\textbackslash{}\+Http\textbackslash{}\+Message\textbackslash{}\+Request\+Interface\+::set\+Is\+Redirect{\ttfamily . Use the History\+Plugin.}
+\item {\ttfamily Removed}Guzzle\textbackslash{}\+Http\textbackslash{}\+Message\textbackslash{}\+Request\+Interface\+::is\+Redirect\`{}. Use the History\+Plugin.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md478}{}\doxysubsection{\texorpdfstring{Cache plugin breaking changes}{Cache plugin breaking changes}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md478}
+
+\begin{DoxyItemize}
+\item Cache\+Key\+Provider\+Interface and Default\+Cache\+Key\+Provider are no longer used. All of this logic is handled in a Cache\+Storage\+Interface. These two objects and interface will be removed in a future version.
+\item Always setting X-\/cache headers on cached responses
+\item Default cache TTLs are now handled by the Cache\+Storage\+Interface of a Cache\+Plugin
+\item {\ttfamily Cache\+Storage\+Interface\+::cache(\$key, Response \$response, \$ttl = null)} has changed to {\ttfamily cache(Request\+Interface \$request, Response \$response);}
+\item {\ttfamily Cache\+Storage\+Interface\+::fetch(\$key)} has changed to {\ttfamily fetch(Request\+Interface \$request);}
+\item {\ttfamily Cache\+Storage\+Interface\+::delete(\$key)} has changed to {\ttfamily delete(Request\+Interface \$request);}
+\item Added {\ttfamily Cache\+Storage\+Interface\+::purge(\$url)}
+\item {\ttfamily Default\+Revalidation\+::\+\_\+\+\_\+construct(Cache\+Key\+Provider\+Interface \$cache\+Key, Cache\+Storage\+Interface \$cache, Cache\+Plugin \$plugin)} has changed to {\ttfamily Default\+Revalidation\+::\+\_\+\+\_\+construct(Cache\+Storage\+Interface \$cache, Can\+Cache\+Strategy\+Interface \$can\+Cache = null)}
+\item Added {\ttfamily Revalidation\+Interface\+::should\+Revalidate(Request\+Interface \$request, Response \$response)}
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md479}{}\doxysection{\texorpdfstring{3.\+5 to 3.\+6}{3.5 to 3.6}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md479}
+
+\begin{DoxyItemize}
+\item Mixed casing of headers are now forced to be a single consistent casing across all values for that header.
+\item Messages internally use a Header\+Collection object to delegate handling case-\/insensitive header resolution
+\item Removed the whole changed\+Header() function system of messages because all header changes now go through add\+Header(). For example, set\+Header() first removes the header using unset on a Header\+Collection and then calls add\+Header(). Keeping the Host header and URL host in sync is now handled by overriding the add\+Header method in Request.
+\item Specific header implementations can be created for complex headers. When a message creates a header, it uses a Header\+Factory which can map specific headers to specific header classes. There is now a Link header and Cache\+Control header implementation.
+\item Moved get\+Links() from Response to just be used on a Link header object.
+\end{DoxyItemize}
+
+If you previously relied on Guzzle\textbackslash{}\+Http\textbackslash{}\+Message\textbackslash{}\+Header\+::raw(), then you will need to update your code to use the Header\+Interface (e.\+g. to\+Array(), get\+All(), etc.).\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md480}{}\doxysubsection{\texorpdfstring{Interface changes}{Interface changes}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md480}
+
+\begin{DoxyItemize}
+\item Removed from interface\+: Guzzle\textbackslash{}\+Http\textbackslash{}\+Client\+Interface\+::set\+Uri\+Template
+\item Removed from interface\+: Guzzle\textbackslash{}\+Http\textbackslash{}\+Client\+Interface\+::set\+Curl\+Multi()
+\item Removed Guzzle\textbackslash{}\+Http\textbackslash{}\+Message\textbackslash{}\+Request\+::received\+Request\+Header() and implemented this functionality in Guzzle\textbackslash{}\+Http\textbackslash{}\+Curl\textbackslash{}\+Request\+Mediator
+\item Removed the optional \$as\+String parameter from Message\+Interface\+::get\+Header(). Just cast the header to a string.
+\item Removed the optional \$try\+Chunked\+Transfer option from Guzzle\textbackslash{}\+Http\textbackslash{}\+Message\textbackslash{}\+Entity\+Enclosing\+Request\+Interface
+\item Removed the \$as\+Objects argument from Guzzle\textbackslash{}\+Http\textbackslash{}\+Message\textbackslash{}\+Message\+Interface\+::get\+Headers()
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md481}{}\doxysubsection{\texorpdfstring{Removed deprecated functions}{Removed deprecated functions}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md481}
+
+\begin{DoxyItemize}
+\item Removed Guzzle\textbackslash{}\+Parser\textbackslash{}\+Parser\+Register\+::get(). Use get\+Parser()
+\item Removed Guzzle\textbackslash{}\+Parser\textbackslash{}\+Parser\+Register\+::set(). Use register\+Parser().
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md482}{}\doxysubsection{\texorpdfstring{Deprecations}{Deprecations}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md482}
+
+\begin{DoxyItemize}
+\item The ability to case-\/insensitively search for header values
+\item Guzzle\textbackslash{}\+Http\textbackslash{}\+Message\textbackslash{}\+Header\+::has\+Exact\+Header
+\item Guzzle\textbackslash{}\+Http\textbackslash{}\+Message\textbackslash{}\+Header\+::raw. Use get\+All()
+\item Deprecated cache control specific methods on Guzzle\textbackslash{}\+Http\textbackslash{}\+Message\textbackslash{}\+Abstract\+Message. Use the Cache\+Control header object instead.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md483}{}\doxysubsection{\texorpdfstring{Other changes}{Other changes}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md483}
+
+\begin{DoxyItemize}
+\item All response header helper functions return a string rather than mixing Header objects and strings inconsistently
+\item Removed c\+URL blacklist support. This is no longer necessary now that Expect, Accept, etc. are managed by Guzzle directly via interfaces
+\item Removed the injecting of a request object onto a response object. The methods to get and set a request still exist but are a no-\/op until removed.
+\item Most classes that used to require a {\ttfamily Guzzle\textbackslash{}Service\textbackslash{}Command\textbackslash{}Command\+Interface} typehint now request a {\ttfamily Guzzle\textbackslash{}Service\textbackslash{}Command\textbackslash{}Array\+Command\+Interface}.
+\item Added {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Message\textbackslash{}Request\+Interface\+::start\+Response()} to the Request\+Interface to handle injecting a response on a request while the request is still being transferred
+\item {\ttfamily Guzzle\textbackslash{}Service\textbackslash{}Command\textbackslash{}Command\+Interface} now extends from To\+Array\+Interface and Array\+Access
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md484}{}\doxysection{\texorpdfstring{3.\+3 to 3.\+4}{3.3 to 3.4}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md484}
+Base URLs of a client now follow the rules of \href{https://tools.ietf.org/html/rfc3986\#section-5.2.2}{\texttt{ https\+://tools.\+ietf.\+org/html/rfc3986\#section-\/5.\+2.\+2}} when merging URLs.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md485}{}\doxysection{\texorpdfstring{3.\+2 to 3.\+3}{3.2 to 3.3}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md485}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md486}{}\doxysubsection{\texorpdfstring{Response\+::get\+Etag() quote stripping removed}{Response::getEtag() quote stripping removed}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md486}
+{\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Message\textbackslash{}Response\+::get\+Etag()} no longer strips quotes around the ETag response header\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md487}{}\doxysubsection{\texorpdfstring{Removed $<$tt$>$\+Guzzle\textbackslash{}\+Http\textbackslash{}\+Utils$<$/tt$>$}{Removed <tt>Guzzle\textbackslash{}Http\textbackslash{}Utils</tt>}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md487}
+The {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Utils} class was removed. This class was only used for testing.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md488}{}\doxysubsection{\texorpdfstring{Stream wrapper and type}{Stream wrapper and type}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md488}
+{\ttfamily Guzzle\textbackslash{}Stream\textbackslash{}Stream\+::get\+Wrapper()} and {\ttfamily Guzzle\textbackslash{}Stream\textbackslash{}Stream\+::get\+Stream\+Type()} are no longer converted to lowercase.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md489}{}\doxysubsection{\texorpdfstring{curl.\+emit\+\_\+io became emit\+\_\+io}{curl.emit\_io became emit\_io}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md489}
+Emitting IO events from a Request\+Mediator is now a parameter that must be set in a request\textquotesingle{}s curl options using the \textquotesingle{}emit\+\_\+io\textquotesingle{} key. This was previously set under a request\textquotesingle{}s parameters using \textquotesingle{}curl.\+emit\+\_\+io\textquotesingle{}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md490}{}\doxysection{\texorpdfstring{3.\+1 to 3.\+2}{3.1 to 3.2}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md490}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md491}{}\doxysubsection{\texorpdfstring{Curl\+Multi is no longer reused globally}{CurlMulti is no longer reused globally}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md491}
+Before 3.\+2, the same Curl\+Multi object was reused globally for each client. This can cause issue where plugins added to a single client can pollute requests dispatched from other clients.
+
+If you still wish to reuse the same Curl\+Multi object with each client, then you can add a listener to the Service\+Builder\textquotesingle{}s {\ttfamily service\+\_\+builder.\+create\+\_\+client} event to inject a custom Curl\+Multi object into each client as it is created.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$multi\ =\ \textcolor{keyword}{new}\ Guzzle\(\backslash\)Http\(\backslash\)Curl\(\backslash\)CurlMulti();}
+\DoxyCodeLine{\$builder\ =\ Guzzle\(\backslash\)Service\(\backslash\)Builder\(\backslash\)ServiceBuilder::factory(\textcolor{stringliteral}{'/path/to/config.json'});}
+\DoxyCodeLine{\$builder-\/>addListener(\textcolor{stringliteral}{'service\_builder.create\_client'},\ \textcolor{keyword}{function}\ (\$event)\ use\ (\$multi)\ \{}
+\DoxyCodeLine{\ \ \ \ \$event[\textcolor{stringliteral}{'client'}]-\/>setCurlMulti(\$multi);}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\});}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md492}{}\doxysubsection{\texorpdfstring{No default path}{No default path}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md492}
+URLs no longer have a default path value of \textquotesingle{}/\textquotesingle{} if no path was specified.
+
+Before\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$request\ =\ \$client-\/>get(\textcolor{stringliteral}{'http://www.foo.com'});}
+\DoxyCodeLine{echo\ \$request-\/>getUrl();}
+\DoxyCodeLine{\textcolor{comment}{//\ >>\ http://www.foo.com/}}
+
+\end{DoxyCode}
+
+
+After\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$request\ =\ \$client-\/>get(\textcolor{stringliteral}{'http://www.foo.com'});}
+\DoxyCodeLine{echo\ \$request-\/>getUrl();}
+\DoxyCodeLine{\textcolor{comment}{//\ >>\ http://www.foo.com}}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md493}{}\doxysubsection{\texorpdfstring{Less verbose Bad\+Response\+Exception}{Less verbose BadResponseException}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md493}
+The exception message for {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Exception\textbackslash{}Bad\+Response\+Exception} no longer contains the full HTTP request and response information. You can, however, get access to the request and response object by calling {\ttfamily get\+Request()} or {\ttfamily get\+Response()} on the exception object.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md494}{}\doxysubsection{\texorpdfstring{Query parameter aggregation}{Query parameter aggregation}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md494}
+Multi-\/valued query parameters are no longer aggregated using a callback function. {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Query} now has a set\+Aggregator() method that accepts a {\ttfamily Guzzle\textbackslash{}Http\textbackslash{}Query\+Aggregator\textbackslash{}Query\+Aggregator\+Interface} object. This object is responsible for handling the aggregation of multi-\/valued query string variables into a flattened hash.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md495}{}\doxysection{\texorpdfstring{2.\+8 to 3.\+x}{2.8 to 3.x}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md495}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md496}{}\doxysubsection{\texorpdfstring{Guzzle\textbackslash{}\+Service\textbackslash{}\+Inspector}{Guzzle\textbackslash{}Service\textbackslash{}Inspector}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md496}
+Change {\ttfamily \textbackslash{}Guzzle\textbackslash{}Service\textbackslash{}Inspector\+::from\+Config} to {\ttfamily \textbackslash{}Guzzle\textbackslash{}Common\textbackslash{}Collection\+::from\+Config}
+
+{\bfseries{Before}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Service\(\backslash\)Inspector;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{class\ }YourClient\ \textcolor{keyword}{extends}\ \(\backslash\)Guzzle\(\backslash\)Service\(\backslash\)Client}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ factory(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}\ =\ array())}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \$default\ =\ array();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \$required\ =\ array(\textcolor{stringliteral}{'base\_url'},\ \textcolor{stringliteral}{'username'},\ \textcolor{stringliteral}{'api\_key'});}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}\ =\ Inspector::fromConfig(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}},\ \$default,\ \$required);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \$client\ =\ \textcolor{keyword}{new}\ \textcolor{keyword}{self}(}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}-\/>get(\textcolor{stringliteral}{'base\_url'}),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}-\/>get(\textcolor{stringliteral}{'username'}),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}-\/>get(\textcolor{stringliteral}{'api\_key'})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \$client-\/>setConfig(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \$client-\/>setDescription(ServiceDescription::factory(\_\_DIR\_\_\ .\ DIRECTORY\_SEPARATOR\ .\ \textcolor{stringliteral}{'client.json'}));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$client;}
+\DoxyCodeLine{\ \ \ \ \}}
+
+\end{DoxyCode}
+
+
+{\bfseries{After}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Common\(\backslash\)Collection;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keyword}{class\ }YourClient\ \textcolor{keyword}{extends}\ \(\backslash\)Guzzle\(\backslash\)Service\(\backslash\)Client}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ factory(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}\ =\ array())}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \$default\ =\ array();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \$required\ =\ array(\textcolor{stringliteral}{'base\_url'},\ \textcolor{stringliteral}{'username'},\ \textcolor{stringliteral}{'api\_key'});}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}\ =\ Collection::fromConfig(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}},\ \$default,\ \$required);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \$client\ =\ \textcolor{keyword}{new}\ \textcolor{keyword}{self}(}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}-\/>get(\textcolor{stringliteral}{'base\_url'}),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}-\/>get(\textcolor{stringliteral}{'username'}),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}-\/>get(\textcolor{stringliteral}{'api\_key'})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \$client-\/>setConfig(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \$client-\/>setDescription(ServiceDescription::factory(\_\_DIR\_\_\ .\ DIRECTORY\_SEPARATOR\ .\ \textcolor{stringliteral}{'client.json'}));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$client;}
+\DoxyCodeLine{\ \ \ \ \}}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md497}{}\doxysubsection{\texorpdfstring{Convert XML Service Descriptions to JSON}{Convert XML Service Descriptions to JSON}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md497}
+{\bfseries{Before}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{<?\textcolor{keyword}{xml}\ \textcolor{keyword}{version}=\textcolor{stringliteral}{"{}1.0"{}}\ \textcolor{keyword}{encoding}=\textcolor{stringliteral}{"{}UTF-\/8"{}}?>}
+\DoxyCodeLine{<\textcolor{keywordtype}{client}>}
+\DoxyCodeLine{\ \ \ \ <\textcolor{keywordtype}{commands}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{<!-\/-\/\ Groups\ -\/-\/>}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ <\textcolor{keywordtype}{command}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}list\_groups"{}}\ \textcolor{keyword}{method}=\textcolor{stringliteral}{"{}GET"{}}\ \textcolor{keyword}{uri}=\textcolor{stringliteral}{"{}groups.json"{}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{doc}>\textcolor{keyword}{Get}\ \textcolor{keyword}{a}\ \textcolor{keyword}{list}\ \textcolor{keyword}{of}\ \textcolor{keyword}{groups}</\textcolor{keywordtype}{doc}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ </\textcolor{keywordtype}{command}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ <\textcolor{keywordtype}{command}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}search\_groups"{}}\ \textcolor{keyword}{method}=\textcolor{stringliteral}{"{}GET"{}}\ \textcolor{keyword}{uri}=\textcolor{stringliteral}{'search.json?query="{}\{\{query\}\}\ type:group"{}'}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{doc}>\textcolor{keyword}{Uses}\ \textcolor{keyword}{a}\ \textcolor{keyword}{search}\ \textcolor{keyword}{query}\ \textcolor{keyword}{to}\ \textcolor{keyword}{get}\ \textcolor{keyword}{a}\ \textcolor{keyword}{list}\ \textcolor{keyword}{of}\ \textcolor{keyword}{groups}</\textcolor{keywordtype}{doc}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{param}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}query"{}}\ \textcolor{keyword}{type}=\textcolor{stringliteral}{"{}string"{}}\ \textcolor{keyword}{required}=\textcolor{stringliteral}{"{}true"{}}\ />}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ </\textcolor{keywordtype}{command}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ <\textcolor{keywordtype}{command}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}create\_group"{}}\ \textcolor{keyword}{method}=\textcolor{stringliteral}{"{}POST"{}}\ \textcolor{keyword}{uri}=\textcolor{stringliteral}{"{}groups.json"{}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{doc}>\textcolor{keyword}{Create}\ \textcolor{keyword}{a}\ \textcolor{keyword}{group}</\textcolor{keywordtype}{doc}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{param}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}data"{}}\ \textcolor{keyword}{type}=\textcolor{stringliteral}{"{}array"{}}\ \textcolor{keyword}{location}=\textcolor{stringliteral}{"{}body"{}}\ \textcolor{keyword}{filters}=\textcolor{stringliteral}{"{}json\_encode"{}}\ \textcolor{keyword}{doc}=\textcolor{stringliteral}{"{}Group\ JSON"{}}/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{param}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}Content-\/Type"{}}\ \textcolor{keyword}{location}=\textcolor{stringliteral}{"{}header"{}}\ \textcolor{keyword}{static}=\textcolor{stringliteral}{"{}application/json"{}}/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ </\textcolor{keywordtype}{command}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ <\textcolor{keywordtype}{command}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}delete\_group"{}}\ \textcolor{keyword}{method}=\textcolor{stringliteral}{"{}DELETE"{}}\ \textcolor{keyword}{uri}=\textcolor{stringliteral}{"{}groups/\{\{id\}\}.json"{}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{doc}>\textcolor{keyword}{Delete}\ \textcolor{keyword}{a}\ \textcolor{keyword}{group}\ \textcolor{keyword}{by}\ \textcolor{keyword}{ID}</\textcolor{keywordtype}{doc}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{param}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}id"{}}\ \textcolor{keyword}{type}=\textcolor{stringliteral}{"{}integer"{}}\ \textcolor{keyword}{required}=\textcolor{stringliteral}{"{}true"{}}/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ </\textcolor{keywordtype}{command}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ <\textcolor{keywordtype}{command}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}get\_group"{}}\ \textcolor{keyword}{method}=\textcolor{stringliteral}{"{}GET"{}}\ \textcolor{keyword}{uri}=\textcolor{stringliteral}{"{}groups/\{\{id\}\}.json"{}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{param}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}id"{}}\ \textcolor{keyword}{type}=\textcolor{stringliteral}{"{}integer"{}}\ \textcolor{keyword}{required}=\textcolor{stringliteral}{"{}true"{}}/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ </\textcolor{keywordtype}{command}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ <\textcolor{keywordtype}{command}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}update\_group"{}}\ \textcolor{keyword}{method}=\textcolor{stringliteral}{"{}PUT"{}}\ \textcolor{keyword}{uri}=\textcolor{stringliteral}{"{}groups/\{\{id\}\}.json"{}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{doc}>\textcolor{keyword}{Update}\ \textcolor{keyword}{a}\ \textcolor{keyword}{group}</\textcolor{keywordtype}{doc}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{param}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}id"{}}\ \textcolor{keyword}{type}=\textcolor{stringliteral}{"{}integer"{}}\ \textcolor{keyword}{required}=\textcolor{stringliteral}{"{}true"{}}/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{param}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}data"{}}\ \textcolor{keyword}{type}=\textcolor{stringliteral}{"{}array"{}}\ \textcolor{keyword}{location}=\textcolor{stringliteral}{"{}body"{}}\ \textcolor{keyword}{filters}=\textcolor{stringliteral}{"{}json\_encode"{}}\ \textcolor{keyword}{doc}=\textcolor{stringliteral}{"{}Group\ JSON"{}}/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ <\textcolor{keywordtype}{param}\ \textcolor{keyword}{name}=\textcolor{stringliteral}{"{}Content-\/Type"{}}\ \textcolor{keyword}{location}=\textcolor{stringliteral}{"{}header"{}}\ \textcolor{keyword}{static}=\textcolor{stringliteral}{"{}application/json"{}}/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ </\textcolor{keywordtype}{command}>}
+\DoxyCodeLine{\ \ \ \ </\textcolor{keywordtype}{commands}>}
+\DoxyCodeLine{</\textcolor{keywordtype}{client}>}
+
+\end{DoxyCode}
+
+
+{\bfseries{After}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ "{}name"{}:\ \ \ \ \ \ \ "{}Zendesk\ REST\ API\ v2"{},}
+\DoxyCodeLine{\ \ \ \ "{}apiVersion"{}:\ "{}2012-\/12-\/31"{},}
+\DoxyCodeLine{\ \ \ \ "{}description"{}:"{}Provides\ access\ to\ Zendesk\ views,\ groups,\ tickets,\ ticket\ fields,\ and\ users"{},}
+\DoxyCodeLine{\ \ \ \ "{}operations"{}:\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ "{}list\_groups"{}:\ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}httpMethod"{}:"{}GET"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}uri"{}:\ \ \ \ \ \ \ "{}groups.json"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}summary"{}:\ \ \ "{}Get\ a\ list\ of\ groups"{}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ "{}search\_groups"{}:\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}httpMethod"{}:"{}GET"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}uri"{}:\ \ \ \ \ \ \ "{}search.json?query=\(\backslash\)"{}\{query\}\ type:group\(\backslash\)"{}"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}summary"{}:\ \ \ "{}Uses\ a\ search\ query\ to\ get\ a\ list\ of\ groups"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}parameters"{}:\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}query"{}:\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}location"{}:\ \ \ "{}uri"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}description"{}:"{}Zendesk\ Search\ Query"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}type"{}:\ \ \ \ \ \ \ "{}string"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}required"{}:\ \ \ true}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ "{}create\_group"{}:\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}httpMethod"{}:"{}POST"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}uri"{}:\ \ \ \ \ \ \ "{}groups.json"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}summary"{}:\ \ \ "{}Create\ a\ group"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}parameters"{}:\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}data"{}:\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}type"{}:\ \ \ \ \ \ \ "{}array"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}location"{}:\ \ \ "{}body"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}description"{}:"{}Group\ JSON"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}filters"{}:\ \ \ \ "{}json\_encode"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}required"{}:\ \ \ true}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}Content-\/Type"{}:\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}type"{}:\ \ \ \ "{}string"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}location"{}:"{}header"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}static"{}:\ \ "{}application/json"{}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ "{}delete\_group"{}:\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}httpMethod"{}:"{}DELETE"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}uri"{}:\ \ \ \ \ \ \ "{}groups/\{id\}.json"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}summary"{}:\ \ \ "{}Delete\ a\ group"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}parameters"{}:\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}id"{}:\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}location"{}:\ \ \ "{}uri"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}description"{}:"{}Group\ to\ delete\ by\ ID"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}type"{}:\ \ \ \ \ \ \ "{}integer"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}required"{}:\ \ \ true}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ "{}get\_group"{}:\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}httpMethod"{}:"{}GET"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}uri"{}:\ \ \ \ \ \ \ "{}groups/\{id\}.json"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}summary"{}:\ \ \ "{}Get\ a\ ticket"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}parameters"{}:\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}id"{}:\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}location"{}:\ \ \ "{}uri"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}description"{}:"{}Group\ to\ get\ by\ ID"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}type"{}:\ \ \ \ \ \ \ "{}integer"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}required"{}:\ \ \ true}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ "{}update\_group"{}:\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}httpMethod"{}:"{}PUT"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}uri"{}:\ \ \ \ \ \ \ "{}groups/\{id\}.json"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}summary"{}:\ \ \ "{}Update\ a\ group"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ "{}parameters"{}:\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}id"{}:\ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}location"{}:\ \ \ "{}uri"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}description"{}:"{}Group\ to\ update\ by\ ID"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}type"{}:\ \ \ \ \ \ \ "{}integer"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}required"{}:\ \ \ true}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}data"{}:\ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}type"{}:\ \ \ \ \ \ \ "{}array"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}location"{}:\ \ \ "{}body"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}description"{}:"{}Group\ JSON"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}filters"{}:\ \ \ \ "{}json\_encode"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}required"{}:\ \ \ true}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}Content-\/Type"{}:\{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}type"{}:\ \ \ \ "{}string"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}location"{}:"{}header"{},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "{}static"{}:\ \ "{}application/json"{}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md498}{}\doxysubsection{\texorpdfstring{Guzzle\textbackslash{}\+Service\textbackslash{}\+Description\textbackslash{}\+Service\+Description}{Guzzle\textbackslash{}Service\textbackslash{}Description\textbackslash{}ServiceDescription}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md498}
+Commands are now called Operations
+
+{\bfseries{Before}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Service\(\backslash\)Description\(\backslash\)ServiceDescription;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$sd\ =\ \textcolor{keyword}{new}\ ServiceDescription();}
+\DoxyCodeLine{\$sd-\/>getCommands();\ \ \ \ \ \textcolor{comment}{//\ @returns\ ApiCommandInterface[]}}
+\DoxyCodeLine{\$sd-\/>hasCommand(\$name);}
+\DoxyCodeLine{\$sd-\/>getCommand(\$name);\ \textcolor{comment}{//\ @returns\ ApiCommandInterface|null}}
+\DoxyCodeLine{\$sd-\/>addCommand(\$command);\ \textcolor{comment}{//\ @param\ ApiCommandInterface\ \$command}}
+
+\end{DoxyCode}
+
+
+{\bfseries{After}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Service\(\backslash\)Description\(\backslash\)ServiceDescription;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$sd\ =\ \textcolor{keyword}{new}\ ServiceDescription();}
+\DoxyCodeLine{\$sd-\/>getOperations();\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @returns\ OperationInterface[]}}
+\DoxyCodeLine{\$sd-\/>hasOperation(\$name);}
+\DoxyCodeLine{\$sd-\/>getOperation(\$name);\ \ \ \ \ \ \ \textcolor{comment}{//\ @returns\ OperationInterface|null}}
+\DoxyCodeLine{\$sd-\/>addOperation(\$operation);\ \ \textcolor{comment}{//\ @param\ OperationInterface\ \$operation}}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md499}{}\doxysubsection{\texorpdfstring{Guzzle\textbackslash{}\+Common\textbackslash{}\+Inflection\textbackslash{}\+Inflector}{Guzzle\textbackslash{}Common\textbackslash{}Inflection\textbackslash{}Inflector}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md499}
+Namespace is now {\ttfamily Guzzle\textbackslash{}Inflection\textbackslash{}Inflector}\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md500}{}\doxysubsection{\texorpdfstring{Guzzle\textbackslash{}\+Http\textbackslash{}\+Plugin}{Guzzle\textbackslash{}Http\textbackslash{}Plugin}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md500}
+Namespace is now {\ttfamily Guzzle\textbackslash{}Plugin}. Many other changes occur within this namespace and are detailed in their own sections below.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md501}{}\doxysubsection{\texorpdfstring{Guzzle\textbackslash{}\+Http\textbackslash{}\+Plugin\textbackslash{}\+Log\+Plugin and Guzzle\textbackslash{}\+Common\textbackslash{}\+Log}{Guzzle\textbackslash{}Http\textbackslash{}Plugin\textbackslash{}LogPlugin and Guzzle\textbackslash{}Common\textbackslash{}Log}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md501}
+Now {\ttfamily Guzzle\textbackslash{}Plugin\textbackslash{}Log\textbackslash{}Log\+Plugin} and {\ttfamily Guzzle\textbackslash{}Log} respectively.
+
+{\bfseries{Before}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Common\(\backslash\)Log\(\backslash\)ClosureLogAdapter;}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Http\(\backslash\)Plugin\(\backslash\)LogPlugin;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$client;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ \$verbosity\ is\ an\ integer\ indicating\ desired\ message\ verbosity\ level}}
+\DoxyCodeLine{\$client-\/>addSubscriber(\textcolor{keyword}{new}\ LogPlugin(\textcolor{keyword}{new}\ ClosureLogAdapter(\textcolor{keyword}{function}(\$m)\ \{\ echo\ \$m;\ \},\ \mbox{\hyperlink{namespace_illuminate_1_1_console_1_1_concerns_a3933a0d9c7598ac8a125bb81ba8ff954}{\$verbosity}}\ =\ LogPlugin::LOG\_VERBOSE);}
+
+\end{DoxyCode}
+
+
+{\bfseries{After}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Log\(\backslash\)ClosureLogAdapter;}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Log\(\backslash\)MessageFormatter;}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Plugin\(\backslash\)Log\(\backslash\)LogPlugin;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$client;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ \$format\ is\ a\ string\ indicating\ desired\ message\ format\ -\/-\/\ @see\ MessageFormatter}}
+\DoxyCodeLine{\$client-\/>addSubscriber(\textcolor{keyword}{new}\ LogPlugin(\textcolor{keyword}{new}\ ClosureLogAdapter(\textcolor{keyword}{function}(\$m)\ \{\ echo\ \$m;\ \},\ \$format\ =\ MessageFormatter::DEBUG\_FORMAT);}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md502}{}\doxysubsection{\texorpdfstring{Guzzle\textbackslash{}\+Http\textbackslash{}\+Plugin\textbackslash{}\+Curl\+Auth\+Plugin}{Guzzle\textbackslash{}Http\textbackslash{}Plugin\textbackslash{}CurlAuthPlugin}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md502}
+Now {\ttfamily Guzzle\textbackslash{}Plugin\textbackslash{}Curl\+Auth\textbackslash{}Curl\+Auth\+Plugin}.\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md503}{}\doxysubsection{\texorpdfstring{Guzzle\textbackslash{}\+Http\textbackslash{}\+Plugin\textbackslash{}\+Exponential\+Backoff\+Plugin}{Guzzle\textbackslash{}Http\textbackslash{}Plugin\textbackslash{}ExponentialBackoffPlugin}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md503}
+Now {\ttfamily Guzzle\textbackslash{}Plugin\textbackslash{}Backoff\textbackslash{}Backoff\+Plugin}, and other changes.
+
+{\bfseries{Before}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Http\(\backslash\)Plugin\(\backslash\)ExponentialBackoffPlugin;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$backoffPlugin\ =\ \textcolor{keyword}{new}\ ExponentialBackoffPlugin(\$maxRetries,\ array\_merge(}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ ExponentialBackoffPlugin::getDefaultFailureCodes(),\ array(429)}
+\DoxyCodeLine{\ \ \ \ ));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$client-\/>addSubscriber(\$backoffPlugin);}
+
+\end{DoxyCode}
+
+
+{\bfseries{After}}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Plugin\(\backslash\)Backoff\(\backslash\)BackoffPlugin;}
+\DoxyCodeLine{use\ Guzzle\(\backslash\)Plugin\(\backslash\)Backoff\(\backslash\)HttpBackoffStrategy;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Use\ convenient\ factory\ method\ instead\ -\/-\/\ see\ implementation\ for\ ideas\ of\ what}}
+\DoxyCodeLine{\textcolor{comment}{//\ you\ can\ do\ with\ chaining\ backoff\ strategies}}
+\DoxyCodeLine{\$backoffPlugin\ =\ BackoffPlugin::getExponentialBackoff(\$maxRetries,\ array\_merge(}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ HttpBackoffStrategy::getDefaultFailureCodes(),\ array(429)}
+\DoxyCodeLine{\ \ \ \ ));}
+\DoxyCodeLine{\$client-\/>addSubscriber(\$backoffPlugin);}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md504}{}\doxysubsection{\texorpdfstring{Known Issues}{Known Issues}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md504}
+\hypertarget{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md505}{}\doxysubsubsection{\texorpdfstring{\mbox{[}\+BUG\mbox{]} Accept-\/\+Encoding header behavior changed unintentionally.}{[BUG] Accept-Encoding header behavior changed unintentionally.}}\label{md_vendor_2guzzlehttp_2guzzle_2_u_p_g_r_a_d_i_n_g_autotoc_md505}
+(See \#217) (Fixed in 09daeb8c666fb44499a0646d655a8ae36456575e)
+
+In version 2.\+8 setting the {\ttfamily Accept-\/\+Encoding} header would set the CURLOPT\+\_\+\+ENCODING option, which permitted c\+URL to properly handle gzip/deflate compressed responses from the server. In versions affected by this bug this does not happen. See issue \#217 for a workaround, or use a version containing the fix. 

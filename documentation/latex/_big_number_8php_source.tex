@@ -1,0 +1,323 @@
+\doxysection{Big\+Number.\+php}
+\hypertarget{_big_number_8php_source}{}\label{_big_number_8php_source}\index{vendor/brick/math/src/BigNumber.php@{vendor/brick/math/src/BigNumber.php}}
+\mbox{\hyperlink{_big_number_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00003}00003\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00005}00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_brick_1_1_math}{Brick\(\backslash\)Math}};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_brick_1_1_math_1_1_exception_1_1_division_by_zero_exception}{Brick\(\backslash\)Math\(\backslash\)Exception\(\backslash\)DivisionByZeroException}};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_brick_1_1_math_1_1_exception_1_1_math_exception}{Brick\(\backslash\)Math\(\backslash\)Exception\(\backslash\)MathException}};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_brick_1_1_math_1_1_exception_1_1_number_format_exception}{Brick\(\backslash\)Math\(\backslash\)Exception\(\backslash\)NumberFormatException}};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_brick_1_1_math_1_1_exception_1_1_rounding_necessary_exception}{Brick\(\backslash\)Math\(\backslash\)Exception\(\backslash\)RoundingNecessaryException}};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00017}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{00017}}\ \textcolor{keyword}{abstract}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}}\ \textcolor{keyword}{implements}\ \(\backslash\)Serializable,\ \(\backslash\)JsonSerializable}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00018}00018\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00022}00022\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ PARSE\_REGEXP\ =}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00023}00023\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'/\string^'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'(?<sign>[\(\backslash\)-\/\(\backslash\)+])?'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'(?:'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'(?:'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00027}00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'(?<integral>[0-\/9]+)?'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00028}00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'(?<point>\(\backslash\).)?'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00029}00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'(?<fractional>[0-\/9]+)?'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00030}00030\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'(?:[eE](?<exponent>[\(\backslash\)-\/\(\backslash\)+]?[0-\/9]+))?'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{')|(?:'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'(?<numerator>[0-\/9]+)'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\(\backslash\)/?'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00034}00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'(?<denominator>[0-\/9]+)'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{charliteral}{')'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{charliteral}{')'}\ .}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\$/'};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00056}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a38b11175f023d97f3a6b8e4dfc9820b3}{00056}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a38b11175f023d97f3a6b8e4dfc9820b3}{of}}(\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}}|\textcolor{keywordtype}{int}|\textcolor{keywordtype}{float}|\textcolor{keywordtype}{string}\ \$value)\ :\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00057}00057\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ instanceof\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$value;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_int(\$value))\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_integer}{BigInteger}}((\textcolor{keywordtype}{string})\ \$value);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \$value\ =\ \(\backslash\)is\_float(\$value)\ ?\ self::floatToString(\$value)\ :\ \$value;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \$throw\ =\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}()\ use\ (\$value)\ :\ \textcolor{keywordtype}{void}\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_exception_1_1_number_format_exception}{NumberFormatException}}(\(\backslash\)sprintf(}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'The\ given\ value\ "{}\%s"{}\ does\ not\ represent\ a\ valid\ number.'},}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)preg\_match(self::PARSE\_REGEXP,\ \$value,\ \$matches)\ !==\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \$throw();}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \$getMatch\ =\ \textcolor{keyword}{static}\ fn(\textcolor{keywordtype}{string}\ \$value):\ ?\textcolor{keywordtype}{string}\ =>\ ((\$matches[\$value]\ ??\ \textcolor{stringliteral}{''})\ !==\ \textcolor{stringliteral}{''})\ ?\ \$matches[\$value]\ :\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \$sign\ \ \ \ \ \ \ \ =\ \$getMatch(\textcolor{stringliteral}{'sign'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \$numerator\ \ \ =\ \$getMatch(\textcolor{stringliteral}{'numerator'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \$denominator\ =\ \$getMatch(\textcolor{stringliteral}{'denominator'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$numerator\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\$denominator\ !==\ \textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$sign\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$numerator\ =\ \$sign\ .\ \$numerator;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \$numerator\ \ \ =\ self::cleanUp(\$numerator);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \$denominator\ =\ self::cleanUp(\$denominator);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$denominator\ ===\ \textcolor{charliteral}{'0'})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ DivisionByZeroException::denominatorMustNotBeZero();}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_rational}{BigRational}}(}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_integer}{BigInteger}}(\$numerator),}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_integer}{BigInteger}}(\$denominator),}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \$point\ \ \ \ \ \ =\ \$getMatch(\textcolor{stringliteral}{'point'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \$integral\ \ \ =\ \$getMatch(\textcolor{stringliteral}{'integral'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \$fractional\ =\ \$getMatch(\textcolor{stringliteral}{'fractional'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \$exponent\ \ \ =\ \$getMatch(\textcolor{stringliteral}{'exponent'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$integral\ ===\ \textcolor{keyword}{null}\ \&\&\ \$fractional\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \$throw();}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$integral\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \$integral\ =\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$point\ !==\ \textcolor{keyword}{null}\ ||\ \$exponent\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \ \ \ \ \$fractional\ =\ (\$fractional\ ??\ \textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \$exponent\ =\ (\$exponent\ !==\ \textcolor{keyword}{null})\ ?\ (\textcolor{keywordtype}{int})\ \$exponent\ :\ 0;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$exponent\ ===\ PHP\_INT\_MIN\ ||\ \$exponent\ ===\ PHP\_INT\_MAX)\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_exception_1_1_number_format_exception}{NumberFormatException}}(\textcolor{stringliteral}{'Exponent\ too\ large.'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \$unscaledValue\ =\ self::cleanUp((\$sign\ ??\ \textcolor{stringliteral}{''}).\ \$integral\ .\ \$fractional);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \$scale\ =\ \(\backslash\)strlen(\$fractional)\ -\/\ \$exponent;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$scale\ <\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$unscaledValue\ !==\ \textcolor{charliteral}{'0'})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$unscaledValue\ .=\ \(\backslash\)str\_repeat(\textcolor{charliteral}{'0'},\ -\/\ \$scale);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$scale\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_decimal}{BigDecimal}}(\$unscaledValue,\ \$scale);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \$integral\ =\ self::cleanUp((\$sign\ ??\ \textcolor{stringliteral}{''})\ .\ \$integral);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_integer}{BigInteger}}(\$integral);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00144}00144\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00154}00154\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ floatToString(\textcolor{keywordtype}{float}\ \$float)\ :\ string}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00155}00155\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \$currentLocale\ =\ \(\backslash\)setlocale(LC\_NUMERIC,\ \textcolor{charliteral}{'0'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \(\backslash\)setlocale(LC\_NUMERIC,\ \textcolor{charliteral}{'C'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \$result\ =\ (string)\ \$float;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \(\backslash\)setlocale(LC\_NUMERIC,\ \$currentLocale);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$result;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00164}00164\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00172}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a61eff188470a5d5694a648cff368f5d4}{00172}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a61eff188470a5d5694a648cff368f5d4}{newBigInteger}}(\textcolor{keywordtype}{string}\ \$value)\ :\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_integer}{BigInteger}}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00173}00173\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_integer}{BigInteger}}(\$value);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00175}00175\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00183}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a294b0f7e1d234e0c09a6b6b9bb59ab00}{00183}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a294b0f7e1d234e0c09a6b6b9bb59ab00}{newBigDecimal}}(\textcolor{keywordtype}{string}\ \$value,\ \textcolor{keywordtype}{int}\ \$scale\ =\ 0)\ :\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_decimal}{BigDecimal}}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00184}00184\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_decimal}{BigDecimal}}(\$value,\ \$scale);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00186}00186\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00194}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aa922f893e0f7bdbab738af51306846c6}{00194}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aa922f893e0f7bdbab738af51306846c6}{newBigRational}}(\mbox{\hyperlink{class_brick_1_1_math_1_1_big_integer}{BigInteger}}\ \$numerator,\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_integer}{BigInteger}}\ \$denominator,\ \textcolor{keywordtype}{bool}\ \$checkDenominator)\ :\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_rational}{BigRational}}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00195}00195\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_rational}{BigRational}}(\$numerator,\ \$denominator,\ \$checkDenominator);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00197}00197\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00212}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_ac26230674e59a4077174546bf1201979}{00212}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_ac26230674e59a4077174546bf1201979}{min}}(\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}}|\textcolor{keywordtype}{int}|\textcolor{keywordtype}{float}|\textcolor{keywordtype}{string}\ ...\$values)\ :\ static}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00213}00213\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \$min\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$values\ as\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ static::of(\$value);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$min\ ===\ \textcolor{keyword}{null}\ ||\ \$value-\/>isLessThan(\$min))\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$min\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$min\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\_\_METHOD\_\_\ .\ \textcolor{stringliteral}{'()\ expects\ at\ least\ one\ value.'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$min;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00229}00229\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00244}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a8a24b296d6a7c951c946ae46b1613ab1}{00244}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a8a24b296d6a7c951c946ae46b1613ab1}{max}}(\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}}|\textcolor{keywordtype}{int}|\textcolor{keywordtype}{float}|\textcolor{keywordtype}{string}\ ...\$values)\ :\ static}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00245}00245\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \$max\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$values\ as\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ static::of(\$value);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$max\ ===\ \textcolor{keyword}{null}\ ||\ \$value-\/>isGreaterThan(\$max))\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$max\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$max\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\_\_METHOD\_\_\ .\ \textcolor{stringliteral}{'()\ expects\ at\ least\ one\ value.'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$max;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00261}00261\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00274}00274\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ sum(\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}}|\textcolor{keywordtype}{int}|\textcolor{keywordtype}{float}|\textcolor{keywordtype}{string}\ ...\$values)\ :\ static}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00275}00275\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \$sum\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00278}00278\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$values\ as\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ static::of(\$value);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \$sum\ =\ \$sum\ ===\ \textcolor{keyword}{null}\ ?\ \$value\ :\ self::add(\$sum,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00285}00285\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$sum\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\_\_METHOD\_\_\ .\ \textcolor{stringliteral}{'()\ expects\ at\ least\ one\ value.'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$sum;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00290}00290\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00291}00291\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00302}00302\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_symfony_1_1_component_1_1_routing_1_1_loader_1_1_configurator_1_1_traits_afaa5addd4f52882d4d869dafb551d257}{add}}(BigNumber\ \$a,\ BigNumber\ \$b)\ :\ BigNumber}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00303}00303\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00304}00304\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$a\ instanceof\ BigRational)\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00305}00305\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$a-\/>plus(\$b);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00306}00306\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00307}00307\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$b\ instanceof\ BigRational)\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$b-\/>plus(\$a);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00311}00311\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$a\ instanceof\ BigDecimal)\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$a-\/>plus(\$b);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00315}00315\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$b\ instanceof\ BigDecimal)\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$b-\/>plus(\$a);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$a-\/>plus(\$b);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00323}00323\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00324}00324\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00332}00332\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ cleanUp(\textcolor{keywordtype}{string}\ \$number)\ :\ string}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00333}00333\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \$firstChar\ =\ \$number[0];}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$firstChar\ ===\ \textcolor{charliteral}{'+'}\ ||\ \$firstChar\ ===\ \textcolor{charliteral}{'-\/'})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \$number\ =\ \(\backslash\)substr(\$number,\ 1);}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00340}00340\ \ \ \ \ \ \ \ \ \$number\ =\ \(\backslash\)ltrim(\$number,\ \textcolor{charliteral}{'0'});}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00342}00342\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$number\ ===\ \textcolor{stringliteral}{''})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'0'};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00344}00344\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00345}00345\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$firstChar\ ===\ \textcolor{charliteral}{'-\/'})\ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{charliteral}{'-\/'}\ .\ \$number;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00350}00350\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$number;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00351}00351\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00352}00352\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00356}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a5c2a00ec44d768380bfafc920bdcda7a}{00356}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a5c2a00ec44d768380bfafc920bdcda7a}{isEqualTo}}(\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}}|\textcolor{keywordtype}{int}|\textcolor{keywordtype}{float}|\textcolor{keywordtype}{string}\ \$that)\ :\ bool}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00357}00357\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aeb7a8a2836027ef248c1b2d1e33729bd}{compareTo}}(\$that)\ ===\ 0;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00359}00359\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00360}00360\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00364}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a5d12e0b45f8b1559deadb830cc0a1bb1}{00364}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a5d12e0b45f8b1559deadb830cc0a1bb1}{isLessThan}}(\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}}|\textcolor{keywordtype}{int}|\textcolor{keywordtype}{float}|\textcolor{keywordtype}{string}\ \$that)\ :\ bool}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00365}00365\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aeb7a8a2836027ef248c1b2d1e33729bd}{compareTo}}(\$that)\ <\ 0;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00367}00367\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00372}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a485a29211527f519bd726ea87e355ec2}{00372}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a485a29211527f519bd726ea87e355ec2}{isLessThanOrEqualTo}}(\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}}|\textcolor{keywordtype}{int}|\textcolor{keywordtype}{float}|\textcolor{keywordtype}{string}\ \$that)\ :\ bool}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00373}00373\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00374}00374\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aeb7a8a2836027ef248c1b2d1e33729bd}{compareTo}}(\$that)\ <=\ 0;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00375}00375\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00376}00376\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00380}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a5ac189c313aa1919cf30d87f33b97d3f}{00380}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a5ac189c313aa1919cf30d87f33b97d3f}{isGreaterThan}}(\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}}|\textcolor{keywordtype}{int}|\textcolor{keywordtype}{float}|\textcolor{keywordtype}{string}\ \$that)\ :\ bool}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00381}00381\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aeb7a8a2836027ef248c1b2d1e33729bd}{compareTo}}(\$that)\ >\ 0;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00383}00383\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00384}00384\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00388}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a6ec6563bac10ad2e82c06219bed276de}{00388}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a6ec6563bac10ad2e82c06219bed276de}{isGreaterThanOrEqualTo}}(\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}}|\textcolor{keywordtype}{int}|\textcolor{keywordtype}{float}|\textcolor{keywordtype}{string}\ \$that)\ :\ bool}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00389}00389\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aeb7a8a2836027ef248c1b2d1e33729bd}{compareTo}}(\$that)\ >=\ 0;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00391}00391\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00396}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_adbd8bd9ed173174eb4509a853096e34d}{00396}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_adbd8bd9ed173174eb4509a853096e34d}{isZero}}()\ :\ bool}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00397}00397\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00398}00398\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a282c839169dc16e5d8bc47e8ac0f202b}{getSign}}()\ ===\ 0;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00399}00399\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00404}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aaeeed6085a91098a429c53b3bc097587}{00404}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aaeeed6085a91098a429c53b3bc097587}{isNegative}}()\ :\ bool}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00405}00405\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00406}00406\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a282c839169dc16e5d8bc47e8ac0f202b}{getSign}}()\ <\ 0;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00407}00407\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00408}00408\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00412}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aba628edfe03498fd1bd0828d17b2613d}{00412}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aba628edfe03498fd1bd0828d17b2613d}{isNegativeOrZero}}()\ :\ bool}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00413}00413\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00414}00414\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a282c839169dc16e5d8bc47e8ac0f202b}{getSign}}()\ <=\ 0;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00415}00415\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00420}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a017a082785367e089977172289090652}{00420}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a017a082785367e089977172289090652}{isPositive}}()\ :\ bool}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00421}00421\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00422}00422\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a282c839169dc16e5d8bc47e8ac0f202b}{getSign}}()\ >\ 0;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00423}00423\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00424}00424\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00428}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a4f73a0b69e275b9db063d36214896c5b}{00428}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a4f73a0b69e275b9db063d36214896c5b}{isPositiveOrZero}}()\ :\ bool}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00429}00429\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a282c839169dc16e5d8bc47e8ac0f202b}{getSign}}()\ >=\ 0;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00431}00431\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00432}00432\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00438}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a282c839169dc16e5d8bc47e8ac0f202b}{00438}}\ \ \ \ \ \textcolor{keyword}{abstract}\ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a282c839169dc16e5d8bc47e8ac0f202b}{getSign}}()\ :\ int;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00439}00439\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00447}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aeb7a8a2836027ef248c1b2d1e33729bd}{00447}}\ \ \ \ \ \textcolor{keyword}{abstract}\ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aeb7a8a2836027ef248c1b2d1e33729bd}{compareTo}}(\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number}{BigNumber}}|\textcolor{keywordtype}{int}|\textcolor{keywordtype}{float}|\textcolor{keywordtype}{string}\ \$that)\ :\ int;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00448}00448\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00454}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a7b4bac2966b6e735a4aaa27d8b6fe37d}{00454}}\ \ \ \ \ \textcolor{keyword}{abstract}\ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a7b4bac2966b6e735a4aaa27d8b6fe37d}{toBigInteger}}()\ :\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_integer}{BigInteger}};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00455}00455\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00461}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_af8b74778aff7e428d45509bb86408596}{00461}}\ \ \ \ \ \textcolor{keyword}{abstract}\ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_af8b74778aff7e428d45509bb86408596}{toBigDecimal}}()\ :\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_decimal}{BigDecimal}};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00462}00462\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00466}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a14c7fa5ae37a286d34765aa00329dd7c}{00466}}\ \ \ \ \ \textcolor{keyword}{abstract}\ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a14c7fa5ae37a286d34765aa00329dd7c}{toBigRational}}()\ :\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_rational}{BigRational}};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00477}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aee98ca780c25d3d40c4c2f02f238e25c}{00477}}\ \ \ \ \ \textcolor{keyword}{abstract}\ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_aee98ca780c25d3d40c4c2f02f238e25c}{toScale}}(\textcolor{keywordtype}{int}\ \$scale,\ \textcolor{keywordtype}{int}\ \$roundingMode\ =\ \mbox{\hyperlink{class_brick_1_1_math_1_1_rounding_mode_a91be30d2d5343f30d7d280e5729c240b}{RoundingMode::UNNECESSARY}})\ :\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_decimal}{BigDecimal}};}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00478}00478\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00487}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_af925bcc620434a34f7ee4029b0700765}{00487}}\ \ \ \ \ \textcolor{keyword}{abstract}\ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_af925bcc620434a34f7ee4029b0700765}{toInt}}()\ :\ int;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00488}00488\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00498}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a3774efe5a19fbbc82f1206fbd6f6dd4b}{00498}}\ \ \ \ \ \textcolor{keyword}{abstract}\ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a3774efe5a19fbbc82f1206fbd6f6dd4b}{toFloat}}()\ :\ float;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00499}00499\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00506}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a7516ca30af0db3cdbf9a7739b48ce91d}{00506}}\ \ \ \ \ \textcolor{keyword}{abstract}\ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a7516ca30af0db3cdbf9a7739b48ce91d}{\_\_toString}}()\ :\ string;}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00507}00507\ }
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00508}\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_ad402d8679325bc514874370f02b5c2ac}{00508}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_ad402d8679325bc514874370f02b5c2ac}{jsonSerialize}}()\ :\ string}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00509}00509\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_brick_1_1_math_1_1_big_number_a7516ca30af0db3cdbf9a7739b48ce91d}{\_\_toString}}();}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00511}00511\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_big_number_8php_source_l00512}00512\ \}}
+
+\end{DoxyCode}

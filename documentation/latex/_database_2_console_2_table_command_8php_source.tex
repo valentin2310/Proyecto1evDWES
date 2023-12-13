@@ -1,0 +1,191 @@
+\doxysection{Table\+Command.\+php}
+\hypertarget{_database_2_console_2_table_command_8php_source}{}\label{_database_2_console_2_table_command_8php_source}\index{vendor/laravel/framework/src/Illuminate/Database/Console/TableCommand.php@{vendor/laravel/framework/src/Illuminate/Database/Console/TableCommand.php}}
+\mbox{\hyperlink{_database_2_console_2_table_command_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_database_1_1_console}{Illuminate\(\backslash\)Database\(\backslash\)Console}};}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00005}00005\ use\ Doctrine\(\backslash\)DBAL\(\backslash\)Schema\(\backslash\)Column;}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00006}00006\ use\ Doctrine\(\backslash\)DBAL\(\backslash\)Schema\(\backslash\)ForeignKeyConstraint;}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00007}00007\ use\ Doctrine\(\backslash\)DBAL\(\backslash\)Schema\(\backslash\)Index;}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00008}00008\ use\ Doctrine\(\backslash\)DBAL\(\backslash\)Schema\(\backslash\)Table;}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00009}00009\ use\ \mbox{\hyperlink{interface_illuminate_1_1_database_1_1_connection_resolver_interface}{Illuminate\(\backslash\)Database\(\backslash\)ConnectionResolverInterface}};}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_str}{Illuminate\(\backslash\)Support\(\backslash\)Str}};}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_console_1_1_attribute_1_1_as_command}{Symfony\(\backslash\)Component\(\backslash\)Console\(\backslash\)Attribute\(\backslash\)AsCommand}};}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ Laravel\(\backslash\)Prompts\(\backslash\)select;}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00015}00015\ \textcolor{preprocessor}{\#[AsCommand(name:\ 'db:table')]}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00016}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command}{00016}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command}{TableCommand}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_database_inspection_command}{DatabaseInspectionCommand}}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00017}00017\ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00023}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_a8f34ca1e46a621ab10a3a40addb794f5}{00023}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_a8f34ca1e46a621ab10a3a40addb794f5}{\$signature}}\ =\ \textcolor{stringliteral}{'db:table}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00024}00024\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{table?\ :\ The\ name\ of\ the\ table\}}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00025}00025\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/-\/database=\ :\ The\ database\ connection\}}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00026}00026\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/-\/json\ :\ Output\ the\ table\ information\ as\ JSON\}'};}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00033}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_a87b032cba06009e3467abf1c8018d960}{00033}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_a87b032cba06009e3467abf1c8018d960}{\$description}}\ =\ \textcolor{stringliteral}{'Display\ information\ about\ the\ given\ database\ table'};}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00040}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_a9a146f7356f57b645c82284457e48760}{00040}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_a9a146f7356f57b645c82284457e48760}{handle}}(\mbox{\hyperlink{interface_illuminate_1_1_database_1_1_connection_resolver_interface}{ConnectionResolverInterface}}\ \$connections)}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00041}00041\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_database_inspection_command_a6c5a3fd29d039e9372c36ae51988c459}{ensureDependenciesExist}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \$connection\ =\ \$connections-\/>\mbox{\hyperlink{interface_illuminate_1_1_database_1_1_connection_resolver_interface_a2a1f1d20567e9fb08ea59603165c5b30}{connection}}(\$this-\/>input-\/>getOption(\textcolor{stringliteral}{'database'}));}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \$schema\ =\ \$connection-\/>getDoctrineSchemaManager();}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_database_inspection_command_a1279b306fe1134dafde4c9b92577a0e2}{registerTypeMappings}}(\$connection-\/>getDoctrineConnection()-\/>getDatabasePlatform());}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \$table\ =\ \$this-\/>argument(\textcolor{stringliteral}{'table'})\ ?:\ select(}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Which\ table\ would\ you\ like\ to\ inspect?'},}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ collect(\$schema-\/>listTables())-\/>flatMap(fn\ (Table\ \$table)\ =>\ [\$table-\/>getName()])-\/>toArray()}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$schema-\/>tablesExist([\$table]))\ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>components-\/>warn(\textcolor{stringliteral}{"{}Table\ [\{\$table\}]\ doesn't\ exist."{}});}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \$table\ =\ \$schema-\/>introspectTable(\$table);}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \$columns\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_a36074fd8a91f6953146abbfdd228c5b1}{columns}}(\$table);}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \$indexes\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_a3f541a8dfed1b8cfe4892acb009d4231}{indexes}}(\$table);}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \$foreignKeys\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_af600b0a833c5c6c20163fef077f5c6ec}{foreignKeys}}(\$table);}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ [}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'table'}\ =>\ [}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ \$table-\/>getName(),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'columns'}\ =>\ \$columns-\/>count(),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'size'}\ =>\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_database_inspection_command_a019991bbaf48311845dcc368adff72fc}{getTableSize}}(\$connection,\ \$table-\/>getName()),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'columns'}\ =>\ \$columns,}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'indexes'}\ =>\ \$indexes,}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'foreign\_keys'}\ =>\ \$foreignKeys,}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_abb245ff75c7d44690c537b8a43e58edf}{display}}(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00081}00081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00089}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_a36074fd8a91f6953146abbfdd228c5b1}{00089}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_a36074fd8a91f6953146abbfdd228c5b1}{columns}}(Table\ \$table)}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00090}00090\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$table-\/>getColumns())-\/>map(fn\ (Column\ \$column)\ =>\ [}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'column'}\ =>\ \$column-\/>getName(),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'attributes'}\ =>\ \$this-\/>getAttributesForColumn(\$column),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'default'}\ =>\ \$column-\/>getDefault(),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'type'}\ =>\ \$column-\/>getType()-\/>getName(),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00097}00097\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00105}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_ac404dd19a7085d441a16d350744b7e07}{00105}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_ac404dd19a7085d441a16d350744b7e07}{getAttributesForColumn}}(Column\ \$column)}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00106}00106\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect([}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \$column-\/>getAutoincrement()\ ?\ \textcolor{stringliteral}{'autoincrement'}\ :\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'type'}\ =>\ \$column-\/>getType()-\/>getName(),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \$column-\/>getUnsigned()\ ?\ \textcolor{stringliteral}{'unsigned'}\ :\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ !\ \$column-\/>getNotNull()\ ?\ \textcolor{stringliteral}{'nullable'}\ :\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ ])-\/>filter();}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00113}00113\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00121}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_a3f541a8dfed1b8cfe4892acb009d4231}{00121}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_a3f541a8dfed1b8cfe4892acb009d4231}{indexes}}(Table\ \$table)}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00122}00122\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$table-\/>getIndexes())-\/>map(fn\ (Index\ \$index)\ =>\ [}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ \$index-\/>getName(),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'columns'}\ =>\ collect(\$index-\/>getColumns()),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'attributes'}\ =>\ \$this-\/>getAttributesForIndex(\$index),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00128}00128\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00136}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_ae034cab2dec76954c3f8ee853e0cccc6}{00136}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_ae034cab2dec76954c3f8ee853e0cccc6}{getAttributesForIndex}}(Index\ \$index)}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00137}00137\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect([}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'compound'}\ =>\ count(\$index-\/>getColumns())\ >\ 1,}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'unique'}\ =>\ \$index-\/>isUnique(),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'primary'}\ =>\ \$index-\/>isPrimary(),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ ])-\/>filter()-\/>keys()-\/>map(fn\ (\$attribute)\ =>\ Str::lower(\$attribute));}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00143}00143\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00151}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_af600b0a833c5c6c20163fef077f5c6ec}{00151}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_af600b0a833c5c6c20163fef077f5c6ec}{foreignKeys}}(Table\ \$table)}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00152}00152\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ collect(\$table-\/>getForeignKeys())-\/>map(fn\ (ForeignKeyConstraint\ \$foreignKey)\ =>\ [}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ \$foreignKey-\/>getName(),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'local\_table'}\ =>\ \$table-\/>getName(),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'local\_columns'}\ =>\ collect(\$foreignKey-\/>getLocalColumns()),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'foreign\_table'}\ =>\ \$foreignKey-\/>getForeignTableName(),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'foreign\_columns'}\ =>\ collect(\$foreignKey-\/>getForeignColumns()),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'on\_update'}\ =>\ Str::lower(rescue(fn\ ()\ =>\ \$foreignKey-\/>getOption(\textcolor{stringliteral}{'onUpdate'}),\ \textcolor{stringliteral}{'N/A'})),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'on\_delete'}\ =>\ Str::lower(rescue(fn\ ()\ =>\ \$foreignKey-\/>getOption(\textcolor{stringliteral}{'onDelete'}),\ \textcolor{stringliteral}{'N/A'})),}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00162}00162\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00170}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_abb245ff75c7d44690c537b8a43e58edf}{00170}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_abb245ff75c7d44690c537b8a43e58edf}{display}}(array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00171}00171\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \$this-\/>option(\textcolor{stringliteral}{'json'})\ ?\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_acd0637340c499066bb4c0f257b82a8b7}{displayJson}}(\$data)\ :\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_ae62f1a9830cc524df8a48ba8be519a96}{displayForCli}}(\$data);}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00173}00173\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00181}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_acd0637340c499066bb4c0f257b82a8b7}{00181}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_acd0637340c499066bb4c0f257b82a8b7}{displayJson}}(array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00182}00182\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \$this-\/>output-\/>writeln(json\_encode(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}));}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00184}00184\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00192}\mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_ae62f1a9830cc524df8a48ba8be519a96}{00192}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_console_1_1_table_command_ae62f1a9830cc524df8a48ba8be519a96}{displayForCli}}(array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00193}00193\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ [\$table,\ \$columns,\ \$indexes,\ \$foreignKeys]\ =\ [}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'table'}],\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'columns'}],\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'indexes'}],\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'foreign\_keys'}],}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \$this-\/>newLine();}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \$this-\/>components-\/>twoColumnDetail(\textcolor{stringliteral}{'<fg=green;options=bold>'}.\$table[\textcolor{stringliteral}{'name'}].\textcolor{stringliteral}{'</>'});}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \$this-\/>components-\/>twoColumnDetail(\textcolor{stringliteral}{'Columns'},\ \$table[\textcolor{stringliteral}{'columns'}]);}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$size\ =\ \$table[\textcolor{stringliteral}{'size'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>twoColumnDetail(\textcolor{stringliteral}{'Size'},\ number\_format(\$size\ /\ 1024\ /\ 1024,\ 2).\textcolor{stringliteral}{'MiB'});}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \$this-\/>newLine();}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$columns-\/>isNotEmpty())\ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>twoColumnDetail(\textcolor{stringliteral}{'<fg=green;options=bold>Column</>'},\ \textcolor{stringliteral}{'Type'});}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \$columns-\/>each(\textcolor{keyword}{function}\ (\$column)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>twoColumnDetail(}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$column[\textcolor{stringliteral}{'column'}].\textcolor{stringliteral}{'\ <fg=gray>'}.\$column[\textcolor{stringliteral}{'attributes'}]-\/>implode(\textcolor{stringliteral}{',\ '}).\textcolor{stringliteral}{'</>'},}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\$column[\textcolor{stringliteral}{'default'}]\ ?\ \textcolor{stringliteral}{'<fg=gray>'}.\$column[\textcolor{stringliteral}{'default'}].\textcolor{stringliteral}{'</>\ '}\ :\ \textcolor{stringliteral}{''}).\textcolor{stringliteral}{''}.\$column[\textcolor{stringliteral}{'type'}].\textcolor{stringliteral}{''}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00218}00218\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>newLine();}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$indexes-\/>isNotEmpty())\ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>twoColumnDetail(\textcolor{stringliteral}{'<fg=green;options=bold>Index</>'});}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \$indexes-\/>each(\textcolor{keyword}{function}\ (\$index)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>twoColumnDetail(}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$index[\textcolor{stringliteral}{'name'}].\textcolor{stringliteral}{'\ <fg=gray>'}.\$index[\textcolor{stringliteral}{'columns'}]-\/>implode(\textcolor{stringliteral}{',\ '}).\textcolor{stringliteral}{'</>'},}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$index[\textcolor{stringliteral}{'attributes'}]-\/>implode(\textcolor{stringliteral}{',\ '})}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>newLine();}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$foreignKeys-\/>isNotEmpty())\ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>twoColumnDetail(\textcolor{stringliteral}{'<fg=green;options=bold>Foreign\ Key</>'},\ \textcolor{stringliteral}{'On\ Update\ /\ On\ Delete'});}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \$foreignKeys-\/>each(\textcolor{keyword}{function}\ (\$foreignKey)\ \{}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>components-\/>twoColumnDetail(}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$foreignKey[\textcolor{stringliteral}{'name'}].\textcolor{stringliteral}{'\ <fg=gray;options=bold>'}.\$foreignKey[\textcolor{stringliteral}{'local\_columns'}]-\/>implode(\textcolor{stringliteral}{',\ '}).\textcolor{stringliteral}{'\ references\ '}.\$foreignKey[\textcolor{stringliteral}{'foreign\_columns'}]-\/>implode(\textcolor{stringliteral}{',\ '}).\textcolor{stringliteral}{'\ on\ '}.\$foreignKey[\textcolor{stringliteral}{'foreign\_table'}].\textcolor{stringliteral}{'</>'},}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$foreignKey[\textcolor{stringliteral}{'on\_update'}].\textcolor{stringliteral}{'\ /\ '}.\$foreignKey[\textcolor{stringliteral}{'on\_delete'}],}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>newLine();}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00247}00247\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_database_2_console_2_table_command_8php_source_l00248}00248\ \}}
+
+\end{DoxyCode}

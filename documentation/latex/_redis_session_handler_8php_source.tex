@@ -1,0 +1,90 @@
+\doxysection{Redis\+Session\+Handler.\+php}
+\hypertarget{_redis_session_handler_8php_source}{}\label{_redis_session_handler_8php_source}\index{vendor/symfony/http-\/foundation/Session/Storage/Handler/RedisSessionHandler.php@{vendor/symfony/http-\/foundation/Session/Storage/Handler/RedisSessionHandler.php}}
+\mbox{\hyperlink{_redis_session_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)Session\(\backslash\)Storage\(\backslash\)Handler}};}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00014}00014\ use\ Predis\(\backslash\)Response\(\backslash\)ErrorInterface;}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00015}00015\ use\ Relay\(\backslash\)Relay;}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00023}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler}{00023}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler}{RedisSessionHandler}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_abstract_session_handler}{AbstractSessionHandler}}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00024}00024\ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$prefix;}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00033}00033\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}|\(\backslash\)Closure|\textcolor{keyword}{null}\ \$ttl;}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00042}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_a2fec351d26dc5790641ab11668588b64}{00042}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_a2fec351d26dc5790641ab11668588b64}{\_\_construct}}(}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ \(\backslash\)Redis|Relay|\(\backslash\)RedisArray|\(\backslash\)RedisCluster|\(\backslash\)Predis\(\backslash\)ClientInterface\ \$redis,}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [],}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00045}00045\ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$diff\ =\ array\_diff(array\_keys(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}),\ [\textcolor{stringliteral}{'prefix'},\ \textcolor{stringliteral}{'ttl'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(sprintf(\textcolor{stringliteral}{'The\ following\ options\ are\ not\ supported\ "{}\%s"{}.'},\ implode(\textcolor{stringliteral}{',\ '},\ \$diff)));}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \$this-\/>prefix\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'prefix'}]\ ??\ \textcolor{stringliteral}{'sf\_s'};}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \$this-\/>ttl\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'ttl'}]\ ??\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00052}00052\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00054}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_ad19f491a9534169990e8a8abed25f8eb}{00054}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_ad19f491a9534169990e8a8abed25f8eb}{doRead}}(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId):\ string}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00055}00055\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>redis-\/>get(\$this-\/>prefix.\$sessionId)\ ?:\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00057}00057\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00059}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_a4376069700ff784813f0309a3536d4c9}{00059}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_a4376069700ff784813f0309a3536d4c9}{doWrite}}(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId,\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}):\ bool}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00060}00060\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \$ttl\ =\ (\$this-\/>ttl\ instanceof\ \(\backslash\)Closure\ ?\ (\$this-\/>ttl)()\ :\ \$this-\/>ttl)\ ??\ \(\backslash\)ini\_get(\textcolor{stringliteral}{'session.gc\_maxlifetime'});}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \$result\ =\ \$this-\/>redis-\/>setEx(\$this-\/>prefix.\$sessionId,\ (\textcolor{keywordtype}{int})\ \$ttl,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$result\ \&\&\ !\$result\ instanceof\ ErrorInterface;}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00065}00065\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00067}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_aa2ae497fcf7172eb5517d86b02aeb350}{00067}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_aa2ae497fcf7172eb5517d86b02aeb350}{doDestroy}}(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId):\ bool}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00068}00068\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \$unlink\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$unlink)\ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$unlink\ =\ \textcolor{keyword}{false}\ !==\ \$this-\/>redis-\/>unlink(\$this-\/>prefix.\$sessionId);}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Throwable)\ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$unlink\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$unlink)\ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>redis-\/>del(\$this-\/>prefix.\$sessionId);}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00084}00084\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00086}00086\ \textcolor{preprocessor}{\ \ \ \ \#[\(\backslash\)ReturnTypeWillChange]}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00087}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_aa69c8bf1f1dcf4e72552efff1fe3e87e}{00087}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_aa69c8bf1f1dcf4e72552efff1fe3e87e}{close}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00088}00088\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00090}00090\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00092}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_ae12e2c10297dfb21870c611bbf15b459}{00092}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_ae12e2c10297dfb21870c611bbf15b459}{gc}}(\textcolor{keywordtype}{int}\ \$maxlifetime):\ int|false}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00093}00093\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00095}00095\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00097}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_a6c1e98fdd5a9eaa83c9ad20c9fe2af82}{00097}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_session_1_1_storage_1_1_handler_1_1_redis_session_handler_a6c1e98fdd5a9eaa83c9ad20c9fe2af82}{updateTimestamp}}(\#[\(\backslash\)SensitiveParameter]\ \textcolor{keywordtype}{string}\ \$sessionId,\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}):\ bool}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00098}00098\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \$ttl\ =\ (\$this-\/>ttl\ instanceof\ \(\backslash\)Closure\ ?\ (\$this-\/>ttl)()\ :\ \$this-\/>ttl)\ ??\ \(\backslash\)ini\_get(\textcolor{stringliteral}{'session.gc\_maxlifetime'});}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>redis-\/>expire(\$this-\/>prefix.\$sessionId,\ (\textcolor{keywordtype}{int})\ \$ttl);}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00102}00102\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_redis_session_handler_8php_source_l00103}00103\ \}}
+
+\end{DoxyCode}

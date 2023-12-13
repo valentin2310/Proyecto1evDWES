@@ -1,0 +1,88 @@
+\doxysection{Test\+Method\+Builder.\+php}
+\hypertarget{_test_method_builder_8php_source}{}\label{_test_method_builder_8php_source}\index{vendor/phpunit/phpunit/src/Event/Value/Test/TestMethodBuilder.php@{vendor/phpunit/phpunit/src/Event/Value/Test/TestMethodBuilder.php}}
+\mbox{\hyperlink{_test_method_builder_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ PHPUnit.}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_p_h_p_unit_1_1_event_1_1_code}{PHPUnit\(\backslash\)Event\(\backslash\)Code}};}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00012}00012\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}};}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ debug\_backtrace;}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ is\_numeric;}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade}{PHPUnit\(\backslash\)Event\(\backslash\)Facade}}\ as\ EventFacade;}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_data_1_1_data_from_data_provider}{PHPUnit\(\backslash\)Event\(\backslash\)TestData\(\backslash\)DataFromDataProvider}};}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_data_1_1_data_from_test_dependency}{PHPUnit\(\backslash\)Event\(\backslash\)TestData\(\backslash\)DataFromTestDependency}};}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_data_1_1_more_than_one_data_set_from_data_provider_exception}{PHPUnit\(\backslash\)Event\(\backslash\)TestData\(\backslash\)MoreThanOneDataSetFromDataProviderException}};}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_data_1_1_test_data_collection}{PHPUnit\(\backslash\)Event\(\backslash\)TestData\(\backslash\)TestDataCollection}};}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_case}{PHPUnit\(\backslash\)Framework\(\backslash\)TestCase}};}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_metadata_1_1_parser_1_1_registry}{PHPUnit\(\backslash\)Metadata\(\backslash\)Parser\(\backslash\)Registry}}\ as\ MetadataRegistry;}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_exporter}{PHPUnit\(\backslash\)Util\(\backslash\)Exporter}};}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_reflection}{PHPUnit\(\backslash\)Util\(\backslash\)Reflection}};}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00028}\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_test_method_builder}{00028}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_test_method_builder}{TestMethodBuilder}}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00029}00029\ \{}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00033}\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_test_method_builder_a31a7e463a4afaa8172556b000c8d3f21}{00033}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_test_method_builder_a31a7e463a4afaa8172556b000c8d3f21}{fromTestCase}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_case}{TestCase}}\ \$testCase):\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_test_method}{TestMethod}}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00034}00034\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00035}00035\ \ \ \ \ \ \ \ \ \$methodName\ =\ \$testCase-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_case_a4b516aaa5fa38da4fed24ab6001627e2}{name}}();}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00037}00037\ \ \ \ \ \ \ \ \ assert(!empty(\$methodName));}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \$location\ =\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_reflection_a722a41e276a58563d538c95d3ba1a6a0}{Reflection::sourceLocationFor}}(\$testCase::class,\ \$methodName);}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_test_method}{TestMethod}}(}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \$testCase::class,}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \$methodName,}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \$location[\textcolor{stringliteral}{'file'}],}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \$location[\textcolor{stringliteral}{'line'}],}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_test_dox_builder_a31a7e463a4afaa8172556b000c8d3f21}{TestDoxBuilder::fromTestCase}}(\$testCase),}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_metadata_1_1_parser_1_1_registry_aa222d86294d212e3df3b3527680f7ad7}{MetadataRegistry::parser}}()-\/>forClassAndMethod(\$testCase::class,\ \$methodName),}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ self::dataFor(\$testCase),}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00050}00050\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00055}\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_test_method_builder_ac7180fc7d71fe6c4e810d663d28840d1}{00055}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_test_method_builder_ac7180fc7d71fe6c4e810d663d28840d1}{fromCallStack}}():\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_test_method}{TestMethod}}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00056}00056\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (debug\_backtrace()\ as\ \$frame)\ \{}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$frame[\textcolor{stringliteral}{'object'}])\ \&\&\ \$frame[\textcolor{stringliteral}{'object'}]\ instanceof\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_case}{TestCase}})\ \{}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$frame[\textcolor{stringliteral}{'object'}]-\/>valueObjectForEvents();}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_no_test_case_object_on_call_stack_exception}{NoTestCaseObjectOnCallStackException}};}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00064}00064\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00069}00069\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ dataFor(\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_case}{TestCase}}\ \$testCase):\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_data_1_1_test_data_collection}{TestDataCollection}}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00070}00070\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \$testData\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$testCase-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_case_aaceec449a3d3d496a69aa56450adbfeb}{usesDataProvider}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \$dataSetName\ =\ \$testCase-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_case_a66efec569d5dbef8e532697a4a189ddb}{dataName}}();}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_numeric(\$dataSetName))\ \{}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dataSetName\ =\ (int)\ \$dataSetName;}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \$testData[]\ =\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_data_1_1_data_from_data_provider_afeea76ad81fa185e254dc13b60f477b4}{DataFromDataProvider::from}}(}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$dataSetName,}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Exporter::export(\$testCase-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_case_a432c459cacf48f1535eda33abde00773}{providedData}}(),\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade_a72dbe005bd689460a70770c42bddc02f}{EventFacade::emitter}}()-\/>exportsObjects()),}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$testCase-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_case_a55efa74d65e12f8f78631b7898eb566c}{hasDependencyInput}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \$testData[]\ =\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_data_1_1_data_from_test_dependency_a88f4e3f21ffe66ef7fbb3a46601443e7}{DataFromTestDependency::from}}(}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Exporter::export(\$testCase-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_test_case_ae53875d9fe920803556eb83ad6619750}{dependencyInput}}(),\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade_a72dbe005bd689460a70770c42bddc02f}{EventFacade::emitter}}()-\/>exportsObjects()),}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ TestDataCollection::fromArray(\$testData);}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00093}00093\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_test_method_builder_8php_source_l00094}00094\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,246 @@
+\doxysection{Queue\+Service\+Provider.\+php}
+\hypertarget{_queue_service_provider_8php_source}{}\label{_queue_service_provider_8php_source}\index{vendor/laravel/framework/src/Illuminate/Queue/QueueServiceProvider.php@{vendor/laravel/framework/src/Illuminate/Queue/QueueServiceProvider.php}}
+\mbox{\hyperlink{_queue_service_provider_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_queue}{Illuminate\(\backslash\)Queue}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00005}00005\ use\ Aws\(\backslash\)DynamoDb\(\backslash\)DynamoDbClient;}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00006}00006\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_debug_1_1_exception_handler}{Illuminate\(\backslash\)Contracts\(\backslash\)Debug\(\backslash\)ExceptionHandler}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00007}00007\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_deferrable_provider}{Illuminate\(\backslash\)Contracts\(\backslash\)Support\(\backslash\)DeferrableProvider}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_connectors_1_1_beanstalkd_connector}{Illuminate\(\backslash\)Queue\(\backslash\)Connectors\(\backslash\)BeanstalkdConnector}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00009}00009\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_connectors_1_1_database_connector}{Illuminate\(\backslash\)Queue\(\backslash\)Connectors\(\backslash\)DatabaseConnector}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_connectors_1_1_null_connector}{Illuminate\(\backslash\)Queue\(\backslash\)Connectors\(\backslash\)NullConnector}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_connectors_1_1_redis_connector}{Illuminate\(\backslash\)Queue\(\backslash\)Connectors\(\backslash\)RedisConnector}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00012}00012\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_connectors_1_1_sqs_connector}{Illuminate\(\backslash\)Queue\(\backslash\)Connectors\(\backslash\)SqsConnector}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00013}00013\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_connectors_1_1_sync_connector}{Illuminate\(\backslash\)Queue\(\backslash\)Connectors\(\backslash\)SyncConnector}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_failed_1_1_database_failed_job_provider}{Illuminate\(\backslash\)Queue\(\backslash\)Failed\(\backslash\)DatabaseFailedJobProvider}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_failed_1_1_database_uuid_failed_job_provider}{Illuminate\(\backslash\)Queue\(\backslash\)Failed\(\backslash\)DatabaseUuidFailedJobProvider}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_failed_1_1_dynamo_db_failed_job_provider}{Illuminate\(\backslash\)Queue\(\backslash\)Failed\(\backslash\)DynamoDbFailedJobProvider}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_failed_1_1_file_failed_job_provider}{Illuminate\(\backslash\)Queue\(\backslash\)Failed\(\backslash\)FileFailedJobProvider}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_failed_1_1_null_failed_job_provider}{Illuminate\(\backslash\)Queue\(\backslash\)Failed\(\backslash\)NullFailedJobProvider}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_arr}{Illuminate\(\backslash\)Support\(\backslash\)Arr}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_facades_1_1_facade}{Illuminate\(\backslash\)Support\(\backslash\)Facades\(\backslash\)Facade}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider}{Illuminate\(\backslash\)Support\(\backslash\)ServiceProvider}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_laravel_1_1_serializable_closure_1_1_serializable_closure}{Laravel\(\backslash\)SerializableClosure\(\backslash\)SerializableClosure}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00024}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider}{00024}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider}{QueueServiceProvider}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider}{ServiceProvider}}\ implements\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_support_1_1_deferrable_provider}{DeferrableProvider}}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00025}00025\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00026}00026\ \ \ \ \ use\ SerializesAndRestoresModelIdentifiers;}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00033}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_acc294a6cc8e69743746820e3d15e3f78}{00033}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \textcolor{keyword}{register}()}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00034}00034\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00035}00035\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a927e8c62004aea0c6160873ae6ea4afe}{configureSerializableClosureUses}}();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00037}00037\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a07b7418e056c2b243f313b8028703ed0}{registerManager}}();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00038}00038\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a7a303c78ce822c1f4819f00a6a81e9eb}{registerConnection}}();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a42ae982b8c48c9bf2b67877f730777bd}{registerWorker}}();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_aa24d7d22f9a86e0e9d8ee3df01b4f67d}{registerListener}}();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_ab60b0ec13b5e8a7736cc513ca6fc78d1}{registerFailedJobServices}}();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00042}00042\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00049}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a927e8c62004aea0c6160873ae6ea4afe}{00049}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a927e8c62004aea0c6160873ae6ea4afe}{configureSerializableClosureUses}}()}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00050}00050\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ SerializableClosure::transformUseVariablesUsing(\textcolor{keyword}{function}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\$key]\ =\ \$this-\/>getSerializedPropertyValue(\$value);}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ SerializableClosure::resolveUseVariablesUsing(\textcolor{keyword}{function}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ as\ \$key\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\$key]\ =\ \$this-\/>getRestoredPropertyValue(\$value);}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00066}00066\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00073}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a07b7418e056c2b243f313b8028703ed0}{00073}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a07b7418e056c2b243f313b8028703ed0}{registerManager}}()}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00074}00074\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(\textcolor{stringliteral}{'queue'},\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}})\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Once\ we\ have\ an\ instance\ of\ the\ queue\ manager,\ we\ will\ register\ the\ various}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ resolvers\ for\ the\ queue\ connectors.\ These\ connectors\ are\ responsible\ for}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ creating\ the\ classes\ that\ accept\ queue\ configs\ and\ instantiate\ queues.}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ tap(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_manager}{QueueManager}}(\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}),\ \textcolor{keyword}{function}\ (\$manager)\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_abb03a6a358c250777b20278ae2af69a9}{registerConnectors}}(\$manager);}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00090}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a7a303c78ce822c1f4819f00a6a81e9eb}{00090}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a7a303c78ce822c1f4819f00a6a81e9eb}{registerConnection}}()}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00091}00091\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(\textcolor{stringliteral}{'queue.connection'},\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}})\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}[\textcolor{stringliteral}{'queue'}]-\/>connection();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00095}00095\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00103}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_abb03a6a358c250777b20278ae2af69a9}{00103}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_abb03a6a358c250777b20278ae2af69a9}{registerConnectors}}(\$manager)}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00104}00104\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ ([\textcolor{stringliteral}{'Null'},\ \textcolor{stringliteral}{'Sync'},\ \textcolor{stringliteral}{'Database'},\ \textcolor{stringliteral}{'Redis'},\ \textcolor{stringliteral}{'Beanstalkd'},\ \textcolor{stringliteral}{'Sqs'}]\ as\ \$connector)\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\{\textcolor{stringliteral}{"{}register\{\$connector\}Connector"{}}\}(\$manager);}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00108}00108\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00116}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a2c84e2607e81b6648095a2213b07a0e7}{00116}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a2c84e2607e81b6648095a2213b07a0e7}{registerNullConnector}}(\$manager)}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00117}00117\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \$manager-\/>addConnector(\textcolor{stringliteral}{'null'},\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_connectors_1_1_null_connector}{NullConnector}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00121}00121\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00129}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a6ec7c9d34df1a722a5a74d6ee561886a}{00129}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a6ec7c9d34df1a722a5a74d6ee561886a}{registerSyncConnector}}(\$manager)}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00130}00130\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \$manager-\/>addConnector(\textcolor{stringliteral}{'sync'},\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_connectors_1_1_sync_connector}{SyncConnector}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00134}00134\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00142}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_ae60a21e27b42bfa08356fe8b3e4b50d5}{00142}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_ae60a21e27b42bfa08356fe8b3e4b50d5}{registerDatabaseConnector}}(\$manager)}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00143}00143\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \$manager-\/>addConnector(\textcolor{stringliteral}{'database'},\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_connectors_1_1_database_connector}{DatabaseConnector}}(\$this-\/>app[\textcolor{stringliteral}{'db'}]);}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00147}00147\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00155}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a1b1fae06dbe72fdd2d50f4b7474be15f}{00155}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a1b1fae06dbe72fdd2d50f4b7474be15f}{registerRedisConnector}}(\$manager)}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00156}00156\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \$manager-\/>addConnector(\textcolor{stringliteral}{'redis'},\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_connectors_1_1_redis_connector}{RedisConnector}}(\$this-\/>app[\textcolor{stringliteral}{'redis'}]);}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00160}00160\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00168}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_aa2c3713346bdaf5c51f2e3cd778b1196}{00168}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_aa2c3713346bdaf5c51f2e3cd778b1196}{registerBeanstalkdConnector}}(\$manager)}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00169}00169\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \$manager-\/>addConnector(\textcolor{stringliteral}{'beanstalkd'},\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_connectors_1_1_beanstalkd_connector}{BeanstalkdConnector}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00173}00173\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00181}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a50e9e00d9e2753776a39290974582da3}{00181}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a50e9e00d9e2753776a39290974582da3}{registerSqsConnector}}(\$manager)}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00182}00182\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \$manager-\/>addConnector(\textcolor{stringliteral}{'sqs'},\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_connectors_1_1_sqs_connector}{SqsConnector}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00186}00186\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00193}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a42ae982b8c48c9bf2b67877f730777bd}{00193}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a42ae982b8c48c9bf2b67877f730777bd}{registerWorker}}()}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00194}00194\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(\textcolor{stringliteral}{'queue.worker'},\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}})\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \$isDownForMaintenance\ =\ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>app-\/>isDownForMaintenance();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \$resetScope\ =\ \textcolor{keyword}{function}\ ()\ use\ (\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}})\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (method\_exists(\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}[\textcolor{stringliteral}{'log'}]-\/>driver(),\ \textcolor{stringliteral}{'withoutContext'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}[\textcolor{stringliteral}{'log'}]-\/>withoutContext();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (method\_exists(\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}[\textcolor{stringliteral}{'db'}],\ \textcolor{stringliteral}{'getConnections'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}[\textcolor{stringliteral}{'db'}]-\/>getConnections()\ as\ \$connection)\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connection-\/>resetTotalQueryDuration();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$connection-\/>allowQueryDurationHandlersToRunAgain();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}-\/>forgetScopedInstances();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Facade::clearResolvedInstances();}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_worker}{Worker}}(}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}[\textcolor{stringliteral}{'queue'}],}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}[\textcolor{stringliteral}{'events'}],}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}[ExceptionHandler::class],}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$isDownForMaintenance,}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$resetScope}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00225}00225\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00232}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_aa24d7d22f9a86e0e9d8ee3df01b4f67d}{00232}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_aa24d7d22f9a86e0e9d8ee3df01b4f67d}{registerListener}}()}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00233}00233\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(\textcolor{stringliteral}{'queue.listener'},\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}})\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_listener}{Listener}}(\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}-\/>basePath());}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00237}00237\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00238}00238\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00244}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_ab60b0ec13b5e8a7736cc513ca6fc78d1}{00244}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_ab60b0ec13b5e8a7736cc513ca6fc78d1}{registerFailedJobServices}}()}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00245}00245\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \$this-\/>app-\/>singleton(\textcolor{stringliteral}{'queue.failer'},\ \textcolor{keyword}{function}\ (\mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}})\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}\ =\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}[\textcolor{stringliteral}{'config'}][\textcolor{stringliteral}{'queue.failed'}];}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (array\_key\_exists(\textcolor{stringliteral}{'driver'},\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}})\ \&\&}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (is\_null(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'driver'}])\ ||\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'driver'}]\ ===\ \textcolor{stringliteral}{'null'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_failed_1_1_null_failed_job_provider}{NullFailedJobProvider}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'driver'}])\ \&\&\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'driver'}]\ ===\ \textcolor{stringliteral}{'file'})\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_failed_1_1_file_failed_job_provider}{FileFailedJobProvider}}(}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'path'}]\ ??\ \$this-\/>app-\/>storagePath(\textcolor{stringliteral}{'framework/cache/failed-\/jobs.json'}),}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'limit'}]\ ??\ 100,}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fn\ ()\ =>\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_service_provider_adfb117f244076aa9bc269269f7e57403}{\$app}}[\textcolor{stringliteral}{'cache'}]-\/>store(\textcolor{stringliteral}{'file'}),}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (isset(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'driver'}])\ \&\&\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'driver'}]\ ===\ \textcolor{stringliteral}{'dynamodb'})\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a6eb7dcfaa74ead263d10de6c1f0a04d9}{dynamoFailedJobProvider}}(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (isset(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'driver'}])\ \&\&\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'driver'}]\ ===\ \textcolor{stringliteral}{'database-\/uuids'})\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a383f09f8e2ba2083d95d826b7b3da53b}{databaseUuidFailedJobProvider}}(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (isset(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'table'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a2420aaea98e2bb0303f417512324439d}{databaseFailedJobProvider}}(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_failed_1_1_null_failed_job_provider}{NullFailedJobProvider}};}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00270}00270\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00278}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a2420aaea98e2bb0303f417512324439d}{00278}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a2420aaea98e2bb0303f417512324439d}{databaseFailedJobProvider}}(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}})}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00279}00279\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_failed_1_1_database_failed_job_provider}{DatabaseFailedJobProvider}}(}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>app[\textcolor{stringliteral}{'db'}],\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'database'}],\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'table'}]}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00283}00283\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00291}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a383f09f8e2ba2083d95d826b7b3da53b}{00291}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a383f09f8e2ba2083d95d826b7b3da53b}{databaseUuidFailedJobProvider}}(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}})}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00292}00292\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_failed_1_1_database_uuid_failed_job_provider}{DatabaseUuidFailedJobProvider}}(}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>app[\textcolor{stringliteral}{'db'}],\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'database'}],\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'table'}]}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00296}00296\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00304}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a6eb7dcfaa74ead263d10de6c1f0a04d9}{00304}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a6eb7dcfaa74ead263d10de6c1f0a04d9}{dynamoFailedJobProvider}}(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}})}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00305}00305\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00306}00306\ \ \ \ \ \ \ \ \ \$dynamoConfig\ =\ [}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'region'}\ =>\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'region'}],}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'version'}\ =>\ \textcolor{stringliteral}{'latest'},}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'endpoint'}\ =>\ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'endpoint'}]\ ??\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00311}00311\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ empty(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'key'}])\ \&\&\ !\ empty(\mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'secret'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \$dynamoConfig[\textcolor{stringliteral}{'credentials'}]\ =\ Arr::only(}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}},\ [\textcolor{stringliteral}{'key'},\ \textcolor{stringliteral}{'secret'},\ \textcolor{stringliteral}{'token'}]}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_failed_1_1_dynamo_db_failed_job_provider}{DynamoDbFailedJobProvider}}(}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ DynamoDbClient(\$dynamoConfig),}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>app[\textcolor{stringliteral}{'config'}][\textcolor{stringliteral}{'app.name'}],}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{translation-status_8php_a49c7011be9c979d9174c52a8b83e5d8e}{\$config}}[\textcolor{stringliteral}{'table'}]}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00323}00323\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00324}00324\ }
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00330}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a121c1b201a74841aa007403c17e87c0b}{00330}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_queue_service_provider_a121c1b201a74841aa007403c17e87c0b}{provides}}()}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00331}00331\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'queue'},}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'queue.connection'},}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'queue.failer'},}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'queue.listener'},}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'queue.worker'},}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00339}00339\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_queue_service_provider_8php_source_l00340}00340\ \}}
+
+\end{DoxyCode}

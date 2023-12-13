@@ -1,0 +1,850 @@
+\doxysection{Merger.\+php}
+\hypertarget{_merger_8php_source}{}\label{_merger_8php_source}\index{vendor/phpunit/phpunit/src/TextUI/Configuration/Merger.php@{vendor/phpunit/phpunit/src/TextUI/Configuration/Merger.php}}
+\mbox{\hyperlink{_merger_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ PHPUnit.}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_p_h_p_unit_1_1_text_u_i_1_1_configuration}{PHPUnit\(\backslash\)TextUI\(\backslash\)Configuration}};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00012}00012\ use\ \textcolor{keyword}{const}\ DIRECTORY\_SEPARATOR;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ array\_diff;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ dirname;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00016}00016\ use\ \textcolor{keyword}{function}\ explode;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00017}00017\ use\ \textcolor{keyword}{function}\ is\_int;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00018}00018\ use\ \textcolor{keyword}{function}\ realpath;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00019}00019\ use\ \textcolor{keyword}{function}\ time;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade}{PHPUnit\(\backslash\)Event\(\backslash\)Facade}}\ as\ EventFacade;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_runner_1_1_test_suite_sorter}{PHPUnit\(\backslash\)Runner\(\backslash\)TestSuiteSorter}};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_cli_arguments_1_1_configuration}{PHPUnit\(\backslash\)TextUI\(\backslash\)CliArguments\(\backslash\)Configuration}}\ as\ CliConfiguration;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_xml_configuration_1_1_configuration}{PHPUnit\(\backslash\)TextUI\(\backslash\)XmlConfiguration\(\backslash\)Configuration}}\ as\ XmlConfiguration;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00024}00024\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_xml_configuration_1_1_loaded_from_file_configuration}{PHPUnit\(\backslash\)TextUI\(\backslash\)XmlConfiguration\(\backslash\)LoadedFromFileConfiguration}};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00025}00025\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_xml_configuration_1_1_schema_detector}{PHPUnit\(\backslash\)TextUI\(\backslash\)XmlConfiguration\(\backslash\)SchemaDetector}};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00026}00026\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_util_1_1_filesystem}{PHPUnit\(\backslash\)Util\(\backslash\)Filesystem}};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00027}00027\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_report_1_1_html_1_1_colors}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)Report\(\backslash\)Html\(\backslash\)Colors}};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00028}00028\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_report_1_1_thresholds}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)Report\(\backslash\)Thresholds}};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00029}00029\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_environment_1_1_console}{SebastianBergmann\(\backslash\)Environment\(\backslash\)Console}};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00030}00030\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_invoker_1_1_invoker}{SebastianBergmann\(\backslash\)Invoker\(\backslash\)Invoker}};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00035}\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_merger}{00035}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_merger}{Merger}}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00036}00036\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00042}\mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_merger_a1a52dbf4031d2c953ec65e13f22b164d}{00042}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_merger_a1a52dbf4031d2c953ec65e13f22b164d}{merge}}(CliConfiguration\ \$cliConfiguration,\ XmlConfiguration\ \$xmlConfiguration):\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration}{Configuration}}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00043}00043\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \$configurationFile\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$xmlConfiguration-\/>wasLoadedFromFile())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\$xmlConfiguration\ instanceof\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_xml_configuration_1_1_loaded_from_file_configuration}{LoadedFromFileConfiguration}});}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \$configurationFile\ =\ \$xmlConfiguration-\/>filename();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \$bootstrap\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasBootstrap())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \$bootstrap\ =\ \$cliConfiguration-\/>bootstrap();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$xmlConfiguration-\/>phpunit()-\/>hasBootstrap())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \$bootstrap\ =\ \$xmlConfiguration-\/>phpunit()-\/>bootstrap();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasCacheResult())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheResult\ =\ \$cliConfiguration-\/>cacheResult();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheResult\ =\ \$xmlConfiguration-\/>phpunit()-\/>cacheResult();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \$cacheDirectory\ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \$coverageCacheDirectory\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasCacheDirectory()\ \&\&\ Filesystem::createDirectory(\$cliConfiguration-\/>cacheDirectory()))\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheDirectory\ =\ realpath(\$cliConfiguration-\/>cacheDirectory());}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$xmlConfiguration-\/>phpunit()-\/>hasCacheDirectory()\ \&\&\ Filesystem::createDirectory(\$xmlConfiguration-\/>phpunit()-\/>cacheDirectory()))\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheDirectory\ =\ realpath(\$xmlConfiguration-\/>phpunit()-\/>cacheDirectory());}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cacheDirectory\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCacheDirectory\ =\ \$cacheDirectory\ .\ DIRECTORY\_SEPARATOR\ .\ \textcolor{stringliteral}{'code-\/coverage'};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \$testResultCacheFile\ \ \ \ =\ \$cacheDirectory\ .\ DIRECTORY\_SEPARATOR\ .\ \textcolor{stringliteral}{'test-\/results'};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$coverageCacheDirectory\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasCoverageCacheDirectory()\ \&\&\ Filesystem::createDirectory(\$cliConfiguration-\/>coverageCacheDirectory()))\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCacheDirectory\ =\ realpath(\$cliConfiguration-\/>coverageCacheDirectory());}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$xmlConfiguration-\/>codeCoverage()-\/>hasCacheDirectory())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCacheDirectory\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>cacheDirectory()-\/>path();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$testResultCacheFile))\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasCacheResultFile())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testResultCacheFile\ =\ \$cliConfiguration-\/>cacheResultFile();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$xmlConfiguration-\/>phpunit()-\/>hasCacheResultFile())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testResultCacheFile\ =\ \$xmlConfiguration-\/>phpunit()-\/>cacheResultFile();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$xmlConfiguration-\/>wasLoadedFromFile())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testResultCacheFile\ =\ dirname(realpath(\$xmlConfiguration-\/>filename()))\ .\ DIRECTORY\_SEPARATOR\ .\ \textcolor{stringliteral}{'.phpunit.result.cache'};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$candidate\ =\ realpath(\$\_SERVER[\textcolor{stringliteral}{'PHP\_SELF'}]);}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$candidate)\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testResultCacheFile\ =\ dirname(\$candidate)\ .\ DIRECTORY\_SEPARATOR\ .\ \textcolor{stringliteral}{'.phpunit.result.cache'};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$testResultCacheFile\ =\ \textcolor{stringliteral}{'.phpunit.result.cache'};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasDisableCodeCoverageIgnore())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \$disableCodeCoverageIgnore\ =\ \$cliConfiguration-\/>disableCodeCoverageIgnore();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \$disableCodeCoverageIgnore\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>disableCodeCoverageIgnore();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasFailOnDeprecation())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnDeprecation\ =\ \$cliConfiguration-\/>failOnDeprecation();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnDeprecation\ =\ \$xmlConfiguration-\/>phpunit()-\/>failOnDeprecation();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasFailOnEmptyTestSuite())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnEmptyTestSuite\ =\ \$cliConfiguration-\/>failOnEmptyTestSuite();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnEmptyTestSuite\ =\ \$xmlConfiguration-\/>phpunit()-\/>failOnEmptyTestSuite();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasFailOnIncomplete())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnIncomplete\ =\ \$cliConfiguration-\/>failOnIncomplete();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnIncomplete\ =\ \$xmlConfiguration-\/>phpunit()-\/>failOnIncomplete();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasFailOnNotice())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnNotice\ =\ \$cliConfiguration-\/>failOnNotice();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnNotice\ =\ \$xmlConfiguration-\/>phpunit()-\/>failOnNotice();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasFailOnRisky())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnRisky\ =\ \$cliConfiguration-\/>failOnRisky();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnRisky\ =\ \$xmlConfiguration-\/>phpunit()-\/>failOnRisky();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasFailOnSkipped())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnSkipped\ =\ \$cliConfiguration-\/>failOnSkipped();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnSkipped\ =\ \$xmlConfiguration-\/>phpunit()-\/>failOnSkipped();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasFailOnWarning())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnWarning\ =\ \$cliConfiguration-\/>failOnWarning();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnWarning\ =\ \$xmlConfiguration-\/>phpunit()-\/>failOnWarning();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasStopOnDefect())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnDefect\ =\ \$cliConfiguration-\/>stopOnDefect();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnDefect\ =\ \$xmlConfiguration-\/>phpunit()-\/>stopOnDefect();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasStopOnDeprecation())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnDeprecation\ =\ \$cliConfiguration-\/>stopOnDeprecation();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnDeprecation\ =\ \$xmlConfiguration-\/>phpunit()-\/>stopOnDeprecation();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasStopOnError())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnError\ =\ \$cliConfiguration-\/>stopOnError();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnError\ =\ \$xmlConfiguration-\/>phpunit()-\/>stopOnError();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasStopOnFailure())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnFailure\ =\ \$cliConfiguration-\/>stopOnFailure();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnFailure\ =\ \$xmlConfiguration-\/>phpunit()-\/>stopOnFailure();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasStopOnIncomplete())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnIncomplete\ =\ \$cliConfiguration-\/>stopOnIncomplete();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnIncomplete\ =\ \$xmlConfiguration-\/>phpunit()-\/>stopOnIncomplete();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasStopOnNotice())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnNotice\ =\ \$cliConfiguration-\/>stopOnNotice();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnNotice\ =\ \$xmlConfiguration-\/>phpunit()-\/>stopOnNotice();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasStopOnRisky())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnRisky\ =\ \$cliConfiguration-\/>stopOnRisky();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnRisky\ =\ \$xmlConfiguration-\/>phpunit()-\/>stopOnRisky();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasStopOnSkipped())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnSkipped\ =\ \$cliConfiguration-\/>stopOnSkipped();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnSkipped\ =\ \$xmlConfiguration-\/>phpunit()-\/>stopOnSkipped();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasStopOnWarning())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnWarning\ =\ \$cliConfiguration-\/>stopOnWarning();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnWarning\ =\ \$xmlConfiguration-\/>phpunit()-\/>stopOnWarning();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasStderr()\ \&\&\ \$cliConfiguration-\/>stderr())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \$outputToStandardErrorStream\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \$outputToStandardErrorStream\ =\ \$xmlConfiguration-\/>phpunit()-\/>stderr();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasColumns())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \$columns\ =\ \$cliConfiguration-\/>columns();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \$columns\ =\ \$xmlConfiguration-\/>phpunit()-\/>columns();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$columns\ ===\ \textcolor{stringliteral}{'max'})\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \$columns\ =\ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_environment_1_1_console}{Console}})-\/>getNumberOfColumns();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$columns\ <\ 16)\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \$columns\ =\ 16;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade_a72dbe005bd689460a70770c42bddc02f}{EventFacade::emitter}}()-\/>testRunnerTriggeredWarning(}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Less\ than\ 16\ columns\ requested,\ number\ of\ columns\ set\ to\ 16'},}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ assert(is\_int(\$columns));}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \$noExtensions\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasNoExtensions()\ \&\&\ \$cliConfiguration-\/>noExtensions())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \$noExtensions\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \$pharExtensionDirectory\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$xmlConfiguration-\/>phpunit()-\/>hasExtensionsDirectory())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \$pharExtensionDirectory\ =\ \$xmlConfiguration-\/>phpunit()-\/>extensionsDirectory();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \$extensionBootstrappers\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$xmlConfiguration-\/>extensions()\ as\ \$extension)\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \$extensionBootstrappers[]\ =\ [}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'className'}\ \ =>\ \$extension-\/>className(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'parameters'}\ =>\ \$extension-\/>parameters(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasPathCoverage()\ \&\&\ \$cliConfiguration-\/>pathCoverage())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \$pathCoverage\ =\ \$cliConfiguration-\/>pathCoverage();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \$pathCoverage\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>pathCoverage();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \$defaultColors\ \ \ \ \ =\ Colors::default();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \$defaultThresholds\ =\ Thresholds::default();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \$coverageClover\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \$coverageCobertura\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \$coverageCrap4j\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \$coverageCrap4jThreshold\ \ \ \ \ \ \ \ =\ 30;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \$coverageHtml\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \$coverageHtmlLowUpperBound\ \ \ \ \ \ =\ \$defaultThresholds-\/>lowUpperBound();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \$coverageHtmlHighLowerBound\ \ \ \ \ =\ \$defaultThresholds-\/>highLowerBound();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \$coverageHtmlColorSuccessLow\ \ \ \ =\ \$defaultColors-\/>successLow();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \$coverageHtmlColorSuccessMedium\ =\ \$defaultColors-\/>successMedium();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \$coverageHtmlColorSuccessHigh\ \ \ =\ \$defaultColors-\/>successHigh();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \$coverageHtmlColorWarning\ \ \ \ \ \ \ =\ \$defaultColors-\/>warning();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \$coverageHtmlColorDanger\ \ \ \ \ \ \ \ =\ \$defaultColors-\/>danger();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \$coverageHtmlCustomCssFile\ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \$coveragePhp\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \$coverageText\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \$coverageTextShowUncoveredFiles\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \$coverageTextShowOnlySummary\ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \$coverageXml\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \$coverageFromXmlConfiguration\ \ \ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00284}00284\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasNoCoverage()\ \&\&\ \$cliConfiguration-\/>noCoverage())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageFromXmlConfiguration\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00286}00286\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00287}00287\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00288}00288\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasCoverageClover())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageClover\ =\ \$cliConfiguration-\/>coverageClover();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00290}00290\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$coverageFromXmlConfiguration\ \&\&\ \$xmlConfiguration-\/>codeCoverage()-\/>hasClover())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageClover\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>clover()-\/>target()-\/>path();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasCoverageCobertura())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCobertura\ =\ \$cliConfiguration-\/>coverageCobertura();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$coverageFromXmlConfiguration\ \&\&\ \$xmlConfiguration-\/>codeCoverage()-\/>hasCobertura())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCobertura\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>cobertura()-\/>target()-\/>path();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00300}00300\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$xmlConfiguration-\/>codeCoverage()-\/>hasCrap4j())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCrap4jThreshold\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>crap4j()-\/>threshold();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00302}00302\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00304}00304\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasCoverageCrap4J())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00305}00305\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCrap4j\ =\ \$cliConfiguration-\/>coverageCrap4J();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00306}00306\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$coverageFromXmlConfiguration\ \&\&\ \$xmlConfiguration-\/>codeCoverage()-\/>hasCrap4j())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCrap4j\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>crap4j()-\/>target()-\/>path();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$xmlConfiguration-\/>codeCoverage()-\/>hasHtml())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlHighLowerBound\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>html()-\/>highLowerBound();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlLowUpperBound\ \ =\ \$xmlConfiguration-\/>codeCoverage()-\/>html()-\/>lowUpperBound();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$coverageHtmlLowUpperBound\ >\ \$coverageHtmlHighLowerBound)\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlLowUpperBound\ \ =\ \$defaultThresholds-\/>lowUpperBound();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlHighLowerBound\ =\ \$defaultThresholds-\/>highLowerBound();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlColorSuccessLow\ \ \ \ =\ \$xmlConfiguration-\/>codeCoverage()-\/>html()-\/>colorSuccessLow();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlColorSuccessMedium\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>html()-\/>colorSuccessMedium();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlColorSuccessHigh\ \ \ =\ \$xmlConfiguration-\/>codeCoverage()-\/>html()-\/>colorSuccessHigh();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlColorWarning\ \ \ \ \ \ \ =\ \$xmlConfiguration-\/>codeCoverage()-\/>html()-\/>colorWarning();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlColorDanger\ \ \ \ \ \ \ \ =\ \$xmlConfiguration-\/>codeCoverage()-\/>html()-\/>colorDanger();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00324}00324\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$xmlConfiguration-\/>codeCoverage()-\/>html()-\/>hasCustomCssFile())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlCustomCssFile\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>html()-\/>customCssFile();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00327}00327\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00329}00329\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasCoverageHtml())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtml\ =\ \$cliConfiguration-\/>coverageHtml();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$coverageFromXmlConfiguration\ \&\&\ \$xmlConfiguration-\/>codeCoverage()-\/>hasHtml())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtml\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>html()-\/>target()-\/>path();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasCoveragePhp())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \$coveragePhp\ =\ \$cliConfiguration-\/>coveragePhp();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$coverageFromXmlConfiguration\ \&\&\ \$xmlConfiguration-\/>codeCoverage()-\/>hasPhp())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \ \ \$coveragePhp\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>php()-\/>target()-\/>path();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00340}00340\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00342}00342\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$xmlConfiguration-\/>codeCoverage()-\/>hasText())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageTextShowUncoveredFiles\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>text()-\/>showUncoveredFiles();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageTextShowOnlySummary\ \ \ \ =\ \$xmlConfiguration-\/>codeCoverage()-\/>text()-\/>showOnlySummary();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasCoverageText())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageText\ =\ \$cliConfiguration-\/>coverageText();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$coverageFromXmlConfiguration\ \&\&\ \$xmlConfiguration-\/>codeCoverage()-\/>hasText())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageText\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>text()-\/>target()-\/>path();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00351}00351\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00352}00352\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00353}00353\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasCoverageXml())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageXml\ =\ \$cliConfiguration-\/>coverageXml();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$coverageFromXmlConfiguration\ \&\&\ \$xmlConfiguration-\/>codeCoverage()-\/>hasXml())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageXml\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>xml()-\/>target()-\/>path();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00357}00357\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00358}00358\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00359}00359\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasBackupGlobals())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \$backupGlobals\ =\ \$cliConfiguration-\/>backupGlobals();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ \$backupGlobals\ =\ \$xmlConfiguration-\/>phpunit()-\/>backupGlobals();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00365}00365\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasBackupStaticProperties())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \$backupStaticProperties\ =\ \$cliConfiguration-\/>backupStaticProperties();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ \$backupStaticProperties\ =\ \$xmlConfiguration-\/>phpunit()-\/>backupStaticProperties();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00370}00370\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00371}00371\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasBeStrictAboutChangesToGlobalState())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \$beStrictAboutChangesToGlobalState\ =\ \$cliConfiguration-\/>beStrictAboutChangesToGlobalState();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00374}00374\ \ \ \ \ \ \ \ \ \ \ \ \ \$beStrictAboutChangesToGlobalState\ =\ \$xmlConfiguration-\/>phpunit()-\/>beStrictAboutChangesToGlobalState();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00375}00375\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00376}00376\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00377}00377\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasProcessIsolation())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \ \ \ \$processIsolation\ =\ \$cliConfiguration-\/>processIsolation();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00379}00379\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00380}00380\ \ \ \ \ \ \ \ \ \ \ \ \ \$processIsolation\ =\ \$xmlConfiguration-\/>phpunit()-\/>processIsolation();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00381}00381\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00382}00382\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00383}00383\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasEnforceTimeLimit())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ \$enforceTimeLimit\ =\ \$cliConfiguration-\/>enforceTimeLimit();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00385}00385\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \ \ \ \ \$enforceTimeLimit\ =\ \$xmlConfiguration-\/>phpunit()-\/>enforceTimeLimit();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00388}00388\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$enforceTimeLimit\ \&\&\ !(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_invoker_1_1_invoker}{Invoker}})-\/>canInvokeWithTimeout())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade_a72dbe005bd689460a70770c42bddc02f}{EventFacade::emitter}}()-\/>testRunnerTriggeredWarning(}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'The\ pcntl\ extension\ is\ required\ for\ enforcing\ time\ limits'},}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasDefaultTimeLimit())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00396}00396\ \ \ \ \ \ \ \ \ \ \ \ \ \$defaultTimeLimit\ =\ \$cliConfiguration-\/>defaultTimeLimit();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00398}00398\ \ \ \ \ \ \ \ \ \ \ \ \ \$defaultTimeLimit\ =\ \$xmlConfiguration-\/>phpunit()-\/>defaultTimeLimit();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00399}00399\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \$timeoutForSmallTests\ \ =\ \$xmlConfiguration-\/>phpunit()-\/>timeoutForSmallTests();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \$timeoutForMediumTests\ =\ \$xmlConfiguration-\/>phpunit()-\/>timeoutForMediumTests();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00403}00403\ \ \ \ \ \ \ \ \ \$timeoutForLargeTests\ \ =\ \$xmlConfiguration-\/>phpunit()-\/>timeoutForLargeTests();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00404}00404\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00405}00405\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasReportUselessTests())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \ \ \ \$reportUselessTests\ =\ \$cliConfiguration-\/>reportUselessTests();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00407}00407\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \$reportUselessTests\ =\ \$xmlConfiguration-\/>phpunit()-\/>beStrictAboutTestsThatDoNotTestAnything();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00409}00409\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00410}00410\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00411}00411\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasStrictCoverage())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \$strictCoverage\ =\ \$cliConfiguration-\/>strictCoverage();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00413}00413\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \$strictCoverage\ =\ \$xmlConfiguration-\/>phpunit()-\/>beStrictAboutCoverageMetadata();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00415}00415\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasDisallowTestOutput())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00418}00418\ \ \ \ \ \ \ \ \ \ \ \ \ \$disallowTestOutput\ =\ \$cliConfiguration-\/>disallowTestOutput();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00419}00419\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ \$disallowTestOutput\ =\ \$xmlConfiguration-\/>phpunit()-\/>beStrictAboutOutputDuringTests();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00421}00421\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00422}00422\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00423}00423\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasDisplayDetailsOnIncompleteTests())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnIncompleteTests\ =\ \$cliConfiguration-\/>displayDetailsOnIncompleteTests();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnIncompleteTests\ =\ \$xmlConfiguration-\/>phpunit()-\/>displayDetailsOnIncompleteTests();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00427}00427\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00428}00428\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00429}00429\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasDisplayDetailsOnSkippedTests())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnSkippedTests\ =\ \$cliConfiguration-\/>displayDetailsOnSkippedTests();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnSkippedTests\ =\ \$xmlConfiguration-\/>phpunit()-\/>displayDetailsOnSkippedTests();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00434}00434\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasDisplayDetailsOnTestsThatTriggerDeprecations())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnTestsThatTriggerDeprecations\ =\ \$cliConfiguration-\/>displayDetailsOnTestsThatTriggerDeprecations();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnTestsThatTriggerDeprecations\ =\ \$xmlConfiguration-\/>phpunit()-\/>displayDetailsOnTestsThatTriggerDeprecations();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00440}00440\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00441}00441\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasDisplayDetailsOnTestsThatTriggerErrors())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnTestsThatTriggerErrors\ =\ \$cliConfiguration-\/>displayDetailsOnTestsThatTriggerErrors();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00443}00443\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnTestsThatTriggerErrors\ =\ \$xmlConfiguration-\/>phpunit()-\/>displayDetailsOnTestsThatTriggerErrors();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00445}00445\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00446}00446\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00447}00447\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasDisplayDetailsOnTestsThatTriggerNotices())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnTestsThatTriggerNotices\ =\ \$cliConfiguration-\/>displayDetailsOnTestsThatTriggerNotices();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnTestsThatTriggerNotices\ =\ \$xmlConfiguration-\/>phpunit()-\/>displayDetailsOnTestsThatTriggerNotices();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasDisplayDetailsOnTestsThatTriggerWarnings())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnTestsThatTriggerWarnings\ =\ \$cliConfiguration-\/>displayDetailsOnTestsThatTriggerWarnings();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnTestsThatTriggerWarnings\ =\ \$xmlConfiguration-\/>phpunit()-\/>displayDetailsOnTestsThatTriggerWarnings();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00458}00458\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00459}00459\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasReverseList())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ \ \ \$reverseDefectList\ =\ \$cliConfiguration-\/>reverseList();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00461}00461\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \$reverseDefectList\ =\ \$xmlConfiguration-\/>phpunit()-\/>reverseDefectList();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00463}00463\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00464}00464\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \$requireCoverageMetadata\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \$xmlConfiguration-\/>phpunit()-\/>requireCoverageMetadata();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \$registerMockObjectsFromTestArgumentsRecursively\ =\ \$xmlConfiguration-\/>phpunit()-\/>registerMockObjectsFromTestArgumentsRecursively();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00468}00468\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasExecutionOrder())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrder\ =\ \$cliConfiguration-\/>executionOrder();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00470}00470\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrder\ =\ \$xmlConfiguration-\/>phpunit()-\/>executionOrder();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00473}00473\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00474}00474\ \ \ \ \ \ \ \ \ \$executionOrderDefects\ =\ TestSuiteSorter::ORDER\_DEFAULT;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00475}00475\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasExecutionOrderDefects())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrderDefects\ =\ \$cliConfiguration-\/>executionOrderDefects();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$xmlConfiguration-\/>phpunit()-\/>defectsFirst())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrderDefects\ =\ TestSuiteSorter::ORDER\_DEFECTS\_FIRST;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00481}00481\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00482}00482\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasResolveDependencies())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00483}00483\ \ \ \ \ \ \ \ \ \ \ \ \ \$resolveDependencies\ =\ \$cliConfiguration-\/>resolveDependencies();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00484}00484\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ \$resolveDependencies\ =\ \$xmlConfiguration-\/>phpunit()-\/>resolveDependencies();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00486}00486\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \$colors\ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \$colorsSupported\ =\ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_environment_1_1_console}{Console}})-\/>hasColorSupport();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00490}00490\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00491}00491\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasColors())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00492}00492\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>colors()\ ===\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_ac41b9afdb2cca18c7fbb77acbc0ff669}{Configuration::COLOR\_ALWAYS}})\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00493}00493\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$colors\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$colorsSupported\ \&\&\ \$cliConfiguration-\/>colors()\ ===\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_a04f9b419c55dfed29e86a49094316c18}{Configuration::COLOR\_AUTO}})\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00495}00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$colors\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00497}00497\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$xmlConfiguration-\/>phpunit()-\/>colors()\ ===\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_ac41b9afdb2cca18c7fbb77acbc0ff669}{Configuration::COLOR\_ALWAYS}})\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ \$colors\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00499}00499\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$colorsSupported\ \&\&\ \$xmlConfiguration-\/>phpunit()-\/>colors()\ ===\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration_a04f9b419c55dfed29e86a49094316c18}{Configuration::COLOR\_AUTO}})\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \$colors\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00501}00501\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00502}00502\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00503}00503\ \ \ \ \ \ \ \ \ \$logfileTeamcity\ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \$logfileJunit\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00505}00505\ \ \ \ \ \ \ \ \ \$logfileTestdoxHtml\ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00506}00506\ \ \ \ \ \ \ \ \ \$logfileTestdoxText\ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00507}00507\ \ \ \ \ \ \ \ \ \$loggingFromXmlConfiguration\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00508}00508\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00509}00509\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasNoLogging()\ \&\&\ \$cliConfiguration-\/>noLogging())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \$loggingFromXmlConfiguration\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00511}00511\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00512}00512\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasTeamcityLogfile())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \$logfileTeamcity\ =\ \$cliConfiguration-\/>teamcityLogfile();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$loggingFromXmlConfiguration\ \&\&\ \$xmlConfiguration-\/>logging()-\/>hasTeamCity())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \ \ \ \ \$logfileTeamcity\ =\ \$xmlConfiguration-\/>logging()-\/>teamCity()-\/>target()-\/>path();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00518}00518\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasJunitLogfile())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \$logfileJunit\ =\ \$cliConfiguration-\/>junitLogfile();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$loggingFromXmlConfiguration\ \&\&\ \$xmlConfiguration-\/>logging()-\/>hasJunit())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \$logfileJunit\ =\ \$xmlConfiguration-\/>logging()-\/>junit()-\/>target()-\/>path();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00523}00523\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00524}00524\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00525}00525\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasTestdoxHtmlFile())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \ \ \ \ \$logfileTestdoxHtml\ =\ \$cliConfiguration-\/>testdoxHtmlFile();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00527}00527\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$loggingFromXmlConfiguration\ \&\&\ \$xmlConfiguration-\/>logging()-\/>hasTestDoxHtml())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00528}00528\ \ \ \ \ \ \ \ \ \ \ \ \ \$logfileTestdoxHtml\ =\ \$xmlConfiguration-\/>logging()-\/>testDoxHtml()-\/>target()-\/>path();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00530}00530\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasTestdoxTextFile())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \ \ \ \ \$logfileTestdoxText\ =\ \$cliConfiguration-\/>testdoxTextFile();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00533}00533\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$loggingFromXmlConfiguration\ \&\&\ \$xmlConfiguration-\/>logging()-\/>hasTestDoxText())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ \$logfileTestdoxText\ =\ \$xmlConfiguration-\/>logging()-\/>testDoxText()-\/>target()-\/>path();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00535}00535\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00536}00536\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00537}00537\ \ \ \ \ \ \ \ \ \$logEventsText\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00538}00538\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00539}00539\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasLogEventsText())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \ \ \ \ \$logEventsText\ =\ \$cliConfiguration-\/>logEventsText();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00541}00541\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00542}00542\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00543}00543\ \ \ \ \ \ \ \ \ \$logEventsVerboseText\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00544}00544\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasLogEventsVerboseText())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \$logEventsVerboseText\ =\ \$cliConfiguration-\/>logEventsVerboseText();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00547}00547\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00548}00548\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \$teamCityOutput\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00550}00550\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00551}00551\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasTeamCityPrinter()\ \&\&\ \$cliConfiguration-\/>teamCityPrinter())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00552}00552\ \ \ \ \ \ \ \ \ \ \ \ \ \$teamCityOutput\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00553}00553\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00554}00554\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00555}00555\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasTestDoxPrinter()\ \&\&\ \$cliConfiguration-\/>testdoxPrinter())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00556}00556\ \ \ \ \ \ \ \ \ \ \ \ \ \$testDoxOutput\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00557}00557\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00558}00558\ \ \ \ \ \ \ \ \ \ \ \ \ \$testDoxOutput\ =\ \$xmlConfiguration-\/>phpunit()-\/>testdoxPrinter();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00559}00559\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00560}00560\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \$noProgress\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00563}00563\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasNoProgress()\ \&\&\ \$cliConfiguration-\/>noProgress())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \ \ \ \ \$noProgress\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00565}00565\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00566}00566\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00567}00567\ \ \ \ \ \ \ \ \ \$noResults\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00568}00568\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasNoResults()\ \&\&\ \$cliConfiguration-\/>noResults())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00570}00570\ \ \ \ \ \ \ \ \ \ \ \ \ \$noResults\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00571}00571\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00572}00572\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00573}00573\ \ \ \ \ \ \ \ \ \$noOutput\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00574}00574\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00575}00575\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasNoOutput()\ \&\&\ \$cliConfiguration-\/>noOutput())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00576}00576\ \ \ \ \ \ \ \ \ \ \ \ \ \$noOutput\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00578}00578\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00579}00579\ \ \ \ \ \ \ \ \ \$testsCovering\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00580}00580\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasTestsCovering())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00582}00582\ \ \ \ \ \ \ \ \ \ \ \ \ \$testsCovering\ =\ \$cliConfiguration-\/>testsCovering();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00583}00583\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00584}00584\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00585}00585\ \ \ \ \ \ \ \ \ \$testsUsing\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00586}00586\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00587}00587\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasTestsUsing())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00588}00588\ \ \ \ \ \ \ \ \ \ \ \ \ \$testsUsing\ =\ \$cliConfiguration-\/>testsUsing();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00589}00589\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00590}00590\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00591}00591\ \ \ \ \ \ \ \ \ \$filter\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00592}00592\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00593}00593\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasFilter())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00594}00594\ \ \ \ \ \ \ \ \ \ \ \ \ \$filter\ =\ \$cliConfiguration-\/>filter();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00595}00595\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00596}00596\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00597}00597\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasGroups())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00598}00598\ \ \ \ \ \ \ \ \ \ \ \ \ \$groups\ =\ \$cliConfiguration-\/>groups();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00599}00599\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00600}00600\ \ \ \ \ \ \ \ \ \ \ \ \ \$groups\ =\ \$xmlConfiguration-\/>groups()-\/>include()-\/>asArrayOfStrings();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00601}00601\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00602}00602\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00603}00603\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasExcludeGroups())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00604}00604\ \ \ \ \ \ \ \ \ \ \ \ \ \$excludeGroups\ =\ \$cliConfiguration-\/>excludeGroups();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00605}00605\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00606}00606\ \ \ \ \ \ \ \ \ \ \ \ \ \$excludeGroups\ =\ \$xmlConfiguration-\/>groups()-\/>exclude()-\/>asArrayOfStrings();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00607}00607\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00608}00608\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00609}00609\ \ \ \ \ \ \ \ \ \$excludeGroups\ =\ array\_diff(\$excludeGroups,\ \$groups);}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00610}00610\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasRandomOrderSeed())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00612}00612\ \ \ \ \ \ \ \ \ \ \ \ \ \$randomOrderSeed\ =\ \$cliConfiguration-\/>randomOrderSeed();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00613}00613\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00614}00614\ \ \ \ \ \ \ \ \ \ \ \ \ \$randomOrderSeed\ =\ time();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00615}00615\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00616}00616\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00617}00617\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$xmlConfiguration-\/>wasLoadedFromFile()\ \&\&\ \$xmlConfiguration-\/>hasValidationErrors())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00618}00618\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_xml_configuration_1_1_schema_detector}{SchemaDetector}})-\/>detect(\$xmlConfiguration-\/>filename())-\/>detected())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00619}00619\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade_a72dbe005bd689460a70770c42bddc02f}{EventFacade::emitter}}()-\/>testRunnerTriggeredDeprecation(}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00620}00620\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Your\ XML\ configuration\ validates\ against\ a\ deprecated\ schema.\ Migrate\ your\ XML\ configuration\ using\ "{}-\/-\/migrate-\/configuration"{}!'},}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00623}00623\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade_a72dbe005bd689460a70770c42bddc02f}{EventFacade::emitter}}()-\/>testRunnerTriggeredWarning(}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Test\ results\ may\ not\ be\ as\ expected\ because\ the\ XML\ configuration\ file\ did\ not\ pass\ validation:\(\backslash\)n"{}}\ .}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00625}00625\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>validationErrors(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00626}00626\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00627}00627\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00628}00628\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00629}00629\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00630}00630\ \ \ \ \ \ \ \ \ \$includeUncoveredFiles\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>includeUncoveredFiles();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00631}00631\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00632}00632\ \ \ \ \ \ \ \ \ \$includePaths\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00633}00633\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00634}00634\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasIncludePath())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00635}00635\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (explode(PATH\_SEPARATOR,\ \$cliConfiguration-\/>includePath())\ as\ \$includePath)\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$includePaths[]\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_directory}{Directory}}(\$includePath);}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00638}00638\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00639}00639\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00640}00640\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$xmlConfiguration-\/>php()-\/>includePaths()\ as\ \$includePath)\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00641}00641\ \ \ \ \ \ \ \ \ \ \ \ \ \$includePaths[]\ =\ \$includePath;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00642}00642\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00643}00643\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00644}00644\ \ \ \ \ \ \ \ \ \$iniSettings\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00645}00645\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00646}00646\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasIniSettings())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00647}00647\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$cliConfiguration-\/>iniSettings()\ as\ \$name\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00648}00648\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$iniSettings[]\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_ini_setting}{IniSetting}}(\$name,\ \$value);}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00649}00649\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00650}00650\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00651}00651\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00652}00652\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$xmlConfiguration-\/>php()-\/>iniSettings()\ as\ \$iniSetting)\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00653}00653\ \ \ \ \ \ \ \ \ \ \ \ \ \$iniSettings[]\ =\ \$iniSetting;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00654}00654\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00655}00655\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00656}00656\ \ \ \ \ \ \ \ \ \$includeTestSuite\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00657}00657\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00658}00658\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasTestSuite())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00659}00659\ \ \ \ \ \ \ \ \ \ \ \ \ \$includeTestSuite\ =\ \$cliConfiguration-\/>testSuite();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00660}00660\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$xmlConfiguration-\/>phpunit()-\/>hasDefaultTestSuite())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00661}00661\ \ \ \ \ \ \ \ \ \ \ \ \ \$includeTestSuite\ =\ \$xmlConfiguration-\/>phpunit()-\/>defaultTestSuite();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00662}00662\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00663}00663\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00664}00664\ \ \ \ \ \ \ \ \ \$excludeTestSuite\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00665}00665\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00666}00666\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasExcludedTestSuite())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00667}00667\ \ \ \ \ \ \ \ \ \ \ \ \ \$excludeTestSuite\ =\ \$cliConfiguration-\/>excludedTestSuite();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00668}00668\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00669}00669\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00670}00670\ \ \ \ \ \ \ \ \ \$testSuffixes\ =\ [\textcolor{stringliteral}{'Test.php'},\ \textcolor{stringliteral}{'.phpt'}];}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00671}00671\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00672}00672\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasTestSuffixes())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00673}00673\ \ \ \ \ \ \ \ \ \ \ \ \ \$testSuffixes\ =\ \$cliConfiguration-\/>testSuffixes();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00674}00674\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00675}00675\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00676}00676\ \ \ \ \ \ \ \ \ \$sourceIncludeDirectories\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00677}00677\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00678}00678\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasCoverageFilter())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00679}00679\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$cliConfiguration-\/>coverageFilter()\ as\ \$directory)\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00680}00680\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sourceIncludeDirectories[]\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_filter_directory}{FilterDirectory}}(\$directory,\ \textcolor{stringliteral}{''},\ \textcolor{stringliteral}{'.php'});}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00681}00681\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00682}00682\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00683}00683\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00684}00684\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$xmlConfiguration-\/>codeCoverage()-\/>hasNonEmptyListOfFilesToBeIncludedInCodeCoverageReport())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00685}00685\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$xmlConfiguration-\/>codeCoverage()-\/>directories()\ as\ \$directory)\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00686}00686\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sourceIncludeDirectories[]\ =\ \$directory;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00687}00687\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00688}00688\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00689}00689\ \ \ \ \ \ \ \ \ \ \ \ \ \$sourceIncludeFiles\ \ \ \ \ \ \ =\ \$xmlConfiguration-\/>codeCoverage()-\/>files();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00690}00690\ \ \ \ \ \ \ \ \ \ \ \ \ \$sourceExcludeDirectories\ =\ \$xmlConfiguration-\/>codeCoverage()-\/>excludeDirectories();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00691}00691\ \ \ \ \ \ \ \ \ \ \ \ \ \$sourceExcludeFiles\ \ \ \ \ \ \ =\ \$xmlConfiguration-\/>codeCoverage()-\/>excludeFiles();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00692}00692\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00693}00693\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$xmlConfiguration-\/>source()-\/>includeDirectories()\ as\ \$directory)\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00694}00694\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sourceIncludeDirectories[]\ =\ \$directory;}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00695}00695\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00696}00696\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00697}00697\ \ \ \ \ \ \ \ \ \ \ \ \ \$sourceIncludeFiles\ \ \ \ \ \ \ =\ \$xmlConfiguration-\/>source()-\/>includeFiles();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00698}00698\ \ \ \ \ \ \ \ \ \ \ \ \ \$sourceExcludeDirectories\ =\ \$xmlConfiguration-\/>source()-\/>excludeDirectories();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00699}00699\ \ \ \ \ \ \ \ \ \ \ \ \ \$sourceExcludeFiles\ \ \ \ \ \ \ =\ \$xmlConfiguration-\/>source()-\/>excludeFiles();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00700}00700\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00701}00701\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00702}00702\ \ \ \ \ \ \ \ \ \$useBaseline\ \ \ \ \ \ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00703}00703\ \ \ \ \ \ \ \ \ \$generateBaseline\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00704}00704\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00705}00705\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$cliConfiguration-\/>hasGenerateBaseline())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00706}00706\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$cliConfiguration-\/>hasUseBaseline())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00707}00707\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$useBaseline\ =\ \$cliConfiguration-\/>useBaseline();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00708}00708\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$xmlConfiguration-\/>source()-\/>hasBaseline())\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00709}00709\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$useBaseline\ =\ \$xmlConfiguration-\/>source()-\/>baseline();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00710}00710\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00711}00711\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00712}00712\ \ \ \ \ \ \ \ \ \ \ \ \ \$generateBaseline\ =\ \$cliConfiguration-\/>generateBaseline();}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00713}00713\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00714}00714\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00715}00715\ \ \ \ \ \ \ \ \ assert(\$useBaseline\ !==\ \textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00716}00716\ \ \ \ \ \ \ \ \ assert(\$generateBaseline\ !==\ \textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00717}00717\ }
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00718}00718\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_configuration}{Configuration}}(}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00719}00719\ \ \ \ \ \ \ \ \ \ \ \ \ \$cliConfiguration-\/>arguments(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00720}00720\ \ \ \ \ \ \ \ \ \ \ \ \ \$configurationFile,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00721}00721\ \ \ \ \ \ \ \ \ \ \ \ \ \$bootstrap,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00722}00722\ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheResult,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00723}00723\ \ \ \ \ \ \ \ \ \ \ \ \ \$cacheDirectory,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00724}00724\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCacheDirectory,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00725}00725\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_source}{Source}}(}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00726}00726\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$useBaseline,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00727}00727\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$cliConfiguration-\/>ignoreBaseline(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00728}00728\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_filter_directory_collection_aa170f7f66330516bf3ac100cd7bdd3c9}{FilterDirectoryCollection::fromArray}}(\$sourceIncludeDirectories),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00729}00729\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sourceIncludeFiles,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00730}00730\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sourceExcludeDirectories,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00731}00731\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$sourceExcludeFiles,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00732}00732\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>source()-\/>restrictDeprecations(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00733}00733\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>source()-\/>restrictNotices(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00734}00734\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>source()-\/>restrictWarnings(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00735}00735\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>source()-\/>ignoreSuppressionOfDeprecations(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00736}00736\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>source()-\/>ignoreSuppressionOfPhpDeprecations(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00737}00737\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>source()-\/>ignoreSuppressionOfErrors(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00738}00738\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>source()-\/>ignoreSuppressionOfNotices(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00739}00739\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>source()-\/>ignoreSuppressionOfPhpNotices(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00740}00740\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>source()-\/>ignoreSuppressionOfWarnings(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00741}00741\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>source()-\/>ignoreSuppressionOfPhpWarnings(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00742}00742\ \ \ \ \ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00743}00743\ \ \ \ \ \ \ \ \ \ \ \ \ \$testResultCacheFile,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00744}00744\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageClover,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00745}00745\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCobertura,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00746}00746\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCrap4j,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00747}00747\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageCrap4jThreshold,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00748}00748\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtml,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00749}00749\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlLowUpperBound,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00750}00750\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlHighLowerBound,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00751}00751\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlColorSuccessLow,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00752}00752\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlColorSuccessMedium,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00753}00753\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlColorSuccessHigh,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00754}00754\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlColorWarning,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00755}00755\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlColorDanger,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00756}00756\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageHtmlCustomCssFile,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00757}00757\ \ \ \ \ \ \ \ \ \ \ \ \ \$coveragePhp,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00758}00758\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageText,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00759}00759\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageTextShowUncoveredFiles,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00760}00760\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageTextShowOnlySummary,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00761}00761\ \ \ \ \ \ \ \ \ \ \ \ \ \$coverageXml,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00762}00762\ \ \ \ \ \ \ \ \ \ \ \ \ \$pathCoverage,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00763}00763\ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>codeCoverage()-\/>ignoreDeprecatedCodeUnits(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00764}00764\ \ \ \ \ \ \ \ \ \ \ \ \ \$disableCodeCoverageIgnore,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00765}00765\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnDeprecation,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00766}00766\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnEmptyTestSuite,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00767}00767\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnIncomplete,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00768}00768\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnNotice,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00769}00769\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnRisky,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00770}00770\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnSkipped,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00771}00771\ \ \ \ \ \ \ \ \ \ \ \ \ \$failOnWarning,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00772}00772\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnDefect,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00773}00773\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnDeprecation,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00774}00774\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnError,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00775}00775\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnFailure,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00776}00776\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnIncomplete,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00777}00777\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnNotice,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00778}00778\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnRisky,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00779}00779\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnSkipped,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00780}00780\ \ \ \ \ \ \ \ \ \ \ \ \ \$stopOnWarning,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00781}00781\ \ \ \ \ \ \ \ \ \ \ \ \ \$outputToStandardErrorStream,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00782}00782\ \ \ \ \ \ \ \ \ \ \ \ \ \$columns,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00783}00783\ \ \ \ \ \ \ \ \ \ \ \ \ \$noExtensions,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00784}00784\ \ \ \ \ \ \ \ \ \ \ \ \ \$pharExtensionDirectory,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00785}00785\ \ \ \ \ \ \ \ \ \ \ \ \ \$extensionBootstrappers,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00786}00786\ \ \ \ \ \ \ \ \ \ \ \ \ \$backupGlobals,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00787}00787\ \ \ \ \ \ \ \ \ \ \ \ \ \$backupStaticProperties,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00788}00788\ \ \ \ \ \ \ \ \ \ \ \ \ \$beStrictAboutChangesToGlobalState,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00789}00789\ \ \ \ \ \ \ \ \ \ \ \ \ \$colors,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00790}00790\ \ \ \ \ \ \ \ \ \ \ \ \ \$processIsolation,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00791}00791\ \ \ \ \ \ \ \ \ \ \ \ \ \$enforceTimeLimit,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00792}00792\ \ \ \ \ \ \ \ \ \ \ \ \ \$defaultTimeLimit,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00793}00793\ \ \ \ \ \ \ \ \ \ \ \ \ \$timeoutForSmallTests,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00794}00794\ \ \ \ \ \ \ \ \ \ \ \ \ \$timeoutForMediumTests,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00795}00795\ \ \ \ \ \ \ \ \ \ \ \ \ \$timeoutForLargeTests,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00796}00796\ \ \ \ \ \ \ \ \ \ \ \ \ \$reportUselessTests,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00797}00797\ \ \ \ \ \ \ \ \ \ \ \ \ \$strictCoverage,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00798}00798\ \ \ \ \ \ \ \ \ \ \ \ \ \$disallowTestOutput,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00799}00799\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnIncompleteTests,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00800}00800\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnSkippedTests,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00801}00801\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnTestsThatTriggerDeprecations,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00802}00802\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnTestsThatTriggerErrors,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00803}00803\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnTestsThatTriggerNotices,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00804}00804\ \ \ \ \ \ \ \ \ \ \ \ \ \$displayDetailsOnTestsThatTriggerWarnings,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00805}00805\ \ \ \ \ \ \ \ \ \ \ \ \ \$reverseDefectList,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00806}00806\ \ \ \ \ \ \ \ \ \ \ \ \ \$requireCoverageMetadata,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00807}00807\ \ \ \ \ \ \ \ \ \ \ \ \ \$registerMockObjectsFromTestArgumentsRecursively,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00808}00808\ \ \ \ \ \ \ \ \ \ \ \ \ \$noProgress,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00809}00809\ \ \ \ \ \ \ \ \ \ \ \ \ \$noResults,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00810}00810\ \ \ \ \ \ \ \ \ \ \ \ \ \$noOutput,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00811}00811\ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrder,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00812}00812\ \ \ \ \ \ \ \ \ \ \ \ \ \$executionOrderDefects,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00813}00813\ \ \ \ \ \ \ \ \ \ \ \ \ \$resolveDependencies,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00814}00814\ \ \ \ \ \ \ \ \ \ \ \ \ \$logfileTeamcity,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00815}00815\ \ \ \ \ \ \ \ \ \ \ \ \ \$logfileJunit,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00816}00816\ \ \ \ \ \ \ \ \ \ \ \ \ \$logfileTestdoxHtml,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00817}00817\ \ \ \ \ \ \ \ \ \ \ \ \ \$logfileTestdoxText,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00818}00818\ \ \ \ \ \ \ \ \ \ \ \ \ \$logEventsText,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00819}00819\ \ \ \ \ \ \ \ \ \ \ \ \ \$logEventsVerboseText,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00820}00820\ \ \ \ \ \ \ \ \ \ \ \ \ \$teamCityOutput,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00821}00821\ \ \ \ \ \ \ \ \ \ \ \ \ \$testDoxOutput,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00822}00822\ \ \ \ \ \ \ \ \ \ \ \ \ \$testsCovering,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00823}00823\ \ \ \ \ \ \ \ \ \ \ \ \ \$testsUsing,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00824}00824\ \ \ \ \ \ \ \ \ \ \ \ \ \$filter,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00825}00825\ \ \ \ \ \ \ \ \ \ \ \ \ \$groups,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00826}00826\ \ \ \ \ \ \ \ \ \ \ \ \ \$excludeGroups,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00827}00827\ \ \ \ \ \ \ \ \ \ \ \ \ \$randomOrderSeed,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00828}00828\ \ \ \ \ \ \ \ \ \ \ \ \ \$includeUncoveredFiles,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00829}00829\ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>testSuite(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00830}00830\ \ \ \ \ \ \ \ \ \ \ \ \ \$includeTestSuite,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00831}00831\ \ \ \ \ \ \ \ \ \ \ \ \ \$excludeTestSuite,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00832}00832\ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>phpunit()-\/>hasDefaultTestSuite()\ ?\ \$xmlConfiguration-\/>phpunit()-\/>defaultTestSuite()\ :\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00833}00833\ \ \ \ \ \ \ \ \ \ \ \ \ \$testSuffixes,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00834}00834\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_php}{Php}}(}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00835}00835\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_directory_collection_aa170f7f66330516bf3ac100cd7bdd3c9}{DirectoryCollection::fromArray}}(\$includePaths),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00836}00836\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_ini_setting_collection_acffe5cb04dd39b3dbc6cad29413353de}{IniSettingCollection::fromArray}}(\$iniSettings),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00837}00837\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>php()-\/>constants(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00838}00838\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>php()-\/>globalVariables(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00839}00839\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>php()-\/>envVariables(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00840}00840\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>php()-\/>postVariables(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00841}00841\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>php()-\/>getVariables(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00842}00842\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>php()-\/>cookieVariables(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00843}00843\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>php()-\/>serverVariables(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00844}00844\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>php()-\/>filesVariables(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00845}00845\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>php()-\/>requestVariables(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00846}00846\ \ \ \ \ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00847}00847\ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>phpunit()-\/>controlGarbageCollector(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00848}00848\ \ \ \ \ \ \ \ \ \ \ \ \ \$xmlConfiguration-\/>phpunit()-\/>numberOfTestsBeforeGarbageCollection(),}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00849}00849\ \ \ \ \ \ \ \ \ \ \ \ \ \$generateBaseline,}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00850}00850\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00851}00851\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_merger_8php_source_l00852}00852\ \}}
+
+\end{DoxyCode}

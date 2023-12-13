@@ -1,0 +1,152 @@
+\doxysection{Elasticsearch\+Handler.\+php}
+\hypertarget{_elasticsearch_handler_8php_source}{}\label{_elasticsearch_handler_8php_source}\index{vendor/monolog/monolog/src/Monolog/Handler/ElasticsearchHandler.php@{vendor/monolog/monolog/src/Monolog/Handler/ElasticsearchHandler.php}}
+\mbox{\hyperlink{_elasticsearch_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Monolog\ package.}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Jordi\ Boggiano\ <j.boggiano@seld.be>}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_monolog_1_1_handler}{Monolog\(\backslash\)Handler}};}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00014}00014\ use\ Elastic\(\backslash\)Elasticsearch\(\backslash\)Response\(\backslash\)Elasticsearch;}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00015}00015\ use\ Throwable;}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00016}00016\ use\ RuntimeException;}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00017}00017\ use\ Monolog\(\backslash\)Level;}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00018}00018\ use\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{Monolog\(\backslash\)Formatter\(\backslash\)FormatterInterface}};}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_elasticsearch_formatter}{Monolog\(\backslash\)Formatter\(\backslash\)ElasticsearchFormatter}};}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00020}00020\ use\ InvalidArgumentException;}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00021}00021\ use\ Elasticsearch\(\backslash\)Common\(\backslash\)Exceptions\(\backslash\)RuntimeException\ as\ ElasticsearchRuntimeException;}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00022}00022\ use\ Elasticsearch\(\backslash\)Client;}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_monolog_1_1_log_record}{Monolog\(\backslash\)LogRecord}};}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00024}00024\ use\ Elastic\(\backslash\)Elasticsearch\(\backslash\)Exception\(\backslash\)InvalidArgumentException\ as\ ElasticInvalidArgumentException;}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00025}00025\ use\ Elastic\(\backslash\)Elasticsearch\(\backslash\)Client\ as\ Client8;}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00060}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler}{00060}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler}{ElasticsearchHandler}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_processing_handler}{AbstractProcessingHandler}}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00061}00061\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00062}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a9cecba7b9a47d18cf66398c3a6a4b498}{00062}}\ \ \ \ \ \textcolor{keyword}{protected}\ Client|Client8\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a9cecba7b9a47d18cf66398c3a6a4b498}{\$client}};}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00068}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_aa75bf2044136a12fd7d99d6e468a1584}{00068}}\ \ \ \ \ \textcolor{keyword}{protected}\ array\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_aa75bf2044136a12fd7d99d6e468a1584}{\$options}};}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00073}00073\ \ \ \ \ \textcolor{keyword}{private}\ \$needsType;}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00081}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_aa0ce6293fe7ec382aaf791e3dcbf15bb}{00081}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_aa0ce6293fe7ec382aaf791e3dcbf15bb}{\_\_construct}}(Client|Client8\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a9cecba7b9a47d18cf66398c3a6a4b498}{\$client}},\ array\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_aa75bf2044136a12fd7d99d6e468a1584}{\$options}}\ =\ [],\ \textcolor{keywordtype}{int}|\textcolor{keywordtype}{string}|Level\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}}\ =\ Level::Debug,\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}}\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00082}00082\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ parent::\_\_construct(\mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}},\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}});}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \$this-\/>client\ =\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a9cecba7b9a47d18cf66398c3a6a4b498}{\$client}};}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \$this-\/>options\ =\ array\_merge(}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ [}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'index'}\ \ \ \ \ \ \ \ =>\ \textcolor{stringliteral}{'monolog'},\ \textcolor{comment}{//\ Elastic\ index\ name}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'type'}\ \ \ \ \ \ \ \ \ =>\ \textcolor{stringliteral}{'\_doc'},\ \ \ \ \textcolor{comment}{//\ Elastic\ document\ type}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'ignore\_error'}\ =>\ \textcolor{keyword}{false},\ \ \ \ \ \textcolor{comment}{//\ Suppress\ Elasticsearch\ exceptions}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'op\_type'}\ \ \ \ \ \ =>\ \textcolor{stringliteral}{'index'},\ \ \ \textcolor{comment}{//\ Elastic\ op\_type\ (index\ or\ create)\ (https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-\/index\_.html\#docs-\/index-\/api-\/op\_type)}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_aa75bf2044136a12fd7d99d6e468a1584}{\$options}}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a9cecba7b9a47d18cf66398c3a6a4b498}{\$client}}\ instanceof\ Client8\ ||\ \$client::VERSION[0]\ ===\ \textcolor{charliteral}{'7'})\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>needsType\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ force\ the\ type\ to\ \_doc\ for\ ES8/ES7}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'type'}]\ =\ \textcolor{stringliteral}{'\_doc'};}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>needsType\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00102}00102\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00107}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a4d821b93cc01881ce31ed79d678a8800}{00107}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a4d821b93cc01881ce31ed79d678a8800}{write}}(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record):\ void}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00108}00108\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \$this-\/>bulkSend([\$record-\/>formatted]);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00110}00110\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00115}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a87804f2347dd817752ef1faa1f0dea05}{00115}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a87804f2347dd817752ef1faa1f0dea05}{setFormatter}}(\mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{FormatterInterface}}\ \$formatter):\ \mbox{\hyperlink{interface_monolog_1_1_handler_1_1_handler_interface}{HandlerInterface}}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00116}00116\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$formatter\ instanceof\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_elasticsearch_formatter}{ElasticsearchFormatter}})\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ parent::setFormatter(\$formatter);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psr_1_1_log_1_1_invalid_argument_exception}{InvalidArgumentException}}(\textcolor{stringliteral}{'ElasticsearchHandler\ is\ only\ compatible\ with\ ElasticsearchFormatter'});}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00122}00122\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00131}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a1a49b8dded6e91a52e2fd07195d334da}{00131}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a1a49b8dded6e91a52e2fd07195d334da}{getOptions}}():\ array}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00132}00132\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_aa75bf2044136a12fd7d99d6e468a1584}{\$this-\/>options}};}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00134}00134\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00139}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a0bd80b04e1992562f7eacea2097d3d9d}{00139}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a0bd80b04e1992562f7eacea2097d3d9d}{getDefaultFormatter}}():\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{FormatterInterface}}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00140}00140\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_elasticsearch_formatter}{ElasticsearchFormatter}}(\$this-\/>options[\textcolor{stringliteral}{'index'}],\ \$this-\/>options[\textcolor{stringliteral}{'type'}]);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00142}00142\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00147}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a944865926b0302ad2d802bea1eec3a57}{00147}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a944865926b0302ad2d802bea1eec3a57}{handleBatch}}(array\ \$records):\ void}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00148}00148\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \$documents\ =\ \$this-\/>\mbox{\hyperlink{interface_monolog_1_1_handler_1_1_formattable_handler_interface_aad3a8e83c90770a1f71a75bb51e782d8}{getFormatter}}()-\/>formatBatch(\$records);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \$this-\/>bulkSend(\$documents);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00151}00151\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00159}00159\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ bulkSend(array\ \$records):\ void}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00160}00160\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \$params\ =\ [}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'body'}\ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$records\ as\ \$record)\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$params[\textcolor{stringliteral}{'body'}][]\ =\ [}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>options[\textcolor{stringliteral}{'op\_type'}]\ =>\ \$this-\/>needsType\ ?\ [}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_index'}\ =>\ \$record[\textcolor{stringliteral}{'\_index'}],}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_type'}\ \ =>\ \$record[\textcolor{stringliteral}{'\_type'}],}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ]\ :\ [}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_index'}\ =>\ \$record[\textcolor{stringliteral}{'\_index'}],}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$record[\textcolor{stringliteral}{'\_index'}],\ \$record[\textcolor{stringliteral}{'\_type'}]);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$params[\textcolor{stringliteral}{'body'}][]\ =\ \$record;}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \$responses\ =\ \$this-\/>client-\/>bulk(\$params);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$responses[\textcolor{stringliteral}{'errors'}]\ ===\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a7a79778a151ab1241ed65a07c3a25c16}{createExceptionFromResponses}}(\$responses);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Throwable\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$this-\/>options[\textcolor{stringliteral}{'ignore\_error'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(\textcolor{stringliteral}{'Error\ sending\ messages\ to\ Elasticsearch'},\ 0,\ \$e);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00191}00191\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00200}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a7a79778a151ab1241ed65a07c3a25c16}{00200}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a7a79778a151ab1241ed65a07c3a25c16}{createExceptionFromResponses}}(\$responses):\ Throwable}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00201}00201\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$responses[\textcolor{stringliteral}{'items'}]\ ??\ []\ as\ \$item)\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$item[\textcolor{stringliteral}{'index'}][\textcolor{stringliteral}{'error'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a52401085ef91e8b14cb1d521bf597fa9}{createExceptionFromError}}(\$item[\textcolor{stringliteral}{'index'}][\textcolor{stringliteral}{'error'}]);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (class\_exists(ElasticInvalidArgumentException::class))\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ ElasticInvalidArgumentException(\textcolor{stringliteral}{'Elasticsearch\ failed\ to\ index\ one\ or\ more\ records.'});}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ ElasticsearchRuntimeException(\textcolor{stringliteral}{'Elasticsearch\ failed\ to\ index\ one\ or\ more\ records.'});}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00213}00213\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00220}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a52401085ef91e8b14cb1d521bf597fa9}{00220}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a52401085ef91e8b14cb1d521bf597fa9}{createExceptionFromError}}(array\ \$error):\ Throwable}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00221}00221\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \$previous\ =\ isset(\$error[\textcolor{stringliteral}{'caused\_by'}])\ ?\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_elasticsearch_handler_a52401085ef91e8b14cb1d521bf597fa9}{createExceptionFromError}}(\$error[\textcolor{stringliteral}{'caused\_by'}])\ :\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (class\_exists(ElasticInvalidArgumentException::class))\ \{}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ ElasticInvalidArgumentException(\$error[\textcolor{stringliteral}{'type'}]\ .\ \textcolor{stringliteral}{':\ '}\ .\ \$error[\textcolor{stringliteral}{'reason'}],\ 0,\ \$previous);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ ElasticsearchRuntimeException(\$error[\textcolor{stringliteral}{'type'}]\ .\ \textcolor{stringliteral}{':\ '}\ .\ \$error[\textcolor{stringliteral}{'reason'}],\ 0,\ \$previous);}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00229}00229\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_elasticsearch_handler_8php_source_l00230}00230\ \}}
+
+\end{DoxyCode}

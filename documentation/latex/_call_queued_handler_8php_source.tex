@@ -1,0 +1,199 @@
+\doxysection{Call\+Queued\+Handler.\+php}
+\hypertarget{_call_queued_handler_8php_source}{}\label{_call_queued_handler_8php_source}\index{vendor/laravel/framework/src/Illuminate/Queue/CallQueuedHandler.php@{vendor/laravel/framework/src/Illuminate/Queue/CallQueuedHandler.php}}
+\mbox{\hyperlink{_call_queued_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_queue}{Illuminate\(\backslash\)Queue}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00005}00005\ use\ Exception;}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00006}00006\ use\ Illuminate\(\backslash\)Bus\(\backslash\)Batchable;}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_illuminate_1_1_bus_1_1_unique_lock}{Illuminate\(\backslash\)Bus\(\backslash\)UniqueLock}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00008}00008\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_bus_1_1_dispatcher}{Illuminate\(\backslash\)Contracts\(\backslash\)Bus\(\backslash\)Dispatcher}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00009}00009\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_cache_1_1_repository}{Illuminate\(\backslash\)Contracts\(\backslash\)Cache\(\backslash\)Repository}}\ as\ Cache;}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00010}00010\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_container_1_1_container}{Illuminate\(\backslash\)Contracts\(\backslash\)Container\(\backslash\)Container}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00011}00011\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_encryption_1_1_encrypter}{Illuminate\(\backslash\)Contracts\(\backslash\)Encryption\(\backslash\)Encrypter}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00012}00012\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_job}{Illuminate\(\backslash\)Contracts\(\backslash\)Queue\(\backslash\)Job}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00013}00013\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_should_be_unique}{Illuminate\(\backslash\)Contracts\(\backslash\)Queue\(\backslash\)ShouldBeUnique}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00014}00014\ use\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_should_be_unique_until_processing}{Illuminate\(\backslash\)Contracts\(\backslash\)Queue\(\backslash\)ShouldBeUniqueUntilProcessing}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model_not_found_exception}{Illuminate\(\backslash\)Database\(\backslash\)Eloquent\(\backslash\)ModelNotFoundException}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_illuminate_1_1_pipeline_1_1_pipeline}{Illuminate\(\backslash\)Pipeline\(\backslash\)Pipeline}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00017}00017\ use\ ReflectionClass;}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00018}00018\ use\ RuntimeException;}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00020}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler}{00020}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler}{CallQueuedHandler}}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00021}00021\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00027}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_ab1d5b769b8d51cf3de5b1f1c4a9e6298}{00027}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_ab1d5b769b8d51cf3de5b1f1c4a9e6298}{\$dispatcher}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00034}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_ab97dd40df90f4ce6f0fce9091e7c7872}{00034}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_ab97dd40df90f4ce6f0fce9091e7c7872}{\$container}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00043}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_adbfdebdc146cf09701e55d44034dbe6d}{00043}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_adbfdebdc146cf09701e55d44034dbe6d}{\_\_construct}}(\mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_bus_1_1_dispatcher}{Dispatcher}}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_ab1d5b769b8d51cf3de5b1f1c4a9e6298}{\$dispatcher}},\ \mbox{\hyperlink{class_illuminate_1_1_container_1_1_container}{Container}}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_ab97dd40df90f4ce6f0fce9091e7c7872}{\$container}})}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00044}00044\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \$this-\/>container\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_ab97dd40df90f4ce6f0fce9091e7c7872}{\$container}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \$this-\/>dispatcher\ =\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_ab1d5b769b8d51cf3de5b1f1c4a9e6298}{\$dispatcher}};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00047}00047\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00056}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a39b20a0892416fb63f0a100805497abe}{00056}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a39b20a0892416fb63f0a100805497abe}{call}}(\mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_job}{Job}}\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00057}00057\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \$command\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a1c044978233aa50702ef079082bd72a8}{setJobInstanceIfNecessary}}(}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$job,\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_aa25208b659b0f34dbe375beeb3e97f73}{getCommand}}(\$data)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{class_illuminate_1_1_database_1_1_eloquent_1_1_model_not_found_exception}{ModelNotFoundException}}\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_aa86441bf078c077871c28cce3427558c}{handleModelNotFound}}(\$job,\ \$e);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$command\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_should_be_unique_until_processing}{ShouldBeUniqueUntilProcessing}})\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a134b613063ee44b4dc291244c2bfa0a6}{ensureUniqueJobLockIsReleased}}(\$command);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_acce8c66223ca892d93e452183293d02a}{dispatchThroughMiddleware}}(\$job,\ \$command);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>isReleased()\ \&\&\ !\ \$command\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_should_be_unique_until_processing}{ShouldBeUniqueUntilProcessing}})\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a134b613063ee44b4dc291244c2bfa0a6}{ensureUniqueJobLockIsReleased}}(\$command);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>hasFailed()\ \&\&\ !\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>isReleased())\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a97a13c9241bad42d8e75e598312fa0e2}{ensureNextJobInChainIsDispatched}}(\$command);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a0cf119689b99a569138bbf0ed5cfd361}{ensureSuccessfulBatchJobIsRecorded}}(\$command);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>isDeletedOrReleased())\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>delete();}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00084}00084\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00094}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_aa25208b659b0f34dbe375beeb3e97f73}{00094}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_aa25208b659b0f34dbe375beeb3e97f73}{getCommand}}(array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00095}00095\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'command'}],\ \textcolor{stringliteral}{'O:'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ unserialize(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'command'}]);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>container-\/>bound(Encrypter::class))\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ unserialize(\$this-\/>container[Encrypter::class]-\/>decrypt(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'command'}]));}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(\textcolor{stringliteral}{'Unable\ to\ extract\ job\ payload.'});}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00105}00105\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00114}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_acce8c66223ca892d93e452183293d02a}{00114}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_acce8c66223ca892d93e452183293d02a}{dispatchThroughMiddleware}}(\mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_job}{Job}}\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$command)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00115}00115\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$command\ instanceof\ \(\backslash\)\_\_PHP\_Incomplete\_Class)\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ Exception(\textcolor{stringliteral}{'Job\ is\ incomplete\ class:\ '}.json\_encode(\$command));}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_pipeline_1_1_pipeline}{Pipeline}}(\$this-\/>container))-\/>send(\$command)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>through(array\_merge(method\_exists(\$command,\ \textcolor{stringliteral}{'middleware'})\ ?\ \$command-\/>middleware()\ :\ [],\ \$command-\/>middleware\ ??\ []))}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>then(\textcolor{keyword}{function}\ (\$command)\ use\ (\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}})\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>dispatcher-\/>dispatchNow(}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$command,\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_af5aaf4e5fc8d9a27c49d28dbc518606c}{resolveHandler}}(\$job,\ \$command)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00127}00127\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00136}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_af5aaf4e5fc8d9a27c49d28dbc518606c}{00136}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_af5aaf4e5fc8d9a27c49d28dbc518606c}{resolveHandler}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$command)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00137}00137\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \$handler\ =\ \$this-\/>dispatcher-\/>getCommandHandler(\$command)\ ?:\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$handler)\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a1c044978233aa50702ef079082bd72a8}{setJobInstanceIfNecessary}}(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$handler);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$handler;}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00145}00145\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00154}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a1c044978233aa50702ef079082bd72a8}{00154}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a1c044978233aa50702ef079082bd72a8}{setJobInstanceIfNecessary}}(\mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_job}{Job}}\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$instance)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00155}00155\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(InteractsWithQueue::class,\ class\_uses\_recursive(\$instance)))\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \$instance-\/>setJob(\mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}});}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$instance;}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00161}00161\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00169}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a97a13c9241bad42d8e75e598312fa0e2}{00169}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a97a13c9241bad42d8e75e598312fa0e2}{ensureNextJobInChainIsDispatched}}(\$command)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00170}00170\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (method\_exists(\$command,\ \textcolor{stringliteral}{'dispatchNextJobInChain'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \$command-\/>dispatchNextJobInChain();}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00174}00174\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00182}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a0cf119689b99a569138bbf0ed5cfd361}{00182}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a0cf119689b99a569138bbf0ed5cfd361}{ensureSuccessfulBatchJobIsRecorded}}(\$command)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00183}00183\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \$uses\ =\ class\_uses\_recursive(\$command);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ in\_array(Batchable::class,\ \$uses)\ ||}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ !\ in\_array(InteractsWithQueue::class,\ \$uses))\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$batch\ =\ \$command-\/>batch())\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \$batch-\/>recordSuccessfulJob(\$command-\/>job-\/>uuid());}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00194}00194\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00195}00195\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00202}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a134b613063ee44b4dc291244c2bfa0a6}{00202}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a134b613063ee44b4dc291244c2bfa0a6}{ensureUniqueJobLockIsReleased}}(\$command)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00203}00203\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$command\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_should_be_unique}{ShouldBeUnique}})\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keyword}{new}\ \mbox{\hyperlink{class_illuminate_1_1_bus_1_1_unique_lock}{UniqueLock}}(\$this-\/>container-\/>make(Cache::class)))-\/>\mbox{\hyperlink{namespace_illuminate_1_1_queue_ac5cc2a30abbe3afc2dc664c91489bb2d}{release}}(\$command);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00207}00207\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00216}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_aa86441bf078c077871c28cce3427558c}{00216}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_aa86441bf078c077871c28cce3427558c}{handleModelNotFound}}(\mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_job}{Job}}\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}},\ \$e)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00217}00217\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}\ =\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>resolveName();}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \$shouldDelete\ =\ (\textcolor{keyword}{new}\ ReflectionClass(\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}))}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -\/>getDefaultProperties()[\textcolor{stringliteral}{'deleteWhenMissingModels'}]\ ??\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Exception)\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \$shouldDelete\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$shouldDelete)\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>delete();}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_illuminate_1_1_queue_aab0e16ecbc63a8e57fdd9823b66be5a1}{\$job}}-\/>fail(\$e);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00232}00232\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00244}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a4f351b6ada9c24afd1f920e6cf24c686}{00244}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a4f351b6ada9c24afd1f920e6cf24c686}{failed}}(array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \$e,\ \textcolor{keywordtype}{string}\ \$uuid)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00245}00245\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \$command\ =\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_aa25208b659b0f34dbe375beeb3e97f73}{getCommand}}(\$data);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \$command\ instanceof\ \mbox{\hyperlink{interface_illuminate_1_1_contracts_1_1_queue_1_1_should_be_unique_until_processing}{ShouldBeUniqueUntilProcessing}})\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a134b613063ee44b4dc291244c2bfa0a6}{ensureUniqueJobLockIsReleased}}(\$command);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$command\ instanceof\ \(\backslash\)\_\_PHP\_Incomplete\_Class)\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_ac02210c8a3ed37daad09074824e44c81}{ensureFailedBatchJobIsRecorded}}(\$uuid,\ \$command,\ \$e);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a000ccbc491512a0623b59fb32e0b2ead}{ensureChainCatchCallbacksAreInvoked}}(\$uuid,\ \$command,\ \$e);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (method\_exists(\$command,\ \textcolor{stringliteral}{'failed'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \$command-\/>failed(\$e);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00262}00262\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00272}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_ac02210c8a3ed37daad09074824e44c81}{00272}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_ac02210c8a3ed37daad09074824e44c81}{ensureFailedBatchJobIsRecorded}}(\textcolor{keywordtype}{string}\ \$uuid,\ \$command,\ \$e)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00273}00273\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ in\_array(Batchable::class,\ class\_uses\_recursive(\$command)))\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$batch\ =\ \$command-\/>batch())\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \$batch-\/>recordFailedJob(\$uuid,\ \$e);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00281}00281\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00291}\mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a000ccbc491512a0623b59fb32e0b2ead}{00291}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_queue_1_1_call_queued_handler_a000ccbc491512a0623b59fb32e0b2ead}{ensureChainCatchCallbacksAreInvoked}}(\textcolor{keywordtype}{string}\ \$uuid,\ \$command,\ \$e)}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00292}00292\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (method\_exists(\$command,\ \textcolor{stringliteral}{'invokeChainCatchCallbacks'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \$command-\/>invokeChainCatchCallbacks(\$e);}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00296}00296\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_call_queued_handler_8php_source_l00297}00297\ \}}
+
+\end{DoxyCode}

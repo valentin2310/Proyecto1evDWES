@@ -1,0 +1,621 @@
+\doxysection{Error\+Handler.\+php}
+\hypertarget{symfony_2error-handler_2_error_handler_8php_source}{}\label{symfony_2error-handler_2_error_handler_8php_source}\index{vendor/symfony/error-\/handler/ErrorHandler.php@{vendor/symfony/error-\/handler/ErrorHandler.php}}
+\mbox{\hyperlink{symfony_2error-handler_2_error_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_error_handler}{Symfony\(\backslash\)Component\(\backslash\)ErrorHandler}};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00014}00014\ use\ \mbox{\hyperlink{interface_psr_1_1_log_1_1_logger_interface}{Psr\(\backslash\)Log\(\backslash\)LoggerInterface}};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_psr_1_1_log_1_1_log_level}{Psr\(\backslash\)Log\(\backslash\)LogLevel}};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_1_1_fatal_error}{Symfony\(\backslash\)Component\(\backslash\)ErrorHandler\(\backslash\)Error\(\backslash\)FatalError}};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_1_1_out_of_memory_error}{Symfony\(\backslash\)Component\(\backslash\)ErrorHandler\(\backslash\)Error\(\backslash\)OutOfMemoryError}};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_enhancer_1_1_class_not_found_error_enhancer}{Symfony\(\backslash\)Component\(\backslash\)ErrorHandler\(\backslash\)ErrorEnhancer\(\backslash\)ClassNotFoundErrorEnhancer}};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00019}00019\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_error_handler_1_1_error_enhancer_1_1_error_enhancer_interface}{Symfony\(\backslash\)Component\(\backslash\)ErrorHandler\(\backslash\)ErrorEnhancer\(\backslash\)ErrorEnhancerInterface}};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_enhancer_1_1_undefined_function_error_enhancer}{Symfony\(\backslash\)Component\(\backslash\)ErrorHandler\(\backslash\)ErrorEnhancer\(\backslash\)UndefinedFunctionErrorEnhancer}};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_enhancer_1_1_undefined_method_error_enhancer}{Symfony\(\backslash\)Component\(\backslash\)ErrorHandler\(\backslash\)ErrorEnhancer\(\backslash\)UndefinedMethodErrorEnhancer}};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_renderer_1_1_cli_error_renderer}{Symfony\(\backslash\)Component\(\backslash\)ErrorHandler\(\backslash\)ErrorRenderer\(\backslash\)CliErrorRenderer}};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_renderer_1_1_html_error_renderer}{Symfony\(\backslash\)Component\(\backslash\)ErrorHandler\(\backslash\)ErrorRenderer\(\backslash\)HtmlErrorRenderer}};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00024}00024\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_exception_1_1_silenced_error_context}{Symfony\(\backslash\)Component\(\backslash\)ErrorHandler\(\backslash\)Exception\(\backslash\)SilencedErrorContext}};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00051}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler}{00051}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler}{ErrorHandler}}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00052}00052\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$levels\ =\ [}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \(\backslash\)E\_DEPRECATED\ =>\ \textcolor{stringliteral}{'Deprecated'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \(\backslash\)E\_USER\_DEPRECATED\ =>\ \textcolor{stringliteral}{'User\ Deprecated'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \(\backslash\)E\_NOTICE\ =>\ \textcolor{stringliteral}{'Notice'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \(\backslash\)E\_USER\_NOTICE\ =>\ \textcolor{stringliteral}{'User\ Notice'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \(\backslash\)E\_STRICT\ =>\ \textcolor{stringliteral}{'Runtime\ Notice'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \(\backslash\)E\_WARNING\ =>\ \textcolor{stringliteral}{'Warning'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \(\backslash\)E\_USER\_WARNING\ =>\ \textcolor{stringliteral}{'User\ Warning'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \(\backslash\)E\_COMPILE\_WARNING\ =>\ \textcolor{stringliteral}{'Compile\ Warning'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \(\backslash\)E\_CORE\_WARNING\ =>\ \textcolor{stringliteral}{'Core\ Warning'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \(\backslash\)E\_USER\_ERROR\ =>\ \textcolor{stringliteral}{'User\ Error'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \(\backslash\)E\_RECOVERABLE\_ERROR\ =>\ \textcolor{stringliteral}{'Catchable\ Fatal\ Error'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \(\backslash\)E\_COMPILE\_ERROR\ =>\ \textcolor{stringliteral}{'Compile\ Error'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \(\backslash\)E\_PARSE\ =>\ \textcolor{stringliteral}{'Parse\ Error'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \(\backslash\)E\_ERROR\ =>\ \textcolor{stringliteral}{'Error'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \(\backslash\)E\_CORE\_ERROR\ =>\ \textcolor{stringliteral}{'Core\ Error'},}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00069}00069\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00071}00071\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$loggers\ =\ [}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \(\backslash\)E\_DEPRECATED\ =>\ [\textcolor{keyword}{null},\ LogLevel::INFO],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \(\backslash\)E\_USER\_DEPRECATED\ =>\ [\textcolor{keyword}{null},\ LogLevel::INFO],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \(\backslash\)E\_NOTICE\ =>\ [\textcolor{keyword}{null},\ LogLevel::WARNING],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \(\backslash\)E\_USER\_NOTICE\ =>\ [\textcolor{keyword}{null},\ LogLevel::WARNING],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \(\backslash\)E\_STRICT\ =>\ [\textcolor{keyword}{null},\ LogLevel::WARNING],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \(\backslash\)E\_WARNING\ =>\ [\textcolor{keyword}{null},\ LogLevel::WARNING],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \(\backslash\)E\_USER\_WARNING\ =>\ [\textcolor{keyword}{null},\ LogLevel::WARNING],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \(\backslash\)E\_COMPILE\_WARNING\ =>\ [\textcolor{keyword}{null},\ LogLevel::WARNING],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \(\backslash\)E\_CORE\_WARNING\ =>\ [\textcolor{keyword}{null},\ LogLevel::WARNING],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \(\backslash\)E\_USER\_ERROR\ =>\ [\textcolor{keyword}{null},\ LogLevel::CRITICAL],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \(\backslash\)E\_RECOVERABLE\_ERROR\ =>\ [\textcolor{keyword}{null},\ LogLevel::CRITICAL],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \(\backslash\)E\_COMPILE\_ERROR\ =>\ [\textcolor{keyword}{null},\ LogLevel::CRITICAL],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \(\backslash\)E\_PARSE\ =>\ [\textcolor{keyword}{null},\ LogLevel::CRITICAL],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \(\backslash\)E\_ERROR\ =>\ [\textcolor{keyword}{null},\ LogLevel::CRITICAL],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \(\backslash\)E\_CORE\_ERROR\ =>\ [\textcolor{keyword}{null},\ LogLevel::CRITICAL],}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00087}00087\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00089}00089\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$thrownErrors\ =\ 0x1FFF;\ \textcolor{comment}{//\ E\_ALL\ -\/\ E\_DEPRECATED\ -\/\ E\_USER\_DEPRECATED}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00090}00090\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$scopedErrors\ =\ 0x1FFF;\ \textcolor{comment}{//\ E\_ALL\ -\/\ E\_DEPRECATED\ -\/\ E\_USER\_DEPRECATED}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00091}00091\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$tracedErrors\ =\ 0x77FB;\ \textcolor{comment}{//\ E\_ALL\ -\/\ E\_STRICT\ -\/\ E\_PARSE}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00092}00092\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$screamedErrors\ =\ 0x55;\ \textcolor{comment}{//\ E\_ERROR\ +\ E\_CORE\_ERROR\ +\ E\_COMPILE\_ERROR\ +\ E\_PARSE}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00093}00093\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$loggedErrors\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00094}00094\ \ \ \ \ private\ \(\backslash\)Closure\ \$configureException;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00095}00095\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$debug;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00097}00097\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$isRecursive\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00098}00098\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$isRoot\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00099}00099\ \ \ \ \ \textcolor{keyword}{private}\ \$exceptionHandler;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00100}00100\ \ \ \ \ \textcolor{keyword}{private}\ ?\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_buffering_logger}{BufferingLogger}}\ \$bootstrappingLogger\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00102}00102\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ ?\textcolor{keywordtype}{string}\ \$reservedMemory\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00103}00103\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ array\ \$silencedErrorCache\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00104}00104\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \$silencedErrorCount\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00105}00105\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \$exitCode\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00110}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_a148dd09d968c62a0cc6f11ab5c9438d4}{00110}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \textcolor{keyword}{register}(\textcolor{keyword}{self}\ \$handler\ =\ \textcolor{keyword}{null},\ \textcolor{keywordtype}{bool}\ \$replace\ =\ \textcolor{keyword}{true}):\ self}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00111}00111\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ self::\$reservedMemory)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ self::\$reservedMemory\ =\ str\_repeat(\textcolor{charliteral}{'x'},\ 32768);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ register\_shutdown\_function(\_\_CLASS\_\_.\textcolor{stringliteral}{'::handleFatalError'});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$handlerIsNew\ =\ \textcolor{keyword}{null}\ ===\ \$handler)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler\ =\ \textcolor{keyword}{new}\ \textcolor{keyword}{static}();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$prev\ =\ set\_error\_handler([\$handler,\ \textcolor{stringliteral}{'handleError'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ restore\_error\_handler();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Specifying\ the\ error\ types\ earlier\ would\ expose\ us\ to\ https://bugs.php.net/63206}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ set\_error\_handler([\$handler,\ \textcolor{stringliteral}{'handleError'}],\ \$handler-\/>thrownErrors\ |\ \$handler-\/>loggedErrors);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>isRoot\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$handlerIsNew\ \&\&\ \(\backslash\)is\_array(\$prev)\ \&\&\ \$prev[0]\ instanceof\ \textcolor{keyword}{self})\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler\ =\ \$prev[0];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \$replace\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$replace\ \&\&\ \$prev)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ restore\_error\_handler();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \$handlerIsRegistered\ =\ \(\backslash\)is\_array(\$prev)\ \&\&\ \$handler\ ===\ \$prev[0];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \$handlerIsRegistered\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_array(\$prev\ =\ set\_exception\_handler([\$handler,\ \textcolor{stringliteral}{'handleException'}]))\ \&\&\ \$prev[0]\ instanceof\ \textcolor{keyword}{self})\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ restore\_exception\_handler();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$handlerIsRegistered)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$handler\ =\ \$prev[0];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$handler\ !==\ \$prev[0]\ \&\&\ \$replace)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ set\_exception\_handler([\$handler,\ \textcolor{stringliteral}{'handleException'}]);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$p\ =\ \$prev[0]-\/>setExceptionHandler(\textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>setExceptionHandler(\$p);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$prev[0]-\/>setExceptionHandler(\$p);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>setExceptionHandler(\$prev\ ??\ [\$handler,\ \textcolor{stringliteral}{'renderException'}]);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \$handler-\/>throwAt(\(\backslash\)E\_ALL\ \&\ \$handler-\/>thrownErrors,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$handler;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00155}00155\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00162}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_ac934698e50fe3677ea4adb2881d460b9}{00162}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_ac934698e50fe3677ea4adb2881d460b9}{call}}(callable\ \$function,\ mixed\ ...\$arguments):\ mixed}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00163}00163\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ set\_error\_handler(\textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (\textcolor{keywordtype}{int}\ \$type,\ \textcolor{keywordtype}{string}\ \$message,\ \textcolor{keywordtype}{string}\ \$file,\ \textcolor{keywordtype}{int}\ \$line)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\_\_FILE\_\_\ ===\ \$file)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$trace\ =\ debug\_backtrace(\(\backslash\)DEBUG\_BACKTRACE\_IGNORE\_ARGS,\ 3);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$file\ =\ \$trace[2][\textcolor{stringliteral}{'file'}]\ ??\ \$file;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$line\ =\ \$trace[2][\textcolor{stringliteral}{'line'}]\ ??\ \$line;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)ErrorException(\$message,\ 0,\ \$type,\ \$file,\ \$line);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$function(...\$arguments);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{finally}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ restore\_error\_handler();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00179}00179\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00181}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_aabfdd26f37a8945c5a8ae8df35fe9e1e}{00181}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_aabfdd26f37a8945c5a8ae8df35fe9e1e}{\_\_construct}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_buffering_logger}{BufferingLogger}}\ \$bootstrappingLogger\ =\ \textcolor{keyword}{null},\ \textcolor{keywordtype}{bool}\ \$debug\ =\ \textcolor{keyword}{false})}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00182}00182\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$bootstrappingLogger)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>bootstrappingLogger\ =\ \$bootstrappingLogger;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_a3260341c17f9e7e2a67fa8a40f84ecc4}{setDefaultLogger}}(\$bootstrappingLogger);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \$traceReflector\ =\ new\ \(\backslash\)ReflectionProperty(\(\backslash\)Exception::class,\ \textcolor{stringliteral}{'trace'});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \$this-\/>configureException\ =\ \(\backslash\)Closure::bind(\textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (\$e,\ \$trace,\ \$file\ =\ \textcolor{keyword}{null},\ \$line\ =\ \textcolor{keyword}{null})\ use\ (\$traceReflector)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \$traceReflector-\/>setValue(\$e,\ \$trace);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \$e-\/>file\ =\ \$file\ ??\ \$e-\/>file;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \$e-\/>line\ =\ \$line\ ??\ \$e-\/>line;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \},\ \textcolor{keyword}{null},\ \textcolor{keyword}{new}\ \textcolor{keyword}{class}()\ extends\ \(\backslash\)Exception\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \$this-\/>debug\ =\ \$debug;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00195}00195\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00204}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_a3260341c17f9e7e2a67fa8a40f84ecc4}{00204}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_a3260341c17f9e7e2a67fa8a40f84ecc4}{setDefaultLogger}}(\mbox{\hyperlink{interface_psr_1_1_log_1_1_logger_interface}{LoggerInterface}}\ \$logger,\ array|\textcolor{keywordtype}{int}|\textcolor{keyword}{null}\ \$levels\ =\ \(\backslash\)E\_ALL,\ \textcolor{keywordtype}{bool}\ \$replace\ =\ \textcolor{keyword}{false}):\ void}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00205}00205\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \$loggers\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_array(\$levels))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$levels\ as\ \$type\ =>\ \$logLevel)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$this-\/>loggers[\$type][0])\ ||\ \$replace\ ||\ \$this-\/>loggers[\$type][0]\ ===\ \$this-\/>bootstrappingLogger)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$loggers[\$type]\ =\ [\$logger,\ \$logLevel];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \$levels\ ??=\ \(\backslash\)E\_ALL;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>loggers\ as\ \$type\ =>\ \$log)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\$type\ \&\ \$levels)\ \&\&\ (empty(\$log[0])\ ||\ \$replace\ ||\ \$log[0]\ ===\ \$this-\/>bootstrappingLogger))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$log[0]\ =\ \$logger;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$loggers[\$type]\ =\ \$log;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_a51a1316f38cc9c98ee6bb12027cb5b06}{setLoggers}}(\$loggers);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00225}00225\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00234}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_a51a1316f38cc9c98ee6bb12027cb5b06}{00234}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_a51a1316f38cc9c98ee6bb12027cb5b06}{setLoggers}}(array\ \$loggers):\ array}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00235}00235\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \$prevLogged\ =\ \$this-\/>loggedErrors;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \$prev\ =\ \$this-\/>loggers;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \$flush\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$loggers\ as\ \$type\ =>\ \$log)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$prev[\$type]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'Unknown\ error\ type:\ '}.\$type);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)is\_array(\$log))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$log\ =\ [\$log];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (!\(\backslash\)array\_key\_exists(0,\ \$log))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'No\ logger\ provided.'});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$log[0])\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>loggedErrors\ \&=\ \string~\$type;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$log[0]\ instanceof\ \mbox{\hyperlink{interface_psr_1_1_log_1_1_logger_interface}{LoggerInterface}})\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>loggedErrors\ |=\ \$type;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'Invalid\ logger\ provided.'});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>loggers[\$type]\ =\ \$log\ +\ \$prev[\$type];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>bootstrappingLogger\ \&\&\ \$prev[\$type][0]\ ===\ \$this-\/>bootstrappingLogger)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$flush[\$type]\ =\ \$type;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \$this-\/>reRegister(\$prevLogged\ |\ \$this-\/>thrownErrors);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$flush)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>bootstrappingLogger-\/>cleanLogs()\ as\ \$log)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$type\ =\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_throwable_utils_a6cfa7fc05fdad6de6f8e79bf4329e374}{ThrowableUtils::getSeverity}}(\$log[2][\textcolor{stringliteral}{'exception'}]);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$flush[\$type]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>bootstrappingLogger-\/>log(\$log[0],\ \$log[1],\ \$log[2]);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$this-\/>loggers[\$type][0])\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>loggers[\$type][0]-\/>log(\$this-\/>loggers[\$type][1],\ \$log[1],\ \$log[2]);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$prev;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00276}00276\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00278}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_ae8cdfc3d81e78a8c03dd3b06c9123f7f}{00278}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_ae8cdfc3d81e78a8c03dd3b06c9123f7f}{setExceptionHandler}}(?callable\ \$handler):\ ?callable}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00279}00279\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \$prev\ =\ \$this-\/>exceptionHandler;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \$this-\/>exceptionHandler\ =\ \$handler;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$prev;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00284}00284\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00292}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_ac2f38b4289ff4ed6de094080cb97d2a9}{00292}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_ac2f38b4289ff4ed6de094080cb97d2a9}{throwAt}}(\textcolor{keywordtype}{int}\ \$levels,\ \textcolor{keywordtype}{bool}\ \$replace\ =\ \textcolor{keyword}{false}):\ int}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00293}00293\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \$prev\ =\ \$this-\/>thrownErrors;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \$this-\/>thrownErrors\ =\ (\$levels\ |\ \(\backslash\)E\_RECOVERABLE\_ERROR\ |\ \(\backslash\)E\_USER\_ERROR)\ \&\ \string~\(\backslash\)E\_USER\_DEPRECATED\ \&\ \string~\(\backslash\)E\_DEPRECATED;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$replace)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>thrownErrors\ |=\ \$prev;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00299}00299\ \ \ \ \ \ \ \ \ \$this-\/>reRegister(\$prev\ |\ \$this-\/>loggedErrors);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00301}00301\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$prev;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00302}00302\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00310}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_aa638b4daa9f39635ec6160e3409976a7}{00310}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_aa638b4daa9f39635ec6160e3409976a7}{scopeAt}}(\textcolor{keywordtype}{int}\ \$levels,\ \textcolor{keywordtype}{bool}\ \$replace\ =\ \textcolor{keyword}{false}):\ int}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00311}00311\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \$prev\ =\ \$this-\/>scopedErrors;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00313}00313\ \ \ \ \ \ \ \ \ \$this-\/>scopedErrors\ =\ \$levels;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$replace)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>scopedErrors\ |=\ \$prev;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$prev;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00319}00319\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00320}00320\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00327}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_aefdd8587fb32e3027a99d5b85ab738d6}{00327}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_aefdd8587fb32e3027a99d5b85ab738d6}{traceAt}}(\textcolor{keywordtype}{int}\ \$levels,\ \textcolor{keywordtype}{bool}\ \$replace\ =\ \textcolor{keyword}{false}):\ int}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00328}00328\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \$prev\ =\ \$this-\/>tracedErrors;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \$this-\/>tracedErrors\ =\ \$levels;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$replace)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>tracedErrors\ |=\ \$prev;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00334}00334\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$prev;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00336}00336\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00344}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_ac8ad3369e3cb9ca59e3a504e3e85ed02}{00344}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_ac8ad3369e3cb9ca59e3a504e3e85ed02}{screamAt}}(\textcolor{keywordtype}{int}\ \$levels,\ \textcolor{keywordtype}{bool}\ \$replace\ =\ \textcolor{keyword}{false}):\ int}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00345}00345\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \$prev\ =\ \$this-\/>screamedErrors;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \$this-\/>screamedErrors\ =\ \$levels;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$replace)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>screamedErrors\ |=\ \$prev;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00350}00350\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00351}00351\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$prev;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00353}00353\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00358}00358\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ reRegister(\textcolor{keywordtype}{int}\ \$prev):\ void}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00359}00359\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$prev\ !==\ (\$this-\/>thrownErrors\ |\ \$this-\/>loggedErrors))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler\ =\ set\_error\_handler(\textcolor{stringliteral}{'is\_int'});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler\ =\ \(\backslash\)is\_array(\$handler)\ ?\ \$handler[0]\ :\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \ \ \ restore\_error\_handler();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$handler\ ===\ \$this)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ restore\_error\_handler();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>isRoot)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ set\_error\_handler([\$this,\ \textcolor{stringliteral}{'handleError'}],\ \$this-\/>thrownErrors\ |\ \$this-\/>loggedErrors);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ set\_error\_handler([\$this,\ \textcolor{stringliteral}{'handleError'}]);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00370}00370\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00373}00373\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00384}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_ac01788920669836bf723e56830814e59}{00384}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_ac01788920669836bf723e56830814e59}{handleError}}(\textcolor{keywordtype}{int}\ \$type,\ \textcolor{keywordtype}{string}\ \$message,\ \textcolor{keywordtype}{string}\ \$file,\ \textcolor{keywordtype}{int}\ \$line):\ bool}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00385}00385\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)E\_WARNING\ ===\ \$type\ \&\&\ \textcolor{charliteral}{'"{}'}\ ===\ \$message[0]\ \&\&\ str\_contains(\$message,\ \textcolor{stringliteral}{'"{}\ targeting\ switch\ is\ equivalent\ to\ "{}break'}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \ \ \ \ \$type\ =\ \(\backslash\)E\_DEPRECATED;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Level\ is\ the\ current\ error\ reporting\ level\ to\ manage\ silent\ error.}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \$level\ =\ error\_reporting();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \$silenced\ =\ 0\ ===\ (\$level\ \&\ \$type);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Strong\ errors\ are\ not\ authorized\ to\ be\ silenced.}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \$level\ |=\ \(\backslash\)E\_RECOVERABLE\_ERROR\ |\ \(\backslash\)E\_USER\_ERROR\ |\ \(\backslash\)E\_DEPRECATED\ |\ \(\backslash\)E\_USER\_DEPRECATED;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \$log\ =\ \$this-\/>loggedErrors\ \&\ \$type;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00396}00396\ \ \ \ \ \ \ \ \ \$throw\ =\ \$this-\/>thrownErrors\ \&\ \$type\ \&\ \$level;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \$type\ \&=\ \$level\ |\ \$this-\/>screamedErrors;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00399}00399\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Never\ throw\ on\ warnings\ triggered\ by\ assert()}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00400}00400\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)E\_WARNING\ ===\ \$type\ \&\&\ \textcolor{charliteral}{'a'}\ ===\ \$message[0]\ \&\&\ 0\ ===\ strncmp(\$message,\ \textcolor{stringliteral}{'assert():\ '},\ 10))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ \$throw\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00403}00403\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$type\ ||\ (!\$log\ \&\&\ !\$throw))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00406}00406\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00407}00407\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \$logMessage\ =\ \$this-\/>levels[\$type].\textcolor{stringliteral}{':\ '}.\$message;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00409}00409\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00410}00410\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$throw\ \&\&\ !(\$type\ \&\ \$level))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(self::\$silencedErrorCache[\$id\ =\ \$file.\textcolor{charliteral}{':'}.\$line]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$lightTrace\ =\ \$this-\/>tracedErrors\ \&\ \$type\ ?\ \$this-\/>cleanTrace(debug\_backtrace(\(\backslash\)DEBUG\_BACKTRACE\_IGNORE\_ARGS,\ 5),\ \$type,\ \$file,\ \$line,\ \textcolor{keyword}{false})\ :\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00413}00413\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$errorAsException\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_exception_1_1_silenced_error_context}{SilencedErrorContext}}(\$type,\ \$file,\ \$line,\ isset(\$lightTrace[1])\ ?\ [\$lightTrace[0]]\ :\ \$lightTrace);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (isset(self::\$silencedErrorCache[\$id][\$message]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00415}00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$lightTrace\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00416}00416\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$errorAsException\ =\ self::\$silencedErrorCache[\$id][\$message];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++\$errorAsException-\/>count;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00418}00418\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$lightTrace\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$errorAsException\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00421}00421\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00422}00422\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00423}00423\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (100\ <\ ++self::\$silencedErrorCount)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self::\$silencedErrorCache\ =\ \$lightTrace\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self::\$silencedErrorCount\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$errorAsException)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self::\$silencedErrorCache[\$id][\$message]\ =\ \$errorAsException;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$lightTrace)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$message,\ \textcolor{stringliteral}{'@anonymous'}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$backtrace\ =\ debug\_backtrace(\textcolor{keyword}{false},\ 5);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 1;\ isset(\$backtrace[\$i]);\ ++\$i)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$backtrace[\$i][\textcolor{stringliteral}{'function'}],\ \$backtrace[\$i][\textcolor{stringliteral}{'args'}][0])}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ (\textcolor{stringliteral}{'trigger\_error'}\ ===\ \$backtrace[\$i][\textcolor{stringliteral}{'function'}]\ ||\ \textcolor{stringliteral}{'user\_error'}\ ===\ \$backtrace[\$i][\textcolor{stringliteral}{'function'}])}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$backtrace[\$i][\textcolor{stringliteral}{'args'}][0]\ !==\ \$message)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \$this-\/>parseAnonymousClass(\$backtrace[\$i][\textcolor{stringliteral}{'args'}][0]);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$logMessage\ =\ \$this-\/>levels[\$type].\textcolor{stringliteral}{':\ '}.\$message;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00445}00445\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00446}00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00447}00447\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00450}00450\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \ \ \ \ \$errorAsException\ =\ new\ \(\backslash\)ErrorException(\$logMessage,\ 0,\ \$type,\ \$file,\ \$line);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$throw\ ||\ \$this-\/>tracedErrors\ \&\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$backtrace\ =\ \$errorAsException-\/>getTrace();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$backtrace\ =\ \$this-\/>cleanTrace(\$backtrace,\ \$type,\ \$file,\ \$line,\ \$throw);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\$this-\/>configureException)(\$errorAsException,\ \$backtrace,\ \$file,\ \$line);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\$this-\/>configureException)(\$errorAsException,\ []);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00460}00460\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00461}00461\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$throw)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$errorAsException;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00465}00465\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>isRecursive)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00467}00467\ \ \ \ \ \ \ \ \ \ \ \ \ \$log\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00468}00468\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00470}00470\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>isRecursive\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$level\ =\ (\$type\ \&\ \$level)\ ?\ \$this-\/>loggers[\$type][1]\ :\ LogLevel::DEBUG;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>loggers[\$type][0]-\/>log(\$level,\ \$logMessage,\ \$errorAsException\ ?\ [\textcolor{stringliteral}{'exception'}\ =>\ \$errorAsException]\ :\ []);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{finally}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00474}00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>isRecursive\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00477}00477\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !\$silenced\ \&\&\ \$type\ \&\&\ \$log;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00479}00479\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00480}00480\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00486}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_abea24535c19b48771fb45b4e776655fe}{00486}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_abea24535c19b48771fb45b4e776655fe}{handleException}}(\(\backslash\)Throwable\ \$exception):\ void}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00487}00487\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \$handlerException\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00489}00489\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00490}00490\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$exception\ instanceof\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_1_1_fatal_error}{FatalError}})\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00491}00491\ \ \ \ \ \ \ \ \ \ \ \ \ self::\$exitCode\ =\ 255;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00492}00492\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00493}00493\ \ \ \ \ \ \ \ \ \ \ \ \ \$type\ =\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_throwable_utils_a6cfa7fc05fdad6de6f8e79bf4329e374}{ThrowableUtils::getSeverity}}(\$exception);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00495}00495\ \ \ \ \ \ \ \ \ \ \ \ \ \$type\ =\ \$exception-\/>getError()[\textcolor{stringliteral}{'type'}];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00497}00497\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00498}00498\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>loggedErrors\ \&\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$message\ =\ \$exception-\/>getMessage(),\ \textcolor{stringliteral}{"{}@anonymous\(\backslash\)0"{}}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \$this-\/>parseAnonymousClass(\$message);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00501}00501\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00502}00502\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00503}00503\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$exception\ instanceof\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_1_1_fatal_error}{FatalError}})\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \textcolor{stringliteral}{'Fatal\ '}.\$message;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$exception\ instanceof\ \(\backslash\)Error)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00506}00506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \textcolor{stringliteral}{'Uncaught\ Error:\ '}.\$message;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00507}00507\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$exception\ instanceof\ \(\backslash\)ErrorException)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00508}00508\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \textcolor{stringliteral}{'Uncaught\ '}.\$message;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00509}00509\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ =\ \textcolor{stringliteral}{'Uncaught\ Exception:\ '}.\$message;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00512}00512\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>loggers[\$type][0]-\/>log(\$this-\/>loggers[\$type][1],\ \$message,\ [\textcolor{stringliteral}{'exception'}\ =>\ \$exception]);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Throwable\ \$handlerException)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00518}00518\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$exception\ instanceof\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_1_1_out_of_memory_error}{OutOfMemoryError}})\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_a139a96354c2925c5f8cd95ff4b053ec1}{getErrorEnhancers}}()\ as\ \$errorEnhancer)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$e\ =\ \$errorEnhancer-\/>enhance(\$exception))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$exception\ =\ \$e;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00524}00524\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00525}00525\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00527}00527\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00528}00528\ \ \ \ \ \ \ \ \ \$exceptionHandler\ =\ \$this-\/>exceptionHandler;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \$this-\/>exceptionHandler\ =\ [\$this,\ \textcolor{stringliteral}{'renderException'}];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00530}00530\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$exceptionHandler\ ||\ \$exceptionHandler\ ===\ \$this-\/>exceptionHandler)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>exceptionHandler\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00533}00533\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00534}00534\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00535}00535\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00536}00536\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$exceptionHandler)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00537}00537\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$exceptionHandler(\$exception);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00538}00538\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00539}00539\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00541}00541\ \ \ \ \ \ \ \ \ \ \ \ \ \$handlerException\ ??=\ \$exception;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Throwable\ \$handlerException)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00543}00543\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00544}00544\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$exception\ ===\ \$handlerException\ \&\&\ \textcolor{keyword}{null}\ ===\ \$this-\/>exceptionHandler)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \ \ \ \ self::\$reservedMemory\ =\ \textcolor{keyword}{null};\ \textcolor{comment}{//\ Disable\ the\ fatal\ error\ handler}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$exception;\ \textcolor{comment}{//\ Give\ back\ \$exception\ to\ the\ native\ handler}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00547}00547\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00548}00548\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \$loggedErrors\ =\ \$this-\/>loggedErrors;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00550}00550\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$exception\ ===\ \$handlerException)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00551}00551\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>loggedErrors\ \&=\ \string~\$type;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00552}00552\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00553}00553\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00554}00554\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00555}00555\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_abea24535c19b48771fb45b4e776655fe}{handleException}}(\$handlerException);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00556}00556\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{finally}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00557}00557\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>loggedErrors\ =\ \$loggedErrors;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00558}00558\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00559}00559\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00560}00560\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00568}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_a3433bbc8258d6c1bfe7be3de416622be}{00568}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_a3433bbc8258d6c1bfe7be3de416622be}{handleFatalError}}(array\ \$error\ =\ \textcolor{keyword}{null}):\ void}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00569}00569\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00570}00570\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ self::\$reservedMemory)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00571}00571\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00572}00572\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00573}00573\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00574}00574\ \ \ \ \ \ \ \ \ \$handler\ =\ self::\$reservedMemory\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00575}00575\ \ \ \ \ \ \ \ \ \$handlers\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00576}00576\ \ \ \ \ \ \ \ \ \$previousHandler\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \$sameHandlerLimit\ =\ 10;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00578}00578\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00579}00579\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (!\(\backslash\)is\_array(\$handler)\ ||\ !\$handler[0]\ instanceof\ \textcolor{keyword}{self})\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00580}00580\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler\ =\ set\_exception\_handler(\textcolor{stringliteral}{'is\_int'});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \ \ \ \ restore\_exception\_handler();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00582}00582\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00583}00583\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$handler)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00585}00585\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00586}00586\ \ \ \ \ \ \ \ \ \ \ \ \ restore\_exception\_handler();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00587}00587\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00588}00588\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$handler\ !==\ \$previousHandler)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00589}00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_unshift(\$handlers,\ \$handler);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00590}00590\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$previousHandler\ =\ \$handler;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00591}00591\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (0\ ===\ -\/-\/\$sameHandlerLimit)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00592}00592\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$handler\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00593}00593\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00594}00594\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00595}00595\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$handlers\ as\ \$h)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00597}00597\ \ \ \ \ \ \ \ \ \ \ \ \ set\_exception\_handler(\$h);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00598}00598\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00599}00599\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$handler)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00600}00600\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00601}00601\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00602}00602\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$handler\ !==\ \$h)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00603}00603\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler[0]-\/>setExceptionHandler(\$h);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00604}00604\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00605}00605\ \ \ \ \ \ \ \ \ \$handler\ =\ \$handler[0];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00606}00606\ \ \ \ \ \ \ \ \ \$handlers\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00607}00607\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00608}00608\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$exit\ =\ \textcolor{keyword}{null}\ ===\ \$error)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \ \ \$error\ =\ error\_get\_last();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00611}00611\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00612}00612\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$error\ \&\&\ \$error[\textcolor{stringliteral}{'type'}]\ \&=\ \(\backslash\)E\_PARSE\ |\ \(\backslash\)E\_ERROR\ |\ \(\backslash\)E\_CORE\_ERROR\ |\ \(\backslash\)E\_COMPILE\_ERROR)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00613}00613\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Let's\ not\ throw\ anymore\ but\ keep\ logging}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00614}00614\ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>throwAt(0,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00615}00615\ \ \ \ \ \ \ \ \ \ \ \ \ \$trace\ =\ \$error[\textcolor{stringliteral}{'backtrace'}]\ ??\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00616}00616\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00617}00617\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\$error[\textcolor{stringliteral}{'message'}],\ \textcolor{stringliteral}{'Allowed\ memory'})\ ||\ str\_starts\_with(\$error[\textcolor{stringliteral}{'message'}],\ \textcolor{stringliteral}{'Out\ of\ memory'}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00618}00618\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$fatalError\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_1_1_out_of_memory_error}{OutOfMemoryError}}(\$handler-\/>levels[\$error[\textcolor{stringliteral}{'type'}]].\textcolor{stringliteral}{':\ '}.\$error[\textcolor{stringliteral}{'message'}],\ 0,\ \$error,\ 2,\ \textcolor{keyword}{false},\ \$trace);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00619}00619\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00620}00620\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$fatalError\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_1_1_fatal_error}{FatalError}}(\$handler-\/>levels[\$error[\textcolor{stringliteral}{'type'}]].\textcolor{stringliteral}{':\ '}.\$error[\textcolor{stringliteral}{'message'}],\ 0,\ \$error,\ 2,\ \textcolor{keyword}{true},\ \$trace);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00622}00622\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00623}00623\ \ \ \ \ \ \ \ \ \ \ \ \ \$fatalError\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00624}00624\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00625}00625\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00626}00626\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00627}00627\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$fatalError)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00628}00628\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self::\$exitCode\ =\ 255;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00629}00629\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$handler-\/>handleException(\$fatalError);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00630}00630\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00631}00631\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_1_1_fatal_error}{FatalError}})\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00632}00632\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Ignore\ this\ re-\/throw}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00633}00633\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00634}00634\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00635}00635\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$exit\ \&\&\ self::\$exitCode)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \ \$exitCode\ =\ self::\$exitCode;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \ \ register\_shutdown\_function(\textcolor{stringliteral}{'register\_shutdown\_function'},\ \textcolor{keyword}{function}\ ()\ use\ (\$exitCode)\ \{\ exit(\$exitCode);\ \});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00638}00638\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00639}00639\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00640}00640\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00647}00647\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ renderException(\(\backslash\)Throwable\ \$exception):\ void}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00648}00648\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00649}00649\ \ \ \ \ \ \ \ \ \$renderer\ =\ \(\backslash\)in\_array(\(\backslash\)PHP\_SAPI,\ [\textcolor{stringliteral}{'cli'},\ \textcolor{stringliteral}{'phpdbg'}],\ \textcolor{keyword}{true})\ ?\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_renderer_1_1_cli_error_renderer}{CliErrorRenderer}}()\ :\ new\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_renderer_1_1_html_error_renderer}{HtmlErrorRenderer}}(\$this-\/>debug);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00650}00650\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00651}00651\ \ \ \ \ \ \ \ \ \$exception\ =\ \$renderer-\/>render(\$exception);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00652}00652\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00653}00653\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!headers\_sent())\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00654}00654\ \ \ \ \ \ \ \ \ \ \ \ \ http\_response\_code(\$exception-\/>getStatusCode());}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00655}00655\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00656}00656\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$exception-\/>getHeaders()\ as\ \$name\ =>\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00657}00657\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ header(\$name.\textcolor{stringliteral}{':\ '}.\$value,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00658}00658\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00659}00659\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00660}00660\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00661}00661\ \ \ \ \ \ \ \ \ echo\ \$exception-\/>getAsString();}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00662}00662\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00663}00663\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00669}\mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_a139a96354c2925c5f8cd95ff4b053ec1}{00669}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_handler_a139a96354c2925c5f8cd95ff4b053ec1}{getErrorEnhancers}}():\ iterable}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00670}00670\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00671}00671\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00672}00672\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_enhancer_1_1_undefined_function_error_enhancer}{UndefinedFunctionErrorEnhancer}}(),}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00673}00673\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_enhancer_1_1_undefined_method_error_enhancer}{UndefinedMethodErrorEnhancer}}(),}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00674}00674\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_error_handler_1_1_error_enhancer_1_1_class_not_found_error_enhancer}{ClassNotFoundErrorEnhancer}}(),}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00675}00675\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00676}00676\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00677}00677\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00681}00681\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ cleanTrace(array\ \$backtrace,\ \textcolor{keywordtype}{int}\ \$type,\ \textcolor{keywordtype}{string}\ \&\$file,\ \textcolor{keywordtype}{int}\ \&\$line,\ \textcolor{keywordtype}{bool}\ \$throw):\ array}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00682}00682\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00683}00683\ \ \ \ \ \ \ \ \ \$lightTrace\ =\ \$backtrace;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00684}00684\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00685}00685\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 0;\ isset(\$backtrace[\$i]);\ ++\$i)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00686}00686\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$backtrace[\$i][\textcolor{stringliteral}{'file'}],\ \$backtrace[\$i][\textcolor{stringliteral}{'line'}])\ \&\&\ \$backtrace[\$i][\textcolor{stringliteral}{'line'}]\ ===\ \$line\ \&\&\ \$backtrace[\$i][\textcolor{stringliteral}{'file'}]\ ===\ \$file)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00687}00687\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$lightTrace\ =\ \(\backslash\)array\_slice(\$lightTrace,\ 1\ +\ \$i);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00688}00688\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00689}00689\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00690}00690\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00691}00691\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)E\_USER\_DEPRECATED\ ===\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00692}00692\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 0;\ isset(\$lightTrace[\$i]);\ ++\$i)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00693}00693\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$lightTrace[\$i][\textcolor{stringliteral}{'file'}],\ \$lightTrace[\$i][\textcolor{stringliteral}{'line'}],\ \$lightTrace[\$i][\textcolor{stringliteral}{'function'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00694}00694\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00695}00695\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00696}00696\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$lightTrace[\$i][\textcolor{stringliteral}{'class'}])\ \&\&\ \textcolor{stringliteral}{'trigger\_deprecation'}\ ===\ \$lightTrace[\$i][\textcolor{stringliteral}{'function'}])\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00697}00697\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$file\ =\ \$lightTrace[\$i][\textcolor{stringliteral}{'file'}];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00698}00698\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$line\ =\ \$lightTrace[\$i][\textcolor{stringliteral}{'line'}];}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00699}00699\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$lightTrace\ =\ \(\backslash\)array\_slice(\$lightTrace,\ 1\ +\ \$i);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00700}00700\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00701}00701\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00702}00702\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00703}00703\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00704}00704\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (class\_exists(DebugClassLoader::class,\ \textcolor{keyword}{false}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00705}00705\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ \(\backslash\)count(\$lightTrace)\ -\/\ 2;\ 0\ <\ \$i;\ -\/-\/\$i)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00706}00706\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (DebugClassLoader::class\ ===\ (\$lightTrace[\$i][\textcolor{stringliteral}{'class'}]\ ??\ \textcolor{keyword}{null}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00707}00707\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ array\_splice(\$lightTrace,\ -\/-\/\$i,\ 2);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00708}00708\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00709}00709\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00710}00710\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00711}00711\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(\$throw\ ||\ \$this-\/>scopedErrors\ \&\ \$type))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00712}00712\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 0;\ isset(\$lightTrace[\$i]);\ ++\$i)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00713}00713\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$lightTrace[\$i][\textcolor{stringliteral}{'args'}],\ \$lightTrace[\$i][\textcolor{stringliteral}{'object'}]);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00714}00714\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00715}00715\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00716}00716\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00717}00717\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$lightTrace;}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00718}00718\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00719}00719\ }
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00724}00724\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ parseAnonymousClass(\textcolor{keywordtype}{string}\ \$message):\ string}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00725}00725\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00726}00726\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ preg\_replace\_callback(\textcolor{stringliteral}{'/[a-\/zA-\/Z\_\(\backslash\)x7f-\/\(\backslash\)xff][\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\)a-\/zA-\/Z0-\/9\_\(\backslash\)x7f-\/\(\backslash\)xff]*+@anonymous\(\backslash\)x00.*?\(\backslash\).php(?:0x?|:[0-\/9]++\(\backslash\)\$)[0-\/9a-\/fA-\/F]++/'},\ \textcolor{keyword}{static}\ fn\ (\$m)\ =>\ class\_exists(\$m[0],\ \textcolor{keyword}{false})\ ?\ (get\_parent\_class(\$m[0])\ ?:\ key(class\_implements(\$m[0]))\ ?:\ \textcolor{stringliteral}{'class'}).\textcolor{stringliteral}{'@anonymous'}\ :\ \$m[0],\ \$message);}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00727}00727\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2error-handler_2_error_handler_8php_source_l00728}00728\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,226 @@
+\doxysection{Parsing\+File\+Analyser.\+php}
+\hypertarget{_parsing_file_analyser_8php_source}{}\label{_parsing_file_analyser_8php_source}\index{vendor/phpunit/php-\/code-\/coverage/src/StaticAnalysis/ParsingFileAnalyser.php@{vendor/phpunit/php-\/code-\/coverage/src/StaticAnalysis/ParsingFileAnalyser.php}}
+\mbox{\hyperlink{_parsing_file_analyser_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ phpunit/php-\/code-\/coverage.}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)StaticAnalysis}};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00012}00012\ use\ \textcolor{keyword}{function}\ array\_merge;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ array\_unique;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ file\_get\_contents;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00016}00016\ use\ \textcolor{keyword}{function}\ is\_array;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00017}00017\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_support_1_1_traits_a56d9fc87df339998f88486b0b09214c0}{max}};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00018}00018\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_carbon_1_1_traits_a3868d62595946c978f9a2fd71bd3fab8}{range}};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00019}00019\ use\ \textcolor{keyword}{function}\ sort;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00020}00020\ use\ \textcolor{keyword}{function}\ sprintf;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00021}00021\ use\ \textcolor{keyword}{function}\ substr\_count;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00022}00022\ use\ \textcolor{keyword}{function}\ token\_get\_all;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00023}00023\ use\ \textcolor{keyword}{function}\ trim;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00024}00024\ use\ \mbox{\hyperlink{class_php_parser_1_1_error}{PhpParser\(\backslash\)Error}};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00025}00025\ use\ \mbox{\hyperlink{namespace_php_parser_1_1_lexer}{PhpParser\(\backslash\)Lexer}};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00026}00026\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_traverser}{PhpParser\(\backslash\)NodeTraverser}};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00027}00027\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_visitor_1_1_name_resolver}{PhpParser\(\backslash\)NodeVisitor\(\backslash\)NameResolver}};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00028}00028\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_visitor_1_1_parent_connecting_visitor}{PhpParser\(\backslash\)NodeVisitor\(\backslash\)ParentConnectingVisitor}};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00029}00029\ use\ \mbox{\hyperlink{class_php_parser_1_1_parser_factory}{PhpParser\(\backslash\)ParserFactory}};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00030}00030\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_parser_exception}{SebastianBergmann\(\backslash\)CodeCoverage\(\backslash\)ParserException}};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00031}00031\ use\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_lines_of_code_1_1_line_counting_visitor}{SebastianBergmann\(\backslash\)LinesOfCode\(\backslash\)LineCountingVisitor}};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00043}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser}{00043}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser}{ParsingFileAnalyser}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_file_analyser}{FileAnalyser}}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00044}00044\ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00048}00048\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$classes\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$traits\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00058}00058\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$functions\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00063}00063\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$linesOfCode\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00068}00068\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$ignoredLines\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00073}00073\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$executableLines\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00074}00074\ \ \ \ \ \textcolor{keyword}{private}\ readonly\ \textcolor{keywordtype}{bool}\ \$useAnnotationsForIgnoringCode;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00075}00075\ \ \ \ \ \textcolor{keyword}{private}\ readonly\ \textcolor{keywordtype}{bool}\ \$ignoreDeprecatedCode;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00077}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_a92d67bc2becddc4e6cfe926f0bd2a239}{00077}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_a92d67bc2becddc4e6cfe926f0bd2a239}{\_\_construct}}(\textcolor{keywordtype}{bool}\ \$useAnnotationsForIgnoringCode,\ \textcolor{keywordtype}{bool}\ \$ignoreDeprecatedCode)}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00078}00078\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \$this-\/>useAnnotationsForIgnoringCode\ =\ \$useAnnotationsForIgnoringCode;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \$this-\/>ignoreDeprecatedCode\ \ \ \ \ \ \ \ \ \ =\ \$ignoreDeprecatedCode;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00081}00081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00083}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_a4963d0a318ad2edcac88f5361f7b3e9b}{00083}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_a4963d0a318ad2edcac88f5361f7b3e9b}{classesIn}}(\textcolor{keywordtype}{string}\ \$filename):\ array}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00084}00084\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \$this-\/>analyse(\$filename);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>classes[\$filename];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00088}00088\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00090}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_a88b517a9d4f4b2dc1adb505041814b79}{00090}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_a88b517a9d4f4b2dc1adb505041814b79}{traitsIn}}(\textcolor{keywordtype}{string}\ \$filename):\ array}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00091}00091\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \$this-\/>analyse(\$filename);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>traits[\$filename];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00095}00095\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00097}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_a8debaf96a4fc2224e1f164b52e02a099}{00097}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_a8debaf96a4fc2224e1f164b52e02a099}{functionsIn}}(\textcolor{keywordtype}{string}\ \$filename):\ array}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00098}00098\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \$this-\/>analyse(\$filename);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>functions[\$filename];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00102}00102\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00104}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_af4bccadbc371c62fc4f59a22977ea050}{00104}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_af4bccadbc371c62fc4f59a22977ea050}{linesOfCodeFor}}(\textcolor{keywordtype}{string}\ \$filename):\ array}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00105}00105\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \$this-\/>analyse(\$filename);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>linesOfCode[\$filename];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00109}00109\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00111}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_aa980224164977b7af87d62f5402696f4}{00111}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_aa980224164977b7af87d62f5402696f4}{executableLinesIn}}(\textcolor{keywordtype}{string}\ \$filename):\ array}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00112}00112\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \$this-\/>analyse(\$filename);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00114}00114\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>executableLines[\$filename];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00116}00116\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00118}\mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_a832886c1708121775fdb1e0d02e72509}{00118}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_sebastian_bergmann_1_1_code_coverage_1_1_static_analysis_1_1_parsing_file_analyser_a832886c1708121775fdb1e0d02e72509}{ignoredLinesFor}}(\textcolor{keywordtype}{string}\ \$filename):\ array}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00119}00119\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \$this-\/>analyse(\$filename);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>ignoredLines[\$filename];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00123}00123\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00128}00128\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ analyse(\textcolor{keywordtype}{string}\ \$filename):\ void}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00129}00129\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>classes[\$filename]))\ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \$source\ \ \ \ \ \ =\ file\_get\_contents(\$filename);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \$linesOfCode\ =\ max(substr\_count(\$source,\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}})\ +\ 1,\ substr\_count(\$source,\ \textcolor{stringliteral}{"{}\(\backslash\)r"{}})\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$linesOfCode\ ===\ 0\ \&\&\ !empty(\$source))\ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \$linesOfCode\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ assert(\$linesOfCode\ >\ 0);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \$parser\ =\ (\textcolor{keyword}{new}\ ParserFactory)-\/>create(}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_php_parser_1_1_parser_factory_a6cb5c8b69d76ac8bbf4bfd968c95c6f6}{ParserFactory::PREFER\_PHP7}},}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ Lexer}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \$nodes\ =\ \$parser-\/>parse(\$source);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\$nodes\ !==\ \textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \$traverser\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{new}\ NodeTraverser;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \$codeUnitFindingVisitor\ \ \ \ \ \ \ \ =\ \textcolor{keyword}{new}\ CodeUnitFindingVisitor;}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \$lineCountingVisitor\ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{new}\ LineCountingVisitor(\$linesOfCode);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \$ignoredLinesFindingVisitor\ \ \ \ =\ \textcolor{keyword}{new}\ IgnoredLinesFindingVisitor(\$this-\/>useAnnotationsForIgnoringCode,\ \$this-\/>ignoreDeprecatedCode);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \$executableLinesFindingVisitor\ =\ \textcolor{keyword}{new}\ ExecutableLinesFindingVisitor(\$source);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \$traverser-\/>addVisitor(\textcolor{keyword}{new}\ NameResolver);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \$traverser-\/>addVisitor(\textcolor{keyword}{new}\ ParentConnectingVisitor);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \$traverser-\/>addVisitor(\$codeUnitFindingVisitor);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \$traverser-\/>addVisitor(\$lineCountingVisitor);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \$traverser-\/>addVisitor(\$ignoredLinesFindingVisitor);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \$traverser-\/>addVisitor(\$executableLinesFindingVisitor);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00165}00165\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ @noinspection\ UnusedFunctionResultInspection\ */}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \$traverser-\/>traverse(\$nodes);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @codeCoverageIgnoreStart}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Error\ \$error)\ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ ParserException(}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sprintf(}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Cannot\ parse\ \%s:\ \%s'},}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$filename,}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$error-\/>getMessage()}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$error-\/>getCode(),}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$error}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @codeCoverageIgnoreEnd}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00181}00181\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \$this-\/>classes[\$filename]\ \ \ \ \ \ \ \ \ =\ \$codeUnitFindingVisitor-\/>classes();}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \$this-\/>traits[\$filename]\ \ \ \ \ \ \ \ \ \ =\ \$codeUnitFindingVisitor-\/>traits();}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \$this-\/>functions[\$filename]\ \ \ \ \ \ \ =\ \$codeUnitFindingVisitor-\/>functions();}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \$this-\/>executableLines[\$filename]\ =\ \$executableLinesFindingVisitor-\/>executableLinesGroupedByBranch();}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \$this-\/>ignoredLines[\$filename]\ \ \ \ =\ [];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \$this-\/>findLinesIgnoredByLineBasedAnnotations(\$filename,\ \$source,\ \$this-\/>useAnnotationsForIgnoringCode);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \$this-\/>ignoredLines[\$filename]\ =\ array\_unique(}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ array\_merge(}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>ignoredLines[\$filename],}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$ignoredLinesFindingVisitor-\/>ignoredLines()}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ sort(\$this-\/>ignoredLines[\$filename]);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \$result\ =\ \$lineCountingVisitor-\/>result();}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \$this-\/>linesOfCode[\$filename]\ =\ [}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'linesOfCode'}\ \ \ \ \ \ \ \ \ \ \ =>\ \$result-\/>linesOfCode(),}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'commentLinesOfCode'}\ \ \ \ =>\ \$result-\/>commentLinesOfCode(),}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'nonCommentLinesOfCode'}\ =>\ \$result-\/>nonCommentLinesOfCode(),}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00206}00206\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00208}00208\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ findLinesIgnoredByLineBasedAnnotations(\textcolor{keywordtype}{string}\ \$filename,\ \textcolor{keywordtype}{string}\ \$source,\ \textcolor{keywordtype}{bool}\ \$useAnnotationsForIgnoringCode):\ void}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00209}00209\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$useAnnotationsForIgnoringCode)\ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \$start\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (token\_get\_all(\$source)\ as\ \$token)\ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_array(\$token)\ ||}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !(T\_COMMENT\ ===\ \$token[0]\ ||\ T\_DOC\_COMMENT\ ===\ \$token[0]))\ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \$comment\ =\ trim(\$token[1]);}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$comment\ ===\ \textcolor{stringliteral}{'//\ @codeCoverageIgnore'}\ ||}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$comment\ ===\ \textcolor{stringliteral}{'//@codeCoverageIgnore'})\ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>ignoredLines[\$filename][]\ =\ \$token[2];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00230}00230\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$comment\ ===\ \textcolor{stringliteral}{'//\ @codeCoverageIgnoreStart'}\ ||}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$comment\ ===\ \textcolor{stringliteral}{'//@codeCoverageIgnoreStart'})\ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$start\ =\ \$token[2];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$comment\ ===\ \textcolor{stringliteral}{'//\ @codeCoverageIgnoreEnd'}\ ||}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$comment\ ===\ \textcolor{stringliteral}{'//@codeCoverageIgnoreEnd'})\ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{false}\ ===\ \$start)\ \{}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$start\ =\ \$token[2];}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00243}00243\ }
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>ignoredLines[\$filename]\ =\ array\_merge(}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>ignoredLines[\$filename],}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_carbon_1_1_traits_a3868d62595946c978f9a2fd71bd3fab8}{range}}(\$start,\ \$token[2])}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00250}00250\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_parsing_file_analyser_8php_source_l00251}00251\ \}}
+
+\end{DoxyCode}

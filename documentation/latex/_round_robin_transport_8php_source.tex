@@ -1,0 +1,117 @@
+\doxysection{Round\+Robin\+Transport.\+php}
+\hypertarget{_round_robin_transport_8php_source}{}\label{_round_robin_transport_8php_source}\index{vendor/symfony/mailer/Transport/RoundRobinTransport.php@{vendor/symfony/mailer/Transport/RoundRobinTransport.php}}
+\mbox{\hyperlink{_round_robin_transport_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_mailer_1_1_transport}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Transport}};}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_envelope}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Envelope}};}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_transport_exception}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Exception\(\backslash\)TransportException}};}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00016}00016\ use\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_transport_exception_interface}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)Exception\(\backslash\)TransportExceptionInterface}};}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_sent_message}{Symfony\(\backslash\)Component\(\backslash\)Mailer\(\backslash\)SentMessage}};}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mime_1_1_raw_message}{Symfony\(\backslash\)Component\(\backslash\)Mime\(\backslash\)RawMessage}};}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00025}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport}{00025}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport}{RoundRobinTransport}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_transport_interface}{TransportInterface}}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00026}00026\ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00030}00030\ \ \ \ \ private\ \(\backslash\)SplObjectStorage\ \$deadTransports;}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$transports\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$retryPeriod;}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00033}00033\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$cursor\ =\ -\/1;}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00038}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_a51ac2ade2a3d06dbccc0da7d782c8262}{00038}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_a51ac2ade2a3d06dbccc0da7d782c8262}{\_\_construct}}(array\ \$transports,\ \textcolor{keywordtype}{int}\ \$retryPeriod\ =\ 60)}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00039}00039\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$transports)\ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_transport_exception}{TransportException}}(sprintf(\textcolor{stringliteral}{'"{}\%s"{}\ must\ have\ at\ least\ one\ transport\ configured.'},\ static::class));}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \$this-\/>transports\ =\ \$transports;}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \$this-\/>deadTransports\ =\ new\ \(\backslash\)SplObjectStorage();}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \$this-\/>retryPeriod\ =\ \$retryPeriod;}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00047}00047\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00049}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_abc5a6e24e4daeca140f1565af067dcc8}{00049}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_abc5a6e24e4daeca140f1565af067dcc8}{send}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_mime_1_1_raw_message}{RawMessage}}\ \$message,\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_envelope}{Envelope}}\ \$envelope\ =\ \textcolor{keyword}{null}):\ ?\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_sent_message}{SentMessage}}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00050}00050\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \$exception\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\$transport\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_af64dc468c020e131bdd990b0a8632b95}{getNextTransport}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$transport-\/>send(\$message,\ \$envelope);}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\mbox{\hyperlink{interface_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_transport_exception_interface}{TransportExceptionInterface}}\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$exception\ ??=\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_transport_exception}{TransportException}}(\textcolor{stringliteral}{'All\ transports\ failed.'});}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$exception-\/>appendDebug(sprintf(\textcolor{stringliteral}{"{}Transport\ \(\backslash\)"{}\%s\(\backslash\)"{}:\ \%s\(\backslash\)n"{}},\ \$transport,\ \$e-\/>\mbox{\hyperlink{interface_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_transport_exception_interface_a2328b703767e1a8c77e8a93198b89a26}{getDebug}}()));}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>deadTransports[\$transport]\ =\ microtime(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \$exception\ ??\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_exception_1_1_transport_exception}{TransportException}}(\textcolor{stringliteral}{'No\ transports\ found.'});}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00064}00064\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00066}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_a7516ca30af0db3cdbf9a7739b48ce91d}{00066}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_a7516ca30af0db3cdbf9a7739b48ce91d}{\_\_toString}}():\ string}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00067}00067\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_af10e253f76eccacdda4edca00bb90beb}{getNameSymbol}}().\textcolor{charliteral}{'('}.implode(\textcolor{charliteral}{'\ '},\ array\_map(\textcolor{stringliteral}{'strval'},\ \$this-\/>transports)).\textcolor{charliteral}{')'};}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00069}00069\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00074}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_af64dc468c020e131bdd990b0a8632b95}{00074}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_af64dc468c020e131bdd990b0a8632b95}{getNextTransport}}():\ ?\mbox{\hyperlink{interface_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_transport_interface}{TransportInterface}}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00075}00075\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (-\/1\ ===\ \$this-\/>cursor)\ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>cursor\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_ae5566213ecfcb91289c331a9311d3d6e}{getInitialCursor}}();}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \$cursor\ =\ \$this-\/>cursor;}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \$transport\ =\ \$this-\/>transports[\$cursor];}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_afd0ad3133d92b7c4527dea9d44ddadd2}{isTransportDead}}(\$transport))\ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((microtime(\textcolor{keyword}{true})\ -\/\ \$this-\/>deadTransports[\$transport])\ >\ \$this-\/>retryPeriod)\ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>deadTransports-\/>detach(\$transport);}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>cursor\ ===\ \$cursor\ =\ \$this-\/>moveCursor(\$cursor))\ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \$this-\/>cursor\ =\ \$this-\/>moveCursor(\$cursor);}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$transport;}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00102}00102\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00104}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_afd0ad3133d92b7c4527dea9d44ddadd2}{00104}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_afd0ad3133d92b7c4527dea9d44ddadd2}{isTransportDead}}(\mbox{\hyperlink{interface_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_transport_interface}{TransportInterface}}\ \$transport):\ bool}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00105}00105\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>deadTransports-\/>contains(\$transport);}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00109}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_ae5566213ecfcb91289c331a9311d3d6e}{00109}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_ae5566213ecfcb91289c331a9311d3d6e}{getInitialCursor}}():\ int}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00110}00110\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ cursor\ initial\ value\ is\ randomized\ so\ that}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ when\ are\ not\ in\ a\ daemon,\ we\ are\ still\ rotating\ the\ transports}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ mt\_rand(0,\ \(\backslash\)count(\$this-\/>transports)\ -\/\ 1);}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00114}00114\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00116}\mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_af10e253f76eccacdda4edca00bb90beb}{00116}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_mailer_1_1_transport_1_1_round_robin_transport_af10e253f76eccacdda4edca00bb90beb}{getNameSymbol}}():\ string}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00117}00117\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'roundrobin'};}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00119}00119\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00121}00121\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ moveCursor(\textcolor{keywordtype}{int}\ \$cursor):\ int}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00122}00122\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ++\$cursor\ >=\ \(\backslash\)count(\$this-\/>transports)\ ?\ 0\ :\ \$cursor;}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00124}00124\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_round_robin_transport_8php_source_l00125}00125\ \}}
+
+\end{DoxyCode}

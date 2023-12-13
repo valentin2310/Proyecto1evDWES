@@ -1,0 +1,162 @@
+\doxysection{Route\+Registrar.\+php}
+\hypertarget{_route_registrar_8php_source}{}\label{_route_registrar_8php_source}\index{vendor/laravel/framework/src/Illuminate/Routing/RouteRegistrar.php@{vendor/laravel/framework/src/Illuminate/Routing/RouteRegistrar.php}}
+\mbox{\hyperlink{_route_registrar_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00003}00003\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_illuminate_1_1_routing}{Illuminate\(\backslash\)Routing}};}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00005}00005\ use\ BadMethodCallException;}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00006}00006\ use\ Closure;}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00007}00007\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_arr}{Illuminate\(\backslash\)Support\(\backslash\)Arr}};}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_illuminate_1_1_support_1_1_reflector}{Illuminate\(\backslash\)Support\(\backslash\)Reflector}};}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00009}00009\ use\ InvalidArgumentException;}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00031}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar}{00031}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar}{RouteRegistrar}}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00032}00032\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00033}00033\ \ \ \ \ use\ CreatesRegularExpressionRouteConstraints;}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00040}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_ad77f00d881c7c3dc8bd1749c7174de92}{00040}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_ad77f00d881c7c3dc8bd1749c7174de92}{\$router}};}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00047}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_adc851f7a62250e75df0490c0280aef4c}{00047}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_adc851f7a62250e75df0490c0280aef4c}{\$attributes}}\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00054}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a291dc574eb95ac78da5f0dffafdfd91a}{00054}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a291dc574eb95ac78da5f0dffafdfd91a}{\$passthru}}\ =\ [}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'get'},\ \textcolor{stringliteral}{'post'},\ \textcolor{stringliteral}{'put'},\ \textcolor{stringliteral}{'patch'},\ \textcolor{stringliteral}{'delete'},\ \textcolor{stringliteral}{'options'},\ \textcolor{stringliteral}{'any'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00056}00056\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00063}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a2d24480e38bc327e77b81a5b5c5ca3f4}{00063}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a2d24480e38bc327e77b81a5b5c5ca3f4}{\$allowedAttributes}}\ =\ [}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'as'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'controller'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'domain'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'middleware'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'namespace'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'prefix'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'scopeBindings'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'where'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'withoutMiddleware'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00074}00074\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00081}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a7e6d29edbd9ec5d8ec9d478cf98fba03}{00081}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a7e6d29edbd9ec5d8ec9d478cf98fba03}{\$aliases}}\ =\ [}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'name'}\ =>\ \textcolor{stringliteral}{'as'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'scopeBindings'}\ =>\ \textcolor{stringliteral}{'scope\_bindings'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'withoutMiddleware'}\ =>\ \textcolor{stringliteral}{'excluded\_middleware'},}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00085}00085\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00093}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a250c1c193d93f20723111ad7bd06330f}{00093}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a250c1c193d93f20723111ad7bd06330f}{\_\_construct}}(\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_router}{Router}}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_ad77f00d881c7c3dc8bd1749c7174de92}{\$router}})}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00094}00094\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \$this-\/>router\ =\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_ad77f00d881c7c3dc8bd1749c7174de92}{\$router}};}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00096}00096\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00107}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a2918cd0c25a845687aec746ec33bee66}{00107}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a2918cd0c25a845687aec746ec33bee66}{attribute}}(\$key,\ \$value)}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00108}00108\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ in\_array(\$key,\ \$this-\/>allowedAttributes))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidArgumentException(\textcolor{stringliteral}{"{}Attribute\ [\{\$key\}]\ does\ not\ exist."{}});}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$key\ ===\ \textcolor{stringliteral}{'middleware'})\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$value\ as\ \$index\ =>\ \$middleware)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value[\$index]\ =\ (string)\ \$middleware;}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \$attributeKey\ =\ Arr::get(\$this-\/>aliases,\ \$key,\ \$key);}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$key\ ===\ \textcolor{stringliteral}{'withoutMiddleware'})\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ array\_merge(}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (array)\ (\$this-\/>attributes[\$attributeKey]\ ??\ []),\ Arr::wrap(\$value)}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \$this-\/>attributes[\$attributeKey]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00130}00130\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00140}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a9f6e08b5f0bab700132b7df07018252a}{00140}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a9f6e08b5f0bab700132b7df07018252a}{resource}}(\$name,\ \$controller,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00141}00141\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>router-\/>resource(\$name,\ \$controller,\ \$this-\/>attributes\ +\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00143}00143\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00153}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a79b4222aee91e428750345d0f039e7ca}{00153}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a79b4222aee91e428750345d0f039e7ca}{apiResource}}(\$name,\ \$controller,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00154}00154\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>router-\/>apiResource(\$name,\ \$controller,\ \$this-\/>attributes\ +\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00156}00156\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00166}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a6c0232fa638898be3fa9f3e0b4d5af6e}{00166}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a6c0232fa638898be3fa9f3e0b4d5af6e}{singleton}}(\$name,\ \$controller,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00167}00167\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>router-\/>singleton(\$name,\ \$controller,\ \$this-\/>attributes\ +\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00169}00169\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00179}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a2f12596baff736857bebbfd795465f76}{00179}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a2f12596baff736857bebbfd795465f76}{apiSingleton}}(\$name,\ \$controller,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ [])}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00180}00180\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>router-\/>apiSingleton(\$name,\ \$controller,\ \$this-\/>attributes\ +\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}});}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00182}00182\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00190}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a36ae336ee08f9ef09808873f4f48f96a}{00190}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a36ae336ee08f9ef09808873f4f48f96a}{group}}(\$callback)}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00191}00191\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \$this-\/>router-\/>group(\$this-\/>attributes,\ \$callback);}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00195}00195\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00205}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_ae95e88099b6b143330beb3867a60a285}{00205}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_ae95e88099b6b143330beb3867a60a285}{match}}(\$methods,\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \$action\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00206}00206\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>router-\/>match(\$methods,\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a32748c0919eeb604e04cad3061dc7fe8}{compileAction}}(\$action));}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00208}00208\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00218}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a8e60b14f3174329b6d2fd656a1ea26de}{00218}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a8e60b14f3174329b6d2fd656a1ea26de}{registerRoute}}(\$method,\ \mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \$action\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00219}00219\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ is\_array(\$action))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \$action\ =\ array\_merge(\$this-\/>attributes,\ \$action\ ?\ [\textcolor{stringliteral}{'uses'}\ =>\ \$action]\ :\ []);}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00223}00223\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>router-\/>\{\$method\}(\mbox{\hyperlink{server_8php_a653b5458163d338546c47271b4fb81b7}{\$uri}},\ \$this-\/>\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a32748c0919eeb604e04cad3061dc7fe8}{compileAction}}(\$action));}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00225}00225\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00233}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a32748c0919eeb604e04cad3061dc7fe8}{00233}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_a32748c0919eeb604e04cad3061dc7fe8}{compileAction}}(\$action)}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00234}00234\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_null(\$action))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>attributes;}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00238}00238\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$action)\ ||\ \$action\ instanceof\ Closure)\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \$action\ =\ [\textcolor{stringliteral}{'uses'}\ =>\ \$action];}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_array(\$action)\ \&\&}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ array\_is\_list(\$action)\ \&\&}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ Reflector::isCallable(\$action))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strncmp(\$action[0],\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'},\ 1))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$action[0]\ =\ \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'}.\$action[0];}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \$action\ =\ [}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'uses'}\ =>\ \$action[0].\textcolor{charliteral}{'@'}.\$action[1],}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'controller'}\ =>\ \$action[0].\textcolor{charliteral}{'@'}.\$action[1],}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00254}00254\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_merge(\$this-\/>attributes,\ \$action);}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00256}00256\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00267}\mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_ac565bd6a9d062c73a0a0db7afe0ffea9}{00267}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_illuminate_1_1_routing_1_1_route_registrar_ac565bd6a9d062c73a0a0db7afe0ffea9}{\_\_call}}(\$method,\ \$parameters)}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00268}00268\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\$method,\ \$this-\/>passthru))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>registerRoute(\$method,\ ...\$parameters);}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\$method,\ \$this-\/>allowedAttributes))\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$method\ ===\ \textcolor{stringliteral}{'middleware'})\ \{}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>attribute(\$method,\ is\_array(\$parameters[0])\ ?\ \$parameters[0]\ :\ \$parameters);}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>attribute(\$method,\ array\_key\_exists(0,\ \$parameters)\ ?\ \$parameters[0]\ :\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ BadMethodCallException(sprintf(}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Method\ \%s::\%s\ does\ not\ exist.'},\ static::class,\ \$method}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ ));}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00284}00284\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_route_registrar_8php_source_l00285}00285\ \}}
+
+\end{DoxyCode}

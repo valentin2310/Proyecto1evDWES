@@ -1,0 +1,120 @@
+\doxysection{Unix\+Time\+Generator.\+php}
+\hypertarget{_unix_time_generator_8php_source}{}\label{_unix_time_generator_8php_source}\index{vendor/ramsey/uuid/src/Generator/UnixTimeGenerator.php@{vendor/ramsey/uuid/src/Generator/UnixTimeGenerator.php}}
+\mbox{\hyperlink{_unix_time_generator_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00013}00013\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_ramsey_1_1_uuid_1_1_generator}{Ramsey\(\backslash\)Uuid\(\backslash\)Generator}};}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_brick_1_1_math_1_1_big_integer}{Brick\(\backslash\)Math\(\backslash\)BigInteger}};}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00018}00018\ use\ DateTimeImmutable;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00019}00019\ use\ DateTimeInterface;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_type_1_1_hexadecimal}{Ramsey\(\backslash\)Uuid\(\backslash\)Type\(\backslash\)Hexadecimal}};}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00022}00022\ use\ \textcolor{keyword}{function}\ hash;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00023}00023\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_illuminate_1_1_redis_1_1_connections_aadf5b6e1de066b74856a16eb2fe56838}{pack}};}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00024}00024\ use\ \textcolor{keyword}{function}\ str\_pad;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00025}00025\ use\ \textcolor{keyword}{function}\ strlen;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00026}00026\ use\ \textcolor{keyword}{function}\ substr;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00027}00027\ use\ \textcolor{keyword}{function}\ substr\_replace;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00028}00028\ use\ \textcolor{keyword}{function}\ unpack;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00030}00030\ use\ \textcolor{keyword}{const}\ PHP\_INT\_SIZE;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00031}00031\ use\ \textcolor{keyword}{const}\ STR\_PAD\_LEFT;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00046}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_generator_1_1_unix_time_generator}{00046}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_generator_1_1_unix_time_generator}{UnixTimeGenerator}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_generator_1_1_time_generator_interface}{TimeGeneratorInterface}}}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00047}00047\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00048}00048\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{string}\ \$time\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00049}00049\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ ?\textcolor{keywordtype}{string}\ \$seed\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00050}00050\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ \$seedIndex\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ array\ \$rand\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00056}00056\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ array\ \$seedParts;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00058}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_generator_1_1_unix_time_generator_ae6883b0c6783e19848c59d77f9b6ba29}{00058}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_generator_1_1_unix_time_generator_ae6883b0c6783e19848c59d77f9b6ba29}{\_\_construct}}(}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_generator_1_1_random_generator_interface}{RandomGeneratorInterface}}\ \$randomGenerator,}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$intSize\ =\ PHP\_INT\_SIZE}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00061}00061\ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00062}00062\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00072}00072\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_generator_1_1_time_generator_interface_a8ce2bfb40818af23362132297f0c1806}{generate}}(\$node\ =\ \textcolor{keyword}{null},\ ?\textcolor{keywordtype}{int}\ \$clockSeq\ =\ \textcolor{keyword}{null},\ ?DateTimeInterface\ \$dateTime\ =\ \textcolor{keyword}{null}):\ string}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00073}00073\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \$time\ =\ (\$dateTime\ ??\ \textcolor{keyword}{new}\ DateTimeImmutable(\textcolor{stringliteral}{'now'}))-\/>format(\textcolor{stringliteral}{'Uv'});}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$time\ >\ self::\$time\ ||\ (\$dateTime\ !==\ \textcolor{keyword}{null}\ \&\&\ \$time\ !==\ self::\$time))\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>randomize(\$time);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \$time\ =\ \$this-\/>increment();}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>intSize\ >=\ 8)\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \$time\ =\ substr(pack(\textcolor{charliteral}{'J'},\ (\textcolor{keywordtype}{int})\ \$time),\ -\/6);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \$time\ =\ str\_pad(BigInteger::of(\$time)-\/>toBytes(\textcolor{keyword}{false}),\ 6,\ \textcolor{stringliteral}{"{}\(\backslash\)x00"{}},\ STR\_PAD\_LEFT);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$time\ .\ \mbox{\hyperlink{namespace_illuminate_1_1_redis_1_1_connections_aadf5b6e1de066b74856a16eb2fe56838}{pack}}(\textcolor{stringliteral}{'n*'},\ self::\$rand[1],\ self::\$rand[2],\ self::\$rand[3],\ self::\$rand[4],\ self::\$rand[5]);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00090}00090\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00092}00092\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ randomize(\textcolor{keywordtype}{string}\ \$time):\ void}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00093}00093\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (self::\$seed\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \$seed\ =\ \$this-\/>randomGenerator-\/>generate(16);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ self::\$seed\ =\ \$seed;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \ \ \ \ \$seed\ =\ \$this-\/>randomGenerator-\/>generate(10);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \$rand\ =\ unpack(\textcolor{stringliteral}{'n*'},\ \$seed);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \$rand[1]\ \&=\ 0x03ff;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ self::\$rand\ =\ \$rand;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ self::\$time\ =\ \$time;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00128}00128\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ increment():\ string}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00129}00129\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (self::\$seedIndex\ ===\ 0\ \&\&\ self::\$seed\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ self::\$seed\ =\ hash(\textcolor{stringliteral}{'sha512'},\ self::\$seed,\ \textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \$s\ =\ unpack(\textcolor{stringliteral}{'l*'},\ self::\$seed);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \$s[]\ =\ (\$s[1]\ >>\ 8\ \&\ 0xff0000)\ |\ (\$s[2]\ >>\ 16\ \&\ 0xff00)\ |\ (\$s[3]\ >>\ 24\ \&\ 0xff);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \ \ \ \ \$s[]\ =\ (\$s[4]\ >>\ 8\ \&\ 0xff0000)\ |\ (\$s[5]\ >>\ 16\ \&\ 0xff00)\ |\ (\$s[6]\ >>\ 24\ \&\ 0xff);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \ \ \ \ \$s[]\ =\ (\$s[7]\ >>\ 8\ \&\ 0xff0000)\ |\ (\$s[8]\ >>\ 16\ \&\ 0xff00)\ |\ (\$s[9]\ >>\ 24\ \&\ 0xff);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \ \ \ \ \$s[]\ =\ (\$s[10]\ >>\ 8\ \&\ 0xff0000)\ |\ (\$s[11]\ >>\ 16\ \&\ 0xff00)\ |\ (\$s[12]\ >>\ 24\ \&\ 0xff);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \$s[]\ =\ (\$s[13]\ >>\ 8\ \&\ 0xff0000)\ |\ (\$s[14]\ >>\ 16\ \&\ 0xff00)\ |\ (\$s[15]\ >>\ 24\ \&\ 0xff);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ self::\$seedParts\ =\ \$s;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ self::\$seedIndex\ =\ 21;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ self::\$rand[5]\ =\ 0xffff\ \&\ \$carry\ =\ self::\$rand[5]\ +\ 1\ +\ (self::\$seedParts[self::\$seedIndex-\/-\/]\ \&\ 0xffffff);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ self::\$rand[4]\ =\ 0xffff\ \&\ \$carry\ =\ self::\$rand[4]\ +\ (\$carry\ >>\ 16);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ self::\$rand[3]\ =\ 0xffff\ \&\ \$carry\ =\ self::\$rand[3]\ +\ (\$carry\ >>\ 16);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ self::\$rand[2]\ =\ 0xffff\ \&\ \$carry\ =\ self::\$rand[2]\ +\ (\$carry\ >>\ 16);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ self::\$rand[1]\ +=\ \$carry\ >>\ 16;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (0xfc00\ \&\ self::\$rand[1])\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \$time\ =\ self::\$time;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \$mtime\ =\ (int)\ substr(\$time,\ -\/9);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>intSize\ >=\ 8\ ||\ strlen(\$time)\ <\ 10)\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$time\ =\ (string)\ ((\textcolor{keywordtype}{int})\ \$time\ +\ 1);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$mtime\ ===\ 999999999)\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$time\ =\ (1\ +\ (int)\ substr(\$time,\ 0,\ -\/9))\ .\ \textcolor{stringliteral}{'000000000'};}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$mtime++;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$time\ =\ substr\_replace(\$time,\ str\_pad((\textcolor{keywordtype}{string})\ \$mtime,\ 9,\ \textcolor{charliteral}{'0'},\ STR\_PAD\_LEFT),\ -\/9);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>randomize(\$time);}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::\$time;}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00168}00168\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_unix_time_generator_8php_source_l00169}00169\ \}}
+
+\end{DoxyCode}

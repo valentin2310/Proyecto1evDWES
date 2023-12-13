@@ -1,0 +1,471 @@
+\chapter{Guzzle Promises}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e}{}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e}\index{Guzzle Promises@{Guzzle Promises}}
+\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md543}%
+\Hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md543}%
+ \href{https://promisesaplus.com/}{\texttt{ Promises/\+A+}} implementation that handles promise chaining and resolution iteratively, allowing for "{}infinite"{} promise chaining while keeping the stack size constant. Read \href{https://blog.domenic.me/youre-missing-the-point-of-promises/}{\texttt{ this blog post}} for a general introduction to promises.
+
+
+\begin{DoxyItemize}
+\item Features
+\item Quick start
+\item Synchronous wait
+\item Cancellation
+\item API
+\begin{DoxyItemize}
+\item Promise
+\item Fulfilled\+Promise
+\item Rejected\+Promise
+\end{DoxyItemize}
+\item Promise interop
+\item Implementation notes
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md544}{}\doxysection{\texorpdfstring{Features}{Features}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md544}
+
+\begin{DoxyItemize}
+\item \href{https://promisesaplus.com/}{\texttt{ Promises/\+A+}} implementation.
+\item Promise resolution and chaining is handled iteratively, allowing for "{}infinite"{} promise chaining.
+\item Promises have a synchronous {\ttfamily wait} method.
+\item Promises can be cancelled.
+\item Works with any object that has a {\ttfamily then} function.
+\item C\# style async/await coroutine promises using {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Promise\textbackslash{}Coroutine\+::of()}.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md545}{}\doxysection{\texorpdfstring{Installation}{Installation}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md545}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{composer\ require\ guzzlehttp/promises}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md546}{}\doxysection{\texorpdfstring{Version Guidance}{Version Guidance}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md546}
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{3}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Version   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Status   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ PHP Version    }\\\cline{1-3}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Version   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Status   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ PHP Version    }\\\cline{1-3}
+\endhead
+1.\+x   &Bug and security fixes   &\texorpdfstring{$>$}{>}=5.\+5,\texorpdfstring{$<$}{<}8.\+3    \\\cline{1-3}
+2.\+x   &Latest   &\texorpdfstring{$>$}{>}=7.\+2.\+5,\texorpdfstring{$<$}{<}8.\+4   \\\cline{1-3}
+\end{longtabu}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md547}{}\doxysection{\texorpdfstring{Quick Start}{Quick Start}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md547}
+A {\itshape promise} represents the eventual result of an asynchronous operation. The primary way of interacting with a promise is through its {\ttfamily then} method, which registers callbacks to receive either a promise\textquotesingle{}s eventual value or the reason why the promise cannot be fulfilled.\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md548}{}\doxysubsection{\texorpdfstring{Callbacks}{Callbacks}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md548}
+Callbacks are registered with the {\ttfamily then} method by providing an optional {\ttfamily \$on\+Fulfilled} followed by an optional {\ttfamily \$on\+Rejected} function.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)Promise}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise();}
+\DoxyCodeLine{\$promise-\/>then(}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \$onFulfilled}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{function}\ (\$value)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ echo\ \textcolor{stringliteral}{'The\ promise\ was\ fulfilled.'};}
+\DoxyCodeLine{\ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ \$onRejected}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{function}\ (\$reason)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ echo\ \textcolor{stringliteral}{'The\ promise\ was\ rejected.'};}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{);}
+
+\end{DoxyCode}
+
+
+{\itshape Resolving} a promise means that you either fulfill a promise with a {\itshape value} or reject a promise with a {\itshape reason}. Resolving a promise triggers callbacks registered with the promise\textquotesingle{}s {\ttfamily then} method. These callbacks are triggered only once and in the order in which they were added.\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md549}{}\doxysubsection{\texorpdfstring{Resolving a Promise}{Resolving a Promise}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md549}
+Promises are fulfilled using the {\ttfamily resolve(\$value)} method. Resolving a promise with any value other than a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Promise\textbackslash{}Rejected\+Promise} will trigger all of the on\+Fulfilled callbacks (resolving a promise with a rejected promise will reject the promise and trigger the {\ttfamily \$on\+Rejected} callbacks).
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)Promise}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise();}
+\DoxyCodeLine{\$promise}
+\DoxyCodeLine{\ \ \ \ -\/>then(\textcolor{keyword}{function}\ (\$value)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{//\ Return\ a\ value\ and\ don't\ break\ the\ chain}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Hello,\ "{}}\ .\ \$value;}
+\DoxyCodeLine{\ \ \ \ \})}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ This\ then\ is\ executed\ after\ the\ first\ then\ and\ receives\ the\ value}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ returned\ from\ the\ first\ then.}}
+\DoxyCodeLine{\ \ \ \ -\/>then(\textcolor{keyword}{function}\ (\$value)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ echo\ \$value;}
+\DoxyCodeLine{\ \ \ \ \});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Resolving\ the\ promise\ triggers\ the\ \$onFulfilled\ callbacks\ and\ outputs}}
+\DoxyCodeLine{\textcolor{comment}{//\ "{}Hello,\ reader."{}}}
+\DoxyCodeLine{\$promise-\/>resolve(\textcolor{stringliteral}{'reader.'});}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md550}{}\doxysubsection{\texorpdfstring{Promise Forwarding}{Promise Forwarding}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md550}
+Promises can be chained one after the other. Each then in the chain is a new promise. The return value of a promise is what\textquotesingle{}s forwarded to the next promise in the chain. Returning a promise in a {\ttfamily then} callback will cause the subsequent promises in the chain to only be fulfilled when the returned promise has been fulfilled. The next promise in the chain will be invoked with the resolved value of the promise.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)Promise}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise();}
+\DoxyCodeLine{\$nextPromise\ =\ \textcolor{keyword}{new}\ Promise();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise}
+\DoxyCodeLine{\ \ \ \ -\/>then(\textcolor{keyword}{function}\ (\$value)\ use\ (\$nextPromise)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ echo\ \$value;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$nextPromise;}
+\DoxyCodeLine{\ \ \ \ \})}
+\DoxyCodeLine{\ \ \ \ -\/>then(\textcolor{keyword}{function}\ (\$value)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ echo\ \$value;}
+\DoxyCodeLine{\ \ \ \ \});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Triggers\ the\ first\ callback\ and\ outputs\ "{}A"{}}}
+\DoxyCodeLine{\$promise-\/>resolve(\textcolor{charliteral}{'A'});}
+\DoxyCodeLine{\textcolor{comment}{//\ Triggers\ the\ second\ callback\ and\ outputs\ "{}B"{}}}
+\DoxyCodeLine{\$nextPromise-\/>resolve(\textcolor{charliteral}{'B'});}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md551}{}\doxysubsection{\texorpdfstring{Promise Rejection}{Promise Rejection}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md551}
+When a promise is rejected, the {\ttfamily \$on\+Rejected} callbacks are invoked with the rejection reason.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)Promise}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise();}
+\DoxyCodeLine{\$promise-\/>then(\textcolor{keyword}{null},\ \textcolor{keyword}{function}\ (\$reason)\ \{}
+\DoxyCodeLine{\ \ \ \ echo\ \$reason;}
+\DoxyCodeLine{\});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise-\/>reject(\textcolor{stringliteral}{'Error!'});}
+\DoxyCodeLine{\textcolor{comment}{//\ Outputs\ "{}Error!"{}}}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md552}{}\doxysubsection{\texorpdfstring{Rejection Forwarding}{Rejection Forwarding}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md552}
+If an exception is thrown in an {\ttfamily \$on\+Rejected} callback, subsequent {\ttfamily \$on\+Rejected} callbacks are invoked with the thrown exception as the reason.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)Promise}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise();}
+\DoxyCodeLine{\$promise-\/>then(\textcolor{keyword}{null},\ \textcolor{keyword}{function}\ (\$reason)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ Exception(\$reason);}
+\DoxyCodeLine{\})-\/>then(\textcolor{keyword}{null},\ \textcolor{keyword}{function}\ (\$reason)\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}}(\$reason-\/>getMessage()\ ===\ \textcolor{stringliteral}{'Error!'});}
+\DoxyCodeLine{\});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise-\/>reject(\textcolor{stringliteral}{'Error!'});}
+
+\end{DoxyCode}
+
+
+You can also forward a rejection down the promise chain by returning a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Promise\textbackslash{}Rejected\+Promise} in either an {\ttfamily \$on\+Fulfilled} or {\ttfamily \$on\+Rejected} callback.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)Promise}};}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_rejected_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)RejectedPromise}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise();}
+\DoxyCodeLine{\$promise-\/>then(\textcolor{keyword}{null},\ \textcolor{keyword}{function}\ (\$reason)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ RejectedPromise(\$reason);}
+\DoxyCodeLine{\})-\/>then(\textcolor{keyword}{null},\ \textcolor{keyword}{function}\ (\$reason)\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}}(\$reason\ ===\ \textcolor{stringliteral}{'Error!'});}
+\DoxyCodeLine{\});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise-\/>reject(\textcolor{stringliteral}{'Error!'});}
+
+\end{DoxyCode}
+
+
+If an exception is not thrown in a {\ttfamily \$on\+Rejected} callback and the callback does not return a rejected promise, downstream {\ttfamily \$on\+Fulfilled} callbacks are invoked using the value returned from the {\ttfamily \$on\+Rejected} callback.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)Promise}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise();}
+\DoxyCodeLine{\$promise}
+\DoxyCodeLine{\ \ \ \ -\/>then(\textcolor{keyword}{null},\ \textcolor{keyword}{function}\ (\$reason)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}It's\ ok"{}};}
+\DoxyCodeLine{\ \ \ \ \})}
+\DoxyCodeLine{\ \ \ \ -\/>then(\textcolor{keyword}{function}\ (\$value)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}}(\$value\ ===\ \textcolor{stringliteral}{"{}It's\ ok"{}});}
+\DoxyCodeLine{\ \ \ \ \});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise-\/>reject(\textcolor{stringliteral}{'Error!'});}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md553}{}\doxysection{\texorpdfstring{Synchronous Wait}{Synchronous Wait}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md553}
+You can synchronously force promises to complete using a promise\textquotesingle{}s {\ttfamily wait} method. When creating a promise, you can provide a wait function that is used to synchronously force a promise to complete. When a wait function is invoked it is expected to deliver a value to the promise or reject the promise. If the wait function does not deliver a value, then an exception is thrown. The wait function provided to a promise constructor is invoked when the {\ttfamily wait} function of the promise is called.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise(\textcolor{keyword}{function}\ ()\ use\ (\&\$promise)\ \{}
+\DoxyCodeLine{\ \ \ \ \$promise-\/>resolve(\textcolor{stringliteral}{'foo'});}
+\DoxyCodeLine{\});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Calling\ wait\ will\ return\ the\ value\ of\ the\ promise.}}
+\DoxyCodeLine{echo\ \$promise-\/>wait();\ \textcolor{comment}{//\ outputs\ "{}foo"{}}}
+
+\end{DoxyCode}
+
+
+If an exception is encountered while invoking the wait function of a promise, the promise is rejected with the exception and the exception is thrown.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise(\textcolor{keyword}{function}\ ()\ use\ (\&\$promise)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ Exception(\textcolor{stringliteral}{'foo'});}
+\DoxyCodeLine{\});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise-\/>wait();\ \textcolor{comment}{//\ throws\ the\ exception.}}
+
+\end{DoxyCode}
+
+
+Calling {\ttfamily wait} on a promise that has been fulfilled will not trigger the wait function. It will simply return the previously resolved value.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise(\textcolor{keyword}{function}\ ()\ \{\ die(\textcolor{stringliteral}{'this\ is\ not\ called!'});\ \});}
+\DoxyCodeLine{\$promise-\/>resolve(\textcolor{stringliteral}{'foo'});}
+\DoxyCodeLine{echo\ \$promise-\/>wait();\ \textcolor{comment}{//\ outputs\ "{}foo"{}}}
+
+\end{DoxyCode}
+
+
+Calling {\ttfamily wait} on a promise that has been rejected will throw an exception. If the rejection reason is an instance of {\ttfamily \textbackslash{}Exception} the reason is thrown. Otherwise, a {\ttfamily \doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}Promise\textbackslash{}Rejection\+Exception} is thrown and the reason can be obtained by calling the {\ttfamily get\+Reason} method of the exception.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise();}
+\DoxyCodeLine{\$promise-\/>reject(\textcolor{stringliteral}{'foo'});}
+\DoxyCodeLine{\$promise-\/>wait();}
+
+\end{DoxyCode}
+
+
+\begin{quote}
+PHP Fatal error\+: Uncaught exception \textquotesingle{}\doxylink{namespace_guzzle_http}{Guzzle\+Http}\textbackslash{}\+Promise\textbackslash{}\+Rejection\+Exception\textquotesingle{} with message \textquotesingle{}The promise was rejected with value\+: foo\textquotesingle{} \end{quote}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md554}{}\doxysubsection{\texorpdfstring{Unwrapping a Promise}{Unwrapping a Promise}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md554}
+When synchronously waiting on a promise, you are joining the state of the promise into the current state of execution (i.\+e., return the value of the promise if it was fulfilled or throw an exception if it was rejected). This is called "{}unwrapping"{} the promise. Waiting on a promise will by default unwrap the promise state.
+
+You can force a promise to resolve and {\itshape not} unwrap the state of the promise by passing {\ttfamily false} to the first argument of the {\ttfamily wait} function\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise();}
+\DoxyCodeLine{\$promise-\/>reject(\textcolor{stringliteral}{'foo'});}
+\DoxyCodeLine{\textcolor{comment}{//\ This\ will\ not\ throw\ an\ exception.\ It\ simply\ ensures\ the\ promise\ has}}
+\DoxyCodeLine{\textcolor{comment}{//\ been\ resolved.}}
+\DoxyCodeLine{\$promise-\/>wait(\textcolor{keyword}{false});}
+
+\end{DoxyCode}
+
+
+When unwrapping a promise, the resolved value of the promise will be waited upon until the unwrapped value is not a promise. This means that if you resolve promise A with a promise B and unwrap promise A, the value returned by the wait function will be the value delivered to promise B.
+
+{\bfseries{Note}}\+: when you do not unwrap the promise, no value is returned.\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md555}{}\doxysection{\texorpdfstring{Cancellation}{Cancellation}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md555}
+You can cancel a promise that has not yet been fulfilled using the {\ttfamily cancel()} method of a promise. When creating a promise you can provide an optional cancel function that when invoked cancels the action of computing a resolution of the promise.\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md556}{}\doxysection{\texorpdfstring{API}{API}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md556}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md557}{}\doxysubsection{\texorpdfstring{Promise}{Promise}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md557}
+When creating a promise object, you can provide an optional {\ttfamily \$wait\+Fn} and {\ttfamily \$cancel\+Fn}. {\ttfamily \$wait\+Fn} is a function that is invoked with no arguments and is expected to resolve the promise. {\ttfamily \$cancel\+Fn} is a function with no arguments that is expected to cancel the computation of a promise. It is invoked when the {\ttfamily cancel()} method of a promise is called.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)Promise}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise(}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{function}\ ()\ use\ (\&\$promise)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \$promise-\/>resolve(\textcolor{stringliteral}{'waited'});}
+\DoxyCodeLine{\ \ \ \ \},}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{function}\ ()\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{//\ do\ something\ that\ will\ cancel\ the\ promise\ computation\ (e.g.,\ close}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{//\ a\ socket,\ cancel\ a\ database\ query,\ etc...)}}
+\DoxyCodeLine{\ \ \ \ \}}
+\DoxyCodeLine{);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}}(\textcolor{stringliteral}{'waited'}\ ===\ \$promise-\/>wait());}
+
+\end{DoxyCode}
+
+
+A promise has the following methods\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily then(callable \$on\+Fulfilled, callable \$on\+Rejected) \+: Promise\+Interface}
+
+Appends fulfillment and rejection handlers to the promise, and returns a new promise resolving to the return value of the called handler.
+\item {\ttfamily otherwise(callable \$on\+Rejected) \+: Promise\+Interface}
+
+Appends a rejection handler callback to the promise, and returns a new promise resolving to the return value of the callback if it is called, or to its original fulfillment value if the promise is instead fulfilled.
+\item {\ttfamily wait(\$unwrap = true) \+: mixed}
+
+Synchronously waits on the promise to complete.
+
+{\ttfamily \$unwrap} controls whether or not the value of the promise is returned for a fulfilled promise or if an exception is thrown if the promise is rejected. This is set to {\ttfamily true} by default.
+\item {\ttfamily cancel()}
+
+Attempts to cancel the promise if possible. The promise being cancelled and the parent most ancestor that has not yet been resolved will also be cancelled. Any promises waiting on the cancelled promise to resolve will also be cancelled.
+\item {\ttfamily get\+State() \+: string}
+
+Returns the state of the promise. One of {\ttfamily pending}, {\ttfamily fulfilled}, or {\ttfamily rejected}.
+\item {\ttfamily resolve(\$value)}
+
+Fulfills the promise with the given {\ttfamily \$value}.
+\item {\ttfamily reject(\$reason)}
+
+Rejects the promise with the given {\ttfamily \$reason}.
+\end{DoxyItemize}\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md558}{}\doxysubsection{\texorpdfstring{Fulfilled\+Promise}{FulfilledPromise}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md558}
+A fulfilled promise can be created to represent a promise that has been fulfilled.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_fulfilled_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)FulfilledPromise}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ FulfilledPromise(\textcolor{stringliteral}{'value'});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Fulfilled\ callbacks\ are\ immediately\ invoked.}}
+\DoxyCodeLine{\$promise-\/>then(\textcolor{keyword}{function}\ (\$value)\ \{}
+\DoxyCodeLine{\ \ \ \ echo\ \$value;}
+\DoxyCodeLine{\});}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md559}{}\doxysubsection{\texorpdfstring{Rejected\+Promise}{RejectedPromise}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md559}
+A rejected promise can be created to represent a promise that has been rejected.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_rejected_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)RejectedPromise}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ RejectedPromise(\textcolor{stringliteral}{'Error'});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Rejected\ callbacks\ are\ immediately\ invoked.}}
+\DoxyCodeLine{\$promise-\/>then(\textcolor{keyword}{null},\ \textcolor{keyword}{function}\ (\$reason)\ \{}
+\DoxyCodeLine{\ \ \ \ echo\ \$reason;}
+\DoxyCodeLine{\});}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md560}{}\doxysection{\texorpdfstring{Promise Interoperability}{Promise Interoperability}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md560}
+This library works with foreign promises that have a {\ttfamily then} method. This means you can use Guzzle promises with \href{https://github.com/reactphp/promise}{\texttt{ React promises}} for example. When a foreign promise is returned inside of a then method callback, promise resolution will occur recursively.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ Create\ a\ React\ promise}}
+\DoxyCodeLine{\$deferred\ =\ \textcolor{keyword}{new}\ React\(\backslash\)Promise\(\backslash\)Deferred();}
+\DoxyCodeLine{\$reactPromise\ =\ \$deferred-\/>promise();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Create\ a\ Guzzle\ promise\ that\ is\ fulfilled\ with\ a\ React\ promise.}}
+\DoxyCodeLine{\$guzzlePromise\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)Promise}}();}
+\DoxyCodeLine{\$guzzlePromise-\/>then(\textcolor{keyword}{function}\ (\$value)\ use\ (\$reactPromise)\ \{}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Do\ something\ something\ with\ the\ value...}}
+\DoxyCodeLine{\ \ \ \ \textcolor{comment}{//\ Return\ the\ React\ promise}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keywordflow}{return}\ \$reactPromise;}
+\DoxyCodeLine{\});}
+
+\end{DoxyCode}
+
+
+Please note that wait and cancel chaining is no longer possible when forwarding a foreign promise. You will need to wrap a third-\/party promise with a Guzzle promise in order to utilize wait and cancel functions with foreign promises.\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md561}{}\doxysubsection{\texorpdfstring{Event Loop Integration}{Event Loop Integration}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md561}
+In order to keep the stack size constant, Guzzle promises are resolved asynchronously using a task queue. When waiting on promises synchronously, the task queue will be automatically run to ensure that the blocking promise and any forwarded promises are resolved. When using promises asynchronously in an event loop, you will need to run the task queue on each tick of the loop. If you do not run the task queue, then promises will not be resolved.
+
+You can run the task queue using the {\ttfamily run()} method of the global task queue instance.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ Get\ the\ global\ task\ queue}}
+\DoxyCodeLine{\mbox{\hyperlink{namespace_illuminate_1_1_bus_a4a0b48f6ae2fcb248a4f0288c7c344a6}{\$queue}}\ =\ GuzzleHttp\(\backslash\)Promise\(\backslash\)Utils::queue();}
+\DoxyCodeLine{\mbox{\hyperlink{namespace_illuminate_1_1_bus_a4a0b48f6ae2fcb248a4f0288c7c344a6}{\$queue}}-\/>run();}
+
+\end{DoxyCode}
+
+
+For example, you could use Guzzle promises with React using a periodic timer\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{1a557177cfd75ac38db8e3e496f560d8_8php_ae7d53f6b57a5cd2cec9cadec7e80910a}{\$loop}}\ =\ React\(\backslash\)EventLoop\(\backslash\)Factory::create();}
+\DoxyCodeLine{\mbox{\hyperlink{1a557177cfd75ac38db8e3e496f560d8_8php_ae7d53f6b57a5cd2cec9cadec7e80910a}{\$loop}}-\/>addPeriodicTimer(0,\ [\$queue,\ \textcolor{stringliteral}{'run'}]);}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md562}{}\doxysection{\texorpdfstring{Implementation Notes}{Implementation Notes}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md562}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md563}{}\doxysubsection{\texorpdfstring{Promise Resolution and Chaining is Handled Iteratively}{Promise Resolution and Chaining is Handled Iteratively}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md563}
+By shuffling pending handlers from one owner to another, promises are resolved iteratively, allowing for "{}infinite"{} then chaining.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{<?php}
+\DoxyCodeLine{require\ \textcolor{stringliteral}{'vendor/autoload.php'};}
+\DoxyCodeLine{}
+\DoxyCodeLine{use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)Promise}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$parent\ =\ \textcolor{keyword}{new}\ Promise();}
+\DoxyCodeLine{\$p\ =\ \$parent;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\$i\ =\ 0;\ \$i\ <\ 1000;\ \$i++)\ \{}
+\DoxyCodeLine{\ \ \ \ \$p\ =\ \$p-\/>then(\textcolor{keyword}{function}\ (\$v)\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ stack\ size\ remains\ constant\ (a\ good\ thing)}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ echo\ xdebug\_get\_stack\_depth()\ .\ \textcolor{stringliteral}{',\ '};}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$v\ +\ 1;}
+\DoxyCodeLine{\ \ \ \ \});}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\$parent-\/>resolve(0);}
+\DoxyCodeLine{var\_dump(\$p-\/>wait());\ \textcolor{comment}{//\ int(1000)}}
+
+\end{DoxyCode}
+
+
+When a promise is fulfilled or rejected with a non-\/promise value, the promise then takes ownership of the handlers of each child promise and delivers values down the chain without using recursion.
+
+When a promise is resolved with another promise, the original promise transfers all of its pending handlers to the new promise. When the new promise is eventually resolved, all of the pending handlers are delivered the forwarded value.\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md564}{}\doxysubsection{\texorpdfstring{A Promise is the Deferred}{A Promise is the Deferred}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md564}
+Some promise libraries implement promises using a deferred object to represent a computation and a promise object to represent the delivery of the result of the computation. This is a nice separation of computation and delivery because consumers of the promise cannot modify the value that will be eventually delivered.
+
+One side effect of being able to implement promise resolution and chaining iteratively is that you need to be able for one promise to reach into the state of another promise to shuffle around ownership of handlers. In order to achieve this without making the handlers of a promise publicly mutable, a promise is also the deferred value, allowing promises of the same parent class to reach into and modify the private properties of promises of the same type. While this does allow consumers of the value to modify the resolution or rejection of the deferred, it is a small price to pay for keeping the stack size constant.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\$promise\ =\ \textcolor{keyword}{new}\ Promise();}
+\DoxyCodeLine{\$promise-\/>then(\textcolor{keyword}{function}\ (\$value)\ \{\ echo\ \$value;\ \});}
+\DoxyCodeLine{\textcolor{comment}{//\ The\ promise\ is\ the\ deferred\ value,\ so\ you\ can\ deliver\ a\ value\ to\ it.}}
+\DoxyCodeLine{\$promise-\/>resolve(\textcolor{stringliteral}{'foo'});}
+\DoxyCodeLine{\textcolor{comment}{//\ prints\ "{}foo"{}}}
+
+\end{DoxyCode}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md565}{}\doxysection{\texorpdfstring{Upgrading from Function API}{Upgrading from Function API}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md565}
+A static API was first introduced in 1.\+4.\+0, in order to mitigate problems with functions conflicting between global and local copies of the package. The function API was removed in 2.\+0.\+0. A migration table has been provided here for your convenience\+:
+
+\tabulinesep=1mm
+\begin{longtabu}spread 0pt [c]{*{2}{|X[-1]}|}
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Original Function   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Replacement Method    }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Original Function   }&\PBS\centering \cellcolor{\tableheadbgcolor}\textbf{ Replacement Method    }\\\cline{1-2}
+\endhead
+{\ttfamily queue}   &{\ttfamily Utils\+::queue}    \\\cline{1-2}
+{\ttfamily task}   &{\ttfamily Utils\+::task}    \\\cline{1-2}
+{\ttfamily promise\+\_\+for}   &{\ttfamily Create\+::promise\+For}    \\\cline{1-2}
+{\ttfamily rejection\+\_\+for}   &{\ttfamily Create\+::rejection\+For}    \\\cline{1-2}
+{\ttfamily exception\+\_\+for}   &{\ttfamily Create\+::exception\+For}    \\\cline{1-2}
+{\ttfamily iter\+\_\+for}   &{\ttfamily Create\+::iter\+For}    \\\cline{1-2}
+{\ttfamily inspect}   &{\ttfamily Utils\+::inspect}    \\\cline{1-2}
+{\ttfamily inspect\+\_\+all}   &{\ttfamily Utils\+::inspect\+All}    \\\cline{1-2}
+{\ttfamily unwrap}   &{\ttfamily Utils\+::unwrap}    \\\cline{1-2}
+{\ttfamily all}   &{\ttfamily Utils\+::all}    \\\cline{1-2}
+{\ttfamily some}   &{\ttfamily Utils\+::some}    \\\cline{1-2}
+{\ttfamily any}   &{\ttfamily Utils\+::any}    \\\cline{1-2}
+{\ttfamily settle}   &{\ttfamily Utils\+::settle}    \\\cline{1-2}
+{\ttfamily each}   &{\ttfamily Each\+::of}    \\\cline{1-2}
+{\ttfamily each\+\_\+limit}   &{\ttfamily Each\+::of\+Limit}    \\\cline{1-2}
+{\ttfamily each\+\_\+limit\+\_\+all}   &{\ttfamily Each\+::of\+Limit\+All}    \\\cline{1-2}
+{\ttfamily !is\+\_\+fulfilled}   &{\ttfamily Is\+::pending}    \\\cline{1-2}
+{\ttfamily is\+\_\+fulfilled}   &{\ttfamily Is\+::fulfilled}    \\\cline{1-2}
+{\ttfamily is\+\_\+rejected}   &{\ttfamily Is\+::rejected}    \\\cline{1-2}
+{\ttfamily is\+\_\+settled}   &{\ttfamily Is\+::settled}    \\\cline{1-2}
+{\ttfamily coroutine}   &{\ttfamily Coroutine\+::of}   \\\cline{1-2}
+\end{longtabu}
+\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md566}{}\doxysection{\texorpdfstring{Security}{Security}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md566}
+If you discover a security vulnerability within this package, please send an email to \href{mailto:security@tidelift.com}{\texttt{ security@tidelift.\+com}}. All security vulnerabilities will be promptly addressed. Please do not disclose security-\/related issues publicly until a fix has been announced. Please see \href{https://github.com/guzzle/promises/security/policy}{\texttt{ Security Policy}} for more information.\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md567}{}\doxysection{\texorpdfstring{License}{License}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md567}
+Guzzle is made available under the MIT License (MIT). Please see \mbox{[}License File\mbox{]}(LICENSE) for more information.\hypertarget{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md568}{}\doxysection{\texorpdfstring{For Enterprise}{For Enterprise}}\label{md_vendor_2guzzlehttp_2promises_2_r_e_a_d_m_e_autotoc_md568}
+Available as part of the Tidelift Subscription
+
+The maintainers of Guzzle and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source dependencies you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact dependencies you use. \href{https://tidelift.com/subscription/pkg/packagist-guzzlehttp-promises?utm_source=packagist-guzzlehttp-promises&utm_medium=referral&utm_campaign=enterprise&utm_term=repo}{\texttt{ Learn more.}} 

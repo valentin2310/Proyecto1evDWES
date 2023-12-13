@@ -1,0 +1,70 @@
+\doxysection{Dynamo\+Db\+Handler.\+php}
+\hypertarget{_dynamo_db_handler_8php_source}{}\label{_dynamo_db_handler_8php_source}\index{vendor/monolog/monolog/src/Monolog/Handler/DynamoDbHandler.php@{vendor/monolog/monolog/src/Monolog/Handler/DynamoDbHandler.php}}
+\mbox{\hyperlink{_dynamo_db_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Monolog\ package.}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Jordi\ Boggiano\ <j.boggiano@seld.be>}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_monolog_1_1_handler}{Monolog\(\backslash\)Handler}};}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00014}00014\ use\ Aws\(\backslash\)Sdk;}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00015}00015\ use\ Aws\(\backslash\)DynamoDb\(\backslash\)DynamoDbClient;}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00016}00016\ use\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{Monolog\(\backslash\)Formatter\(\backslash\)FormatterInterface}};}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00017}00017\ use\ Aws\(\backslash\)DynamoDb\(\backslash\)Marshaler;}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_scalar_formatter}{Monolog\(\backslash\)Formatter\(\backslash\)ScalarFormatter}};}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00019}00019\ use\ Monolog\(\backslash\)Level;}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_monolog_1_1_log_record}{Monolog\(\backslash\)LogRecord}};}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00028}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler}{00028}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler}{DynamoDbHandler}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_processing_handler}{AbstractProcessingHandler}}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00029}00029\ \{}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00030}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_a97a87ae294a108ebd7ff4db7c0d0ae4d}{00030}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_a97a87ae294a108ebd7ff4db7c0d0ae4d}{DATE\_FORMAT}}\ =\ \textcolor{stringliteral}{'Y-\/m-\/d\(\backslash\)TH:i:s.uO'};}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00032}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_ab23a89d46781c57f81b7ae928600ef2d}{00032}}\ \ \ \ \ \textcolor{keyword}{protected}\ DynamoDbClient\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_ab23a89d46781c57f81b7ae928600ef2d}{\$client}};}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00034}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_adab5438224e48204d162e89b273b36b3}{00034}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_adab5438224e48204d162e89b273b36b3}{\$table}};}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00036}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_a0c6dffe20546e69bc5573b23786a1281}{00036}}\ \ \ \ \ \textcolor{keyword}{protected}\ Marshaler\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_a0c6dffe20546e69bc5573b23786a1281}{\$marshaler}};}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00038}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_ac240e9af5b4ca5fdb2455255dc7f90e4}{00038}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_ac240e9af5b4ca5fdb2455255dc7f90e4}{\_\_construct}}(DynamoDbClient\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_ab23a89d46781c57f81b7ae928600ef2d}{\$client}},\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_adab5438224e48204d162e89b273b36b3}{\$table}},\ \textcolor{keywordtype}{int}|\textcolor{keywordtype}{string}|Level\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}}\ =\ Level::Debug,\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}}\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00039}00039\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \$this-\/>marshaler\ =\ \textcolor{keyword}{new}\ Marshaler;}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \$this-\/>client\ =\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_ab23a89d46781c57f81b7ae928600ef2d}{\$client}};}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \$this-\/>table\ =\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_adab5438224e48204d162e89b273b36b3}{\$table}};}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ parent::\_\_construct(\mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_aa36bf98e6175620b31e86fef2a7a86ff}{\$level}},\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_abstract_handler_ac6f55e8d474d30b8cbfc3f43f5c32a42}{\$bubble}});}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00046}00046\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00051}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_a4d821b93cc01881ce31ed79d678a8800}{00051}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_a4d821b93cc01881ce31ed79d678a8800}{write}}(\mbox{\hyperlink{class_monolog_1_1_log_record}{LogRecord}}\ \$record):\ void}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00052}00052\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \$filtered\ =\ \$this-\/>\mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_acc49209dd3a2c216e0e56ccb6ed663ec}{filterEmptyFields}}(\$record-\/>formatted);}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \$formatted\ =\ \$this-\/>marshaler-\/>marshalItem(\$filtered);}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \$this-\/>client-\/>putItem([}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'TableName'}\ =>\ \$this-\/>table,}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Item'}\ =>\ \$formatted,}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ ]);}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00060}00060\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00066}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_acc49209dd3a2c216e0e56ccb6ed663ec}{00066}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_acc49209dd3a2c216e0e56ccb6ed663ec}{filterEmptyFields}}(array\ \$record):\ array}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00067}00067\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ array\_filter(\$record,\ \textcolor{keyword}{function}\ (\$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ []\ !==\ \$value;}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00071}00071\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00076}\mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_a0bd80b04e1992562f7eacea2097d3d9d}{00076}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_monolog_1_1_handler_1_1_dynamo_db_handler_a0bd80b04e1992562f7eacea2097d3d9d}{getDefaultFormatter}}():\ \mbox{\hyperlink{interface_monolog_1_1_formatter_1_1_formatter_interface}{FormatterInterface}}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00077}00077\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_monolog_1_1_formatter_1_1_scalar_formatter}{ScalarFormatter}}(self::DATE\_FORMAT);}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00079}00079\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_dynamo_db_handler_8php_source_l00080}00080\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,115 @@
+\doxysection{Require\+Pass.\+php}
+\hypertarget{_require_pass_8php_source}{}\label{_require_pass_8php_source}\index{vendor/psy/psysh/src/CodeCleaner/RequirePass.php@{vendor/psy/psysh/src/CodeCleaner/RequirePass.php}}
+\mbox{\hyperlink{_require_pass_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ Psy\ Shell.}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ 2012-\/2023\ Justin\ Hileman}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_psy_1_1_code_cleaner}{Psy\(\backslash\)CodeCleaner}};}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00014}00014\ use\ \mbox{\hyperlink{namespace_php_parser_1_1_node}{PhpParser\(\backslash\)Node}};}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_arg}{PhpParser\(\backslash\)Node\(\backslash\)Arg}};}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_expr_1_1_include__}{PhpParser\(\backslash\)Node\(\backslash\)Expr\(\backslash\)Include\_}};}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_expr_1_1_static_call}{PhpParser\(\backslash\)Node\(\backslash\)Expr\(\backslash\)StaticCall}};}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_name_1_1_fully_qualified}{PhpParser\(\backslash\)Node\(\backslash\)Name\(\backslash\)FullyQualified}}\ as\ FullyQualifiedName;}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_scalar_1_1_l_number}{PhpParser\(\backslash\)Node\(\backslash\)Scalar\(\backslash\)LNumber}};}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_error_exception}{Psy\(\backslash\)Exception\(\backslash\)ErrorException}};}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_fatal_error_exception}{Psy\(\backslash\)Exception\(\backslash\)FatalErrorException}};}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00026}\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_require_pass}{00026}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_require_pass}{RequirePass}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_code_cleaner_pass}{CodeCleanerPass}}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00027}00027\ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00028}00028\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \$requireTypes\ =\ [\mbox{\hyperlink{class_php_parser_1_1_node_1_1_expr_1_1_include___a9556579ada3fafd171b7d61b5bac52a0}{Include\_::TYPE\_REQUIRE}},\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_expr_1_1_include___a5ba444077c40db1474f5213012113704}{Include\_::TYPE\_REQUIRE\_ONCE}}];}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00035}\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_require_pass_a25ef32b8b5406ef04d6033cd9baa5b92}{00035}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_require_pass_a25ef32b8b5406ef04d6033cd9baa5b92}{enterNode}}(\mbox{\hyperlink{interface_php_parser_1_1_node}{Node}}\ \$origNode)}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00036}00036\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>isRequireNode(\$origNode))\ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00038}00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00039}00039\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \$node\ =\ clone\ \$origNode;}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00044}00044\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ rewrite}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00045}00045\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00046}00046\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ \ \ \$foo\ =\ require\ \$bar}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00047}00047\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00048}00048\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ to}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00049}00049\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00050}00050\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ \ \ \$foo\ =\ require\ \(\backslash\)Psy\(\backslash\)CodeCleaner\(\backslash\)RequirePass::resolve(\$bar)}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00051}00051\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \$node-\/>expr\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_expr_1_1_static_call}{StaticCall}}(}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ FullyQualifiedName(self::class),}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'resolve'},}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{keyword}{new}\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_arg}{Arg}}(\$origNode-\/>expr),\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_arg}{Arg}}(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_scalar_1_1_l_number}{LNumber}}(\$origNode-\/>\mbox{\hyperlink{interface_php_parser_1_1_node_aef9c32f6066788a101028a1d4150f8cb}{getLine}}()))],}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \$origNode-\/>\mbox{\hyperlink{interface_php_parser_1_1_node_afbe85ec4b9947cc951c67d63911cf0a4}{getAttributes}}()}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$node;}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00060}00060\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00078}\mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_require_pass_aa0c0828a1f12d87142299ee0efc5a1e1}{00078}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_psy_1_1_code_cleaner_1_1_require_pass_aa0c0828a1f12d87142299ee0efc5a1e1}{resolve}}(\$file,\ \$lineNumber\ =\ \textcolor{keyword}{null}):\ string}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00079}00079\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \$file\ =\ (string)\ \$file;}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$file\ ===\ \textcolor{stringliteral}{''})\ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @todo\ Shell::handleError\ would\ be\ better\ here,\ because\ we\ could}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ fake\ the\ file\ and\ line\ number,\ but\ we\ can't\ call\ it\ statically.}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ So\ we're\ duplicating\ some\ of\ the\ logics\ here.}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)E\_WARNING\ \&\ \(\backslash\)error\_reporting())\ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ErrorException::throwException(\(\backslash\)E\_WARNING,\ \textcolor{stringliteral}{'Filename\ cannot\ be\ empty'},\ \textcolor{keyword}{null},\ \$lineNumber);}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @todo\ trigger\ an\ error\ as\ fallback?\ this\ is\ pretty\ ugly…}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ trigger\_error('Filename\ cannot\ be\ empty',\ E\_USER\_WARNING);}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \$resolvedPath\ =\ \(\backslash\)stream\_resolve\_include\_path(\$file);}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$file\ ===\ \textcolor{stringliteral}{''}\ ||\ !\$resolvedPath)\ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \$msg\ =\ \(\backslash\)sprintf(\textcolor{stringliteral}{"{}Failed\ opening\ required\ '\%s'"{}},\ \$file);}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_psy_1_1_exception_1_1_fatal_error_exception}{FatalErrorException}}(\$msg,\ 0,\ \(\backslash\)E\_ERROR,\ \textcolor{keyword}{null},\ \$lineNumber);}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Special\ case:\ if\ the\ path\ is\ not\ already\ relative\ or\ absolute,\ and\ it\ would\ resolve\ to}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ something\ inside\ the\ currently\ running\ phar\ (e.g.\ \`{}vendor/autoload.php`),\ we'll\ resolve}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ it\ relative\ to\ the\ include\ path\ so\ PHP\ won't\ grab\ the\ phar\ version.}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Note\ that\ this\ only\ works\ if\ the\ phar\ has\ \`{}psysh`\ in\ the\ path.\ We\ might\ want\ to\ lift\ this}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ restriction\ and\ special\ case\ paths\ that\ would\ collide\ with\ any\ running\ phar?}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$resolvedPath\ !==\ \$file\ \&\&\ \$file[0]\ !==\ \textcolor{charliteral}{'.'})\ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \$runningPhar\ =\ \(\backslash\)Phar::running();}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)strpos(\$runningPhar,\ \textcolor{stringliteral}{'psysh'})\ !==\ \textcolor{keyword}{false}\ \&\&\ \(\backslash\)is\_file(\$runningPhar.\(\backslash\)DIRECTORY\_SEPARATOR.\$file))\ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (self::getIncludePath()\ as\ \$prefix)\ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$resolvedPath\ =\ \$prefix.\(\backslash\)DIRECTORY\_SEPARATOR.\$file;}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_file(\$resolvedPath))\ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$resolvedPath;}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$file;}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00118}00118\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00120}00120\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ isRequireNode(\mbox{\hyperlink{interface_php_parser_1_1_node}{Node}}\ \$node):\ bool}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00121}00121\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$node\ instanceof\ \mbox{\hyperlink{class_php_parser_1_1_node_1_1_expr_1_1_include__}{Include\_}}\ \&\&\ \(\backslash\)in\_array(\$node-\/>type,\ self::\$requireTypes);}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00123}00123\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00125}00125\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ getIncludePath():\ array}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00126}00126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)PATH\_SEPARATOR\ ===\ \textcolor{charliteral}{':'})\ \{}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ return\ \(\backslash\)preg\_split(\textcolor{stringliteral}{'\#:(?!//)\#'},\ \(\backslash\)get\_include\_path());}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ return\ \(\backslash\)explode(\(\backslash\)PATH\_SEPARATOR,\ \(\backslash\)get\_include\_path());}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00132}00132\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_require_pass_8php_source_l00133}00133\ \}}
+
+\end{DoxyCode}

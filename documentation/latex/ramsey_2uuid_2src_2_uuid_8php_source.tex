@@ -1,0 +1,358 @@
+\doxysection{Uuid.\+php}
+\hypertarget{ramsey_2uuid_2src_2_uuid_8php_source}{}\label{ramsey_2uuid_2src_2_uuid_8php_source}\index{vendor/ramsey/uuid/src/Uuid.php@{vendor/ramsey/uuid/src/Uuid.php}}
+\mbox{\hyperlink{ramsey_2uuid_2src_2_uuid_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00013}00013\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_ramsey_1_1_uuid}{Ramsey\(\backslash\)Uuid}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00017}00017\ use\ BadMethodCallException;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00018}00018\ use\ DateTimeInterface;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00019}00019\ use\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_codec_1_1_codec_interface}{Ramsey\(\backslash\)Uuid\(\backslash\)Codec\(\backslash\)CodecInterface}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00020}00020\ use\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_converter_1_1_number_converter_interface}{Ramsey\(\backslash\)Uuid\(\backslash\)Converter\(\backslash\)NumberConverterInterface}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00021}00021\ use\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_converter_1_1_time_converter_interface}{Ramsey\(\backslash\)Uuid\(\backslash\)Converter\(\backslash\)TimeConverterInterface}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_exception_1_1_unsupported_operation_exception}{Ramsey\(\backslash\)Uuid\(\backslash\)Exception\(\backslash\)UnsupportedOperationException}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00023}00023\ use\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_fields_1_1_fields_interface}{Ramsey\(\backslash\)Uuid\(\backslash\)Fields\(\backslash\)FieldsInterface}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00024}00024\ use\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_lazy_1_1_lazy_uuid_from_string}{Ramsey\(\backslash\)Uuid\(\backslash\)Lazy\(\backslash\)LazyUuidFromString}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00025}00025\ use\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_rfc4122_1_1_fields_interface}{Ramsey\(\backslash\)Uuid\(\backslash\)Rfc4122\(\backslash\)FieldsInterface}}\ as\ Rfc4122FieldsInterface;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00026}00026\ use\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_type_1_1_hexadecimal}{Ramsey\(\backslash\)Uuid\(\backslash\)Type\(\backslash\)Hexadecimal}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00027}00027\ use\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_type_1_1_integer}{Ramsey\(\backslash\)Uuid\(\backslash\)Type\(\backslash\)Integer}}\ as\ IntegerObject;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00028}00028\ use\ ValueError;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00030}00030\ use\ \textcolor{keyword}{function}\ \mbox{\hyperlink{namespace_nette_1_1_schema_1_1_elements_a574093ac856447ce4d3781e2bd8beda5}{assert}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00031}00031\ use\ \textcolor{keyword}{function}\ bin2hex;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00032}00032\ use\ \textcolor{keyword}{function}\ method\_exists;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00033}00033\ use\ \textcolor{keyword}{function}\ preg\_match;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00034}00034\ use\ \textcolor{keyword}{function}\ sprintf;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00035}00035\ use\ \textcolor{keyword}{function}\ str\_replace;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00036}00036\ use\ \textcolor{keyword}{function}\ strcmp;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00037}00037\ use\ \textcolor{keyword}{function}\ strlen;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00038}00038\ use\ \textcolor{keyword}{function}\ strtolower;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00039}00039\ use\ \textcolor{keyword}{function}\ substr;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00046}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid}{00046}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid}{Uuid}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00047}00047\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00048}00048\ \ \ \ \ use\ DeprecatedUuidMethodsTrait;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00056}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ac9f28c42a446e163a1766f595ac3571b}{00056}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ac9f28c42a446e163a1766f595ac3571b}{NAMESPACE\_DNS}}\ =\ \textcolor{stringliteral}{'6ba7b810-\/9dad-\/11d1-\/80b4-\/00c04fd430c8'};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00063}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ab7ecf36625b6f40691bd92e7ef9f9797}{00063}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ab7ecf36625b6f40691bd92e7ef9f9797}{NAMESPACE\_URL}}\ =\ \textcolor{stringliteral}{'6ba7b811-\/9dad-\/11d1-\/80b4-\/00c04fd430c8'};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00070}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a2d8dbcd74ffe7c2d792a0f9dc5b70874}{00070}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a2d8dbcd74ffe7c2d792a0f9dc5b70874}{NAMESPACE\_OID}}\ =\ \textcolor{stringliteral}{'6ba7b812-\/9dad-\/11d1-\/80b4-\/00c04fd430c8'};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00078}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a5fada8a61408f94f67d3f22e87255d94}{00078}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a5fada8a61408f94f67d3f22e87255d94}{NAMESPACE\_X500}}\ =\ \textcolor{stringliteral}{'6ba7b814-\/9dad-\/11d1-\/80b4-\/00c04fd430c8'};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00086}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_af7e6a0bd87326b75d22a0c4003a896c6}{00086}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_af7e6a0bd87326b75d22a0c4003a896c6}{NIL}}\ =\ \textcolor{stringliteral}{'00000000-\/0000-\/0000-\/0000-\/000000000000'};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00094}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aea7ca06e97d0ffa2d7764c79dece2bd5}{00094}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aea7ca06e97d0ffa2d7764c79dece2bd5}{MAX}}\ =\ \textcolor{stringliteral}{'ffffffff-\/ffff-\/ffff-\/ffff-\/ffffffffffff'};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00101}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a0426e3cea251e7f266481ff323c84c62}{00101}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a0426e3cea251e7f266481ff323c84c62}{RESERVED\_NCS}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00108}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a2fabd98743823b660271e1e8ac26ad5f}{00108}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a2fabd98743823b660271e1e8ac26ad5f}{RFC\_4122}}\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00115}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a4817162e2d9c0f45534040788175999e}{00115}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a4817162e2d9c0f45534040788175999e}{RESERVED\_MICROSOFT}}\ =\ 6;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00122}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aac91570e99a51939722b248113cc24cf}{00122}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aac91570e99a51939722b248113cc24cf}{RESERVED\_FUTURE}}\ =\ 7;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00127}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ab43a8de8f13c0abb8d7e66286924f4b2}{00127}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ab43a8de8f13c0abb8d7e66286924f4b2}{VALID\_PATTERN}}\ =\ \textcolor{stringliteral}{'\string^[0-\/9A-\/Fa-\/f]\{8\}-\/[0-\/9A-\/Fa-\/f]\{4\}-\/[0-\/9A-\/Fa-\/f]\{4\}-\/[0-\/9A-\/Fa-\/f]\{4\}-\/[0-\/9A-\/Fa-\/f]\{12\}\$'};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00134}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a7350e10ffbd84ecf06e95e10ae09da14}{00134}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a7350e10ffbd84ecf06e95e10ae09da14}{UUID\_TYPE\_TIME}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00141}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a28e866da2b4895bed6eb8859a3655556}{00141}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a28e866da2b4895bed6eb8859a3655556}{UUID\_TYPE\_DCE\_SECURITY}}\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00146}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a3420ab7662943bd1e6491afa87d75342}{00146}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a3420ab7662943bd1e6491afa87d75342}{UUID\_TYPE\_IDENTIFIER}}\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00153}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_af18307133f7cf7a0daf2f4f0c9e92479}{00153}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_af18307133f7cf7a0daf2f4f0c9e92479}{UUID\_TYPE\_HASH\_MD5}}\ =\ 3;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00160}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a4186f863d9b15820d2846cb4961d6f96}{00160}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a4186f863d9b15820d2846cb4961d6f96}{UUID\_TYPE\_RANDOM}}\ =\ 4;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00167}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a9eb3bbee72013337fc5e1692eaf79c68}{00167}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a9eb3bbee72013337fc5e1692eaf79c68}{UUID\_TYPE\_HASH\_SHA1}}\ =\ 5;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00172}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a16c5a6b8bb8801b587740a185dcb697d}{00172}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a16c5a6b8bb8801b587740a185dcb697d}{UUID\_TYPE\_PEABODY}}\ =\ 6;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00179}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a35ea13c259dcf64495db9f11afff1de2}{00179}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a35ea13c259dcf64495db9f11afff1de2}{UUID\_TYPE\_REORDERED\_TIME}}\ =\ 6;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00186}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a19b0e134ad7c8fee616e6134e278462f}{00186}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a19b0e134ad7c8fee616e6134e278462f}{UUID\_TYPE\_UNIX\_TIME}}\ =\ 7;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00191}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a74d52ed083f1dcab85d3fde4053e10f9}{00191}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a74d52ed083f1dcab85d3fde4053e10f9}{UUID\_TYPE\_CUSTOM}}\ =\ 8;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00198}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a1771a99336ef8bc8927dc92320e9150b}{00198}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a1771a99336ef8bc8927dc92320e9150b}{DCE\_DOMAIN\_PERSON}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00205}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a036025bfb36227035be4cb89f1769d31}{00205}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a036025bfb36227035be4cb89f1769d31}{DCE\_DOMAIN\_GROUP}}\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00212}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ac5f5c1e6d1f63c084629c6e3e6e88de5}{00212}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ac5f5c1e6d1f63c084629c6e3e6e88de5}{DCE\_DOMAIN\_ORG}}\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00219}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a0825e5b8d503697b72b13affb3853038}{00219}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a0825e5b8d503697b72b13affb3853038}{DCE\_DOMAIN\_NAMES}}\ =\ [}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ self::DCE\_DOMAIN\_PERSON\ =>\ \textcolor{stringliteral}{'person'},}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ self::DCE\_DOMAIN\_GROUP\ =>\ \textcolor{stringliteral}{'group'},}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ self::DCE\_DOMAIN\_ORG\ =>\ \textcolor{stringliteral}{'org'},}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00223}00223\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00225}00225\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ ?\mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_factory_interface}{UuidFactoryInterface}}\ \$factory\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00232}00232\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \$factoryReplaced\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00234}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aa174c0b045bc14886d4d371d7ccb0e8a}{00234}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_codec_1_1_codec_interface}{CodecInterface}}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aa174c0b045bc14886d4d371d7ccb0e8a}{\$codec}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00235}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a84b8a47e9934e7f5be7d26f263f1475d}{00235}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_converter_1_1_number_converter_interface}{NumberConverterInterface}}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a84b8a47e9934e7f5be7d26f263f1475d}{\$numberConverter}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00236}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aca266bcbc12b9773122c68bcf4a31d3d}{00236}}\ \ \ \ \ \textcolor{keyword}{protected}\ Rfc4122FieldsInterface\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aca266bcbc12b9773122c68bcf4a31d3d}{\$fields}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00237}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ada8aea767374dffbaf4d2bc203ea2897}{00237}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_converter_1_1_time_converter_interface}{TimeConverterInterface}}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ada8aea767374dffbaf4d2bc203ea2897}{\$timeConverter}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00238}00238\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00263}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_abf24837b684225298f8f07048c429fd9}{00263}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_abf24837b684225298f8f07048c429fd9}{\_\_construct}}(}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ Rfc4122FieldsInterface\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aca266bcbc12b9773122c68bcf4a31d3d}{\$fields}},}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_converter_1_1_number_converter_interface}{NumberConverterInterface}}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a84b8a47e9934e7f5be7d26f263f1475d}{\$numberConverter}},}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_codec_1_1_codec_interface}{CodecInterface}}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aa174c0b045bc14886d4d371d7ccb0e8a}{\$codec}},}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_converter_1_1_time_converter_interface}{TimeConverterInterface}}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ada8aea767374dffbaf4d2bc203ea2897}{\$timeConverter}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00268}00268\ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \$this-\/>fields\ =\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aca266bcbc12b9773122c68bcf4a31d3d}{\$fields}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \$this-\/>codec\ =\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aa174c0b045bc14886d4d371d7ccb0e8a}{\$codec}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \$this-\/>numberConverter\ =\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a84b8a47e9934e7f5be7d26f263f1475d}{\$numberConverter}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \$this-\/>timeConverter\ =\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ada8aea767374dffbaf4d2bc203ea2897}{\$timeConverter}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00273}00273\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00278}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a7516ca30af0db3cdbf9a7739b48ce91d}{00278}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a7516ca30af0db3cdbf9a7739b48ce91d}{\_\_toString}}():\ string}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00279}00279\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a5558c5d549f41597377fa1ea8a1cefa3}{toString}}();}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00281}00281\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00286}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ad402d8679325bc514874370f02b5c2ac}{00286}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ad402d8679325bc514874370f02b5c2ac}{jsonSerialize}}():\ string}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00287}00287\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00288}00288\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a5558c5d549f41597377fa1ea8a1cefa3}{toString}}();}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00289}00289\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00290}00290\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00294}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a4d9813fea8525b19a1d370eeb8fe41d6}{00294}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a4d9813fea8525b19a1d370eeb8fe41d6}{serialize}}():\ string}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00295}00295\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>codec-\/>encode(\$this);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00297}00297\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00298}00298\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00302}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ab1d6abfbdcd8c9dd63dfef565bd2cfcf}{00302}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ab1d6abfbdcd8c9dd63dfef565bd2cfcf}{\_\_serialize}}():\ array}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00303}00303\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00304}00304\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\textcolor{stringliteral}{'bytes'}\ =>\ \$this-\/>\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a4d9813fea8525b19a1d370eeb8fe41d6}{serialize}}()];}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00305}00305\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00306}00306\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00313}00313\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ unserialize(\textcolor{keywordtype}{string}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}):\ void}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00314}00314\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strlen(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})\ ===\ 16)\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \$uuid\ =\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a67142a08e07587dda55e709e895afcac}{self::getFactory}}()-\/>fromBytes(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \$uuid\ =\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a67142a08e07587dda55e709e895afcac}{self::getFactory}}()-\/>fromString(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \$this-\/>codec\ =\ \$uuid-\/>codec;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ \$this-\/>numberConverter\ =\ \$uuid-\/>numberConverter;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00325}00325\ \ \ \ \ \ \ \ \ \$this-\/>fields\ =\ \$uuid-\/>fields;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \$this-\/>timeConverter\ =\ \$uuid-\/>timeConverter;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00327}00327\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00328}00328\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00332}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a2fe5966ad9b8e1d91a37d3e055ac4938}{00332}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a2fe5966ad9b8e1d91a37d3e055ac4938}{\_\_unserialize}}(array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}):\ void}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00333}00333\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @codeCoverageIgnoreStart}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'bytes'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ ValueError(sprintf(\textcolor{stringliteral}{'\%s():\ Argument\ \#1\ (\$data)\ is\ invalid'},\ \_\_METHOD\_\_));}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00338}00338\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @codeCoverageIgnoreEnd}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00340}00340\ \ \ \ \ \ \ \ \ \$this-\/>unserialize(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[\textcolor{stringliteral}{'bytes'}]);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00341}00341\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00342}00342\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00343}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aeaf3e77cf275d32438b3d6d4ee764481}{00343}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aeaf3e77cf275d32438b3d6d4ee764481}{compareTo}}(\mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}\ \$other):\ int}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00344}00344\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \$compare\ =\ strcmp(\$this-\/>\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a5558c5d549f41597377fa1ea8a1cefa3}{toString}}(),\ \$other-\/>\mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface_a5558c5d549f41597377fa1ea8a1cefa3}{toString}}());}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$compare\ <\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00350}00350\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00351}00351\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$compare\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 1;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00353}00353\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00356}00356\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00357}00357\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00358}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aeaf66b29d9a08ece6c70e9214d3ac608}{00358}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aeaf66b29d9a08ece6c70e9214d3ac608}{equals}}(?\textcolor{keywordtype}{object}\ \$other):\ bool}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00359}00359\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$other\ instanceof\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}})\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00363}00363\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aeaf3e77cf275d32438b3d6d4ee764481}{compareTo}}(\$other)\ ===\ 0;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00365}00365\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00370}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a74b4bd44ae29d3348a82d5f9f32538ca}{00370}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a74b4bd44ae29d3348a82d5f9f32538ca}{getBytes}}():\ string}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00371}00371\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>codec-\/>encodeBinary(\$this);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00373}00373\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00375}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aff667c8e7e2da76ea9ba77bc12f20027}{00375}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aff667c8e7e2da76ea9ba77bc12f20027}{getFields}}():\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_fields_1_1_fields_interface}{FieldsInterface}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00376}00376\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00377}00377\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_aca266bcbc12b9773122c68bcf4a31d3d}{\$this-\/>fields}};}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00378}00378\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00379}00379\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00380}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a22ef93af40eb3275f4411fbc522ddb13}{00380}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a22ef93af40eb3275f4411fbc522ddb13}{getHex}}():\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_type_1_1_hexadecimal}{Hexadecimal}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00381}00381\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_type_1_1_hexadecimal}{Hexadecimal}}(str\_replace(\textcolor{charliteral}{'-\/'},\ \textcolor{stringliteral}{''},\ \$this-\/>\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a5558c5d549f41597377fa1ea8a1cefa3}{toString}}()));}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00383}00383\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00384}00384\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00385}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_acf4ec112e335aa5344fc21c871e21c1c}{00385}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_acf4ec112e335aa5344fc21c871e21c1c}{getInteger}}():\ IntegerObject}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00386}00386\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ IntegerObject(\$this-\/>numberConverter-\/>fromHex(\$this-\/>getHex()-\/>toString()));}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00388}00388\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00390}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a20576339466f339523acf58110ca08a0}{00390}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a20576339466f339523acf58110ca08a0}{getUrn}}():\ string}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00391}00391\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'urn:uuid:'}\ .\ \$this-\/>\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a5558c5d549f41597377fa1ea8a1cefa3}{toString}}();}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00393}00393\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00398}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a5558c5d549f41597377fa1ea8a1cefa3}{00398}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a5558c5d549f41597377fa1ea8a1cefa3}{toString}}():\ string}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00399}00399\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00400}00400\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>codec-\/>encode(\$this);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00401}00401\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00402}00402\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00406}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a67142a08e07587dda55e709e895afcac}{00406}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a67142a08e07587dda55e709e895afcac}{getFactory}}():\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_factory_interface}{UuidFactoryInterface}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00407}00407\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (self::\$factory\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ self::\$factory\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_factory}{UuidFactory}}();}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00410}00410\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00411}00411\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00412}00412\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::\$factory;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00413}00413\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00414}00414\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00421}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a421ca8fb6ad661b3491da2d40b6b7115}{00421}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a421ca8fb6ad661b3491da2d40b6b7115}{setFactory}}(\mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_factory_interface}{UuidFactoryInterface}}\ \$factory):\ void}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00422}00422\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00423}00423\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Note:\ non-\/strict\ equality\ is\ intentional\ here.\ If\ the\ factory\ is\ configured\ differently,\ every\ assumption}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00424}00424\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ around\ purity\ is\ broken,\ and\ we\ have\ to\ internally\ decide\ everything\ differently.}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ phpcs:ignore\ SlevomatCodingStandard.Operators.DisallowEqualOperators.DisallowedNotEqualOperator}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00426}00426\ \ \ \ \ \ \ \ \ self::\$factoryReplaced\ =\ (\$factory\ !=\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_factory}{UuidFactory}}());}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00428}00428\ \ \ \ \ \ \ \ \ self::\$factory\ =\ \$factory;}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00429}00429\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00430}00430\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00447}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a41ce01ac4de83abd7a0205a0510e8721}{00447}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a41ce01ac4de83abd7a0205a0510e8721}{fromBytes}}(\textcolor{keywordtype}{string}\ \$bytes):\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00448}00448\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!self::\$factoryReplaced\ \&\&\ strlen(\$bytes)\ ===\ 16)\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ \ \ \$base16Uuid\ =\ bin2hex(\$bytes);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00451}00451\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00452}00452\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Note:\ we\ are\ calling\ \`{}fromString`\ internally\ because\ we\ don't\ know\ if\ the\ given\ \`{}\$bytes`\ is\ a\ valid\ UUID}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a6f13ddbf96417325b604b79861c821c9}{self::fromString}}(}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ substr(\$base16Uuid,\ 0,\ 8)}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\ \textcolor{charliteral}{'-\/'}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\ substr(\$base16Uuid,\ 8,\ 4)}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\ \textcolor{charliteral}{'-\/'}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\ substr(\$base16Uuid,\ 12,\ 4)}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\ \textcolor{charliteral}{'-\/'}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\ substr(\$base16Uuid,\ 16,\ 4)}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\ \textcolor{charliteral}{'-\/'}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\ substr(\$base16Uuid,\ 20,\ 12)}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00465}00465\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a67142a08e07587dda55e709e895afcac}{self::getFactory}}()-\/>fromBytes(\$bytes);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00467}00467\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00468}00468\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00485}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a6f13ddbf96417325b604b79861c821c9}{00485}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a6f13ddbf96417325b604b79861c821c9}{fromString}}(\textcolor{keywordtype}{string}\ \$uuid):\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00486}00486\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00487}00487\ \ \ \ \ \ \ \ \ \$uuid\ =\ strtolower(\$uuid);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!self::\$factoryReplaced\ \&\&\ preg\_match(LazyUuidFromString::VALID\_REGEX,\ \$uuid)\ ===\ 1)\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\$uuid\ !==\ \textcolor{stringliteral}{''});}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00490}00490\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00491}00491\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_lazy_1_1_lazy_uuid_from_string}{LazyUuidFromString}}(\$uuid);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00492}00492\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00493}00493\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a67142a08e07587dda55e709e895afcac}{self::getFactory}}()-\/>fromString(\$uuid);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00495}00495\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00496}00496\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00510}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a7978bdaded5903e000ef3ea5995d62a4}{00510}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a7978bdaded5903e000ef3ea5995d62a4}{fromDateTime}}(}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00511}00511\ \ \ \ \ \ \ \ \ DateTimeInterface\ \$dateTime,}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ ?\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_type_1_1_hexadecimal}{Hexadecimal}}\ \$node\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ ?\textcolor{keywordtype}{int}\ \$clockSeq\ =\ \textcolor{keyword}{null}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00514}00514\ \ \ \ \ ):\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_2app_8php_acad40810860c7e1d97832f57dbe2d202}{return}}\ self::\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a67142a08e07587dda55e709e895afcac}{getFactory}}()-\/>\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a7978bdaded5903e000ef3ea5995d62a4}{fromDateTime}}(\$dateTime,\ \$node,\ \$clockSeq);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00516}00516\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00517}00517\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00530}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a2901aacf371d21c6f685f191cddab2bd}{00530}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a2901aacf371d21c6f685f191cddab2bd}{fromHexadecimal}}(\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_type_1_1_hexadecimal}{Hexadecimal}}\ \$hex):\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00531}00531\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \$factory\ =\ self::getFactory();}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00533}00533\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (method\_exists(\$factory,\ \textcolor{stringliteral}{'fromHexadecimal'}))\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00539}00539\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::getFactory()-\/>fromHexadecimal(\$hex);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00540}00540\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00541}00541\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ BadMethodCallException(\textcolor{stringliteral}{'The\ method\ fromHexadecimal()\ does\ not\ exist\ on\ the\ provided\ factory'});}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00543}00543\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00544}00544\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00556}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a75859e606813d72caefad5c04c9b9351}{00556}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a75859e606813d72caefad5c04c9b9351}{fromInteger}}(\textcolor{keywordtype}{string}\ \$integer):\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00557}00557\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00559}00559\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::getFactory()-\/>fromInteger(\$integer);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00560}00560\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00561}00561\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00574}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a42a8f34d40a37fd50570545121e1a6d9}{00574}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a42a8f34d40a37fd50570545121e1a6d9}{isValid}}(\textcolor{keywordtype}{string}\ \$uuid):\ bool}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00575}00575\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::getFactory()-\/>getValidator()-\/>validate(\$uuid);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00578}00578\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00579}00579\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00594}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ae466f6e98c463abb7c4fdbca7d7ce3b1}{00594}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_ae466f6e98c463abb7c4fdbca7d7ce3b1}{uuid1}}(\$node\ =\ \textcolor{keyword}{null},\ ?\textcolor{keywordtype}{int}\ \$clockSeq\ =\ \textcolor{keyword}{null}):\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00595}00595\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::getFactory()-\/>uuid1(\$node,\ \$clockSeq);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00597}00597\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00598}00598\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00619}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a0ffbb04f3e54dcd9351b1d18aa50512d}{00619}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a0ffbb04f3e54dcd9351b1d18aa50512d}{uuid2}}(}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00620}00620\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \$localDomain,}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ ?IntegerObject\ \$localIdentifier\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00622}00622\ \ \ \ \ \ \ \ \ ?\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_type_1_1_hexadecimal}{Hexadecimal}}\ \$node\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00623}00623\ \ \ \ \ \ \ \ \ ?\textcolor{keywordtype}{int}\ \$clockSeq\ =\ \textcolor{keyword}{null}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00624}00624\ \ \ \ \ ):\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00625}00625\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_2app_8php_acad40810860c7e1d97832f57dbe2d202}{return}}\ self::getFactory()-\/>uuid2(\$localDomain,\ \$localIdentifier,\ \$node,\ \$clockSeq);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00626}00626\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00627}00627\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00646}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a028d0a0b309d88f62379e29e01bf144f}{00646}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a028d0a0b309d88f62379e29e01bf144f}{uuid3}}(\$ns,\ \textcolor{keywordtype}{string}\ \$name):\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00647}00647\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00648}00648\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::getFactory()-\/>uuid3(\$ns,\ \$name);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00649}00649\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00650}00650\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00657}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_af510db3de18785088557686724b8eb2c}{00657}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_af510db3de18785088557686724b8eb2c}{uuid4}}():\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00658}00658\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00659}00659\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::getFactory()-\/>uuid4();}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00660}00660\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00661}00661\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00680}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a3539f76f751c371c251c165fd477c117}{00680}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_a3539f76f751c371c251c165fd477c117}{uuid5}}(\$ns,\ \textcolor{keywordtype}{string}\ \$name):\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00681}00681\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00682}00682\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::getFactory()-\/>uuid5(\$ns,\ \$name);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00683}00683\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00684}00684\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00698}\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_af833e904137d7be6ed01bae26b95f421}{00698}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_uuid_af833e904137d7be6ed01bae26b95f421}{uuid6}}(}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00699}00699\ \ \ \ \ \ \ \ \ ?\mbox{\hyperlink{class_ramsey_1_1_uuid_1_1_type_1_1_hexadecimal}{Hexadecimal}}\ \$node\ =\ \textcolor{keyword}{null},}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00700}00700\ \ \ \ \ \ \ \ \ ?\textcolor{keywordtype}{int}\ \$clockSeq\ =\ \textcolor{keyword}{null}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00701}00701\ \ \ \ \ ):\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00702}00702\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{config_2app_8php_acad40810860c7e1d97832f57dbe2d202}{return}}\ self::getFactory()-\/>uuid6(\$node,\ \$clockSeq);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00703}00703\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00704}00704\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00715}00715\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ uuid7(?DateTimeInterface\ \$dateTime\ =\ \textcolor{keyword}{null}):\ \mbox{\hyperlink{interface_ramsey_1_1_uuid_1_1_uuid_interface}{UuidInterface}}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00716}00716\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00717}00717\ \ \ \ \ \ \ \ \ \$factory\ =\ self::getFactory();}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00718}00718\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00719}00719\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (method\_exists(\$factory,\ \textcolor{stringliteral}{'uuid7'}))\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00721}00721\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$factory-\/>uuid7(\$dateTime);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00722}00722\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00723}00723\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00724}00724\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ UnsupportedOperationException(}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00725}00725\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'The\ provided\ factory\ does\ not\ support\ the\ uuid7()\ method'},}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00726}00726\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00727}00727\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00728}00728\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00745}00745\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ uuid8(\textcolor{keywordtype}{string}\ \$bytes):\ UuidInterface}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00746}00746\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00747}00747\ \ \ \ \ \ \ \ \ \$factory\ =\ self::getFactory();}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00748}00748\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00749}00749\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (method\_exists(\$factory,\ \textcolor{stringliteral}{'uuid8'}))\ \{}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00751}00751\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$factory-\/>uuid8(\$bytes);}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00752}00752\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00753}00753\ }
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00754}00754\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ UnsupportedOperationException(}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00755}00755\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'The\ provided\ factory\ does\ not\ support\ the\ uuid8()\ method'},}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00756}00756\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00757}00757\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ramsey_2uuid_2src_2_uuid_8php_source_l00758}00758\ \}}
+
+\end{DoxyCode}

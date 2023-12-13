@@ -1,0 +1,140 @@
+\doxysection{Url\+Autolink\+Parser.\+php}
+\hypertarget{_url_autolink_parser_8php_source}{}\label{_url_autolink_parser_8php_source}\index{vendor/league/commonmark/src/Extension/Autolink/UrlAutolinkParser.php@{vendor/league/commonmark/src/Extension/Autolink/UrlAutolinkParser.php}}
+\mbox{\hyperlink{_url_autolink_parser_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00003}00003\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00005}00005\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00006}00006\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ league/commonmark\ package.}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00008}00008\ \textcolor{comment}{\ *\ (c)\ Colin\ O'Dell\ <colinodell@gmail.com>}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00010}00010\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00011}00011\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00012}00012\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00014}00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_league_1_1_common_mark_1_1_extension_1_1_autolink}{League\(\backslash\)CommonMark\(\backslash\)Extension\(\backslash\)Autolink}};}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_node_1_1_inline_1_1_link}{League\(\backslash\)CommonMark\(\backslash\)Extension\(\backslash\)CommonMark\(\backslash\)Node\(\backslash\)Inline\(\backslash\)Link}};}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00017}00017\ use\ \mbox{\hyperlink{interface_league_1_1_common_mark_1_1_parser_1_1_inline_1_1_inline_parser_interface}{League\(\backslash\)CommonMark\(\backslash\)Parser\(\backslash\)Inline\(\backslash\)InlineParserInterface}};}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_1_1_inline_parser_match}{League\(\backslash\)CommonMark\(\backslash\)Parser\(\backslash\)Inline\(\backslash\)InlineParserMatch}};}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_parser_context}{League\(\backslash\)CommonMark\(\backslash\)Parser\(\backslash\)InlineParserContext}};}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00021}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_autolink_1_1_url_autolink_parser}{00021}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_autolink_1_1_url_autolink_parser}{UrlAutolinkParser}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_league_1_1_common_mark_1_1_parser_1_1_inline_1_1_inline_parser_interface}{InlineParserInterface}}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00022}00022\ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00023}00023\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ ALLOWED\_AFTER\ =\ [\textcolor{keyword}{null},\ \textcolor{charliteral}{'\ '},\ \textcolor{stringliteral}{"{}\(\backslash\)t"{}},\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}},\ \textcolor{stringliteral}{"{}\(\backslash\)x0b"{}},\ \textcolor{stringliteral}{"{}\(\backslash\)x0c"{}},\ \textcolor{stringliteral}{"{}\(\backslash\)x0d"{}},\ \textcolor{charliteral}{'*'},\ \textcolor{charliteral}{'\_'},\ \textcolor{charliteral}{'\string~'},\ \textcolor{charliteral}{'('}];}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00025}00025\ \ \ \ \ \textcolor{comment}{//\ RegEx\ adapted\ from\ https://github.com/symfony/symfony/blob/6.3/src/Symfony/Component/Validator/Constraints/UrlValidator.php}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00026}00026\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{const}\ REGEX\ =\ \textcolor{stringliteral}{'\string~}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00027}00027\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ (}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00028}00028\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \#\ Must\ start\ with\ a\ supported\ scheme\ +\ auth,\ or\ "{}www"{}}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00029}00029\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ (?:}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00030}00030\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (?:\%s)://\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ protocol}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00031}00031\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (?:(?:(?:[\(\backslash\)\_\(\backslash\).\(\backslash\)pL\(\backslash\)pN-\/]|\%\%[0-\/9A-\/Fa-\/f]\{2\})+:)?((?:[\(\backslash\)\_\(\backslash\).\(\backslash\)pL\(\backslash\)pN-\/]|\%\%[0-\/9A-\/Fa-\/f]\{2\})+)@)?\ \#\ basic\ auth}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00032}00032\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ |www\(\backslash\).)}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00033}00033\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ (?:}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00034}00034\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (?:}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00035}00035\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (?:xn-\/-\/[a-\/z0-\/9-\/]++\(\backslash\).)*+xn-\/-\/[a-\/z0-\/9-\/]++\ \ \ \ \ \ \ \ \ \ \ \ \#\ a\ domain\ name\ using\ punycode}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00036}00036\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00037}00037\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (?:[\(\backslash\)pL\(\backslash\)pN\(\backslash\)pS\(\backslash\)pM\(\backslash\)-\/\(\backslash\)\_]++\(\backslash\).)+[\(\backslash\)pL\(\backslash\)pN\(\backslash\)pM]++\ \ \ \ \ \ \ \ \ \ \#\ a\ multi-\/level\ domain\ name}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00038}00038\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00039}00039\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [a-\/z0-\/9\(\backslash\)-\/\(\backslash\)\_]++\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ a\ single-\/level\ domain\ name}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00040}00040\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )\(\backslash\).?}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00041}00041\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ or}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00042}00042\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)d\{1,3\}\(\backslash\).\(\backslash\)d\{1,3\}\(\backslash\).\(\backslash\)d\{1,3\}\(\backslash\).\(\backslash\)d\{1,3\}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ an\ IP\ address}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00043}00043\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ or}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00044}00044\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)[}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00045}00045\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (?:(?:(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):)\{6\})(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):(?:(?:[0-\/9a-\/f]\{1,4\})))|(?:(?:(?:(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9]))\(\backslash\).)\{3\}(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9])))))))|(?:(?:::(?:(?:(?:[0-\/9a-\/f]\{1,4\})):)\{5\})(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):(?:(?:[0-\/9a-\/f]\{1,4\})))|(?:(?:(?:(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9]))\(\backslash\).)\{3\}(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9])))))))|(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})))?::(?:(?:(?:[0-\/9a-\/f]\{1,4\})):)\{4\})(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):(?:(?:[0-\/9a-\/f]\{1,4\})))|(?:(?:(?:(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9]))\(\backslash\).)\{3\}(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9])))))))|(?:(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):)\{0,1\}(?:(?:[0-\/9a-\/f]\{1,4\})))?::(?:(?:(?:[0-\/9a-\/f]\{1,4\})):)\{3\})(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):(?:(?:[0-\/9a-\/f]\{1,4\})))|(?:(?:(?:(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9]))\(\backslash\).)\{3\}(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9])))))))|(?:(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):)\{0,2\}(?:(?:[0-\/9a-\/f]\{1,4\})))?::(?:(?:(?:[0-\/9a-\/f]\{1,4\})):)\{2\})(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):(?:(?:[0-\/9a-\/f]\{1,4\})))|(?:(?:(?:(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9]))\(\backslash\).)\{3\}(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9])))))))|(?:(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):)\{0,3\}(?:(?:[0-\/9a-\/f]\{1,4\})))?::(?:(?:[0-\/9a-\/f]\{1,4\})):)(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):(?:(?:[0-\/9a-\/f]\{1,4\})))|(?:(?:(?:(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9]))\(\backslash\).)\{3\}(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9])))))))|(?:(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):)\{0,4\}(?:(?:[0-\/9a-\/f]\{1,4\})))?::)(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):(?:(?:[0-\/9a-\/f]\{1,4\})))|(?:(?:(?:(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9]))\(\backslash\).)\{3\}(?:(?:25[0-\/5]|(?:[1-\/9]|1[0-\/9]|2[0-\/4])?[0-\/9])))))))|(?:(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):)\{0,5\}(?:(?:[0-\/9a-\/f]\{1,4\})))?::)(?:(?:[0-\/9a-\/f]\{1,4\})))|(?:(?:(?:(?:(?:(?:[0-\/9a-\/f]\{1,4\})):)\{0,6\}(?:(?:[0-\/9a-\/f]\{1,4\})))?::))))}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00046}00046\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)]\ \ \#\ an\ IPv6\ address}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00047}00047\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ )}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00048}00048\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ (?::[0-\/9]+)?\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ a\ port\ (optional)}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00049}00049\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ (?:/\ (?:[\(\backslash\)pL\(\backslash\)pN\(\backslash\)-\/.\_\(\backslash\)\string~!\$\&\(\backslash\)'()*+,;=:@]|\%\%[0-\/9A-\/Fa-\/f]\{2\})*\ )*\ \ \ \ \ \ \ \ \#\ a\ path}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00050}00050\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ (?:\(\backslash\)?\ (?:[\(\backslash\)pL\(\backslash\)pN\(\backslash\)-\/.\_\(\backslash\)\string~!\$\&\(\backslash\)'\(\backslash\)[\(\backslash\)]()*+,;=:@/?]|\%\%[0-\/9A-\/Fa-\/f]\{2\})*\ )?\ \#\ a\ query\ (optional)}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00051}00051\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ (?:\(\backslash\)\#\ (?:[\(\backslash\)pL\(\backslash\)pN\(\backslash\)-\/.\_\(\backslash\)\string~!\$\&\(\backslash\)'()*+,;=:@/?]|\%\%[0-\/9A-\/Fa-\/f]\{2\})*\ )?\ \ \ \ \ \#\ a\ fragment\ (optional)}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00052}00052\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ )\string~ixu'};}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00059}00059\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$prefixes\ =\ [\textcolor{stringliteral}{'www'}];}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00066}00066\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{string}\ \$finalRegex;}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00071}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_autolink_1_1_url_autolink_parser_a0fc144c40fa784c411d668b00baa8da8}{00071}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_autolink_1_1_url_autolink_parser_a0fc144c40fa784c411d668b00baa8da8}{\_\_construct}}(array\ \$allowedProtocols\ =\ [\textcolor{stringliteral}{'http'},\ \textcolor{stringliteral}{'https'},\ \textcolor{stringliteral}{'ftp'}])}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00072}00072\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \$this-\/>finalRegex\ =\ \(\backslash\)sprintf(self::REGEX,\ \(\backslash\)implode(\textcolor{charliteral}{'|'},\ \$allowedProtocols));}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$allowedProtocols\ as\ \$protocol)\ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>prefixes[]\ =\ \$protocol\ .\ \textcolor{stringliteral}{'://'};}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00081}00081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00083}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_autolink_1_1_url_autolink_parser_a6fd7e980cdddd30feed8b75f9dde53ba}{00083}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_autolink_1_1_url_autolink_parser_a6fd7e980cdddd30feed8b75f9dde53ba}{getMatchDefinition}}():\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_1_1_inline_parser_match}{InlineParserMatch}}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00084}00084\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ InlineParserMatch::oneOf(...\$this-\/>prefixes);}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00086}00086\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00088}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_autolink_1_1_url_autolink_parser_a8dc7a55029ef5ea90a14ae64c918ad4e}{00088}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_autolink_1_1_url_autolink_parser_a8dc7a55029ef5ea90a14ae64c918ad4e}{parse}}(\mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_parser_context}{InlineParserContext}}\ \$inlineContext):\ bool}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00089}00089\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \$cursor\ =\ \$inlineContext-\/>\mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_parser_context_a454ebfd6fa316210ee110218ad08bc97}{getCursor}}();}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Autolinks\ can\ only\ come\ at\ the\ beginning\ of\ a\ line,\ after\ whitespace,\ or\ certain\ delimiting\ characters}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \$previousChar\ =\ \$cursor-\/>peek(-\/1);}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \(\backslash\)in\_array(\$previousChar,\ self::ALLOWED\_AFTER,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ if\ we\ have\ a\ valid\ URL}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\ \(\backslash\)preg\_match(\$this-\/>finalRegex,\ \$cursor-\/>getRemainder(),\ \$matches))\ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \$url\ =\ \$matches[0];}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Does\ the\ URL\ end\ with\ punctuation\ that\ should\ be\ stripped?}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)preg\_match(\textcolor{stringliteral}{'/(.+?)([?!.,:*\_\string~]+)\$/'},\ \$url,\ \$matches))\ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ the\ punctuation\ later}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \$url\ =\ \$matches[1];}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Does\ the\ URL\ end\ with\ something\ that\ looks\ like\ an\ entity\ reference?}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)preg\_match(\textcolor{stringliteral}{'/(.+)(\&[A-\/Za-\/z0-\/9]+;)\$/'},\ \$url,\ \$matches))\ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \$url\ =\ \$matches[1];}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Does\ the\ URL\ need\ unmatched\ parens\ chopped\ off?}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)substr(\$url,\ -\/1)\ ===\ \textcolor{charliteral}{')'}\ \&\&\ (\$diff\ =\ self::diffParens(\$url))\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \$url\ =\ \(\backslash\)substr(\$url,\ 0,\ -\/\$diff);}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \$cursor-\/>advanceBy(\(\backslash\)mb\_strlen(\$url,\ \textcolor{stringliteral}{'UTF-\/8'}));}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Auto-\/prefix\ 'http://'\ onto\ 'www'\ URLs}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)substr(\$url,\ 0,\ 4)\ ===\ \textcolor{stringliteral}{'www.'})\ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \ \ \ \ \$inlineContext-\/>\mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_parser_context_a53e2ca32cf29808b0b18cd5accf3c4db}{getContainer}}()-\/>appendChild(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_node_1_1_inline_1_1_link}{Link}}(\textcolor{stringliteral}{'http://'}\ .\ \$url,\ \$url));}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \$inlineContext-\/>\mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_parser_context_a53e2ca32cf29808b0b18cd5accf3c4db}{getContainer}}()-\/>appendChild(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_common_mark_1_1_node_1_1_inline_1_1_link}{Link}}(\$url,\ \$url));}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00133}00133\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00138}00138\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ diffParens(\textcolor{keywordtype}{string}\ \$content):\ int}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00139}00139\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Scan\ the\ entire\ autolink\ for\ the\ total\ number\ of\ parentheses.}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ there\ is\ a\ greater\ number\ of\ closing\ parentheses\ than\ opening\ ones,}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ we\ don’t\ consider\ ANY\ of\ the\ last\ characters\ as\ part\ of\ the\ autolink,}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ in\ order\ to\ facilitate\ including\ an\ autolink\ inside\ a\ parenthesis.}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \(\backslash\)preg\_match\_all(\textcolor{stringliteral}{'/[()]/'},\ \$content,\ \$matches);}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \$charCount\ =\ [\textcolor{charliteral}{'('}\ =>\ 0,\ \textcolor{charliteral}{')'}\ =>\ 0];}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$matches[0]\ as\ \$char)\ \{}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \$charCount[\$char]++;}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$charCount[\textcolor{charliteral}{')'}]\ -\/\ \$charCount[\textcolor{charliteral}{'('}];}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00152}00152\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_url_autolink_parser_8php_source_l00153}00153\ \}}
+
+\end{DoxyCode}

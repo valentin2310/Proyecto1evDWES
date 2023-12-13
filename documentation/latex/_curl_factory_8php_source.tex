@@ -1,0 +1,597 @@
+\doxysection{Curl\+Factory.\+php}
+\hypertarget{_curl_factory_8php_source}{}\label{_curl_factory_8php_source}\index{vendor/guzzlehttp/guzzle/src/Handler/CurlFactory.php@{vendor/guzzlehttp/guzzle/src/Handler/CurlFactory.php}}
+\mbox{\hyperlink{_curl_factory_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00003}\mbox{\hyperlink{namespace_guzzle_http_1_1_handler}{00003}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_guzzle_http_1_1_handler}{GuzzleHttp\(\backslash\)Handler}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00005}00005\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_connect_exception}{GuzzleHttp\(\backslash\)Exception\(\backslash\)ConnectException}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00006}00006\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_exception_1_1_request_exception}{GuzzleHttp\(\backslash\)Exception\(\backslash\)RequestException}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00007}00007\ use\ \mbox{\hyperlink{namespace_guzzle_http_1_1_promise}{GuzzleHttp\(\backslash\)Promise}}\ as\ \mbox{\hyperlink{namespace_guzzle_http_1_1_promise}{P}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00008}00008\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_fulfilled_promise}{GuzzleHttp\(\backslash\)Promise\(\backslash\)FulfilledPromise}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00009}00009\ use\ \mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface}{GuzzleHttp\(\backslash\)Promise\(\backslash\)PromiseInterface}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00010}00010\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_psr7_1_1_lazy_open_stream}{GuzzleHttp\(\backslash\)Psr7\(\backslash\)LazyOpenStream}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_transfer_stats}{GuzzleHttp\(\backslash\)TransferStats}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00012}00012\ use\ \mbox{\hyperlink{class_guzzle_http_1_1_utils}{GuzzleHttp\(\backslash\)Utils}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00013}00013\ use\ \mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{Psr\(\backslash\)Http\(\backslash\)Message\(\backslash\)RequestInterface}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00020}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory}{00020}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory}{CurlFactory}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_guzzle_http_1_1_handler_1_1_curl_factory_interface}{CurlFactoryInterface}}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00021}00021\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00022}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a19484274c9a6da908594a91ea8caf405}{00022}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a19484274c9a6da908594a91ea8caf405}{CURL\_VERSION\_STR}}\ =\ \textcolor{stringliteral}{'curl\_version'};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00027}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a74eb6eaaa220e67cc013f30ee9666f34}{00027}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a74eb6eaaa220e67cc013f30ee9666f34}{LOW\_CURL\_VERSION\_NUMBER}}\ =\ \textcolor{stringliteral}{'7.21.2'};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}\ \$handles\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00037}00037\ \ \ \ \ \textcolor{keyword}{private}\ \$maxHandles;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00042}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a7ead4edd29107b40633e644dd5121cea}{00042}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a7ead4edd29107b40633e644dd5121cea}{\_\_construct}}(\textcolor{keywordtype}{int}\ \$maxHandles)}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00043}00043\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \$this-\/>maxHandles\ =\ \$maxHandles;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00045}00045\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00047}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a4b9d1608777cf770d90a75590d29d231}{00047}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a4b9d1608777cf770d90a75590d29d231}{create}}(\mbox{\hyperlink{interface_psr_1_1_http_1_1_message_1_1_request_interface}{RequestInterface}}\ \$request,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}):\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_easy_handle}{EasyHandle}}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00048}00048\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'curl'}][\textcolor{stringliteral}{'body\_as\_string'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'\_body\_as\_string'}]\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'curl'}][\textcolor{stringliteral}{'body\_as\_string'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'curl'}][\textcolor{stringliteral}{'body\_as\_string'}]);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \$easy\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_easy_handle}{EasyHandle}}();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \$easy-\/>request\ =\ \$request;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \$easy-\/>options\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \$conf\ =\ \$this-\/>getDefaultConf(\$easy);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \$this-\/>applyMethod(\$easy,\ \$conf);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \$this-\/>applyHandlerOptions(\$easy,\ \$conf);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \$this-\/>applyHeaders(\$easy,\ \$conf);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ unset(\$conf[\textcolor{stringliteral}{'\_headers'}]);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ handler\ options\ from\ the\ request\ configuration\ options}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'curl'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf\ =\ \(\backslash\)array\_replace(\$conf,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'curl'}]);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_HEADERFUNCTION]\ =\ \$this-\/>createHeaderFn(\$easy);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \$easy-\/>handle\ =\ \$this-\/>handles\ ?\ \(\backslash\)array\_pop(\$this-\/>handles)\ :\ \(\backslash\)curl\_init();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ curl\_setopt\_array(\$easy-\/>handle,\ \$conf);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$easy;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00073}00073\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00075}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a8517ec7f10c7e8c476c4cefc2e4fd9dc}{00075}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a8517ec7f10c7e8c476c4cefc2e4fd9dc}{release}}(\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_easy_handle}{EasyHandle}}\ \$easy):\ void}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00076}00076\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \$resource\ =\ \$easy-\/>handle;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ unset(\$easy-\/>handle);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)count(\$this-\/>handles)\ >=\ \$this-\/>maxHandles)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)curl\_close(\$resource);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Remove\ all\ callback\ functions\ as\ they\ can\ hold\ onto\ references}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ and\ are\ not\ cleaned\ up\ by\ curl\_reset.\ Using\ curl\_setopt\_array}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ does\ not\ work\ for\ some\ reason,\ so\ removing\ each\ one}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ individually.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)curl\_setopt(\$resource,\ \(\backslash\)CURLOPT\_HEADERFUNCTION,\ \textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)curl\_setopt(\$resource,\ \(\backslash\)CURLOPT\_READFUNCTION,\ \textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)curl\_setopt(\$resource,\ \(\backslash\)CURLOPT\_WRITEFUNCTION,\ \textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)curl\_setopt(\$resource,\ \(\backslash\)CURLOPT\_PROGRESSFUNCTION,\ \textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)curl\_reset(\$resource);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>handles[]\ =\ \$resource;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00094}00094\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00103}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a10d96b7c2503e3edf323a70830d8737f}{00103}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a10d96b7c2503e3edf323a70830d8737f}{finish}}(callable\ \$handler,\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_easy_handle}{EasyHandle}}\ \$easy,\ \mbox{\hyperlink{interface_guzzle_http_1_1_handler_1_1_curl_factory_interface}{CurlFactoryInterface}}\ \$factory):\ \mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface}{PromiseInterface}}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00104}00104\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$easy-\/>options[\textcolor{stringliteral}{'on\_stats'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ self::invokeStats(\$easy);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$easy-\/>response\ ||\ \$easy-\/>errno)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::finishError(\$handler,\ \$easy,\ \$factory);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Return\ the\ response\ if\ it\ is\ present\ and\ there\ is\ no\ error.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \$factory-\/>\mbox{\hyperlink{interface_guzzle_http_1_1_handler_1_1_curl_factory_interface_a8517ec7f10c7e8c476c4cefc2e4fd9dc}{release}}(\$easy);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Rewind\ the\ body\ of\ the\ response\ if\ possible.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \$body\ =\ \$easy-\/>response-\/>getBody();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$body-\/>isSeekable())\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \$body-\/>rewind();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_guzzle_http_1_1_promise_1_1_fulfilled_promise}{FulfilledPromise}}(\$easy-\/>response);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00123}00123\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00125}00125\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ invokeStats(\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_easy_handle}{EasyHandle}}\ \$easy):\ void}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00126}00126\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \$curlStats\ =\ \(\backslash\)curl\_getinfo(\$easy-\/>handle);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \$curlStats[\textcolor{stringliteral}{'appconnect\_time'}]\ =\ \(\backslash\)curl\_getinfo(\$easy-\/>handle,\ \(\backslash\)CURLINFO\_APPCONNECT\_TIME);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \$stats\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_guzzle_http_1_1_transfer_stats}{TransferStats}}(}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>request,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>response,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \$curlStats[\textcolor{stringliteral}{'total\_time'}],}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>errno,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \$curlStats}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ (\$easy-\/>options[\textcolor{stringliteral}{'on\_stats'}])(\$stats);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00137}00137\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00142}00142\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ finishError(callable\ \$handler,\ EasyHandle\ \$easy,\ CurlFactoryInterface\ \$factory):\ \mbox{\hyperlink{interface_guzzle_http_1_1_promise_1_1_promise_interface}{PromiseInterface}}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00143}00143\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Get\ error\ information\ and\ release\ the\ handle\ to\ the\ factory.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \$ctx\ =\ [}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'errno'}\ =>\ \$easy-\/>errno,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'error'}\ =>\ \(\backslash\)curl\_error(\$easy-\/>handle),}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'appconnect\_time'}\ =>\ \(\backslash\)curl\_getinfo(\$easy-\/>handle,\ \(\backslash\)CURLINFO\_APPCONNECT\_TIME),}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ ]\ +\ \(\backslash\)curl\_getinfo(\$easy-\/>handle);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \$ctx[\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a19484274c9a6da908594a91ea8caf405}{self::CURL\_VERSION\_STR}}]\ =\ \(\backslash\)curl\_version()[\textcolor{stringliteral}{'version'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \$factory-\/>release(\$easy);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Retry\ when\ nothing\ is\ present\ or\ when\ curl\ failed\ to\ rewind.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$easy-\/>options[\textcolor{stringliteral}{'\_err\_message'}])\ \&\&\ (!\$easy-\/>errno\ ||\ \$easy-\/>errno\ ==\ 65))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::retryFailedRewind(\$handler,\ \$easy,\ \$ctx);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::createRejection(\$easy,\ \$ctx);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00159}00159\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00161}00161\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ createRejection(EasyHandle\ \$easy,\ array\ \$ctx):\ PromiseInterface}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00162}00162\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \$connectionErrors\ =\ [}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)CURLE\_OPERATION\_TIMEOUTED\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)CURLE\_COULDNT\_RESOLVE\_HOST\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)CURLE\_COULDNT\_CONNECT\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)CURLE\_SSL\_CONNECT\_ERROR\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)CURLE\_GOT\_NOTHING\ =>\ \textcolor{keyword}{true},}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$easy-\/>createResponseException)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ P\(\backslash\)Create::rejectionFor(}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ RequestException(}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'An\ error\ was\ encountered\ while\ creating\ the\ response'},}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>request,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>response,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>createResponseException,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$ctx}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00182}00182\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ an\ exception\ was\ encountered\ during\ the\ onHeaders\ event,\ then}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ return\ a\ rejected\ promise\ that\ wraps\ that\ exception.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$easy-\/>onHeadersException)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ P\(\backslash\)Create::rejectionFor(}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ RequestException(}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'An\ error\ was\ encountered\ during\ the\ on\_headers\ event'},}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>request,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>response,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>onHeadersException,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$ctx}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \$message\ =\ \(\backslash\)sprintf(}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'cURL\ error\ \%s:\ \%s\ (\%s)'},}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \$ctx[\textcolor{stringliteral}{'errno'}],}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \$ctx[\textcolor{stringliteral}{'error'}],}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'see\ https://curl.haxx.se/libcurl/c/libcurl-\/errors.html'}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \$uriString\ =\ (string)\ \$easy-\/>request-\/>getUri();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$uriString\ !==\ \textcolor{stringliteral}{''}\ \&\&\ \textcolor{keyword}{false}\ ===\ \(\backslash\)strpos(\$ctx[\textcolor{stringliteral}{'error'}],\ \$uriString))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \$message\ .=\ \(\backslash\)sprintf(\textcolor{stringliteral}{'\ for\ \%s'},\ \$uriString);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Create\ a\ connection\ exception\ if\ it\ was\ a\ specific\ error\ code.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \$error\ =\ isset(\$connectionErrors[\$easy-\/>errno])}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ \textcolor{keyword}{new}\ ConnectException(\$message,\ \$easy-\/>request,\ \textcolor{keyword}{null},\ \$ctx)}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ :\ new\ RequestException(\$message,\ \$easy-\/>request,\ \$easy-\/>response,\ null,\ \$ctx);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00212}00212\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ P\(\backslash\)Create::rejectionFor(\$error);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00214}00214\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00219}00219\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getDefaultConf(EasyHandle\ \$easy):\ array}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00220}00220\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \$conf\ =\ [}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_headers'}\ =>\ \$easy-\/>request-\/>getHeaders(),}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)CURLOPT\_CUSTOMREQUEST\ =>\ \$easy-\/>request-\/>getMethod(),}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)CURLOPT\_URL\ =>\ (string)\ \$easy-\/>request-\/>getUri()-\/>withFragment(\textcolor{stringliteral}{''}),}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)CURLOPT\_RETURNTRANSFER\ =>\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)CURLOPT\_HEADER\ =>\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)CURLOPT\_CONNECTTIMEOUT\ =>\ 300,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)\mbox{\hyperlink{namespace_laravel_1_1_serializable_closure_1_1_support_a0b5ee6f176cd47e84b04710f2181e3ff}{defined}}(\textcolor{stringliteral}{'CURLOPT\_PROTOCOLS'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_PROTOCOLS]\ =\ \(\backslash\)CURLPROTO\_HTTP\ |\ \(\backslash\)CURLPROTO\_HTTPS;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \$version\ =\ \$easy-\/>request-\/>getProtocolVersion();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$version\ ==\ 1.1)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_HTTP\_VERSION]\ =\ \(\backslash\)CURL\_HTTP\_VERSION\_1\_1;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$version\ ==\ 2.0)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_HTTP\_VERSION]\ =\ \(\backslash\)CURL\_HTTP\_VERSION\_2\_0;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_HTTP\_VERSION]\ =\ \(\backslash\)CURL\_HTTP\_VERSION\_1\_0;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$conf;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00244}00244\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00246}00246\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ applyMethod(EasyHandle\ \$easy,\ array\ \&\$conf):\ void}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00247}00247\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \$body\ =\ \$easy-\/>request-\/>getBody();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \$size\ =\ \$body-\/>getSize();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$size\ ===\ \textcolor{keyword}{null}\ ||\ \$size\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>applyBody(\$easy-\/>request,\ \$easy-\/>options,\ \$conf);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespace_carbon_1_1_p_h_p_stan_a12661b2fc0f57f97e30a1620889ce9c6}{\$method}}\ =\ \$easy-\/>request-\/>getMethod();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$method\ ===\ \textcolor{stringliteral}{'PUT'}\ ||\ \$method\ ===\ \textcolor{stringliteral}{'POST'})\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ See\ https://tools.ietf.org/html/rfc7230\#section-\/3.3.2}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$easy-\/>request-\/>hasHeader(\textcolor{stringliteral}{'Content-\/Length'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_HTTPHEADER][]\ =\ \textcolor{stringliteral}{'Content-\/Length:\ 0'};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$method\ ===\ \textcolor{stringliteral}{'HEAD'})\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_NOBODY]\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ unset(}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_WRITEFUNCTION],}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_READFUNCTION],}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_FILE],}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_INFILE]}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00272}00272\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00274}00274\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ applyBody(RequestInterface\ \$request,\ array\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}},\ array\ \&\$conf):\ void}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00275}00275\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \$size\ =\ \$request-\/>hasHeader(\textcolor{stringliteral}{'Content-\/Length'})}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ ?\ (int)\ \$request-\/>getHeaderLine(\textcolor{stringliteral}{'Content-\/Length'})}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Send\ the\ body\ as\ a\ string\ if\ the\ size\ is\ less\ than\ 1MB\ OR\ if\ the}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00281}00281\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ [curl][body\_as\_string]\ request\ value\ is\ set.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\$size\ !==\ \textcolor{keyword}{null}\ \&\&\ \$size\ <\ 1000000)\ ||\ !empty(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'\_body\_as\_string'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_POSTFIELDS]\ =\ (string)\ \$request-\/>getBody();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00284}00284\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Don't\ duplicate\ the\ Content-\/Length\ header}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>removeHeader(\textcolor{stringliteral}{'Content-\/Length'},\ \$conf);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>removeHeader(\textcolor{stringliteral}{'Transfer-\/Encoding'},\ \$conf);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_UPLOAD]\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$size\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_INFILESIZE]\ =\ \$size;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>removeHeader(\textcolor{stringliteral}{'Content-\/Length'},\ \$conf);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \$body\ =\ \$request-\/>getBody();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$body-\/>isSeekable())\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$body-\/>rewind();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_READFUNCTION]\ =\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (\$ch,\ \$fd,\ \$length)\ use\ (\$body)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$body-\/>read(\$length);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00300}00300\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00301}00301\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00302}00302\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ Expect\ header\ is\ not\ present,\ prevent\ curl\ from\ adding\ it}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00303}00303\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$request-\/>hasHeader(\textcolor{stringliteral}{'Expect'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00304}00304\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_HTTPHEADER][]\ =\ \textcolor{stringliteral}{'Expect:'};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00305}00305\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00306}00306\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ cURL\ sometimes\ adds\ a\ content-\/type\ by\ default.\ Prevent\ this.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$request-\/>hasHeader(\textcolor{stringliteral}{'Content-\/Type'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_HTTPHEADER][]\ =\ \textcolor{stringliteral}{'Content-\/Type:'};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00311}00311\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00312}00312\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00313}00313\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ applyHeaders(EasyHandle\ \$easy,\ array\ \&\$conf):\ void}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00314}00314\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$conf[\textcolor{stringliteral}{'\_headers'}]\ as\ \$name\ =>\ \$values)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$values\ as\ \$value)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ (string)\ \$value;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ ===\ \textcolor{stringliteral}{''})\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ cURL\ requires\ a\ special\ format\ for\ empty\ headers.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ See\ https://github.com/guzzle/guzzle/issues/1882\ for\ more\ details.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_HTTPHEADER][]\ =\ \textcolor{stringliteral}{"{}\$name;"{}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_HTTPHEADER][]\ =\ \textcolor{stringliteral}{"{}\$name:\ \$value"{}};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00326}00326\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Remove\ the\ Accept\ header\ if\ one\ was\ not\ set}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00329}00329\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$easy-\/>request-\/>hasHeader(\textcolor{stringliteral}{'Accept'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_HTTPHEADER][]\ =\ \textcolor{stringliteral}{'Accept:'};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00332}00332\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00333}00333\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00340}00340\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ removeHeader(\textcolor{keywordtype}{string}\ \$name,\ array\ \&\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}):\ void}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00341}00341\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00342}00342\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\(\backslash\)array\_keys(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'\_headers'}])\ as\ \$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)strcasecmp(\$key,\ \$name))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'\_headers'}][\$key]);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00345}00345\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00349}00349\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00350}00350\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00351}00351\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ applyHandlerOptions(EasyHandle\ \$easy,\ array\ \&\$conf):\ void}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00352}00352\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00353}00353\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}\ =\ \$easy-\/>options;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'verify'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'verify'}]\ ===\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$conf[\(\backslash\)CURLOPT\_CAINFO]);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_SSL\_VERIFYHOST]\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_SSL\_VERIFYPEER]\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00359}00359\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00360}00360\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_SSL\_VERIFYHOST]\ =\ 2;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_SSL\_VERIFYPEER]\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_string(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'verify'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Throw\ an\ error\ if\ the\ file/folder/link\ path\ is\ not\ valid\ or\ doesn't\ exist.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)file\_exists(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'verify'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{"{}SSL\ CA\ bundle\ not\ found:\ \{\$options['verify']\}"{}});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00366}00366\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ it's\ a\ directory\ or\ a\ link\ to\ a\ directory\ use\ CURLOPT\_CAPATH.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ not,\ it's\ probably\ a\ file,\ or\ a\ link\ to\ a\ file,\ so\ use\ CURLOPT\_CAINFO.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00370}00370\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)is\_dir(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'verify'}])}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ (}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)is\_link(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'verify'}])\ ===\ \textcolor{keyword}{true}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ (\$verifyLink\ =\ \(\backslash\)readlink(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'verify'}]))\ !==\ \textcolor{keyword}{false}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00374}00374\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\&\ \(\backslash\)is\_dir(\$verifyLink)}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00375}00375\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00376}00376\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00377}00377\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_CAPATH]\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'verify'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_CAINFO]\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'verify'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00380}00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00383}00383\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00384}00384\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00385}00385\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'curl'}][\(\backslash\)CURLOPT\_ENCODING])\ \&\&\ !empty(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'decode\_content'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \ \ \ \ \$accept\ =\ \$easy-\/>request-\/>getHeaderLine(\textcolor{stringliteral}{'Accept-\/Encoding'});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$accept)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_ENCODING]\ =\ \$accept;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ empty\ string\ enables\ all\ available\ decoders\ and\ implicitly}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ sets\ a\ matching\ 'Accept-\/Encoding'\ header.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_ENCODING]\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ But\ as\ the\ user\ did\ not\ specify\ any\ acceptable\ encodings\ we\ need}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ to\ overwrite\ this\ implicit\ header\ with\ an\ empty\ one.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_HTTPHEADER][]\ =\ \textcolor{stringliteral}{'Accept-\/Encoding:'};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00396}00396\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00399}00399\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'sink'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00400}00400\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Use\ a\ default\ temp\ stream\ if\ no\ sink\ was\ set.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'sink'}]\ =\ \(\backslash\)GuzzleHttp\(\backslash\)Psr7\(\backslash\)Utils::tryFopen(\textcolor{stringliteral}{'php://temp'},\ \textcolor{stringliteral}{'w+'});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00403}00403\ \ \ \ \ \ \ \ \ \$sink\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'sink'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)is\_string(\$sink))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \$sink\ =\ \(\backslash\)GuzzleHttp\(\backslash\)Psr7\(\backslash\)Utils::streamFor(\$sink);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00406}00406\ \ \ \ \ \ \ \ \ \}\ elseif\ (!\(\backslash\)is\_dir(\(\backslash\)dirname(\$sink)))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Ensure\ that\ the\ directory\ exists\ before\ failing\ in\ curl.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\(\backslash\)sprintf(\textcolor{stringliteral}{'Directory\ \%s\ does\ not\ exist\ for\ sink\ value\ of\ \%s'},\ \(\backslash\)dirname(\$sink),\ \$sink));}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00409}00409\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00410}00410\ \ \ \ \ \ \ \ \ \ \ \ \ \$sink\ =\ \textcolor{keyword}{new}\ LazyOpenStream(\$sink,\ \textcolor{stringliteral}{'w+'});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00411}00411\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00412}00412\ \ \ \ \ \ \ \ \ \$easy-\/>sink\ =\ \$sink;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00413}00413\ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_WRITEFUNCTION]\ =\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (\$ch,\ \$write)\ use\ (\$sink):\ \textcolor{keywordtype}{int}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$sink-\/>write(\$write);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00415}00415\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \$timeoutRequiresNoSignal\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00418}00418\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'timeout'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00419}00419\ \ \ \ \ \ \ \ \ \ \ \ \ \$timeoutRequiresNoSignal\ |=\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'timeout'}]\ <\ 1;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00420}00420\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_TIMEOUT\_MS]\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'timeout'}]\ *\ 1000;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00421}00421\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00422}00422\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00423}00423\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ CURL\ default\ value\ is\ CURL\_IPRESOLVE\_WHATEVER}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00424}00424\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'force\_ip\_resolve'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{stringliteral}{'v4'}\ ===\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'force\_ip\_resolve'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_IPRESOLVE]\ =\ \(\backslash\)CURL\_IPRESOLVE\_V4;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\textcolor{stringliteral}{'v6'}\ ===\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'force\_ip\_resolve'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_IPRESOLVE]\ =\ \(\backslash\)CURL\_IPRESOLVE\_V6;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00431}00431\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'connect\_timeout'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \$timeoutRequiresNoSignal\ |=\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'connect\_timeout'}]\ <\ 1;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_CONNECTTIMEOUT\_MS]\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'connect\_timeout'}]\ *\ 1000;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00437}00437\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$timeoutRequiresNoSignal\ \&\&\ \(\backslash\)strtoupper(\(\backslash\)substr(\(\backslash\)PHP\_OS,\ 0,\ 3))\ !==\ \textcolor{stringliteral}{'WIN'})\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_NOSIGNAL]\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00440}00440\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00441}00441\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'proxy'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)is\_array(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'proxy'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00443}00443\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_PROXY]\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'proxy'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00445}00445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$scheme\ =\ \$easy-\/>request-\/>getUri()-\/>getScheme();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00446}00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'proxy'}][\$scheme]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00447}00447\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$host\ =\ \$easy-\/>request-\/>getUri()-\/>getHost();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'proxy'}][\textcolor{stringliteral}{'no'}])\ \&\&\ \mbox{\hyperlink{class_guzzle_http_1_1_utils_ab67b6c2bf67736eccab698cbf5f4b1a8}{Utils::isHostInNoProxy}}(\$host,\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'proxy'}][\textcolor{stringliteral}{'no'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$conf[\(\backslash\)CURLOPT\_PROXY]);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00451}00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_PROXY]\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'proxy'}][\$scheme];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00452}00452\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00455}00455\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00456}00456\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'crypto\_method'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)STREAM\_CRYPTO\_METHOD\_TLSv1\_0\_CLIENT\ ===\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'crypto\_method'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespace_laravel_1_1_serializable_closure_1_1_support_a0b5ee6f176cd47e84b04710f2181e3ff}{defined}}(\textcolor{stringliteral}{'CURL\_SSLVERSION\_TLSv1\_0'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'Invalid\ crypto\_method\ request\ option:\ TLS\ 1.0\ not\ supported\ by\ your\ version\ of\ cURL'});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_SSLVERSION]\ =\ \(\backslash\)CURL\_SSLVERSION\_TLSv1\_0;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\(\backslash\)STREAM\_CRYPTO\_METHOD\_TLSv1\_1\_CLIENT\ ===\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'crypto\_method'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespace_laravel_1_1_serializable_closure_1_1_support_a0b5ee6f176cd47e84b04710f2181e3ff}{defined}}(\textcolor{stringliteral}{'CURL\_SSLVERSION\_TLSv1\_1'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'Invalid\ crypto\_method\ request\ option:\ TLS\ 1.1\ not\ supported\ by\ your\ version\ of\ cURL'});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00467}00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_SSLVERSION]\ =\ \(\backslash\)CURL\_SSLVERSION\_TLSv1\_1;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00468}00468\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\(\backslash\)STREAM\_CRYPTO\_METHOD\_TLSv1\_2\_CLIENT\ ===\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'crypto\_method'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespace_laravel_1_1_serializable_closure_1_1_support_a0b5ee6f176cd47e84b04710f2181e3ff}{defined}}(\textcolor{stringliteral}{'CURL\_SSLVERSION\_TLSv1\_2'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00470}00470\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'Invalid\ crypto\_method\ request\ option:\ TLS\ 1.2\ not\ supported\ by\ your\ version\ of\ cURL'});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00472}00472\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_SSLVERSION]\ =\ \(\backslash\)CURL\_SSLVERSION\_TLSv1\_2;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\mbox{\hyperlink{namespace_laravel_1_1_serializable_closure_1_1_support_a0b5ee6f176cd47e84b04710f2181e3ff}{defined}}(\textcolor{stringliteral}{'STREAM\_CRYPTO\_METHOD\_TLSv1\_3\_CLIENT'})\ \&\&\ \(\backslash\)STREAM\_CRYPTO\_METHOD\_TLSv1\_3\_CLIENT\ ===\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'crypto\_method'}])\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00474}00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{namespace_laravel_1_1_serializable_closure_1_1_support_a0b5ee6f176cd47e84b04710f2181e3ff}{defined}}(\textcolor{stringliteral}{'CURL\_SSLVERSION\_TLSv1\_3'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'Invalid\ crypto\_method\ request\ option:\ TLS\ 1.3\ not\ supported\ by\ your\ version\ of\ cURL'});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00476}00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00477}00477\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_SSLVERSION]\ =\ \(\backslash\)CURL\_SSLVERSION\_TLSv1\_3;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'Invalid\ crypto\_method\ request\ option:\ unknown\ version\ provided'});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00482}00482\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00483}00483\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'cert'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ \$cert\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'cert'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_array(\$cert))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00486}00486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_SSLCERTPASSWD]\ =\ \$cert[1];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00487}00487\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$cert\ =\ \$cert[0];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)file\_exists(\$cert))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00490}00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{"{}SSL\ certificate\ not\ found:\ \{\$cert\}"{}});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00491}00491\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00492}00492\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ OpenSSL\ (versions\ 0.9.3\ and\ later)\ also\ support\ "{}P12"{}\ for\ PKCS\#12-\/encoded\ files.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00493}00493\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ see\ https://curl.se/libcurl/c/CURLOPT\_SSLCERTTYPE.html}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \ \ \ \ \$ext\ =\ pathinfo(\$cert,\ \(\backslash\)PATHINFO\_EXTENSION);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00495}00495\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (preg\_match(\textcolor{stringliteral}{'\#\string^(der|p12)\$\#i'},\ \$ext))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_SSLCERTTYPE]\ =\ strtoupper(\$ext);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00497}00497\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_SSLCERT]\ =\ \$cert;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00499}00499\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00500}00500\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00501}00501\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'ssl\_key'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)is\_array(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'ssl\_key'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00503}00503\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)count(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'ssl\_key'}])\ ===\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\$sslKey,\ \$conf[\(\backslash\)CURLOPT\_SSLKEYPASSWD]]\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'ssl\_key'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00506}00506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\$sslKey]\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'ssl\_key'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00507}00507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00508}00508\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00509}00509\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \$sslKey\ =\ \$sslKey\ ??\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'ssl\_key'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00511}00511\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)file\_exists(\$sslKey))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{"{}SSL\ private\ key\ not\ found:\ \{\$sslKey\}"{}});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_SSLKEY]\ =\ \$sslKey;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00517}00517\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00518}00518\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'progress'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ \$progress\ =\ \mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'progress'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)is\_callable(\$progress))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'progress\ client\ option\ must\ be\ callable'});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_NOPROGRESS]\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00524}00524\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_PROGRESSFUNCTION]\ =\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (\$resource,\ \textcolor{keywordtype}{int}\ \$downloadSize,\ \textcolor{keywordtype}{int}\ \$downloaded,\ \textcolor{keywordtype}{int}\ \$uploadSize,\ \textcolor{keywordtype}{int}\ \$uploaded)\ use\ (\$progress)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00525}00525\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$progress(\$downloadSize,\ \$downloaded,\ \$uploadSize,\ \$uploaded);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00527}00527\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00528}00528\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!empty(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'debug'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00530}00530\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_STDERR]\ =\ \mbox{\hyperlink{class_guzzle_http_1_1_utils_a6293ab252c4880a2a343cef02e739da9}{Utils::debugResource}}(\mbox{\hyperlink{rebuild_parsers_8php_afccc0027dcfb3238aaffaebf99351b54}{\$options}}[\textcolor{stringliteral}{'debug'}]);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \ \ \ \ \$conf[\(\backslash\)CURLOPT\_VERBOSE]\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00533}00533\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00534}00534\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00546}00546\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ retryFailedRewind(callable\ \$handler,\ EasyHandle\ \$easy,\ array\ \$ctx):\ PromiseInterface}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00547}00547\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00548}00548\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Only\ rewind\ if\ the\ body\ has\ been\ read\ from.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00550}00550\ \ \ \ \ \ \ \ \ \ \ \ \ \$body\ =\ \$easy-\/>request-\/>getBody();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00551}00551\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$body-\/>tell()\ >\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00552}00552\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$body-\/>rewind();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00553}00553\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00554}00554\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)RuntimeException\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00555}00555\ \ \ \ \ \ \ \ \ \ \ \ \ \$ctx[\textcolor{stringliteral}{'error'}]\ =\ \textcolor{stringliteral}{'The\ connection\ unexpectedly\ failed\ without\ '}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00556}00556\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\textcolor{stringliteral}{'providing\ an\ error.\ The\ request\ would\ have\ been\ retried,\ '}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00557}00557\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\textcolor{stringliteral}{'but\ attempting\ to\ rewind\ the\ request\ body\ failed.\ '}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00558}00558\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\textcolor{stringliteral}{'Exception:\ '}.\$e;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00559}00559\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00560}00560\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::createRejection(\$easy,\ \$ctx);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00563}00563\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Retry\ no\ more\ than\ 3\ times\ before\ giving\ up.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$easy-\/>options[\textcolor{stringliteral}{'\_curl\_retries'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00565}00565\ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>options[\textcolor{stringliteral}{'\_curl\_retries'}]\ =\ 1;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00566}00566\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$easy-\/>options[\textcolor{stringliteral}{'\_curl\_retries'}]\ ==\ 2)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00567}00567\ \ \ \ \ \ \ \ \ \ \ \ \ \$ctx[\textcolor{stringliteral}{'error'}]\ =\ \textcolor{stringliteral}{'The\ cURL\ request\ was\ retried\ 3\ times\ '}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00568}00568\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\textcolor{stringliteral}{'and\ did\ not\ succeed.\ The\ most\ likely\ reason\ for\ the\ failure\ '}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\textcolor{stringliteral}{'is\ that\ cURL\ was\ unable\ to\ rewind\ the\ body\ of\ the\ request\ '}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00570}00570\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\textcolor{stringliteral}{'and\ subsequent\ retries\ resulted\ in\ the\ same\ error.\ Turn\ on\ '}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00571}00571\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\textcolor{stringliteral}{'the\ debug\ option\ to\ see\ what\ went\ wrong.\ See\ '}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00572}00572\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\textcolor{stringliteral}{'https://bugs.php.net/bug.php?id=47204\ for\ more\ information.'};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00573}00573\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00574}00574\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self::createRejection(\$easy,\ \$ctx);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00575}00575\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00576}00576\ \ \ \ \ \ \ \ \ \ \ \ \ ++\$easy-\/>options[\textcolor{stringliteral}{'\_curl\_retries'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00578}00578\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00579}00579\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$handler(\$easy-\/>request,\ \$easy-\/>options);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00580}00580\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00581}00581\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00582}00582\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ createHeaderFn(EasyHandle\ \$easy):\ callable}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00583}00583\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00584}00584\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$easy-\/>options[\textcolor{stringliteral}{'on\_headers'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00585}00585\ \ \ \ \ \ \ \ \ \ \ \ \ \$onHeaders\ =\ \$easy-\/>options[\textcolor{stringliteral}{'on\_headers'}];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00586}00586\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00587}00587\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\(\backslash\)is\_callable(\$onHeaders))\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00588}00588\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)InvalidArgumentException(\textcolor{stringliteral}{'on\_headers\ must\ be\ callable'});}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00589}00589\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00590}00590\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00591}00591\ \ \ \ \ \ \ \ \ \ \ \ \ \$onHeaders\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00592}00592\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00593}00593\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00594}00594\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ (\$ch,\ \$h)\ use\ (}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00595}00595\ \ \ \ \ \ \ \ \ \ \ \ \ \$onHeaders,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \ \ \ \ \$easy,}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00597}00597\ \ \ \ \ \ \ \ \ \ \ \ \ \&\$startingResponse}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00598}00598\ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00599}00599\ \ \ \ \ \ \ \ \ \ \ \ \ \$value\ =\ \(\backslash\)trim(\$h);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00600}00600\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$value\ ===\ \textcolor{stringliteral}{''})\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00601}00601\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$startingResponse\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00602}00602\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00603}00603\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>createResponse();}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00604}00604\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Exception\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00605}00605\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>createResponseException\ =\ \$e;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00606}00606\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00607}00607\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00608}00608\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00609}00609\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$onHeaders\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$onHeaders(\$easy-\/>response);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00612}00612\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Exception\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00613}00613\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Associate\ the\ exception\ with\ the\ handle\ and\ trigger}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00614}00614\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ a\ curl\ header\ write\ error\ by\ returning\ 0.}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00615}00615\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>onHeadersException\ =\ \$e;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00616}00616\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00617}00617\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ -\/1;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00618}00618\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00619}00619\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00620}00620\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$startingResponse)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$startingResponse\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>headers\ =\ [\$value];}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00623}00623\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$easy-\/>headers[]\ =\ \$value;}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00625}00625\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00626}00626\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00627}00627\ \ \ \ \ \ \ \ \ \ \ \ \ return\ \(\backslash\)strlen(\$h);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00628}00628\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00629}00629\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00630}00630\ }
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00631}\mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a421831a265621325e1fdd19aace0c758}{00631}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_guzzle_http_1_1_handler_1_1_curl_factory_a421831a265621325e1fdd19aace0c758}{\_\_destruct}}()}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00632}00632\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00633}00633\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>handles\ as\ \$id\ =>\ \$handle)\ \{}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00634}00634\ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)curl\_close(\$handle);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00635}00635\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$this-\/>handles[\$id]);}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00636}00636\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00637}00637\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_curl_factory_8php_source_l00638}00638\ \}}
+
+\end{DoxyCode}

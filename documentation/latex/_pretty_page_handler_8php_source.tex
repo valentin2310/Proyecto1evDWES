@@ -1,0 +1,533 @@
+\doxysection{Pretty\+Page\+Handler.\+php}
+\hypertarget{_pretty_page_handler_8php_source}{}\label{_pretty_page_handler_8php_source}\index{vendor/filp/whoops/src/Whoops/Handler/PrettyPageHandler.php@{vendor/filp/whoops/src/Whoops/Handler/PrettyPageHandler.php}}
+\mbox{\hyperlink{_pretty_page_handler_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_whoops_1_1_handler}{Whoops\(\backslash\)Handler}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00009}00009\ use\ InvalidArgumentException;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00010}00010\ use\ RuntimeException;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00011}00011\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_var_dumper_1_1_cloner_1_1_abstract_cloner}{Symfony\(\backslash\)Component\(\backslash\)VarDumper\(\backslash\)Cloner\(\backslash\)AbstractCloner}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00012}00012\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_var_dumper_1_1_cloner_1_1_var_cloner}{Symfony\(\backslash\)Component\(\backslash\)VarDumper\(\backslash\)Cloner\(\backslash\)VarCloner}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00013}00013\ use\ UnexpectedValueException;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_whoops_1_1_exception_1_1_formatter}{Whoops\(\backslash\)Exception\(\backslash\)Formatter}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_whoops_1_1_util_1_1_misc}{Whoops\(\backslash\)Util\(\backslash\)Misc}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_whoops_1_1_util_1_1_template_helper}{Whoops\(\backslash\)Util\(\backslash\)TemplateHelper}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00018}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler}{00018}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler}{PrettyPageHandler}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_handler}{Handler}}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00019}00019\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00020}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_af3b651c93a064d6c2f68adb5f92d6005}{00020}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_af3b651c93a064d6c2f68adb5f92d6005}{EDITOR\_SUBLIME}}\ =\ \textcolor{stringliteral}{"{}sublime"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00021}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_adb52c7403978f773c22481571eacb4db}{00021}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_adb52c7403978f773c22481571eacb4db}{EDITOR\_TEXTMATE}}\ =\ \textcolor{stringliteral}{"{}textmate"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00022}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aff9f98ecf39cb5960e0fbf1cbb52f82b}{00022}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aff9f98ecf39cb5960e0fbf1cbb52f82b}{EDITOR\_EMACS}}\ =\ \textcolor{stringliteral}{"{}emacs"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00023}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a3f2a075ebb8304a07faf5e8cadab5192}{00023}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a3f2a075ebb8304a07faf5e8cadab5192}{EDITOR\_MACVIM}}\ =\ \textcolor{stringliteral}{"{}macvim"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00024}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a6f5ed5504d5c3d7fa71a2b5538f5b5bd}{00024}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a6f5ed5504d5c3d7fa71a2b5538f5b5bd}{EDITOR\_PHPSTORM}}\ =\ \textcolor{stringliteral}{"{}phpstorm"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00025}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a75c2565041e980a150beccba66f81b01}{00025}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a75c2565041e980a150beccba66f81b01}{EDITOR\_IDEA}}\ =\ \textcolor{stringliteral}{"{}idea"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00026}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a15619e5808cff618d53b76bc0dddedd3}{00026}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a15619e5808cff618d53b76bc0dddedd3}{EDITOR\_VSCODE}}\ =\ \textcolor{stringliteral}{"{}vscode"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00027}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_ad4415b05af2f59ef6d7e4cb7e2467507}{00027}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_ad4415b05af2f59ef6d7e4cb7e2467507}{EDITOR\_ATOM}}\ =\ \textcolor{stringliteral}{"{}atom"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00028}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa9e107b4545cd064b9fe686ac58324d8}{00028}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa9e107b4545cd064b9fe686ac58324d8}{EDITOR\_ESPRESSO}}\ =\ \textcolor{stringliteral}{"{}espresso"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00029}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_ac408b03c760a64ad946b1a82d78188b4}{00029}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_ac408b03c760a64ad946b1a82d78188b4}{EDITOR\_XDEBUG}}\ =\ \textcolor{stringliteral}{"{}xdebug"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00030}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a782660e4971bb339eee341eff34eb678}{00030}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a782660e4971bb339eee341eff34eb678}{EDITOR\_NETBEANS}}\ =\ \textcolor{stringliteral}{"{}netbeans"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00039}00039\ \ \ \ \ \textcolor{keyword}{private}\ \$searchPaths\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{private}\ \$resourceCache\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00053}00053\ \ \ \ \ \textcolor{keyword}{private}\ \$customCss\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00060}00060\ \ \ \ \ \textcolor{keyword}{private}\ \$customJs\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00065}00065\ \ \ \ \ \textcolor{keyword}{private}\ \$extraTables\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00070}00070\ \ \ \ \ \textcolor{keyword}{private}\ \$handleUnconditionally\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00075}00075\ \ \ \ \ \textcolor{keyword}{private}\ \$pageTitle\ =\ \textcolor{stringliteral}{"{}Whoops!\ There\ was\ an\ error."{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00080}00080\ \ \ \ \ \textcolor{keyword}{private}\ \$applicationPaths;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00085}00085\ \ \ \ \ \textcolor{keyword}{private}\ \$blacklist\ =\ [}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_GET'}\ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_POST'}\ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_FILES'}\ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_COOKIE'}\ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_SESSION'}\ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_SERVER'}\ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'\_ENV'}\ =>\ [],}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00093}00093\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00107}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{00107}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00114}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_af826e331bb8e06d8faae6a6156381e83}{00114}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_af826e331bb8e06d8faae6a6156381e83}{\$editors}}\ =\ [}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}sublime"{}}\ \ =>\ \textcolor{stringliteral}{"{}subl://open?url=file://\%file\&line=\%line"{}},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}textmate"{}}\ =>\ \textcolor{stringliteral}{"{}txmt://open?url=file://\%file\&line=\%line"{}},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00117}00117\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}emacs"{}}\ \ \ \ =>\ \textcolor{stringliteral}{"{}emacs://open?url=file://\%file\&line=\%line"{}},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}macvim"{}}\ \ \ =>\ \textcolor{stringliteral}{"{}mvim://open/?url=file://\%file\&line=\%line"{}},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}phpstorm"{}}\ =>\ \textcolor{stringliteral}{"{}phpstorm://open?file=\%file\&line=\%line"{}},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}idea"{}}\ \ \ \ \ =>\ \textcolor{stringliteral}{"{}idea://open?file=\%file\&line=\%line"{}},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}vscode"{}}\ \ \ =>\ \textcolor{stringliteral}{"{}vscode://file/\%file:\%line"{}},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}atom"{}}\ \ \ \ \ =>\ \textcolor{stringliteral}{"{}atom://core/open/file?filename=\%file\&line=\%line"{}},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}espresso"{}}\ =>\ \textcolor{stringliteral}{"{}x-\/espresso://open?filepath=\%file\&lines=\%line"{}},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}netbeans"{}}\ =>\ \textcolor{stringliteral}{"{}netbeans://open/?f=\%file:\%line"{}},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00125}00125\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00130}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a93ed1ae983892594cd781b35e84fb5cc}{00130}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a93ed1ae983892594cd781b35e84fb5cc}{\$templateHelper}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00137}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a095c5d389db211932136b53f25f39685}{00137}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a095c5d389db211932136b53f25f39685}{\_\_construct}}()}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00138}00138\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (ini\_get(\textcolor{stringliteral}{'xdebug.file\_link\_format'})\ ||\ get\_cfg\_var(\textcolor{stringliteral}{'xdebug.file\_link\_format'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Register\ editor\ using\ xdebug's\ file\_link\_format\ option.}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>editors[\textcolor{stringliteral}{'xdebug'}]\ =\ \textcolor{keyword}{function}\ (\$file,\ \$line)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ str\_replace([\textcolor{stringliteral}{'\%f'},\ \textcolor{stringliteral}{'\%l'}],\ [\$file,\ \$line],\ ini\_get(\textcolor{stringliteral}{'xdebug.file\_link\_format'})\ ?:\ get\_cfg\_var(\textcolor{stringliteral}{'xdebug.file\_link\_format'}));}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ xdebug\ is\ available,\ use\ it\ as\ default\ editor.}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a27e7e2768a40b76fb45a499c33377111}{setEditor}}(\textcolor{stringliteral}{'xdebug'});}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ the\ default,\ local\ resource\ search\ path:}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \$this-\/>searchPaths[]\ =\ \_\_DIR\_\_\ .\ \textcolor{stringliteral}{"{}/../Resources"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ blacklist\ php\ provided\ auth\ based\ values}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a3fbde3fe6a30cba766440df67491be33}{blacklist}}(\textcolor{stringliteral}{'\_SERVER'},\ \textcolor{stringliteral}{'PHP\_AUTH\_PW'});}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \$this-\/>templateHelper\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_whoops_1_1_util_1_1_template_helper}{TemplateHelper}}();}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (class\_exists(\textcolor{stringliteral}{'Symfony\(\backslash\)Component\(\backslash\)VarDumper\(\backslash\)Cloner\(\backslash\)VarCloner'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \$cloner\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_var_dumper_1_1_cloner_1_1_var_cloner}{VarCloner}}();}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Only\ dump\ object\ internals\ if\ a\ custom\ caster\ exists\ for\ performance\ reasons}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ https://github.com/filp/whoops/pull/404}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \$cloner-\/>addCasters([\textcolor{charliteral}{'*'}\ =>\ \textcolor{keyword}{function}\ (\$obj,\ \$a,\ \$stub,\ \$isNested,\ \$filter\ =\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}\ =\ \$stub-\/>class;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$classes\ =\ [\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}\ =>\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}]\ +\ class\_parents(\$obj)\ +\ class\_implements(\$obj);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$classes\ as\ \mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}})\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{class_symfony_1_1_component_1_1_var_dumper_1_1_cloner_1_1_abstract_cloner_addcee39d7c035bdcb6828007c3ada11a}{AbstractCloner::\$defaultCasters}}[\mbox{\hyperlink{traces_8html_8php_a252ba022809910ea710a068fc1bab657}{\$class}}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$a;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Remove\ all\ internals}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \}]);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>templateHelper-\/>setCloner(\$cloner);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00176}00176\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00183}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a66eb7514ea7f7f8a5738a180b14e9b48}{00183}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a66eb7514ea7f7f8a5738a180b14e9b48}{handle}}()}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00184}00184\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aca7bc767d51705f35b6e2451361584e8}{handleUnconditionally}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ conditions\ for\ outputting\ HTML:}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @todo:\ Make\ this\ more\ robust}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (PHP\_SAPI\ ===\ \textcolor{stringliteral}{'cli'})\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Help\ users\ who\ have\ been\ relying\ on\ an\ internal\ test\ value}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ fix\ their\ code\ to\ the\ proper\ method}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$\_ENV[\textcolor{stringliteral}{'whoops-\/test'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)Exception(}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Use\ handleUnconditionally\ instead\ of\ whoops-\/test'}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .\textcolor{stringliteral}{'\ environment\ variable'}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_handler_a48f8225b479512acc182b1805224619e}{Handler::DONE}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \$templateFile\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}views/layout.html.php"{}});}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \$cssFile\ \ \ \ \ \ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}css/whoops.base.css"{}});}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \$zeptoFile\ \ \ \ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}js/zepto.min.js"{}});}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \$prismJs\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}js/prism.js"{}});}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \$prismCss\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}css/prism.css"{}});}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \$clipboard\ \ \ \ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}js/clipboard.min.js"{}});}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \$jsFile\ \ \ \ \ \ \ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}js/whoops.base.js"{}});}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>customCss)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \$customCssFile\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\$this-\/>customCss);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>customJs)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \$customJsFile\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\$this-\/>customJs);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \$inspector\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_handler_a0fd630c0f160d78af86b2807bea0d381}{getInspector}}();}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00219}00219\ \ \ \ \ \ \ \ \ \$frames\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a9f417b9191ccb0ceabd7066c0e7061a4}{getExceptionFrames}}();}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \$code\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a48d4f4cffdb93314c4f6e212c6b6cf96}{getExceptionCode}}();}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00221}00221\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ List\ of\ variables\ that\ will\ be\ passed\ to\ the\ layout\ template.}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \$vars\ =\ [}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}page\_title"{}}\ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a72e71f0cd569e7975f7e6625c972f37a}{getPageTitle}}(),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @todo:\ Asset\ compiler}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}stylesheet"{}}\ =>\ file\_get\_contents(\$cssFile),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}zepto"{}}\ \ \ \ \ \ =>\ file\_get\_contents(\$zeptoFile),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}prismJs"{}}\ \ \ =>\ file\_get\_contents(\$prismJs),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}prismCss"{}}\ \ \ =>\ file\_get\_contents(\$prismCss),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}clipboard"{}}\ \ =>\ file\_get\_contents(\$clipboard),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}javascript"{}}\ =>\ file\_get\_contents(\$jsFile),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Template\ paths:}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}header"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}views/header.html.php"{}}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}header\_outer"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}views/header\_outer.html.php"{}}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}frame\_list"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}views/frame\_list.html.php"{}}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}frames\_description"{}}\ \ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}views/frames\_description.html.php"{}}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}frames\_container"{}}\ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}views/frames\_container.html.php"{}}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}panel\_details"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}views/panel\_details.html.php"{}}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}panel\_details\_outer"{}}\ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}views/panel\_details\_outer.html.php"{}}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}panel\_left"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}views/panel\_left.html.php"{}}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}panel\_left\_outer"{}}\ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}views/panel\_left\_outer.html.php"{}}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00244}00244\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}frame\_code"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}views/frame\_code.html.php"{}}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}env\_details"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\textcolor{stringliteral}{"{}views/env\_details.html.php"{}}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00246}00246\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}title"{}}\ \ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a72e71f0cd569e7975f7e6625c972f37a}{getPageTitle}}(),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00248}00248\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}name"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ =>\ explode(\textcolor{stringliteral}{"{}\(\backslash\)\(\backslash\)"{}},\ \$inspector-\/>getExceptionName()),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}message"{}}\ \ \ \ \ \ \ \ \ \ =>\ \$inspector-\/>getExceptionMessage(),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00250}00250\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}previousMessages"{}}\ =>\ \$inspector-\/>getPreviousExceptionMessages(),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00251}00251\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}docref\_url"{}}\ \ \ \ \ \ \ =>\ \$inspector-\/>getExceptionDocrefUrl(),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00252}00252\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}code"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$code,}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}previousCodes"{}}\ \ \ \ =>\ \$inspector-\/>getPreviousExceptionCodes(),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}plain\_exception"{}}\ \ =>\ Formatter::formatExceptionPlain(\$inspector),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}frames"{}}\ \ \ \ \ \ \ \ \ \ \ =>\ \$frames,}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00256}00256\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}has\_frames"{}}\ \ \ \ \ \ \ =>\ !!count(\$frames),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}handler"{}}\ \ \ \ \ \ \ \ \ \ =>\ \$this,}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}handlers"{}}\ \ \ \ \ \ \ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_handler_a7a2baf26cdd50ece2b9cfcdf9ceaa966}{getRun}}()-\/>getHandlers(),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}active\_frames\_tab"{}}\ =>\ count(\$frames)\ \&\&\ \$frames-\/>offsetGet(0)-\/>isApplication()\ ?\ \ \textcolor{stringliteral}{'application'}\ :\ \textcolor{stringliteral}{'all'},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}has\_frames\_tabs"{}}\ \ \ =>\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a8b63f76f2ca2c0a5b9757a1ffe30832d}{getApplicationPaths}}(),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}tables"{}}\ \ \ \ \ \ =>\ [}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}GET\ Data"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>masked(\$\_GET,\ \textcolor{stringliteral}{'\_GET'}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}POST\ Data"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>masked(\$\_POST,\ \textcolor{stringliteral}{'\_POST'}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Files"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ isset(\$\_FILES)\ ?\ \$this-\/>masked(\$\_FILES,\ \textcolor{stringliteral}{'\_FILES'})\ :\ [],}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Cookies"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ \$this-\/>masked(\$\_COOKIE,\ \textcolor{stringliteral}{'\_COOKIE'}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Session"{}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =>\ isset(\$\_SESSION)\ ?\ \$this-\/>masked(\$\_SESSION,\ \textcolor{stringliteral}{'\_SESSION'})\ :\ \ [],}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Server/Request\ Data"{}}\ \ \ =>\ \$this-\/>masked(\$\_SERVER,\ \textcolor{stringliteral}{'\_SERVER'}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Environment\ Variables"{}}\ =>\ \$this-\/>masked(\$\_ENV,\ \textcolor{stringliteral}{'\_ENV'}),}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ ],}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00273}00273\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$customCssFile))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \ \ \ \ \$vars[\textcolor{stringliteral}{"{}stylesheet"{}}]\ .=\ file\_get\_contents(\$customCssFile);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00276}00276\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00278}00278\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$customJsFile))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \$vars[\textcolor{stringliteral}{"{}javascript"{}}]\ .=\ file\_get\_contents(\$customJsFile);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00280}00280\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00281}00281\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ extra\ entries\ list\ of\ data\ tables:}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00283}00283\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @todo:\ Consolidate\ addDataTable\ and\ addDataTableCallback}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00284}00284\ \ \ \ \ \ \ \ \ \$extraTables\ =\ array\_map(\textcolor{keyword}{function}\ (\$table)\ use\ (\$inspector)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$table\ instanceof\ \(\backslash\)Closure\ ?\ \$table(\$inspector)\ :\ \$table;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00286}00286\ \ \ \ \ \ \ \ \ \},\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_af33676b65b0ca1a0fe99b3a76905bc7c}{getDataTables}}());}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \$vars[\textcolor{stringliteral}{"{}tables"{}}]\ =\ array\_merge(\$extraTables,\ \$vars[\textcolor{stringliteral}{"{}tables"{}}]);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \$plainTextHandler\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_plain_text_handler}{PlainTextHandler}}();}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00290}00290\ \ \ \ \ \ \ \ \ \$plainTextHandler-\/>setRun(\$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_handler_a7a2baf26cdd50ece2b9cfcdf9ceaa966}{getRun}}());}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \$plainTextHandler-\/>setException(\$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_handler_a31ec439e56ccf74108b96587373a112c}{getException}}());}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \$plainTextHandler-\/>setInspector(\$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_handler_a0fd630c0f160d78af86b2807bea0d381}{getInspector}}());}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \$vars[\textcolor{stringliteral}{"{}preface"{}}]\ =\ \textcolor{stringliteral}{"{}<!-\/-\/\(\backslash\)n\(\backslash\)n\(\backslash\)n"{}}\ .\ \ \$this-\/>templateHelper-\/>escape(\$plainTextHandler-\/>generateResponse())\ .\ \textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)n\(\backslash\)n\(\backslash\)n\(\backslash\)n\(\backslash\)n\(\backslash\)n\(\backslash\)n\(\backslash\)n\(\backslash\)n\(\backslash\)n-\/-\/>"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00294}00294\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \$this-\/>templateHelper-\/>setVariables(\$vars);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \$this-\/>templateHelper-\/>render(\$templateFile);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_handler_a1cc596bf6994ded42040955f0d96b72e}{Handler::QUIT}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00299}00299\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00306}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a9f417b9191ccb0ceabd7066c0e7061a4}{00306}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a9f417b9191ccb0ceabd7066c0e7061a4}{getExceptionFrames}}()}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00307}00307\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00308}00308\ \ \ \ \ \ \ \ \ \$frames\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_handler_a0fd630c0f160d78af86b2807bea0d381}{getInspector}}()-\/>getFrames(\$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_handler_a7a2baf26cdd50ece2b9cfcdf9ceaa966}{getRun}}()-\/>getFrameFilters());}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00309}00309\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a8b63f76f2ca2c0a5b9757a1ffe30832d}{getApplicationPaths}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$frames\ as\ \$frame)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a8b63f76f2ca2c0a5b9757a1ffe30832d}{getApplicationPaths}}()\ as\ \$path)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strpos(\$frame-\/>getFile(),\ \$path)\ ===\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$frame-\/>setApplication(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00318}00318\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00319}00319\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00320}00320\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$frames;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00322}00322\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00329}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a48d4f4cffdb93314c4f6e212c6b6cf96}{00329}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a48d4f4cffdb93314c4f6e212c6b6cf96}{getExceptionCode}}()}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00330}00330\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \$exception\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_handler_a31ec439e56ccf74108b96587373a112c}{getException}}();}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \$code\ =\ \$exception-\/>getCode();}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00334}00334\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$exception\ instanceof\ \(\backslash\)ErrorException)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ ErrorExceptions\ wrap\ the\ php-\/error\ types\ within\ the\ 'severity'\ property}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \$code\ =\ Misc::translateErrorCode(\$exception-\/>getSeverity());}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00338}00338\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00339}00339\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{string})\ \$code;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00340}00340\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00345}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_abc4b18a737c82bd6b75210317ad38b8b}{00345}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_abc4b18a737c82bd6b75210317ad38b8b}{contentType}}()}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00346}00346\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00347}00347\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'text/html'};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00348}00348\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00360}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a34d93ab4bfe11855a7dd0426bd2f387a}{00360}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a34d93ab4bfe11855a7dd0426bd2f387a}{addDataTable}}(\$label,\ array\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00361}00361\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \$this-\/>extraTables[\$label]\ =\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00364}00364\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00380}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a9de38d58869ab783c7df2f49c13ca55e}{00380}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a9de38d58869ab783c7df2f49c13ca55e}{addDataTableCallback}}(\$label,\ \textcolor{comment}{/*\ callable\ */}\ \$callback)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00381}00381\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_callable(\$callback))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidArgumentException(\textcolor{stringliteral}{'Expecting\ callback\ argument\ to\ be\ callable'});}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00384}00384\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00385}00385\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \$this-\/>extraTables[\$label]\ =\ \textcolor{keyword}{function}\ (\(\backslash\)\mbox{\hyperlink{interface_whoops_1_1_inspector_1_1_inspector_interface}{Whoops\(\backslash\)Inspector\(\backslash\)InspectorInterface}}\ \$inspector\ =\ \textcolor{keyword}{null})\ use\ (\$callback)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$result\ =\ call\_user\_func(\$callback,\ \$inspector);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Only\ return\ the\ result\ if\ it\ can\ be\ iterated\ over\ by\ foreach().}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_array(\$result)\ ||\ \$result\ instanceof\ \(\backslash\)Traversable\ ?\ \$result\ :\ [];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00392}00392\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (\(\backslash\)Exception\ \$e)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Don't\ allow\ failure\ to\ break\ the\ rendering\ of\ the\ original\ exception.}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00396}00396\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00397}00397\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00398}00398\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00399}00399\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00411}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_af33676b65b0ca1a0fe99b3a76905bc7c}{00411}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_af33676b65b0ca1a0fe99b3a76905bc7c}{getDataTables}}(\$label\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00412}00412\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00413}00413\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$label\ !==\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00414}00414\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ isset(\$this-\/>extraTables[\$label])\ ?}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00415}00415\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>extraTables[\$label]\ :\ [];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00416}00416\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00417}00417\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00418}00418\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>extraTables;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00419}00419\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00420}00420\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00432}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aca7bc767d51705f35b6e2451361584e8}{00432}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aca7bc767d51705f35b6e2451361584e8}{handleUnconditionally}}(\$value\ =\ \textcolor{keyword}{null})}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00433}00433\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (func\_num\_args()\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>handleUnconditionally;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00437}00437\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aca7bc767d51705f35b6e2451361584e8}{handleUnconditionally}}\ =\ (bool)\ \$value;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00440}00440\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00441}00441\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00462}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa22922dc6665218d3f04ce5aee2ef12f}{00462}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa22922dc6665218d3f04ce5aee2ef12f}{addEditor}}(\$identifier,\ \$resolver)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00463}00463\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \$this-\/>editors[\$identifier]\ =\ \$resolver;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00466}00466\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00485}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a27e7e2768a40b76fb45a499c33377111}{00485}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a27e7e2768a40b76fb45a499c33377111}{setEditor}}(\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}})}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00486}00486\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00487}00487\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_callable(\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}})\ \&\&\ !isset(\$this-\/>editors[\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidArgumentException(}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Unknown\ editor\ identifier:\ \$editor.\ Known\ editors:"{}}\ .}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00490}00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ implode(\textcolor{stringliteral}{"{},"{}},\ array\_keys(\$this-\/>editors))}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00491}00491\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00492}00492\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00493}00493\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \$this-\/>editor\ =\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00495}00495\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00496}00496\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00497}00497\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00508}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a983ab1780e2b594552f4c7326db6cffe}{00508}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a983ab1780e2b594552f4c7326db6cffe}{getEditorHref}}(\$filePath,\ \$line)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00509}00509\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a9bf0855c14d779854b3fd2e664e10d69}{getEditor}}(\$filePath,\ \$line);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00511}00511\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00512}00512\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00515}00515\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ that\ the\ editor\ is\ a\ string,\ and\ replace\ the}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \%line\ and\ \%file\ placeholders:}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00518}00518\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}[\textcolor{stringliteral}{'url'}])\ ||\ !is\_string(\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}[\textcolor{stringliteral}{'url'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ UnexpectedValueException(}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_\_METHOD\_\_\ .\ \textcolor{stringliteral}{"{}\ should\ always\ resolve\ to\ a\ string\ or\ a\ valid\ editor\ array;\ got\ something\ else\ instead."{}}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00523}00523\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00524}00524\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}[\textcolor{stringliteral}{'url'}]\ =\ str\_replace(\textcolor{stringliteral}{"{}\%line"{}},\ rawurlencode(\$line),\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}[\textcolor{stringliteral}{'url'}]);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00525}00525\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}[\textcolor{stringliteral}{'url'}]\ =\ str\_replace(\textcolor{stringliteral}{"{}\%file"{}},\ rawurlencode(\$filePath),\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}[\textcolor{stringliteral}{'url'}]);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00526}00526\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00527}00527\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}[\textcolor{stringliteral}{'url'}];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00528}00528\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00529}00529\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00540}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a8f23c6ccc3b1c2758b64298fadbebb54}{00540}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a8f23c6ccc3b1c2758b64298fadbebb54}{getEditorAjax}}(\$filePath,\ \$line)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00541}00541\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a9bf0855c14d779854b3fd2e664e10d69}{getEditor}}(\$filePath,\ \$line);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00543}00543\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00544}00544\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Check\ that\ the\ ajax\ is\ a\ bool}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}[\textcolor{stringliteral}{'ajax'}])\ ||\ !is\_bool(\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}[\textcolor{stringliteral}{'ajax'}]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00546}00546\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ UnexpectedValueException(}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00547}00547\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_\_METHOD\_\_\ .\ \textcolor{stringliteral}{"{}\ should\ always\ resolve\ to\ a\ bool;\ got\ something\ else\ instead."{}}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00548}00548\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00550}00550\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$editor}}[\textcolor{stringliteral}{'ajax'}];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00551}00551\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00552}00552\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00561}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a9bf0855c14d779854b3fd2e664e10d69}{00561}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a9bf0855c14d779854b3fd2e664e10d69}{getEditor}}(\$filePath,\ \$line)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00562}00562\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00563}00563\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>editor\ ||\ (!is\_string(\$this-\/>editor)\ \&\&\ !is\_callable(\$this-\/>editor)))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00565}00565\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00566}00566\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00567}00567\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$this-\/>editor)\ \&\&\ isset(\$this-\/>editors[\$this-\/>editor])\ \&\&\ !is\_callable(\$this-\/>editors[\$this-\/>editor]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00568}00568\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'ajax'}\ =>\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00570}00570\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'url'}\ =>\ \$this-\/>editors[\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aeaf75d75efded45109bfc5c51ba3d66f}{\$this-\/>editor}}],}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00571}00571\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00572}00572\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00573}00573\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00574}00574\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_callable(\$this-\/>editor)\ ||\ (isset(\$this-\/>editors[\$this-\/>editor])\ \&\&\ is\_callable(\$this-\/>editors[\$this-\/>editor])))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00575}00575\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_callable(\$this-\/>editor))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00576}00576\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$callback\ =\ call\_user\_func(\$this-\/>editor,\ \$filePath,\ \$line);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00577}00577\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00578}00578\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$callback\ =\ call\_user\_func(\$this-\/>editors[\$this-\/>editor],\ \$filePath,\ \$line);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00579}00579\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00580}00580\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00581}00581\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$callback))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00582}00582\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00583}00583\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00584}00584\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00585}00585\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_string(\$callback))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00586}00586\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00587}00587\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'ajax'}\ =>\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00588}00588\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'url'}\ =>\ \$callback,}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00589}00589\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00590}00590\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00591}00591\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00592}00592\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00593}00593\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'ajax'}\ =>\ isset(\$callback[\textcolor{stringliteral}{'ajax'}])\ ?\ \$callback[\textcolor{stringliteral}{'ajax'}]\ :\ \textcolor{keyword}{false},}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00594}00594\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'url'}\ =>\ isset(\$callback[\textcolor{stringliteral}{'url'}])\ ?\ \$callback[\textcolor{stringliteral}{'url'}]\ :\ \$callback,}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00595}00595\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00596}00596\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00597}00597\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00598}00598\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00599}00599\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00600}00600\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00608}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a1c0b5e1f1c1a56a9dd657671d3fcfb81}{00608}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a1c0b5e1f1c1a56a9dd657671d3fcfb81}{setPageTitle}}(\$title)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00609}00609\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00610}00610\ \ \ \ \ \ \ \ \ \$this-\/>pageTitle\ =\ (string)\ \$title;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00611}00611\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00612}00612\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00613}00613\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00619}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a72e71f0cd569e7975f7e6625c972f37a}{00619}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a72e71f0cd569e7975f7e6625c972f37a}{getPageTitle}}()}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00620}00620\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00621}00621\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>pageTitle;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00622}00622\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00623}00623\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00633}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aea6259b952466986329b11f77f783a5d}{00633}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aea6259b952466986329b11f77f783a5d}{addResourcePath}}(\$path)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00634}00634\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00635}00635\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_dir(\$path))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ InvalidArgumentException(}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}'\$path'\ is\ not\ a\ valid\ directory"{}}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00638}00638\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00639}00639\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00640}00640\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00641}00641\ \ \ \ \ \ \ \ \ array\_unshift(\$this-\/>searchPaths,\ \$path);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00642}00642\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00643}00643\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00644}00644\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00652}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a614dd519ea5800efdb14bf4c34da9f1d}{00652}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a614dd519ea5800efdb14bf4c34da9f1d}{addCustomCss}}(\$name)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00653}00653\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00654}00654\ \ \ \ \ \ \ \ \ \$this-\/>customCss\ =\ \$name;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00655}00655\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00656}00656\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00657}00657\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00665}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_ada55dab842fd21b137c0015d95f26544}{00665}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_ada55dab842fd21b137c0015d95f26544}{addCustomJs}}(\$name)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00666}00666\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00667}00667\ \ \ \ \ \ \ \ \ \$this-\/>customJs\ =\ \$name;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00668}00668\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00669}00669\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00670}00670\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00674}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a99d513885f4263f7bd785c31e73d51aa}{00674}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a99d513885f4263f7bd785c31e73d51aa}{getResourcePaths}}()}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00675}00675\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00676}00676\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>searchPaths;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00677}00677\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00678}00678\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00692}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{00692}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aa2c1b8634bea77c8eb6a7d909511bd52}{getResource}}(\$resource)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00693}00693\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00694}00694\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ the\ resource\ was\ found\ before,\ we\ can\ speed\ things\ up}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00695}00695\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ by\ caching\ its\ absolute,\ resolved\ path:}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00696}00696\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>resourceCache[\$resource]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00697}00697\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>resourceCache[\$resource];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00698}00698\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00699}00699\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00700}00700\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Search\ through\ available\ search\ paths,\ until\ we\ find\ the}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00701}00701\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ resource\ we're\ after:}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00702}00702\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>searchPaths\ as\ \$path)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00703}00703\ \ \ \ \ \ \ \ \ \ \ \ \ \$fullPath\ =\ \$path\ .\ \textcolor{stringliteral}{"{}/\$resource"{}};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00704}00704\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00705}00705\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_file(\$fullPath))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00706}00706\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Cache\ the\ result:}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00707}00707\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>resourceCache[\$resource]\ =\ \$fullPath;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00708}00708\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$fullPath;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00709}00709\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00710}00710\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00711}00711\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00712}00712\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ If\ we\ got\ this\ far,\ nothing\ was\ found.}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00713}00713\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00714}00714\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Could\ not\ find\ resource\ '\$resource'\ in\ any\ resource\ paths."{}}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00715}00715\ \ \ \ \ \ \ \ \ \ \ \ \ .\ \textcolor{stringliteral}{"{}(searched:\ "{}}\ .\ join(\textcolor{stringliteral}{"{},\ "{}},\ \$this-\/>searchPaths).\ \textcolor{stringliteral}{"{})"{}}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00716}00716\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00717}00717\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00718}00718\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00724}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a1ca1159e28d6afbf818c967879e97ed4}{00724}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a1ca1159e28d6afbf818c967879e97ed4}{getResourcesPath}}()}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00725}00725\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00726}00726\ \ \ \ \ \ \ \ \ \$allPaths\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a99d513885f4263f7bd785c31e73d51aa}{getResourcePaths}}();}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00727}00727\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00728}00728\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Compat:\ return\ only\ the\ first\ path\ added}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00729}00729\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ end(\$allPaths)\ ?:\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00730}00730\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00731}00731\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00739}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_ae06df6d170b9f7217b36b28e56b99e89}{00739}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_ae06df6d170b9f7217b36b28e56b99e89}{setResourcesPath}}(\$resourcesPath)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00740}00740\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00741}00741\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aea6259b952466986329b11f77f783a5d}{addResourcePath}}(\$resourcesPath);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00742}00742\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00743}00743\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00744}00744\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00750}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a8b63f76f2ca2c0a5b9757a1ffe30832d}{00750}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a8b63f76f2ca2c0a5b9757a1ffe30832d}{getApplicationPaths}}()}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00751}00751\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00752}00752\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>applicationPaths;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00753}00753\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00754}00754\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00760}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aef9f11724521b87f1f88f642a3c0c432}{00760}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_aef9f11724521b87f1f88f642a3c0c432}{setApplicationPaths}}(array\ \$applicationPaths)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00761}00761\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00762}00762\ \ \ \ \ \ \ \ \ \$this-\/>applicationPaths\ =\ \$applicationPaths;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00763}00763\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00764}00764\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00772}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a6a1ba0c29c1473ed4abfa26c7cd25590}{00772}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a6a1ba0c29c1473ed4abfa26c7cd25590}{setApplicationRootPath}}(\$applicationRootPath)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00773}00773\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00774}00774\ \ \ \ \ \ \ \ \ \$this-\/>templateHelper-\/>setApplicationRootPath(\$applicationRootPath);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00775}00775\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00776}00776\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00787}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a3fbde3fe6a30cba766440df67491be33}{00787}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a3fbde3fe6a30cba766440df67491be33}{blacklist}}(\$superGlobalName,\ \$key)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00788}00788\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00789}00789\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a3fbde3fe6a30cba766440df67491be33}{blacklist}}[\$superGlobalName][]\ =\ \$key;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00790}00790\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00791}00791\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00792}00792\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00800}\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_abad648059ee3603d21cd4fcfbcb6bb05}{00800}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_abad648059ee3603d21cd4fcfbcb6bb05}{hideSuperglobalKey}}(\$superGlobalName,\ \$key)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00801}00801\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00802}00802\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a3fbde3fe6a30cba766440df67491be33}{blacklist}}(\$superGlobalName,\ \$key);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00803}00803\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00804}00804\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00818}00818\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ masked(\$superGlobal,\ \$superGlobalName)}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00819}00819\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00820}00820\ \ \ \ \ \ \ \ \ \$blacklisted\ =\ \$this-\/>\mbox{\hyperlink{class_whoops_1_1_handler_1_1_pretty_page_handler_a3fbde3fe6a30cba766440df67491be33}{blacklist}}[\$superGlobalName];}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00821}00821\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00822}00822\ \ \ \ \ \ \ \ \ \$values\ =\ \$superGlobal;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00823}00823\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00824}00824\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$blacklisted\ as\ \$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00825}00825\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$superGlobal[\$key]))\ \{}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00826}00826\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$values[\$key]\ =\ str\_repeat(\textcolor{charliteral}{'*'},\ is\_string(\$superGlobal[\$key])\ ?\ strlen(\$superGlobal[\$key])\ :\ 3);}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00827}00827\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00828}00828\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00829}00829\ }
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00830}00830\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$values;}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00831}00831\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_pretty_page_handler_8php_source_l00832}00832\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,397 @@
+\doxysection{Store.\+php}
+\hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source}{}\label{symfony_2http-kernel_2_http_cache_2_store_8php_source}\index{vendor/symfony/http-\/kernel/HttpCache/Store.php@{vendor/symfony/http-\/kernel/HttpCache/Store.php}}
+\mbox{\hyperlink{symfony_2http-kernel_2_http_cache_2_store_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00008}00008\ \textcolor{comment}{\ *\ This\ code\ is\ partially\ based\ on\ the\ Rack-\/Cache\ library\ by\ Ryan\ Tomayko,}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00009}00009\ \textcolor{comment}{\ *\ which\ is\ released\ under\ the\ MIT\ license.}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00010}00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00011}00011\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00012}00012\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00013}00013\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_http_kernel_1_1_http_cache}{Symfony\(\backslash\)Component\(\backslash\)HttpKernel\(\backslash\)HttpCache}};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)Request}};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_response}{Symfony\(\backslash\)Component\(\backslash\)HttpFoundation\(\backslash\)Response}};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00025}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store}{00025}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store}{Store}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_interface}{StoreInterface}}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00026}00026\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00027}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ab37f7c32f41c3c61ed940887453767f4}{00027}}\ \ \ \ \ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ab37f7c32f41c3c61ed940887453767f4}{\$root}};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00029}00029\ \ \ \ \ private\ \(\backslash\)SplObjectStorage\ \$keyCache;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$locks\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$options;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00044}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a30e9a27a309bfa923ca800c279847c24}{00044}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a30e9a27a309bfa923ca800c279847c24}{\_\_construct}}(\textcolor{keywordtype}{string}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ab37f7c32f41c3c61ed940887453767f4}{\$root}},\ array\ \$options\ =\ [])}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00045}00045\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \$this-\/>root\ =\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ab37f7c32f41c3c61ed940887453767f4}{\$root}};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_dir(\$this-\/>root)\ \&\&\ !@mkdir(\$this-\/>root,\ 0777,\ \textcolor{keyword}{true})\ \&\&\ !is\_dir(\$this-\/>root))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(sprintf(\textcolor{stringliteral}{'Unable\ to\ create\ the\ store\ directory\ (\%s).'},\ \$this-\/>root));}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \$this-\/>keyCache\ =\ new\ \(\backslash\)SplObjectStorage();}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \$this-\/>options\ =\ array\_merge([}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'private\_headers'}\ =>\ [\textcolor{stringliteral}{'Set-\/Cookie'}],}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ ],\ \$options);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00054}00054\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00061}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_aff07c1d29d6d6a540c726948254a1764}{00061}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_aff07c1d29d6d6a540c726948254a1764}{cleanup}}()}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00062}00062\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ unlock\ everything}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>locks\ as\ \$lock)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ flock(\$lock,\ \(\backslash\)LOCK\_UN);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$lock);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \$this-\/>locks\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00077}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a9f1eee00e090d98848f944eb3ef52eed}{00077}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a9f1eee00e090d98848f944eb3ef52eed}{lock}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request):\ bool|string}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00078}00078\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \$key\ =\ \$this-\/>getCacheKey(\$request);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>locks[\$key]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \$path\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ad941dcc290dd9dff46535a464bf46408}{getPath}}(\$key);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_dir(\(\backslash\)dirname(\$path))\ \&\&\ \textcolor{keyword}{false}\ ===\ @mkdir(\(\backslash\)dirname(\$path),\ 0777,\ \textcolor{keyword}{true})\ \&\&\ !is\_dir(\(\backslash\)dirname(\$path)))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$path;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \ \ \ \ \$h\ =\ fopen(\$path,\ \textcolor{charliteral}{'c'});}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!flock(\$h,\ \(\backslash\)LOCK\_EX\ |\ \(\backslash\)LOCK\_NB))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$h);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$path;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>locks[\$key]\ =\ \$h;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00097}00097\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00104}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a3bee2944d6dfee4b331e439c83833e4f}{00104}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a3bee2944d6dfee4b331e439c83833e4f}{unlock}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request):\ bool}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00105}00105\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \$key\ =\ \$this-\/>getCacheKey(\$request);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>locks[\$key]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ flock(\$this-\/>locks[\$key],\ \(\backslash\)LOCK\_UN);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$this-\/>locks[\$key]);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$this-\/>locks[\$key]);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00112}00112\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00117}00117\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00118}00118\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00119}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a6e9baf20e51bbf29ba51dd31e7e2f75e}{00119}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a6e9baf20e51bbf29ba51dd31e7e2f75e}{isLocked}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request):\ bool}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00120}00120\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \$key\ =\ \$this-\/>getCacheKey(\$request);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>locks[\$key]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};\ \textcolor{comment}{//\ shortcut\ if\ lock\ held\ by\ this\ process}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_file(\$path\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ad941dcc290dd9dff46535a464bf46408}{getPath}}(\$key)))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \$h\ =\ fopen(\$path,\ \textcolor{charliteral}{'r'});}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ flock(\$h,\ \(\backslash\)LOCK\_EX\ |\ \(\backslash\)LOCK\_NB,\ \$wouldBlock);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ flock(\$h,\ \(\backslash\)LOCK\_UN);\ \textcolor{comment}{//\ release\ the\ lock\ we\ just\ acquired}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ fclose(\$h);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keywordtype}{bool})\ \$wouldBlock;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00137}00137\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00142}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a89146d2eb037705a558bc79ad819e258}{00142}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a89146d2eb037705a558bc79ad819e258}{lookup}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request):\ ?\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_response}{Response}}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00143}00143\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \$key\ =\ \$this-\/>getCacheKey(\$request);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$entries\ =\ \$this-\/>getMetadata(\$key))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ find\ a\ cached\ entry\ that\ matches\ the\ request.}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \$match\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$entries\ as\ \$entry)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>requestsMatch(isset(\$entry[1][\textcolor{stringliteral}{'vary'}][0])\ ?\ implode(\textcolor{stringliteral}{',\ '},\ \$entry[1][\textcolor{stringliteral}{'vary'}])\ :\ \textcolor{stringliteral}{''},\ \$request-\/>headers-\/>all(),\ \$entry[0]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$match\ =\ \$entry;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ ===\ \$match)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00161}00161\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00163}00163\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \$headers\ =\ \$match[1];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (file\_exists(\$path\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ad941dcc290dd9dff46535a464bf46408}{getPath}}(\$headers[\textcolor{stringliteral}{'x-\/content-\/digest'}][0])))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>restoreResponse(\$headers,\ \$path);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ TODO\ the\ metaStore\ referenced\ an\ entity\ that\ doesn't\ exist\ in}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ entityStore.\ We\ definitely\ want\ to\ return\ nil\ but\ we\ should}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ also\ purge\ the\ entry\ from\ the\ meta-\/store\ when\ this\ is\ detected.}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00173}00173\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00183}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a7e11ac1aabf95f26abd8aadb2b44f9a7}{00183}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a7e11ac1aabf95f26abd8aadb2b44f9a7}{write}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request,\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_response}{Response}}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}):\ string}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00184}00184\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \$key\ =\ \$this-\/>getCacheKey(\$request);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \$storedEnv\ =\ \$this-\/>persistRequest(\$request);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>has(\textcolor{stringliteral}{'X-\/Body-\/File'}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Assume\ the\ response\ came\ from\ disk,\ but\ at\ least\ perform\ some\ safeguard\ checks}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>has(\textcolor{stringliteral}{'X-\/Content-\/Digest'}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{'A\ restored\ response\ must\ have\ the\ X-\/Content-\/Digest\ header.'});}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \ \ \ \ \$digest\ =\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>get(\textcolor{stringliteral}{'X-\/Content-\/Digest'});}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ad941dcc290dd9dff46535a464bf46408}{getPath}}(\$digest)\ !==\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>get(\textcolor{stringliteral}{'X-\/Body-\/File'}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{'X-\/Body-\/File\ and\ X-\/Content-\/Digest\ do\ not\ match.'});}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Everything\ seems\ ok,\ omit\ writing\ content\ to\ disk}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \$digest\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a70fcf777d3add1647a9d66710d12ea04}{generateContentDigest}}(\$response);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>set(\textcolor{stringliteral}{'X-\/Content-\/Digest'},\ \$digest);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>save(\$digest,\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getContent(),\ \textcolor{keyword}{false}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{'Unable\ to\ store\ the\ entity.'});}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>has(\textcolor{stringliteral}{'Transfer-\/Encoding'}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>set(\textcolor{stringliteral}{'Content-\/Length'},\ \(\backslash\)strlen(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getContent()));}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ read\ existing\ cache\ entries,\ remove\ non-\/varying,\ and\ add\ this\ one\ to\ the\ list}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \$entries\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \$vary\ =\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>get(\textcolor{stringliteral}{'vary'});}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>getMetadata(\$key)\ as\ \$entry)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$entry[1][\textcolor{stringliteral}{'vary'}][0]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$entry[1][\textcolor{stringliteral}{'vary'}]\ =\ [\textcolor{stringliteral}{''}];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$entry[1][\textcolor{stringliteral}{'vary'}][0]\ !=\ \$vary\ ||\ !\$this-\/>requestsMatch(\$vary\ ??\ \textcolor{stringliteral}{''},\ \$entry[0],\ \$storedEnv))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$entries[]\ =\ \$entry;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00222}00222\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00224}00224\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00225}00225\ \ \ \ \ \ \ \ \ \$headers\ =\ \$this-\/>persistResponse(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}});}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00226}00226\ \ \ \ \ \ \ \ \ unset(\$headers[\textcolor{stringliteral}{'age'}]);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00227}00227\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>options[\textcolor{stringliteral}{'private\_headers'}]\ as\ \$h)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$headers[strtolower(\$h)]);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ array\_unshift(\$entries,\ [\$storedEnv,\ \$headers]);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>save(\$key,\ serialize(\$entries)))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{'Unable\ to\ store\ the\ metadata.'});}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$key;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00239}00239\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00244}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a70fcf777d3add1647a9d66710d12ea04}{00244}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a70fcf777d3add1647a9d66710d12ea04}{generateContentDigest}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_response}{Response}}\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}):\ string}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00245}00245\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00246}00246\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'en'}.hash(\textcolor{stringliteral}{'xxh128'},\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getContent());}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00247}00247\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00248}00248\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00256}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a2a6f6a88467a844d4cdfb91cb720ba42}{00256}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a2a6f6a88467a844d4cdfb91cb720ba42}{invalidate}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request)}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00257}00257\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00258}00258\ \ \ \ \ \ \ \ \ \$modified\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \$key\ =\ \$this-\/>getCacheKey(\$request);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \$entries\ =\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00262}00262\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>getMetadata(\$key)\ as\ \$entry)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}\ =\ \$this-\/>restoreResponse(\$entry[1]);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>isFresh())\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>expire();}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$modified\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00267}00267\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$entries[]\ =\ [\$entry[0],\ \$this-\/>persistResponse(\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}})];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$entries[]\ =\ \$entry;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00271}00271\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$modified\ \&\&\ !\$this-\/>save(\$key,\ serialize(\$entries)))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)RuntimeException(\textcolor{stringliteral}{'Unable\ to\ store\ the\ metadata.'});}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00276}00276\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00286}00286\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ requestsMatch(?\textcolor{keywordtype}{string}\ \$vary,\ array\ \$env1,\ array\ \$env2):\ bool}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00287}00287\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00288}00288\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (empty(\$vary))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00290}00290\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00291}00291\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00292}00292\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (preg\_split(\textcolor{stringliteral}{'/[\(\backslash\)s,]+/'},\ \$vary)\ as\ \$header)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \$key\ =\ str\_replace(\textcolor{charliteral}{'\_'},\ \textcolor{charliteral}{'-\/'},\ strtolower(\$header));}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \$v1\ =\ \$env1[\$key]\ ??\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \$v2\ =\ \$env2[\$key]\ ??\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$v1\ !==\ \$v2)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00299}00299\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00301}00301\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00302}00302\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00309}00309\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getMetadata(\textcolor{keywordtype}{string}\ \$key):\ array}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00310}00310\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$entries\ =\ \$this-\/>load(\$key))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00313}00313\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00314}00314\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{namespace_ramsey_1_1_uuid_1_1_fields_a429f38a9f871921ed271c9cf73498ce0}{unserialize}}(\$entries)\ ?:\ [];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00316}00316\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00325}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a1ef20adebd22c5bd7b95dbceb2879879}{00325}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a1ef20adebd22c5bd7b95dbceb2879879}{purge}}(\textcolor{keywordtype}{string}\ \$url):\ bool}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00326}00326\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00327}00327\ \ \ \ \ \ \ \ \ \$http\ =\ preg\_replace(\textcolor{stringliteral}{'\#\string^https:\#'},\ \textcolor{stringliteral}{'http:'},\ \$url);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \$https\ =\ preg\_replace(\textcolor{stringliteral}{'\#\string^http:\#'},\ \textcolor{stringliteral}{'https:'},\ \$url);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00329}00329\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00330}00330\ \ \ \ \ \ \ \ \ \$purgedHttp\ =\ \$this-\/>doPurge(\$http);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00331}00331\ \ \ \ \ \ \ \ \ \$purgedHttps\ =\ \$this-\/>doPurge(\$https);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$purgedHttp\ ||\ \$purgedHttps;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00334}00334\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00339}00339\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ doPurge(\textcolor{keywordtype}{string}\ \$url):\ bool}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00340}00340\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00341}00341\ \ \ \ \ \ \ \ \ \$key\ =\ \$this-\/>getCacheKey(Request::create(\$url));}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00342}00342\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>locks[\$key]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ flock(\$this-\/>locks[\$key],\ \(\backslash\)LOCK\_UN);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$this-\/>locks[\$key]);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$this-\/>locks[\$key]);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00347}00347\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00348}00348\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_file(\$path\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ad941dcc290dd9dff46535a464bf46408}{getPath}}(\$key)))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ unlink(\$path);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00350}00350\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00353}00353\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00355}00355\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00356}00356\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00360}00360\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ load(\textcolor{keywordtype}{string}\ \$key):\ ?string}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00361}00361\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \$path\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ad941dcc290dd9dff46535a464bf46408}{getPath}}(\$key);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00363}00363\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00364}00364\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ is\_file(\$path)\ \&\&\ \textcolor{keyword}{false}\ !==\ (\$contents\ =\ @file\_get\_contents(\$path))\ ?\ \$contents\ :\ null;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00365}00365\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00370}00370\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ save(\textcolor{keywordtype}{string}\ \$key,\ \textcolor{keywordtype}{string}\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}},\ \textcolor{keywordtype}{bool}\ \$overwrite\ =\ \textcolor{keyword}{true}):\ bool}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00371}00371\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \$path\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ad941dcc290dd9dff46535a464bf46408}{getPath}}(\$key);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00374}00374\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$overwrite\ \&\&\ file\_exists(\$path))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00375}00375\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00376}00376\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00377}00377\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00378}00378\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>locks[\$key]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \ \ \$fp\ =\ \$this-\/>locks[\$key];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00380}00380\ \ \ \ \ \ \ \ \ \ \ \ \ @ftruncate(\$fp,\ 0);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00381}00381\ \ \ \ \ \ \ \ \ \ \ \ \ @fseek(\$fp,\ 0);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ \$len\ =\ @fwrite(\$fp,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)strlen(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}})\ !==\ \$len)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ @ftruncate(\$fp,\ 0);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00385}00385\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00388}00388\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_dir(\(\backslash\)dirname(\$path))\ \&\&\ \textcolor{keyword}{false}\ ===\ @mkdir(\(\backslash\)dirname(\$path),\ 0777,\ \textcolor{keyword}{true})\ \&\&\ !is\_dir(\(\backslash\)dirname(\$path)))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \$tmpFile\ =\ tempnam(\(\backslash\)dirname(\$path),\ basename(\$path));}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{false}\ ===\ \$fp\ =\ @fopen(\$tmpFile,\ \textcolor{charliteral}{'w'}))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ @unlink(\$tmpFile);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00396}00396\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00398}00398\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \ \ \ @fwrite(\$fp,\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00400}00400\ \ \ \ \ \ \ \ \ \ \ \ \ @fclose(\$fp);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00401}00401\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ !=\ file\_get\_contents(\$tmpFile))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ @unlink(\$tmpFile);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00404}00404\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00407}00407\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{false}\ ===\ @rename(\$tmpFile,\ \$path))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ @unlink(\$tmpFile);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00410}00410\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00411}00411\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00412}00412\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00413}00413\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00414}00414\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00415}00415\ \ \ \ \ \ \ \ \ @chmod(\$path,\ 0666\ \&\ \string~umask());}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00418}00418\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00419}00419\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00423}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ad941dcc290dd9dff46535a464bf46408}{00423}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_ad941dcc290dd9dff46535a464bf46408}{getPath}}(\textcolor{keywordtype}{string}\ \$key)}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00424}00424\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>root.\(\backslash\)DIRECTORY\_SEPARATOR.substr(\$key,\ 0,\ 2).\(\backslash\)DIRECTORY\_SEPARATOR.substr(\$key,\ 2,\ 2).\(\backslash\)DIRECTORY\_SEPARATOR.substr(\$key,\ 4,\ 2).\(\backslash\)DIRECTORY\_SEPARATOR.substr(\$key,\ 6);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00426}00426\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00438}\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a24e66cd0ac1d839704fdd1a6a1b3dbce}{00438}}\ \ \ \ \ \textcolor{keyword}{protected}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a24e66cd0ac1d839704fdd1a6a1b3dbce}{generateCacheKey}}(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request):\ string}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00439}00439\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00440}00440\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{'md'}.hash(\textcolor{stringliteral}{'sha256'},\ \$request-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request_a2ac86cae38fbe15a019d075d485ab702}{getUri}}());}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00441}00441\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00442}00442\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00446}00446\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getCacheKey(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_foundation_1_1_request}{Request}}\ \$request):\ string}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00447}00447\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00448}00448\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>keyCache[\$request]))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>keyCache[\$request];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00451}00451\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00452}00452\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>keyCache[\$request]\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_store_a24e66cd0ac1d839704fdd1a6a1b3dbce}{generateCacheKey}}(\$request);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00453}00453\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00454}00454\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00458}00458\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ persistRequest(Request\ \$request):\ array}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00459}00459\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00460}00460\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$request-\/>headers-\/>all();}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00461}00461\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00462}00462\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00466}00466\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ persistResponse(Response\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}):\ array}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00467}00467\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00468}00468\ \ \ \ \ \ \ \ \ \$headers\ =\ \mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>headers-\/>all();}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00469}00469\ \ \ \ \ \ \ \ \ \$headers[\textcolor{stringliteral}{'X-\/Status'}]\ =\ [\mbox{\hyperlink{index_8php_af4b6fb1bbc77ccc05f10da3b16935b99}{\$response}}-\/>getStatusCode()];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00470}00470\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$headers;}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00472}00472\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00473}00473\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00477}00477\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ restoreResponse(array\ \$headers,\ \textcolor{keywordtype}{string}\ \$path\ =\ \textcolor{keyword}{null}):\ ?Response}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00478}00478\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \$status\ =\ \$headers[\textcolor{stringliteral}{'X-\/Status'}][0];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00480}00480\ \ \ \ \ \ \ \ \ unset(\$headers[\textcolor{stringliteral}{'X-\/Status'}]);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ \$content\ =\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00482}00482\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00483}00483\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\textcolor{keyword}{null}\ !==\ \$path)\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ \$headers[\textcolor{stringliteral}{'X-\/Body-\/File'}]\ =\ [\$path];}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$headers[\textcolor{stringliteral}{'x-\/body-\/file'}]);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00486}00486\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00487}00487\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$headers[\textcolor{stringliteral}{'X-\/Body-\/Eval'}]\ ??\ \$headers[\textcolor{stringliteral}{'x-\/body-\/eval'}]\ ??\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$content\ =\ file\_get\_contents(\$path);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)assert(\mbox{\hyperlink{class_symfony_1_1_component_1_1_http_kernel_1_1_http_cache_1_1_http_cache_af7808ff5104a0acb50d0af9d0e91c2a1}{HttpCache::BODY\_EVAL\_BOUNDARY\_LENGTH}}\ ===\ 24);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00490}00490\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (48\ >\ \(\backslash\)strlen(\$content)\ ||\ substr(\$content,\ -\/24)\ !==\ substr(\$content,\ 0,\ 24))\ \{}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00491}00491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00492}00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00493}00493\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00495}00495\ }
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ Response(\$content,\ \$status,\ \$headers);}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00497}00497\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{symfony_2http-kernel_2_http_cache_2_store_8php_source_l00498}00498\ \}}
+
+\end{DoxyCode}

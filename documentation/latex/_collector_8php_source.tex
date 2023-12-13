@@ -1,0 +1,590 @@
+\doxysection{Collector.\+php}
+\hypertarget{_collector_8php_source}{}\label{_collector_8php_source}\index{vendor/phpunit/phpunit/src/Runner/TestResult/Collector.php@{vendor/phpunit/phpunit/src/Runner/TestResult/Collector.php}}
+\mbox{\hyperlink{_collector_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ PHPUnit.}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00010}\mbox{\hyperlink{namespace_p_h_p_unit_1_1_test_runner_1_1_test_result}{00010}}\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_p_h_p_unit_1_1_test_runner_1_1_test_result}{PHPUnit\(\backslash\)TestRunner\(\backslash\)TestResult}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00012}00012\ use\ \textcolor{keyword}{function}\ array\_values;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ assert;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ implode;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ str\_contains;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00016}00016\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_test_method}{PHPUnit\(\backslash\)Event\(\backslash\)Code\(\backslash\)TestMethod}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00017}00017\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_event_facade_is_sealed_exception}{PHPUnit\(\backslash\)Event\(\backslash\)EventFacadeIsSealedException}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00018}00018\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade}{PHPUnit\(\backslash\)Event\(\backslash\)Facade}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_before_first_test_method_errored}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)BeforeFirstTestMethodErrored}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00020}00020\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_considered_risky}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)ConsideredRisky}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_deprecation_triggered}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)DeprecationTriggered}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_errored}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)Errored}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_error_triggered}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)ErrorTriggered}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00024}00024\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_failed}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)Failed}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00025}00025\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_finished}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)Finished}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00026}00026\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_marked_incomplete}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)MarkedIncomplete}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00027}00027\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_notice_triggered}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)NoticeTriggered}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00028}00028\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_deprecation_triggered}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)PhpDeprecationTriggered}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00029}00029\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_notice_triggered}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)PhpNoticeTriggered}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00030}00030\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_deprecation_triggered}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)PhpunitDeprecationTriggered}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00031}00031\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_error_triggered}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)PhpunitErrorTriggered}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00032}00032\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_warning_triggered}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)PhpunitWarningTriggered}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00033}00033\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_warning_triggered}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)PhpWarningTriggered}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00034}00034\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_skipped}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)Skipped}}\ as\ TestSkipped;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00035}00035\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered}{PHPUnit\(\backslash\)Event\(\backslash\)Test\(\backslash\)WarningTriggered}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00036}00036\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_data_1_1_no_data_set_from_data_provider_exception}{PHPUnit\(\backslash\)Event\(\backslash\)TestData\(\backslash\)NoDataSetFromDataProviderException}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00037}00037\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_runner_1_1_deprecation_triggered}{PHPUnit\(\backslash\)Event\(\backslash\)TestRunner\(\backslash\)DeprecationTriggered}}\ as\ TestRunnerDeprecationTriggered;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00038}00038\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_runner_1_1_execution_started}{PHPUnit\(\backslash\)Event\(\backslash\)TestRunner\(\backslash\)ExecutionStarted}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00039}00039\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_runner_1_1_warning_triggered}{PHPUnit\(\backslash\)Event\(\backslash\)TestRunner\(\backslash\)WarningTriggered}}\ as\ TestRunnerWarningTriggered;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00040}00040\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_suite_1_1_finished}{PHPUnit\(\backslash\)Event\(\backslash\)TestSuite\(\backslash\)Finished}}\ as\ TestSuiteFinished;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00041}00041\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_suite_1_1_skipped}{PHPUnit\(\backslash\)Event\(\backslash\)TestSuite\(\backslash\)Skipped}}\ as\ TestSuiteSkipped;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00042}00042\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_suite_1_1_started}{PHPUnit\(\backslash\)Event\(\backslash\)TestSuite\(\backslash\)Started}}\ as\ TestSuiteStarted;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00043}00043\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_suite_1_1_test_suite_for_test_class}{PHPUnit\(\backslash\)Event\(\backslash\)TestSuite\(\backslash\)TestSuiteForTestClass}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00044}00044\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_suite_1_1_test_suite_for_test_method_with_data_provider}{PHPUnit\(\backslash\)Event\(\backslash\)TestSuite\(\backslash\)TestSuiteForTestMethodWithDataProvider}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00045}00045\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_unknown_subscriber_type_exception}{PHPUnit\(\backslash\)Event\(\backslash\)UnknownSubscriberTypeException}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00046}00046\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_issues_1_1_issue}{PHPUnit\(\backslash\)TestRunner\(\backslash\)TestResult\(\backslash\)Issues\(\backslash\)Issue}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00047}00047\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_source}{PHPUnit\(\backslash\)TextUI\(\backslash\)Configuration\(\backslash\)Source}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00048}00048\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_source_filter}{PHPUnit\(\backslash\)TextUI\(\backslash\)Configuration\(\backslash\)SourceFilter}};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00053}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector}{00053}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector}{Collector}}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00054}00054\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00055}00055\ \ \ \ \ \textcolor{keyword}{private}\ readonly\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_source}{Source}}\ \$source;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00056}00056\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$numberOfTests\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00057}00057\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$numberOfTestsRun\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00058}00058\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$numberOfAssertions\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00059}00059\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$prepared\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00060}00060\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{bool}\ \$currentTestSuiteForTestClassFailed\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00065}00065\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keywordtype}{int}\ \$numberOfIssuesIgnoredByBaseline\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00070}00070\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$testErroredEvents\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00075}00075\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$testFailedEvents\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00080}00080\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$testMarkedIncompleteEvents\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00085}00085\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$testSuiteSkippedEvents\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00090}00090\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$testSkippedEvents\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00095}00095\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$testConsideredRiskyEvents\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00100}00100\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$testTriggeredPhpunitDeprecationEvents\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00105}00105\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$testTriggeredPhpunitErrorEvents\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00110}00110\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$testTriggeredPhpunitWarningEvents\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00115}00115\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$testRunnerTriggeredWarningEvents\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00120}00120\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$testRunnerTriggeredDeprecationEvents\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00125}00125\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$errors\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00130}00130\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$deprecations\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00135}00135\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$notices\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00140}00140\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$warnings\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00145}00145\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$phpDeprecations\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00150}00150\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$phpNotices\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00155}00155\ \ \ \ \ \textcolor{keyword}{private}\ array\ \$phpWarnings\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00161}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ac845dbd788e38fdee69060eba679f056}{00161}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ac845dbd788e38fdee69060eba679f056}{\_\_construct}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade}{Facade}}\ \$facade,\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_source}{Source}}\ \$source)}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00162}00162\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00163}00163\ \ \ \ \ \ \ \ \ \$facade-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_facade_a913e4311dce235407dbe439014cc4c73}{registerSubscribers}}(}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00164}00164\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_execution_started_subscriber}{ExecutionStartedSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_suite_skipped_subscriber}{TestSuiteSkippedSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_suite_started_subscriber}{TestSuiteStartedSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_suite_finished_subscriber}{TestSuiteFinishedSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_prepared_subscriber}{TestPreparedSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_finished_subscriber}{TestFinishedSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00170}00170\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_before_test_class_method_errored_subscriber}{BeforeTestClassMethodErroredSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_errored_subscriber}{TestErroredSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_failed_subscriber}{TestFailedSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00173}00173\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_marked_incomplete_subscriber}{TestMarkedIncompleteSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00174}00174\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_skipped_subscriber}{TestSkippedSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00175}00175\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_considered_risky_subscriber}{TestConsideredRiskySubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00176}00176\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_triggered_deprecation_subscriber}{TestTriggeredDeprecationSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_triggered_error_subscriber}{TestTriggeredErrorSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_triggered_notice_subscriber}{TestTriggeredNoticeSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_triggered_php_deprecation_subscriber}{TestTriggeredPhpDeprecationSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_triggered_php_notice_subscriber}{TestTriggeredPhpNoticeSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_triggered_phpunit_deprecation_subscriber}{TestTriggeredPhpunitDeprecationSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_triggered_phpunit_error_subscriber}{TestTriggeredPhpunitErrorSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_triggered_phpunit_warning_subscriber}{TestTriggeredPhpunitWarningSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_triggered_php_warning_subscriber}{TestTriggeredPhpWarningSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_triggered_warning_subscriber}{TestTriggeredWarningSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_runner_triggered_deprecation_subscriber}{TestRunnerTriggeredDeprecationSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_runner_triggered_warning_subscriber}{TestRunnerTriggeredWarningSubscriber}}(\$this),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \$this-\/>source\ =\ \$source;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00191}00191\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00193}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ae09b6b0429e047ad85537683eaec3913}{00193}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ae09b6b0429e047ad85537683eaec3913}{result}}():\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_result}{TestResult}}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00194}00194\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00195}00195\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_test_result}{TestResult}}(}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00196}00196\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numberOfTests,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00197}00197\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numberOfTestsRun,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00198}00198\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numberOfAssertions,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00199}00199\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testErroredEvents,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00200}00200\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testFailedEvents,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00201}00201\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testConsideredRiskyEvents,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00202}00202\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testSuiteSkippedEvents,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00203}00203\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testSkippedEvents,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00204}00204\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testMarkedIncompleteEvents,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00205}00205\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testTriggeredPhpunitDeprecationEvents,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testTriggeredPhpunitErrorEvents,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testTriggeredPhpunitWarningEvents,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testRunnerTriggeredDeprecationEvents,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testRunnerTriggeredWarningEvents,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ array\_values(\$this-\/>errors),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ array\_values(\$this-\/>deprecations),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ array\_values(\$this-\/>notices),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ array\_values(\$this-\/>warnings),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ array\_values(\$this-\/>phpDeprecations),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ array\_values(\$this-\/>phpNotices),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ array\_values(\$this-\/>phpWarnings),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numberOfIssuesIgnoredByBaseline,}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00218}00218\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00219}00219\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00220}00220\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00221}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_af93276271c5b231d95925f291cd8070d}{00221}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_af93276271c5b231d95925f291cd8070d}{executionStarted}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_runner_1_1_execution_started}{ExecutionStarted}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00222}00222\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00223}00223\ \ \ \ \ \ \ \ \ \$this-\/>numberOfTests\ =\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_runner_1_1_execution_started_a5755b406e2caaa5393479d5792c787f3}{testSuite}}()-\/>count();}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00224}00224\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00226}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_adce39737fcf2c6c616fb815ac126d6a2}{00226}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_adce39737fcf2c6c616fb815ac126d6a2}{testSuiteSkipped}}(TestSuiteSkipped\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00227}00227\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00228}00228\ \ \ \ \ \ \ \ \ \$testSuite\ =\ \$event-\/>testSuite();}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00229}00229\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$testSuite-\/>isForTestClass())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00233}00233\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \$this-\/>testSuiteSkippedEvents[]\ =\ \$event;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00235}00235\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00237}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ae73cc8f8890cda3eefde6578da944296}{00237}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ae73cc8f8890cda3eefde6578da944296}{testSuiteStarted}}(TestSuiteStarted\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00238}00238\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \$testSuite\ =\ \$event-\/>testSuite();}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00240}00240\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00241}00241\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$testSuite-\/>isForTestClass())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00243}00243\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00245}00245\ \ \ \ \ \ \ \ \ \$this-\/>currentTestSuiteForTestClassFailed\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00246}00246\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00247}00247\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00251}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ac73d6d183b8186321519943a1a666627}{00251}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ac73d6d183b8186321519943a1a666627}{testSuiteFinished}}(TestSuiteFinished\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00252}00252\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00253}00253\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>currentTestSuiteForTestClassFailed)\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00255}00255\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00257}00257\ \ \ \ \ \ \ \ \ \$testSuite\ =\ \$event-\/>testSuite();}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00258}00258\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00259}00259\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$testSuite-\/>isWithName())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00260}00260\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00261}00261\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00263}00263\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$testSuite-\/>isForTestMethodWithDataProvider())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00264}00264\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\$testSuite\ instanceof\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_suite_1_1_test_suite_for_test_method_with_data_provider}{TestSuiteForTestMethodWithDataProvider}});}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00265}00265\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \$test\ =\ \$testSuite-\/>tests()-\/>asArray()[0];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ assert(\$test\ instanceof\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_code_1_1_test_method}{TestMethod}});}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_passed_tests_a0deb004950b8dc4f51836316fd19c111}{PassedTests::instance}}()-\/>testMethodPassed(\$test,\ \textcolor{keyword}{null});}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00271}00271\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00272}00272\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00273}00273\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00275}00275\ \ \ \ \ \ \ \ \ assert(\$testSuite\ instanceof\ \mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_suite_1_1_test_suite_for_test_class}{TestSuiteForTestClass}});}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00276}00276\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00277}00277\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_passed_tests_a0deb004950b8dc4f51836316fd19c111}{PassedTests::instance}}()-\/>testClassPassed(\$testSuite-\/>className());}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00278}00278\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00280}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_aa1ead96c70e923d4269b34dc46f5955d}{00280}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_aa1ead96c70e923d4269b34dc46f5955d}{testPrepared}}():\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00281}00281\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00282}00282\ \ \ \ \ \ \ \ \ \$this-\/>prepared\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00283}00283\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00285}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a1d4a203b8cf306d173c1fe14d4a581fd}{00285}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a1d4a203b8cf306d173c1fe14d4a581fd}{testFinished}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_finished}{Finished}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00286}00286\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00287}00287\ \ \ \ \ \ \ \ \ \$this-\/>numberOfAssertions\ +=\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_finished_a160b6c3eb75e81cf80196591c81f9c3d}{numberOfAssertionsPerformed}}();}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00289}00289\ \ \ \ \ \ \ \ \ \$this-\/>numberOfTestsRun++;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00290}00290\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00291}00291\ \ \ \ \ \ \ \ \ \$this-\/>prepared\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00292}00292\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00294}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a17b7a9eed4e1e4e9b96c66cda6d31efe}{00294}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a17b7a9eed4e1e4e9b96c66cda6d31efe}{beforeTestClassMethodErrored}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_before_first_test_method_errored}{BeforeFirstTestMethodErrored}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00295}00295\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00296}00296\ \ \ \ \ \ \ \ \ \$this-\/>testErroredEvents[]\ =\ \$event;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00298}00298\ \ \ \ \ \ \ \ \ \$this-\/>numberOfTestsRun++;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00299}00299\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00301}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a2a9f44fa1cf2bd323eb556ea1a98871b}{00301}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a2a9f44fa1cf2bd323eb556ea1a98871b}{testErrored}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_errored}{Errored}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00302}00302\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00303}00303\ \ \ \ \ \ \ \ \ \$this-\/>testErroredEvents[]\ =\ \$event;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00305}00305\ \ \ \ \ \ \ \ \ \$this-\/>currentTestSuiteForTestClassFailed\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00306}00306\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00307}00307\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00308}00308\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ @todo\ Eliminate\ this\ special\ case}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00309}00309\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00310}00310\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_errored_aa1a17ab79247b7e7d740bb55e13cab14}{asString}}(),\ \textcolor{stringliteral}{'Test\ was\ run\ in\ child\ process\ and\ ended\ unexpectedly'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00312}00312\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00314}00314\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>prepared)\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00315}00315\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numberOfTestsRun++;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00316}00316\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00317}00317\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00319}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_add786606ecd33d5e17882ab447886613}{00319}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_add786606ecd33d5e17882ab447886613}{testFailed}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_failed}{Failed}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00320}00320\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00321}00321\ \ \ \ \ \ \ \ \ \$this-\/>testFailedEvents[]\ =\ \$event;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00323}00323\ \ \ \ \ \ \ \ \ \$this-\/>currentTestSuiteForTestClassFailed\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00324}00324\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00326}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a7d18757ee6c5cdf428227fa6a883bb53}{00326}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a7d18757ee6c5cdf428227fa6a883bb53}{testMarkedIncomplete}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_marked_incomplete}{MarkedIncomplete}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00327}00327\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00328}00328\ \ \ \ \ \ \ \ \ \$this-\/>testMarkedIncompleteEvents[]\ =\ \$event;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00329}00329\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00331}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ae0fcaf5e3e5ab038ac2ed412f2f2ef92}{00331}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ae0fcaf5e3e5ab038ac2ed412f2f2ef92}{testSkipped}}(TestSkipped\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00332}00332\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00333}00333\ \ \ \ \ \ \ \ \ \$this-\/>testSkippedEvents[]\ =\ \$event;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00334}00334\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00335}00335\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>prepared)\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numberOfTestsRun++;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00337}00337\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00338}00338\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00340}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ad594a7b8dfd3158dacaec036045355c2}{00340}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ad594a7b8dfd3158dacaec036045355c2}{testConsideredRisky}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_considered_risky}{ConsideredRisky}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00341}00341\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00342}00342\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>testConsideredRiskyEvents[\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_considered_risky_ad69dd4607977cae05ebe19d1ae604fb1}{test}}()-\/>id()]))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testConsideredRiskyEvents[\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_considered_risky_ad69dd4607977cae05ebe19d1ae604fb1}{test}}()-\/>id()]\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00344}00344\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00345}00345\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00346}00346\ \ \ \ \ \ \ \ \ \$this-\/>testConsideredRiskyEvents[\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_considered_risky_ad69dd4607977cae05ebe19d1ae604fb1}{test}}()-\/>id()][]\ =\ \$event;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00347}00347\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00348}00348\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00349}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a6792f157227292635c163479b56299d4}{00349}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a6792f157227292635c163479b56299d4}{testTriggeredDeprecation}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_deprecation_triggered}{DeprecationTriggered}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00350}00350\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00351}00351\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_deprecation_triggered_afcb36a156b293124af705f655b2ed96d}{ignoredByBaseline}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numberOfIssuesIgnoredByBaseline++;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00353}00353\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00355}00355\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00356}00356\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00357}00357\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>source-\/>ignoreSuppressionOfDeprecations()\ \&\&\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_deprecation_triggered_a07460a211c8bfd97da43f7e2beef1d7c}{wasSuppressed}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00358}00358\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00359}00359\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00360}00360\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00361}00361\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>source-\/>restrictDeprecations()\ \&\&\ !(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_source_filter}{SourceFilter}})-\/>includes(\$this-\/>source,\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_deprecation_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}()))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00362}00362\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00363}00363\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00365}00365\ \ \ \ \ \ \ \ \ \$id\ =\ \$this-\/>issueId(\$event);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00367}00367\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>deprecations[\$id]))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>deprecations[\$id]\ =\ Issue::from(}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_deprecation_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00370}00370\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_deprecation_triggered_a8171967e96cb49169768dabaa8cb7000}{line}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00371}00371\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_deprecation_triggered_aba502b8bb024cc38b45756fdf581f915}{message}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00372}00372\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_deprecation_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00373}00373\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00375}00375\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00376}00376\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00377}00377\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00378}00378\ \ \ \ \ \ \ \ \ \$this-\/>deprecations[\$id]-\/>triggeredBy(\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_deprecation_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}());}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00379}00379\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00380}00380\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00381}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a07b8f8673a6bbfb9100977ce958eb3d3}{00381}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a07b8f8673a6bbfb9100977ce958eb3d3}{testTriggeredPhpDeprecation}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_deprecation_triggered}{PhpDeprecationTriggered}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00382}00382\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00383}00383\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_deprecation_triggered_afcb36a156b293124af705f655b2ed96d}{ignoredByBaseline}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numberOfIssuesIgnoredByBaseline++;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00385}00385\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00386}00386\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00387}00387\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00388}00388\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00389}00389\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>source-\/>ignoreSuppressionOfPhpDeprecations()\ \&\&\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_deprecation_triggered_a07460a211c8bfd97da43f7e2beef1d7c}{wasSuppressed}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00391}00391\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00393}00393\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>source-\/>restrictDeprecations()\ \&\&\ !(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_source_filter}{SourceFilter}})-\/>includes(\$this-\/>source,\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_deprecation_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}()))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00395}00395\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00396}00396\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00397}00397\ \ \ \ \ \ \ \ \ \$id\ =\ \$this-\/>issueId(\$event);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00399}00399\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>phpDeprecations[\$id]))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00400}00400\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>phpDeprecations[\$id]\ =\ Issue::from(}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_deprecation_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_deprecation_triggered_a8171967e96cb49169768dabaa8cb7000}{line}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_deprecation_triggered_aba502b8bb024cc38b45756fdf581f915}{message}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_deprecation_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00406}00406\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00408}00408\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00409}00409\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00410}00410\ \ \ \ \ \ \ \ \ \$this-\/>phpDeprecations[\$id]-\/>triggeredBy(\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_deprecation_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}());}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00411}00411\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00412}00412\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00413}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a6adef45369ff55875de160af6832fdf7}{00413}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a6adef45369ff55875de160af6832fdf7}{testTriggeredPhpunitDeprecation}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_deprecation_triggered}{PhpunitDeprecationTriggered}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00414}00414\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00415}00415\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>testTriggeredPhpunitDeprecationEvents[\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_deprecation_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}()-\/>id()]))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00416}00416\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testTriggeredPhpunitDeprecationEvents[\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_deprecation_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}()-\/>id()]\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00417}00417\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00418}00418\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00419}00419\ \ \ \ \ \ \ \ \ \$this-\/>testTriggeredPhpunitDeprecationEvents[\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_deprecation_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}()-\/>id()][]\ =\ \$event;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00420}00420\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00421}00421\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00422}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a61e8a0d2feca431d659963080e1beb86}{00422}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a61e8a0d2feca431d659963080e1beb86}{testTriggeredError}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_error_triggered}{ErrorTriggered}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00423}00423\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00424}00424\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>source-\/>ignoreSuppressionOfErrors()\ \&\&\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_error_triggered_a07460a211c8bfd97da43f7e2beef1d7c}{wasSuppressed}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00426}00426\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00427}00427\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00428}00428\ \ \ \ \ \ \ \ \ \$id\ =\ \$this-\/>issueId(\$event);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00429}00429\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00430}00430\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>errors[\$id]))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00431}00431\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>errors[\$id]\ =\ Issue::from(}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_error_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_error_triggered_a8171967e96cb49169768dabaa8cb7000}{line}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_error_triggered_aba502b8bb024cc38b45756fdf581f915}{message}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_error_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00437}00437\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00438}00438\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00439}00439\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00440}00440\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00441}00441\ \ \ \ \ \ \ \ \ \$this-\/>errors[\$id]-\/>triggeredBy(\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_error_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}());}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00442}00442\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00443}00443\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00444}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ac640c765a79dcd0581a8ef306ae1f452}{00444}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ac640c765a79dcd0581a8ef306ae1f452}{testTriggeredNotice}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_notice_triggered}{NoticeTriggered}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00445}00445\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00446}00446\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_notice_triggered_afcb36a156b293124af705f655b2ed96d}{ignoredByBaseline}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00447}00447\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numberOfIssuesIgnoredByBaseline++;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00448}00448\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00450}00450\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00451}00451\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00452}00452\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>source-\/>ignoreSuppressionOfNotices()\ \&\&\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_notice_triggered_a07460a211c8bfd97da43f7e2beef1d7c}{wasSuppressed}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00453}00453\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00454}00454\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00455}00455\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00456}00456\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>source-\/>restrictNotices()\ \&\&\ !(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_source_filter}{SourceFilter}})-\/>includes(\$this-\/>source,\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_notice_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}()))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00458}00458\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00459}00459\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00460}00460\ \ \ \ \ \ \ \ \ \$id\ =\ \$this-\/>issueId(\$event);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00461}00461\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00462}00462\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>notices[\$id]))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>notices[\$id]\ =\ Issue::from(}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_notice_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_notice_triggered_a8171967e96cb49169768dabaa8cb7000}{line}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_notice_triggered_aba502b8bb024cc38b45756fdf581f915}{message}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00467}00467\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_notice_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00468}00468\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00469}00469\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00470}00470\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00471}00471\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00472}00472\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00473}00473\ \ \ \ \ \ \ \ \ \$this-\/>notices[\$id]-\/>triggeredBy(\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_notice_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}());}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00474}00474\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00475}00475\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00476}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a7166b5fbb307f18b14d35d664b282619}{00476}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a7166b5fbb307f18b14d35d664b282619}{testTriggeredPhpNotice}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_notice_triggered}{PhpNoticeTriggered}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00477}00477\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00478}00478\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_notice_triggered_afcb36a156b293124af705f655b2ed96d}{ignoredByBaseline}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numberOfIssuesIgnoredByBaseline++;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00480}00480\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00481}00481\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00482}00482\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00483}00483\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00484}00484\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>source-\/>ignoreSuppressionOfPhpNotices()\ \&\&\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_notice_triggered_a07460a211c8bfd97da43f7e2beef1d7c}{wasSuppressed}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00486}00486\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00488}00488\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>source-\/>restrictNotices()\ \&\&\ !(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_source_filter}{SourceFilter}})-\/>includes(\$this-\/>source,\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_notice_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}()))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00489}00489\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00490}00490\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00491}00491\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00492}00492\ \ \ \ \ \ \ \ \ \$id\ =\ \$this-\/>issueId(\$event);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00493}00493\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00494}00494\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>phpNotices[\$id]))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00495}00495\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>phpNotices[\$id]\ =\ Issue::from(}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00496}00496\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_notice_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00497}00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_notice_triggered_a8171967e96cb49169768dabaa8cb7000}{line}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_notice_triggered_aba502b8bb024cc38b45756fdf581f915}{message}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_notice_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00501}00501\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00503}00503\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00504}00504\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00505}00505\ \ \ \ \ \ \ \ \ \$this-\/>phpNotices[\$id]-\/>triggeredBy(\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_notice_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}());}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00506}00506\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00507}00507\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00508}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a5d7f0289b3440327c72449854655e1f8}{00508}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a5d7f0289b3440327c72449854655e1f8}{testTriggeredWarning}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered}{WarningTriggered}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00509}00509\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00510}00510\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered_afcb36a156b293124af705f655b2ed96d}{ignoredByBaseline}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numberOfIssuesIgnoredByBaseline++;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00512}00512\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00514}00514\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00515}00515\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00516}00516\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>source-\/>ignoreSuppressionOfWarnings()\ \&\&\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered_a07460a211c8bfd97da43f7e2beef1d7c}{wasSuppressed}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00517}00517\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00518}00518\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00519}00519\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00520}00520\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>source-\/>restrictWarnings()\ \&\&\ !(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_source_filter}{SourceFilter}})-\/>includes(\$this-\/>source,\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}()))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00522}00522\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00523}00523\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00524}00524\ \ \ \ \ \ \ \ \ \$id\ =\ \$this-\/>issueId(\$event);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00525}00525\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00526}00526\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>warnings[\$id]))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00527}00527\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>warnings[\$id]\ =\ Issue::from(}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00528}00528\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00529}00529\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered_a8171967e96cb49169768dabaa8cb7000}{line}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00530}00530\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered_aba502b8bb024cc38b45756fdf581f915}{message}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00531}00531\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00532}00532\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00533}00533\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00534}00534\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00535}00535\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00536}00536\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00537}00537\ \ \ \ \ \ \ \ \ \$this-\/>warnings[\$id]-\/>triggeredBy(\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}());}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00538}00538\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00539}00539\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00540}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a54242552906924fd2c7790cfe9f2d20a}{00540}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a54242552906924fd2c7790cfe9f2d20a}{testTriggeredPhpWarning}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_warning_triggered}{PhpWarningTriggered}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00541}00541\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00542}00542\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_warning_triggered_afcb36a156b293124af705f655b2ed96d}{ignoredByBaseline}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00543}00543\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>numberOfIssuesIgnoredByBaseline++;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00544}00544\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00545}00545\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00546}00546\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00547}00547\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00548}00548\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>source-\/>ignoreSuppressionOfPhpWarnings()\ \&\&\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_warning_triggered_a07460a211c8bfd97da43f7e2beef1d7c}{wasSuppressed}}())\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00549}00549\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00550}00550\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00551}00551\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00552}00552\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>source-\/>restrictWarnings()\ \&\&\ !(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_text_u_i_1_1_configuration_1_1_source_filter}{SourceFilter}})-\/>includes(\$this-\/>source,\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_warning_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}()))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00553}00553\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00554}00554\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00555}00555\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00556}00556\ \ \ \ \ \ \ \ \ \$id\ =\ \$this-\/>issueId(\$event);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00557}00557\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00558}00558\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>phpWarnings[\$id]))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00559}00559\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>phpWarnings[\$id]\ =\ Issue::from(}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00560}00560\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_warning_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00561}00561\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_warning_triggered_a8171967e96cb49169768dabaa8cb7000}{line}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00562}00562\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_warning_triggered_aba502b8bb024cc38b45756fdf581f915}{message}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00563}00563\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_warning_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}(),}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00564}00564\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00565}00565\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00566}00566\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00567}00567\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00568}00568\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00569}00569\ \ \ \ \ \ \ \ \ \$this-\/>phpWarnings[\$id]-\/>triggeredBy(\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_warning_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}());}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00570}00570\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00571}00571\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00572}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a5403f57ded289c3bb558a1848cc60216}{00572}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a5403f57ded289c3bb558a1848cc60216}{testTriggeredPhpunitError}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_error_triggered}{PhpunitErrorTriggered}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00573}00573\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00574}00574\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>testTriggeredPhpunitErrorEvents[\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_error_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}()-\/>id()]))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00575}00575\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testTriggeredPhpunitErrorEvents[\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_error_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}()-\/>id()]\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00576}00576\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00577}00577\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00578}00578\ \ \ \ \ \ \ \ \ \$this-\/>testTriggeredPhpunitErrorEvents[\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_error_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}()-\/>id()][]\ =\ \$event;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00579}00579\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00580}00580\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00581}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ace72d8fb09b7485695952b0f5987530d}{00581}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ace72d8fb09b7485695952b0f5987530d}{testTriggeredPhpunitWarning}}(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_warning_triggered}{PhpunitWarningTriggered}}\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00582}00582\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00583}00583\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!isset(\$this-\/>testTriggeredPhpunitWarningEvents[\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_warning_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}()-\/>id()]))\ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00584}00584\ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>testTriggeredPhpunitWarningEvents[\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_warning_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}()-\/>id()]\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00585}00585\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00586}00586\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00587}00587\ \ \ \ \ \ \ \ \ \$this-\/>testTriggeredPhpunitWarningEvents[\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_phpunit_warning_triggered_ad69dd4607977cae05ebe19d1ae604fb1}{test}}()-\/>id()][]\ =\ \$event;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00588}00588\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00589}00589\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00590}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a77c7c55eb06324c0e7d6d1aea1c74e53}{00590}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a77c7c55eb06324c0e7d6d1aea1c74e53}{testRunnerTriggeredDeprecation}}(TestRunnerDeprecationTriggered\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00591}00591\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00592}00592\ \ \ \ \ \ \ \ \ \$this-\/>testRunnerTriggeredDeprecationEvents[]\ =\ \$event;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00593}00593\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00594}00594\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00595}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a62d01b5c9644123ffc81a3c5630d884f}{00595}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a62d01b5c9644123ffc81a3c5630d884f}{testRunnerTriggeredWarning}}(TestRunnerWarningTriggered\ \$event):\ void}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00596}00596\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00597}00597\ \ \ \ \ \ \ \ \ \$this-\/>testRunnerTriggeredWarningEvents[]\ =\ \$event;}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00598}00598\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00599}00599\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00600}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a732673f04e92d825d623e7c17880000c}{00600}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a732673f04e92d825d623e7c17880000c}{hasErroredTests}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00601}00601\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00602}00602\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !empty(\$this-\/>testErroredEvents);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00603}00603\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00604}00604\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00605}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a78ea2ff0edc6e81366e807a41de90255}{00605}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a78ea2ff0edc6e81366e807a41de90255}{hasFailedTests}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00606}00606\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00607}00607\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !empty(\$this-\/>testFailedEvents);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00608}00608\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00609}00609\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00610}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ae96bc33b0e09a3bf5048292e5ce3e440}{00610}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ae96bc33b0e09a3bf5048292e5ce3e440}{hasRiskyTests}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00611}00611\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00612}00612\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !empty(\$this-\/>testConsideredRiskyEvents);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00613}00613\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00614}00614\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00615}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ac1b0ad92cc6ab3d486784044d5f618fc}{00615}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ac1b0ad92cc6ab3d486784044d5f618fc}{hasSkippedTests}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00616}00616\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00617}00617\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !empty(\$this-\/>testSkippedEvents);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00618}00618\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00619}00619\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00620}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a2cc37f05aaa02c2a56dccbc0829dc963}{00620}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a2cc37f05aaa02c2a56dccbc0829dc963}{hasIncompleteTests}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00621}00621\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00622}00622\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !empty(\$this-\/>testMarkedIncompleteEvents);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00623}00623\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00624}00624\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00625}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a90f5b52e4745cea5132d514fb89319bd}{00625}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a90f5b52e4745cea5132d514fb89319bd}{hasDeprecations}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00626}00626\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00627}00627\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !empty(\$this-\/>deprecations)\ ||}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00628}00628\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !empty(\$this-\/>phpDeprecations)\ ||}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00629}00629\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !empty(\$this-\/>testTriggeredPhpunitDeprecationEvents)\ ||}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00630}00630\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !empty(\$this-\/>testRunnerTriggeredDeprecationEvents);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00631}00631\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00632}00632\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00633}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a0f1acfe820b7dc8d2e264a71245d5f49}{00633}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_a0f1acfe820b7dc8d2e264a71245d5f49}{hasNotices}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00634}00634\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00635}00635\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !empty(\$this-\/>notices)\ ||}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !empty(\$this-\/>phpNotices);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00637}00637\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00638}00638\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00639}\mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ae541ee8a8d20f2b41fe3efbcd0b05c0d}{00639}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_test_runner_1_1_test_result_1_1_collector_ae541ee8a8d20f2b41fe3efbcd0b05c0d}{hasWarnings}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00640}00640\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00641}00641\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ !empty(\$this-\/>warnings)\ ||}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00642}00642\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !empty(\$this-\/>phpWarnings)\ ||}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00643}00643\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !empty(\$this-\/>testTriggeredPhpunitWarningEvents)\ ||}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00644}00644\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !empty(\$this-\/>testRunnerTriggeredWarningEvents);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00645}00645\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00646}00646\ }
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00650}00650\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ issueId(\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_deprecation_triggered}{DeprecationTriggered}}|\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_error_triggered}{ErrorTriggered}}|\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_notice_triggered}{NoticeTriggered}}|\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_deprecation_triggered}{PhpDeprecationTriggered}}|\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_notice_triggered}{PhpNoticeTriggered}}|\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_php_warning_triggered}{PhpWarningTriggered}}|\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered}{WarningTriggered}}\ \$event):\ string}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00651}00651\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00652}00652\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ implode(\textcolor{charliteral}{':'},\ [\$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered_ae8b0b7ca00030bf54a95c85cd6dbd701}{file}}(),\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered_a8171967e96cb49169768dabaa8cb7000}{line}}(),\ \$event-\/>\mbox{\hyperlink{class_p_h_p_unit_1_1_event_1_1_test_1_1_warning_triggered_aba502b8bb024cc38b45756fdf581f915}{message}}()]);}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00653}00653\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_collector_8php_source_l00654}00654\ \}}
+
+\end{DoxyCode}

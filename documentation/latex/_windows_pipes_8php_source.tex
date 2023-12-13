@@ -1,0 +1,182 @@
+\doxysection{Windows\+Pipes.\+php}
+\hypertarget{_windows_pipes_8php_source}{}\label{_windows_pipes_8php_source}\index{vendor/symfony/process/Pipes/WindowsPipes.php@{vendor/symfony/process/Pipes/WindowsPipes.php}}
+\mbox{\hyperlink{_windows_pipes_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00003}00003\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00004}00004\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ Symfony\ package.}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00005}00005\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00006}00006\ \textcolor{comment}{\ *\ (c)\ Fabien\ Potencier\ <fabien@symfony.com>}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00008}00008\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00009}00009\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00010}00010\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00012}00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_symfony_1_1_component_1_1_process_1_1_pipes}{Symfony\(\backslash\)Component\(\backslash\)Process\(\backslash\)Pipes}};}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00014}00014\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_exception_1_1_runtime_exception}{Symfony\(\backslash\)Component\(\backslash\)Process\(\backslash\)Exception\(\backslash\)RuntimeException}};}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00015}00015\ use\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_process}{Symfony\(\backslash\)Component\(\backslash\)Process\(\backslash\)Process}};}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00027}\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes}{00027}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes}{WindowsPipes}}\ \textcolor{keyword}{extends}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_abstract_pipes}{AbstractPipes}}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00028}00028\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00029}00029\ \ \ \ \ \textcolor{keyword}{private}\ \$files\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00030}00030\ \ \ \ \ \textcolor{keyword}{private}\ \$fileHandles\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00031}00031\ \ \ \ \ \textcolor{keyword}{private}\ \$lockHandles\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00032}00032\ \ \ \ \ \textcolor{keyword}{private}\ \$readBytes\ =\ [}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00033}00033\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_process_a4f3480c219bfe74e2a9d07e49700ed7b}{Process::STDOUT}}\ =>\ 0,}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00034}00034\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_process_a3bc84077bf369141cbcfc976cd261009}{Process::STDERR}}\ =>\ 0,}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00035}00035\ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00036}00036\ \ \ \ \ \textcolor{keyword}{private}\ \$haveReadSupport;}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00038}\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a2599119539255f5965043eeaaee125a4}{00038}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a2599119539255f5965043eeaaee125a4}{\_\_construct}}(mixed\ \$input,\ \textcolor{keywordtype}{bool}\ \$haveReadSupport)}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00039}00039\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a8389db8aef82010817379b62f877730c}{haveReadSupport}}\ =\ \$haveReadSupport;}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a8389db8aef82010817379b62f877730c}{haveReadSupport}})\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Fix\ for\ PHP\ bug\ \#51800:\ reading\ from\ STDOUT\ pipe\ hangs\ forever\ on\ Windows\ if\ the\ output\ is\ too\ big.}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Workaround\ for\ this\ problem\ is\ to\ use\ temporary\ files\ instead\ of\ pipes\ on\ Windows\ platform.}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ @see\ https://bugs.php.net/51800}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_abstract_pipes_ac3ce6b4fb85d73e6ef696c930af4700d}{\$pipes}}\ =\ [}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_process_a4f3480c219bfe74e2a9d07e49700ed7b}{Process::STDOUT}}\ =>\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_process_ad2d630b672d818fd6b2bbd722b8896da}{Process::OUT}},}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_process_a3bc84077bf369141cbcfc976cd261009}{Process::STDERR}}\ =>\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_process_ad499fd4beeea227e7c373e967ac68259}{Process::ERR}},}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \$tmpDir\ =\ sys\_get\_temp\_dir();}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \$lastError\ =\ \textcolor{stringliteral}{'unknown\ reason'};}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ set\_error\_handler(\textcolor{keyword}{function}\ (\$type,\ \$msg)\ use\ (\&\$lastError)\ \{\ \$lastError\ =\ \$msg;\ \});}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\$i\ =\ 0;;\ ++\$i)\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_abstract_pipes_ac3ce6b4fb85d73e6ef696c930af4700d}{\$pipes}}\ as\ \$pipe\ =>\ \$name)\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$file\ =\ sprintf(\textcolor{stringliteral}{'\%s\(\backslash\)\(\backslash\)sf\_proc\_\%02X.\%s'},\ \$tmpDir,\ \$i,\ \$name);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$h\ =\ fopen(\$file.\textcolor{stringliteral}{'.lock'},\ \textcolor{charliteral}{'w'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (file\_exists(\$file.\textcolor{stringliteral}{'.lock'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}\ 2;}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ restore\_error\_handler();}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_exception_1_1_runtime_exception}{RuntimeException}}(\textcolor{stringliteral}{'A\ temporary\ file\ could\ not\ be\ opened\ to\ write\ the\ process\ output:\ '}.\$lastError);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!flock(\$h,\ \(\backslash\)LOCK\_EX\ |\ \(\backslash\)LOCK\_NB))\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}\ 2;}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\$this-\/>lockHandles[\$pipe]))\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00069}00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flock(\$this-\/>lockHandles[\$pipe],\ \(\backslash\)LOCK\_UN);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$this-\/>lockHandles[\$pipe]);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>lockHandles[\$pipe]\ =\ \$h;}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!(\$h\ =\ fopen(\$file,\ \textcolor{charliteral}{'w'}))\ ||\ !fclose(\$h)\ ||\ !\$h\ =\ fopen(\$file,\ \textcolor{charliteral}{'r'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flock(\$this-\/>lockHandles[\$pipe],\ \(\backslash\)LOCK\_UN);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$this-\/>lockHandles[\$pipe]);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$this-\/>lockHandles[\$pipe]);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}\ 2;}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>fileHandles[\$pipe]\ =\ \$h;}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>files[\$pipe]\ =\ \$file;}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ restore\_error\_handler();}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00086}00086\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ parent::\_\_construct(\$input);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00089}00089\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00091}\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_aaf11785905da71774e052912d784e3b4}{00091}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_aaf11785905da71774e052912d784e3b4}{\_\_sleep}}():\ array}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00092}00092\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)BadMethodCallException(\textcolor{stringliteral}{'Cannot\ serialize\ '}.\_\_CLASS\_\_);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00094}00094\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00096}\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a19dd44fe063cfd1cbafe97452e57666c}{00096}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a19dd44fe063cfd1cbafe97452e57666c}{\_\_wakeup}}()}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00097}00097\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ new\ \(\backslash\)BadMethodCallException(\textcolor{stringliteral}{'Cannot\ unserialize\ '}.\_\_CLASS\_\_);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00099}00099\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00101}\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a421831a265621325e1fdd19aace0c758}{00101}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a421831a265621325e1fdd19aace0c758}{\_\_destruct}}()}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00102}00102\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_aa69c8bf1f1dcf4e72552efff1fe3e87e}{close}}();}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00104}00104\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00106}\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a9c144ad9cb25e68ba9733623ceecaad6}{00106}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a9c144ad9cb25e68ba9733623ceecaad6}{getDescriptors}}():\ array}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00107}00107\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a8389db8aef82010817379b62f877730c}{haveReadSupport}})\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \ \ \$nullstream\ =\ fopen(\textcolor{stringliteral}{'NUL'},\ \textcolor{charliteral}{'c'});}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'pipe'},\ \textcolor{charliteral}{'r'}],}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$nullstream,}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$nullstream,}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We're\ not\ using\ pipe\ on\ Windows\ platform\ as\ it\ hangs\ (https://bugs.php.net/51800)}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ We're\ not\ using\ file\ handles\ as\ it\ can\ produce\ corrupted\ output\ https://bugs.php.net/65650}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00120}00120\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ So\ we\ redirect\ output\ within\ the\ commandline\ and\ pass\ the\ nul\ device\ to\ the\ process}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'pipe'},\ \textcolor{charliteral}{'r'}],}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'file'},\ \textcolor{stringliteral}{'NUL'},\ \textcolor{charliteral}{'w'}],}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \ \ \ \ [\textcolor{stringliteral}{'file'},\ \textcolor{stringliteral}{'NUL'},\ \textcolor{charliteral}{'w'}],}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00125}00125\ \ \ \ \ \ \ \ \ ];}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00126}00126\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00128}\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a7010e197d8dce475dfdd443c11dd7ee9}{00128}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a7010e197d8dce475dfdd443c11dd7ee9}{getFiles}}():\ array}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00129}00129\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00130}00130\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>files;}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00131}00131\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00132}00132\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00133}\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_af05fe16754926312e87bfb86487fa803}{00133}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_af05fe16754926312e87bfb86487fa803}{readAndWrite}}(\textcolor{keywordtype}{bool}\ \$blocking,\ \textcolor{keywordtype}{bool}\ \$close\ =\ \textcolor{keyword}{false}):\ array}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00134}00134\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_abstract_pipes_a65f6fb5231853af323b6b493dcf4d34f}{unblock}}();}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \$w\ =\ \$this-\/>\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_abstract_pipes_aa245791a86f0178986f84c9357339aab}{write}}();}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00137}00137\ \ \ \ \ \ \ \ \ \$read\ =\ \$r\ =\ \$e\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$blocking)\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$w)\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00141}00141\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ @stream\_select(\$r,\ \$w,\ \$e,\ 0,\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_process_ab37fd98bc389973cba55f34c618c3948}{Process::TIMEOUT\_PRECISION}}\ *\ 1E6);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ elseif\ (\$this-\/>fileHandles)\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00143}00143\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ usleep(\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_process_ab37fd98bc389973cba55f34c618c3948}{Process::TIMEOUT\_PRECISION}}\ *\ 1E6);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>fileHandles\ as\ \$type\ =>\ \$fileHandle)\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}\ =\ stream\_get\_contents(\$fileHandle,\ -\/1,\ \$this-\/>readBytes[\$type]);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00149}00149\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (isset(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}}[0]))\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$this-\/>readBytes[\$type]\ +=\ \(\backslash\)strlen(\mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}});}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$read[\$type]\ =\ \mbox{\hyperlink{update__mime__types_8php_ab9807831e7f54cb17039eb0b280ef902}{\$data}};}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$close)\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ftruncate(\$fileHandle,\ 0);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$fileHandle);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flock(\$this-\/>lockHandles[\$type],\ \(\backslash\)LOCK\_UN);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$this-\/>lockHandles[\$type]);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ unset(\$this-\/>fileHandles[\$type],\ \$this-\/>lockHandles[\$type]);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00160}00160\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00162}00162\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$read;}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00163}00163\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00165}\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a8389db8aef82010817379b62f877730c}{00165}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_a8389db8aef82010817379b62f877730c}{haveReadSupport}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00166}00166\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>haveReadSupport;}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00168}00168\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00170}\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_aca02f24328fca5f34d89fa67c29e702a}{00170}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_aca02f24328fca5f34d89fa67c29e702a}{areOpen}}():\ bool}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00171}00171\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00172}00172\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>pipes\ \&\&\ \$this-\/>fileHandles;}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00173}00173\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00175}\mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_aa69c8bf1f1dcf4e72552efff1fe3e87e}{00175}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_symfony_1_1_component_1_1_process_1_1_pipes_1_1_windows_pipes_aa69c8bf1f1dcf4e72552efff1fe3e87e}{close}}():\ void}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00176}00176\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00177}00177\ \ \ \ \ \ \ \ \ parent::close();}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00178}00178\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$this-\/>fileHandles\ as\ \$type\ =>\ \$handle)\ \{}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00179}00179\ \ \ \ \ \ \ \ \ \ \ \ \ ftruncate(\$handle,\ 0);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$handle);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ flock(\$this-\/>lockHandles[\$type],\ \(\backslash\)LOCK\_UN);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ fclose(\$this-\/>lockHandles[\$type]);}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \$this-\/>fileHandles\ =\ \$this-\/>lockHandles\ =\ [];}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00185}00185\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_windows_pipes_8php_source_l00186}00186\ \}}
+
+\end{DoxyCode}

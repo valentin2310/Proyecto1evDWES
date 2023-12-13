@@ -1,0 +1,105 @@
+\doxysection{Quote\+Parser.\+php}
+\hypertarget{_quote_parser_8php_source}{}\label{_quote_parser_8php_source}\index{vendor/league/commonmark/src/Extension/SmartPunct/QuoteParser.php@{vendor/league/commonmark/src/Extension/SmartPunct/QuoteParser.php}}
+\mbox{\hyperlink{_quote_parser_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00001}00001\ <?php}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00003}00003\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00005}00005\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00006}00006\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ the\ league/commonmark\ package.}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00007}00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00008}00008\ \textcolor{comment}{\ *\ (c)\ Colin\ O'Dell\ <colinodell@gmail.com>}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00009}00009\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00010}00010\ \textcolor{comment}{\ *\ Original\ code\ based\ on\ the\ CommonMark\ JS\ reference\ parser\ (http://bitly.com/commonmark-\/js)}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00011}00011\ \textcolor{comment}{\ *\ \ -\/\ (c)\ John\ MacFarlane}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00012}00012\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00013}00013\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00014}00014\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00015}00015\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00017}00017\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_league_1_1_common_mark_1_1_extension_1_1_smart_punct}{League\(\backslash\)CommonMark\(\backslash\)Extension\(\backslash\)SmartPunct}};}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00019}00019\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_delimiter_1_1_delimiter}{League\(\backslash\)CommonMark\(\backslash\)Delimiter\(\backslash\)Delimiter}};}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00020}00020\ use\ \mbox{\hyperlink{interface_league_1_1_common_mark_1_1_parser_1_1_inline_1_1_inline_parser_interface}{League\(\backslash\)CommonMark\(\backslash\)Parser\(\backslash\)Inline\(\backslash\)InlineParserInterface}};}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00021}00021\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_1_1_inline_parser_match}{League\(\backslash\)CommonMark\(\backslash\)Parser\(\backslash\)Inline\(\backslash\)InlineParserMatch}};}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_parser_context}{League\(\backslash\)CommonMark\(\backslash\)Parser\(\backslash\)InlineParserContext}};}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00023}00023\ use\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_util_1_1_regex_helper}{League\(\backslash\)CommonMark\(\backslash\)Util\(\backslash\)RegexHelper}};}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00025}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_parser}{00025}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_parser}{QuoteParser}}\ \textcolor{keyword}{implements}\ \mbox{\hyperlink{interface_league_1_1_common_mark_1_1_parser_1_1_inline_1_1_inline_parser_interface}{InlineParserInterface}}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00026}00026\ \{}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00027}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_parser_ac4bb7ec6743e5af81c9f3f9d7f7eaba2}{00027}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_parser_ac4bb7ec6743e5af81c9f3f9d7f7eaba2}{DOUBLE\_QUOTES}}\ =\ [\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_a7f8a185a5478a0d65df617b0f7b01d74}{Quote::DOUBLE\_QUOTE}},\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_a2f408a757bb526d72adf5462a5b59d46}{Quote::DOUBLE\_QUOTE\_OPENER}},\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_a9e4982a8f38190801311d977168c8549}{Quote::DOUBLE\_QUOTE\_CLOSER}}];}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00028}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_parser_a7278e08de0325e37d268884db7120dd6}{00028}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_parser_a7278e08de0325e37d268884db7120dd6}{SINGLE\_QUOTES}}\ =\ [\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_af2ca1a22d8e8742a6da9b05b098da7ce}{Quote::SINGLE\_QUOTE}},\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_a6cf93cef01202e2516e6187f448359bb}{Quote::SINGLE\_QUOTE\_OPENER}},\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_af9a91fa5bbffbecd38fff2cd3a8cc26f}{Quote::SINGLE\_QUOTE\_CLOSER}}];}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00030}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_parser_a6fd7e980cdddd30feed8b75f9dde53ba}{00030}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_parser_a6fd7e980cdddd30feed8b75f9dde53ba}{getMatchDefinition}}():\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_1_1_inline_parser_match}{InlineParserMatch}}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00031}00031\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ InlineParserMatch::oneOf(...\(\backslash\)array\_merge(self::DOUBLE\_QUOTES,\ self::SINGLE\_QUOTES));}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00033}00033\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00038}\mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_parser_a8dc7a55029ef5ea90a14ae64c918ad4e}{00038}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_parser_a8dc7a55029ef5ea90a14ae64c918ad4e}{parse}}(\mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_parser_context}{InlineParserContext}}\ \$inlineContext):\ bool}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00039}00039\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00040}00040\ \ \ \ \ \ \ \ \ \$char\ \ \ =\ \$inlineContext-\/>\mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_parser_context_a6c055dca2981a5ffd44e5295c966e577}{getFullMatch}}();}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \$cursor\ =\ \$inlineContext-\/>\mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_parser_context_a454ebfd6fa316210ee110218ad08bc97}{getCursor}}();}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00043}00043\ \ \ \ \ \ \ \ \ \$normalizedCharacter\ =\ \$this-\/>getNormalizedQuoteCharacter(\$char);}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \$charBefore\ =\ \$cursor-\/>peek(-\/1);}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$charBefore\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \$charBefore\ =\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \$cursor-\/>advance();}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \$charAfter\ =\ \$cursor-\/>getCurrentCharacter();}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$charAfter\ ===\ \textcolor{keyword}{null})\ \{}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \$charAfter\ =\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ [\$leftFlanking,\ \$rightFlanking]\ =\ \$this-\/>determineFlanking(\$charBefore,\ \$charAfter);}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \$canOpen\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \$leftFlanking\ \&\&\ !\ \$rightFlanking;}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00059}00059\ \ \ \ \ \ \ \ \ \$canClose\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \$rightFlanking;}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00061}00061\ \ \ \ \ \ \ \ \ \$node\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote}{Quote}}(\$normalizedCharacter,\ [\textcolor{stringliteral}{'delim'}\ =>\ \textcolor{keyword}{true}]);}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \$inlineContext-\/>\mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_parser_context_a53e2ca32cf29808b0b18cd5accf3c4db}{getContainer}}()-\/>appendChild(\$node);}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Add\ entry\ to\ stack\ to\ this\ opener}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \$inlineContext-\/>\mbox{\hyperlink{class_league_1_1_common_mark_1_1_parser_1_1_inline_parser_context_a112562fce5d4657e3ff21bc4751ba814}{getDelimiterStack}}()-\/>push(\textcolor{keyword}{new}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_delimiter_1_1_delimiter}{Delimiter}}(\$normalizedCharacter,\ 1,\ \$node,\ \$canOpen,\ \$canClose));}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00068}00068\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00070}00070\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ getNormalizedQuoteCharacter(\textcolor{keywordtype}{string}\ \$character):\ string}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00071}00071\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)in\_array(\$character,\ self::DOUBLE\_QUOTES,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_a7f8a185a5478a0d65df617b0f7b01d74}{Quote::DOUBLE\_QUOTE}};}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\(\backslash\)in\_array(\$character,\ self::SINGLE\_QUOTES,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_league_1_1_common_mark_1_1_extension_1_1_smart_punct_1_1_quote_af2ca1a22d8e8742a6da9b05b098da7ce}{Quote::SINGLE\_QUOTE}};}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00078}00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$character;}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00081}00081\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00086}00086\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ determineFlanking(\textcolor{keywordtype}{string}\ \$charBefore,\ \textcolor{keywordtype}{string}\ \$charAfter):\ array}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00087}00087\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \$afterIsWhitespace\ \ \ =\ \(\backslash\)preg\_match(\textcolor{stringliteral}{'/\(\backslash\)pZ|\(\backslash\)s/u'},\ \$charAfter);}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \$afterIsPunctuation\ \ =\ \(\backslash\)preg\_match(RegexHelper::REGEX\_PUNCTUATION,\ \$charAfter);}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00090}00090\ \ \ \ \ \ \ \ \ \$beforeIsWhitespace\ \ =\ \(\backslash\)preg\_match(\textcolor{stringliteral}{'/\(\backslash\)pZ|\(\backslash\)s/u'},\ \$charBefore);}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \$beforeIsPunctuation\ =\ \(\backslash\)preg\_match(RegexHelper::REGEX\_PUNCTUATION,\ \$charBefore);}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \$leftFlanking\ =\ !\ \$afterIsWhitespace\ \&\&}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00094}00094\ \ \ \ \ \ \ \ \ \ \ \ \ !\ (\$afterIsPunctuation\ \&\&}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !\ \$beforeIsWhitespace\ \&\&}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !\ \$beforeIsPunctuation);}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00097}00097\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00098}00098\ \ \ \ \ \ \ \ \ \$rightFlanking\ =\ !\ \$beforeIsWhitespace\ \&\&}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ !\ (\$beforeIsPunctuation\ \&\&}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !\ \$afterIsWhitespace\ \&\&}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ !\ \$afterIsPunctuation);}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [\$leftFlanking,\ \$rightFlanking];}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00104}00104\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_quote_parser_8php_source_l00105}00105\ \}}
+
+\end{DoxyCode}

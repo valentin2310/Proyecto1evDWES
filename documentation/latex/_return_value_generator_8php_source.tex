@@ -1,0 +1,214 @@
+\doxysection{Return\+Value\+Generator.\+php}
+\hypertarget{_return_value_generator_8php_source}{}\label{_return_value_generator_8php_source}\index{vendor/phpunit/phpunit/src/Framework/MockObject/Runtime/ReturnValueGenerator.php@{vendor/phpunit/phpunit/src/Framework/MockObject/Runtime/ReturnValueGenerator.php}}
+\mbox{\hyperlink{_return_value_generator_8php}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00001}00001\ <?php\ declare(strict\_types=1);}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00002}00002\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00003}00003\ \textcolor{comment}{\ *\ This\ file\ is\ part\ of\ PHPUnit.}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00004}00004\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00005}00005\ \textcolor{comment}{\ *\ (c)\ Sebastian\ Bergmann\ <sebastian@phpunit.de>}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00006}00006\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00007}00007\ \textcolor{comment}{\ *\ For\ the\ full\ copyright\ and\ license\ information,\ please\ view\ the\ LICENSE}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00008}00008\ \textcolor{comment}{\ *\ file\ that\ was\ distributed\ with\ this\ source\ code.}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00009}00009\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00010}00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_p_h_p_unit_1_1_framework_1_1_mock_object}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject}};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00012}00012\ use\ \textcolor{keyword}{function}\ array\_keys;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00013}00013\ use\ \textcolor{keyword}{function}\ array\_map;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00014}00014\ use\ \textcolor{keyword}{function}\ explode;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00015}00015\ use\ \textcolor{keyword}{function}\ in\_array;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00016}00016\ use\ \textcolor{keyword}{function}\ interface\_exists;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00017}00017\ use\ \textcolor{keyword}{function}\ sprintf;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00018}00018\ use\ \textcolor{keyword}{function}\ str\_contains;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00019}00019\ use\ \textcolor{keyword}{function}\ str\_ends\_with;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00020}00020\ use\ \textcolor{keyword}{function}\ str\_starts\_with;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00021}00021\ use\ \textcolor{keyword}{function}\ substr;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00022}00022\ use\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_generator_1_1_generator}{PHPUnit\(\backslash\)Framework\(\backslash\)MockObject\(\backslash\)Generator\(\backslash\)Generator}};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00023}00023\ use\ ReflectionClass;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00024}00024\ use\ stdClass;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00025}00025\ use\ Throwable;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00030}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_return_value_generator}{00030}}\ \textcolor{keyword}{final}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_return_value_generator}{ReturnValueGenerator}}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00031}00031\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00039}\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_return_value_generator_ab927b5c9250c04944b81d239a7a61203}{00039}}\ \ \ \ \ \textcolor{keyword}{public}\ \textcolor{keyword}{function}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_return_value_generator_ab927b5c9250c04944b81d239a7a61203}{generate}}(\textcolor{keywordtype}{string}\ \$className,\ \textcolor{keywordtype}{string}\ \$methodName,\ \textcolor{keywordtype}{string}\ \$stubClassName,\ \textcolor{keywordtype}{string}\ \$returnType):\ mixed}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00040}00040\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00041}00041\ \ \ \ \ \ \ \ \ \$intersection\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00042}00042\ \ \ \ \ \ \ \ \ \$union\ \ \ \ \ \ \ \ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00044}00044\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$returnType,\ \textcolor{charliteral}{'|'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \$types\ =\ explode(\textcolor{charliteral}{'|'},\ \$returnType);}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \$union\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (array\_keys(\$types)\ as\ \$key)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_starts\_with(\$types[\$key],\ \textcolor{charliteral}{'('})\ \&\&\ str\_ends\_with(\$types[\$key],\ \textcolor{charliteral}{')'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$types[\$key]\ =\ substr(\$types[\$key],\ 1,\ -\/1);}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00053}00053\ \ \ \ \ \ \ \ \ \}\ elseif\ (str\_contains(\$returnType,\ \textcolor{charliteral}{'\&'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \$types\ \ \ \ \ \ \ \ =\ explode(\textcolor{charliteral}{'\&'},\ \$returnType);}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \$intersection\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00056}00056\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \$types\ =\ [\$returnType];}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00058}00058\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00060}00060\ \ \ \ \ \ \ \ \ \$types\ =\ array\_map(\textcolor{stringliteral}{'strtolower'},\ \$types);}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00062}00062\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$intersection)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00063}00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\textcolor{stringliteral}{''},\ \$types,\ \textcolor{keyword}{true})\ ||}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00064}00064\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in\_array(\textcolor{stringliteral}{'null'},\ \$types,\ \textcolor{keyword}{true})\ ||}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00065}00065\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in\_array(\textcolor{stringliteral}{'mixed'},\ \$types,\ \textcolor{keyword}{true})\ ||}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in\_array(\textcolor{stringliteral}{'void'},\ \$types,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00067}00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{null};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\textcolor{stringliteral}{'true'},\ \$types,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00071}00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\textcolor{stringliteral}{'false'},\ \$types,\ \textcolor{keyword}{true})\ ||}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00075}00075\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in\_array(\textcolor{stringliteral}{'bool'},\ \$types,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00077}00077\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00079}00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\textcolor{stringliteral}{'float'},\ \$types,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00080}00080\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0.0;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00081}00081\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00083}00083\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\textcolor{stringliteral}{'int'},\ \$types,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00084}00084\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00085}00085\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00087}00087\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\textcolor{stringliteral}{'string'},\ \$types,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00088}00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00089}00089\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00091}00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\textcolor{stringliteral}{'array'},\ \$types,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00092}00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ [];}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00093}00093\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00095}00095\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\textcolor{stringliteral}{'static'},\ \$types,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00096}00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>newInstanceOf(\$stubClassName,\ \$className,\ \$methodName);}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00097}00097\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\textcolor{stringliteral}{'object'},\ \$types,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00100}00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{new}\ stdClass;}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00101}00101\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\textcolor{stringliteral}{'callable'},\ \$types,\ \textcolor{keyword}{true})\ ||}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00104}00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in\_array(\textcolor{stringliteral}{'closure'},\ \$types,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00105}00105\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ ():\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00106}00106\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00107}00107\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (in\_array(\textcolor{stringliteral}{'traversable'},\ \$types,\ \textcolor{keyword}{true})\ ||}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00111}00111\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in\_array(\textcolor{stringliteral}{'generator'},\ \$types,\ \textcolor{keyword}{true})\ ||}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00112}00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ in\_array(\textcolor{stringliteral}{'iterable'},\ \$types,\ \textcolor{keyword}{true}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00113}00113\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{hamcrest_2hamcrest-php_2generator_2_run_8php_ab328ac5b606185b5e1706aa41380cc76}{\$generator}}\ =\ \textcolor{keyword}{static}\ \textcolor{keyword}{function}\ ():\ \(\backslash\)\mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_generator_1_1_generator}{Generator}}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00114}00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00115}00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ yield\ from\ [];}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00116}00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00118}00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{hamcrest_2hamcrest-php_2generator_2_run_8php_ab328ac5b606185b5e1706aa41380cc76}{\$generator}}();}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00119}00119\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\$union)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>testDoubleFor(\$returnType,\ \$className,\ \$methodName);}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00123}00123\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00124}00124\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00126}00126\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$union)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00127}00127\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$types\ as\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00128}00128\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (str\_contains(\$type,\ \textcolor{charliteral}{'\&'}))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00129}00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$\_types\ =\ explode(\textcolor{charliteral}{'\&'},\ \$type);}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00131}00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$this-\/>onlyInterfaces(\$\_types))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00132}00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>testDoubleForIntersectionOfInterfaces(\$\_types,\ \$className,\ \$methodName);}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00133}00133\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00134}00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00135}00135\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00136}00136\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00138}00138\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$intersection\ \&\&\ \$this-\/>onlyInterfaces(\$types))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00139}00139\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \$this-\/>testDoubleForIntersectionOfInterfaces(\$types,\ \$className,\ \$methodName);}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00140}00140\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00141}00141\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00142}00142\ \ \ \ \ \ \ \ \ \$reason\ =\ \textcolor{stringliteral}{''};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00144}00144\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\$union)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00145}00145\ \ \ \ \ \ \ \ \ \ \ \ \ \$reason\ =\ \textcolor{stringliteral}{'\ because\ the\ declared\ return\ type\ is\ a\ union'};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00146}00146\ \ \ \ \ \ \ \ \ \}\ elseif\ (\$intersection)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00147}00147\ \ \ \ \ \ \ \ \ \ \ \ \ \$reason\ =\ \textcolor{stringliteral}{'\ because\ the\ declared\ return\ type\ is\ an\ intersection'};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00148}00148\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00150}00150\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_p_h_p_unit_1_1_framework_1_1_mock_object_1_1_runtime_exception}{RuntimeException}}(}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00151}00151\ \ \ \ \ \ \ \ \ \ \ \ \ sprintf(}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00152}00152\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Return\ value\ for\ \%s::\%s()\ cannot\ be\ generated\%s,\ please\ configure\ a\ return\ value\ for\ this\ method'},}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00153}00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$className,}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00154}00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$methodName,}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00155}00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$reason,}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00156}00156\ \ \ \ \ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00157}00157\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00158}00158\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00163}00163\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ onlyInterfaces(array\ \$types):\ bool}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00164}00164\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00165}00165\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{foreach}\ (\$types\ as\ \$type)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00166}00166\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!interface\_exists(\$type))\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00167}00167\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00168}00168\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00169}00169\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00172}00172\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00173}00173\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00181}00181\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ newInstanceOf(\textcolor{keywordtype}{string}\ \$stubClassName,\ \textcolor{keywordtype}{string}\ \$className,\ \textcolor{keywordtype}{string}\ \$methodName):\ MockObject}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00182}00182\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00183}00183\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{new}\ ReflectionClass(\$stubClassName))-\/>newInstanceWithoutConstructor();}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00185}00185\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Throwable\ \$t)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00187}00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sprintf(}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00188}00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Return\ value\ for\ \%s::\%s()\ cannot\ be\ generated:\ \%s'},}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00189}00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$className,}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00190}00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$methodName,}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00191}00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$t-\/>getMessage(),}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00192}00192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00193}00193\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00194}00194\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00195}00195\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00204}00204\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ testDoubleFor(\textcolor{keywordtype}{string}\ \$type,\ \textcolor{keywordtype}{string}\ \$className,\ \textcolor{keywordtype}{string}\ \$methodName):\ Stub}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00205}00205\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00206}00206\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00207}00207\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{new}\ Generator)-\/>testDouble(\$type,\ \textcolor{keyword}{false},\ [],\ [],\ \textcolor{stringliteral}{''},\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00208}00208\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Throwable\ \$t)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00209}00209\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00210}00210\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sprintf(}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00211}00211\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Return\ value\ for\ \%s::\%s()\ cannot\ be\ generated:\ \%s'},}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$className,}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00213}00213\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$methodName,}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$t-\/>getMessage(),}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00215}00215\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00217}00217\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00218}00218\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00227}00227\ \ \ \ \ \textcolor{keyword}{private}\ \textcolor{keyword}{function}\ testDoubleForIntersectionOfInterfaces(array\ \$types,\ \textcolor{keywordtype}{string}\ \$className,\ \textcolor{keywordtype}{string}\ \$methodName):\ Stub}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00228}00228\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00229}00229\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\textcolor{keyword}{new}\ Generator)-\/>testDoubleForInterfaceIntersection(\$types,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00231}00231\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{catch}\ (Throwable\ \$t)\ \{}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ \textcolor{keyword}{new}\ RuntimeException(}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sprintf(}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00234}00234\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{'Return\ value\ for\ \%s::\%s()\ cannot\ be\ generated:\ \%s'},}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$className,}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$methodName,}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00237}00237\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$t-\/>getMessage(),}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ),}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00240}00240\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00241}00241\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{_return_value_generator_8php_source_l00242}00242\ \}}
+
+\end{DoxyCode}
